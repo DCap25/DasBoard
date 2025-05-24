@@ -10,11 +10,7 @@ const app = express();
 // Set up middleware
 app.use(
   cors({
-    origin: [
-      'https://scintillating-marzipan-11392c.netlify.app',
-      'http://localhost:5173',
-      'http://localhost:3000',
-    ],
+    origin: ['https://das-board-app.netlify.app', 'http://localhost:5173', 'http://localhost:3000'],
     credentials: true,
   })
 );

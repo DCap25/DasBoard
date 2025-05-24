@@ -100,12 +100,12 @@ const AuthPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-orange-500">
         <div className="flex flex-col items-center gap-3">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
           {loadingTimeout && (
-            <div className="text-sm text-gray-500 max-w-md text-center mt-4 flex items-center gap-2 bg-amber-50 p-2 rounded border border-amber-200">
-              <AlertCircle className="h-4 w-4 text-amber-500" />
+            <div className="text-sm text-white max-w-md text-center mt-4 flex items-center gap-2 bg-orange-600 p-2 rounded border border-orange-400">
+              <AlertCircle className="h-4 w-4 text-orange-200" />
               <span>
                 Taking longer than expected. Please try refreshing the page if this continues.
               </span>
@@ -138,58 +138,68 @@ const AuthPage: React.FC = () => {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <div className="w-full max-w-md">
-        <Card>
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">Das Board</CardTitle>
-            {(forceLogin || noRedirect) && (
-              <p className="text-sm text-center text-green-600">
-                Force login mode active - you can log in again
+    <div className="min-h-screen bg-orange-500">
+      {/* Black border top section with 1" height (approximately 96px) */}
+      <div className="h-24 bg-black flex items-center justify-center">
+        <h1 className="text-white text-3xl font-bold text-center">The DAS Board</h1>
+      </div>
+
+      {/* Main content area */}
+      <div className="flex items-center justify-center py-12">
+        <div className="w-full max-w-md">
+          <Card className="bg-white">
+            <CardHeader className="space-y-1">
+              <CardTitle className="text-2xl font-bold text-center text-gray-800">
+                The DAS Board Login
+              </CardTitle>
+              {(forceLogin || noRedirect) && (
+                <p className="text-sm text-center text-green-600">
+                  Force login mode active - you can log in again
+                </p>
+              )}
+            </CardHeader>
+            <CardContent>
+              <LoginForm />
+            </CardContent>
+            <CardFooter className="flex flex-col gap-2">
+              <p className="text-sm text-gray-500 text-center">
+                Don't have an account? Contact your administrator.
               </p>
-            )}
-          </CardHeader>
-          <CardContent>
-            <LoginForm />
-          </CardContent>
-          <CardFooter className="flex flex-col gap-2">
-            <p className="text-sm text-gray-500 text-center">
-              Don't have an account? Contact your administrator.
-            </p>
-            <div className="text-center mt-2 flex flex-col gap-1">
-              <a
-                href="/debug-auth"
-                className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
-              >
-                Test User Login
-              </a>
-              <a
-                href="/direct-login"
-                className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-bold"
-              >
-                Reliable Direct Login
-              </a>
-              <a
-                href="/force-login"
-                className="text-xs text-red-600 hover:text-red-800 hover:underline"
-              >
-                Emergency Force Login
-              </a>
-              <a
-                href="/group-admin-bypass?auto=true"
-                className="text-xs text-green-600 hover:text-green-800 hover:underline font-bold"
-              >
-                ★ Direct Group Admin Login ★
-              </a>
-              <a
-                href="/logout"
-                className="text-xs text-red-600 hover:text-red-800 hover:underline mt-2"
-              >
-                Force Logout
-              </a>
-            </div>
-          </CardFooter>
-        </Card>
+              <div className="text-center mt-2 flex flex-col gap-1">
+                <a
+                  href="/debug-auth"
+                  className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                >
+                  Test User Login
+                </a>
+                <a
+                  href="/direct-login"
+                  className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-bold"
+                >
+                  Reliable Direct Login
+                </a>
+                <a
+                  href="/force-login"
+                  className="text-xs text-red-600 hover:text-red-800 hover:underline"
+                >
+                  Emergency Force Login
+                </a>
+                <a
+                  href="/group-admin-bypass?auto=true"
+                  className="text-xs text-green-600 hover:text-green-800 hover:underline font-bold"
+                >
+                  ★ Direct Group Admin Login ★
+                </a>
+                <a
+                  href="/logout"
+                  className="text-xs text-red-600 hover:text-red-800 hover:underline mt-2"
+                >
+                  Force Logout
+                </a>
+              </div>
+            </CardFooter>
+          </Card>
+        </div>
       </div>
 
       <AuthDebugButton placement="bottom-right" />
