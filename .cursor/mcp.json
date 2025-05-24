@@ -1,0 +1,26 @@
+{
+  "mcpServers": {
+    "supabase-main": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "sbp_ad02d08c9feedc846628181b2bc70955003a56a3"
+      ]
+    },
+    "supabase-dealership1": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "sbp_ad02d08c9feedc846628181b2bc70955003a56a3"
+      ]
+    }
+  }
+}

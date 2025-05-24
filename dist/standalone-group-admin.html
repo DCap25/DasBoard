@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Group Admin Dashboard</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .card {
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      .btn {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        text-align: center;
+        border-radius: 0.25rem;
+        cursor: pointer;
+      }
+      .btn-primary {
+        color: white;
+        background-color: #8b5cf6;
+      }
+      .btn-primary:hover {
+        background-color: #7c3aed;
+      }
+      .btn-secondary {
+        color: white;
+        background-color: #6b7280;
+      }
+      .btn-secondary:hover {
+        background-color: #4b5563;
+      }
+      .loader {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #8b5cf6;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      .badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+      .badge-green {
+        background-color: #d1fae5;
+        color: #065f46;
+      }
+      .badge-yellow {
+        background-color: #fef3c7;
+        color: #92400e;
+      }
+      .badge-red {
+        background-color: #fee2e2;
+        color: #b91c1c;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto py-8 px-4">
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-bold">Dealer Group Admin Dashboard</h1>
+        <div>
+          <span id="userEmail" class="mr-4 text-sm">Not logged in</span>
+          <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="card bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+          <h2 class="text-xl font-semibold mb-2">Dealership Group</h2>
+          <p class="text-3xl font-bold">Midwest Motors</p>
+          <p class="mt-2 text-indigo-100">Group ID: GRP-28764</p>
+        </div>
+        <div class="card">
+          <h2 class="text-xl font-semibold mb-2">Total Dealerships</h2>
+          <p class="text-3xl font-bold" id="totalDealerships">--</p>
+          <p class="mt-2 text-gray-500"><span id="activeDealerships">--</span> active</p>
+        </div>
+        <div class="card">
+          <h2 class="text-xl font-semibold mb-2">Total Staff</h2>
+          <p class="text-3xl font-bold" id="totalStaff">--</p>
+          <p class="mt-2 text-gray-500">Across all dealerships</p>
+        </div>
+      </div>
+
+      <div class="mb-8">
+        <div class="card">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">Dealerships Overview</h2>
+            <button class="btn btn-primary" id="addDealershipBtn">Add Dealership</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full">
+              <thead>
+                <tr class="bg-gray-50">
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Name
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Location
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Staff
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Status
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="dealershipTableBody" class="bg-white divide-y divide-gray-200">
+                <!-- Dealership rows will be inserted here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="card">
+          <h2 class="text-xl font-semibold mb-4">Group Performance</h2>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-indigo-50 p-4 rounded">
+              <p class="text-sm text-gray-500">Total Sales (MTD)</p>
+              <p class="text-2xl font-bold">$2.4M</p>
+            </div>
+            <div class="bg-indigo-50 p-4 rounded">
+              <p class="text-sm text-gray-500">Units Sold (MTD)</p>
+              <p class="text-2xl font-bold">87</p>
+            </div>
+            <div class="bg-indigo-50 p-4 rounded">
+              <p class="text-sm text-gray-500">Avg. Sale Price</p>
+              <p class="text-2xl font-bold">$27,931</p>
+            </div>
+            <div class="bg-indigo-50 p-4 rounded">
+              <p class="text-sm text-gray-500">Inventory Value</p>
+              <p class="text-2xl font-bold">$12.7M</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="text-xl font-semibold mb-4">Recent Activity</h2>
+          <div id="activityList" class="space-y-3">
+            <div class="loader" id="activityLoader"></div>
+            <!-- Activity items will be inserted here -->
+          </div>
+        </div>
+      </div>
+
+      <div id="modal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+        <div class="absolute inset-0 bg-black opacity-50"></div>
+        <div class="bg-white p-6 rounded-lg shadow-xl z-10 w-full max-w-md">
+          <h3 class="text-lg font-semibold mb-4" id="modalTitle">Modal Title</h3>
+          <div id="modalContent">Modal content goes here</div>
+          <div class="mt-6 flex justify-end">
+            <button class="btn btn-primary mr-2" id="modalConfirmBtn">Confirm</button>
+            <button class="px-4 py-2 text-gray-600" id="modalCancelBtn">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // Directly set session data without any redirects
+        function setSessionData() {
+          // Hardcoded group admin session
+          const sessionData = {
+            access_token:
+              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ1ODQxMzgwLCJzdWIiOiJjM2JmNjMwZS1mMWEwLTRjODAtYTMxOC04MzZkYmExZjdlMTQiLCJlbWFpbCI6Imdyb3VwMS5hZG1pbkBleGFtcGxldGVzdC5jb20iLCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzEzNzA1MzgwfV0sInNlc3Npb25faWQiOiJjODQ0ZTdjMy04MDYyLTRmZjEtOWQ0MC0xNmY0Y2Q1Zjk4MDMifQ.6k-nkMlkIaHdKGAB5Pp4XdXv9sm52zBh8_YwgF2QWjk',
+            refresh_token: 'MOCK_REFRESH_TOKEN',
+            expires_at: Math.floor(Date.now() / 1000) + 3600,
+            user: {
+              id: 'c3bf630e-f1a0-4c80-a318-836dba1f7e14',
+              app_metadata: {
+                provider: 'email',
+                providers: ['email'],
+              },
+              user_metadata: {
+                is_group_admin: true,
+                role: 'dealer_group_admin',
+              },
+              aud: 'authenticated',
+              email: 'group1.admin@exampletest.com',
+            },
+          };
+
+          // Store in localStorage
+          localStorage.setItem('sb-iugjtokydvbcvmrpeziv-auth-token', JSON.stringify(sessionData));
+          sessionStorage.setItem('is_group_admin', 'true');
+
+          // Update UI
+          const userEmailEl = document.getElementById('userEmail');
+          userEmailEl.textContent = sessionData.user.email;
+
+          console.log('Group admin session set successfully');
+          return sessionData;
+        }
+
+        // Set session immediately
+        const sessionData = setSessionData();
+
+        // Load mock data
+        function loadMockData() {
+          document.getElementById('totalDealerships').textContent = '8';
+          document.getElementById('activeDealerships').textContent = '7';
+          document.getElementById('totalStaff').textContent = '143';
+
+          // Load dealership data
+          const dealerships = [
+            {
+              id: 1,
+              name: 'Midwest Motors Downtown',
+              location: 'Chicago, IL',
+              staff: 32,
+              status: 'Active',
+            },
+            {
+              id: 2,
+              name: 'Midwest Motors North',
+              location: 'Evanston, IL',
+              staff: 28,
+              status: 'Active',
+            },
+            {
+              id: 3,
+              name: 'Midwest Motors South',
+              location: 'Orland Park, IL',
+              staff: 24,
+              status: 'Active',
+            },
+            {
+              id: 4,
+              name: 'Midwest Motors West',
+              location: 'Aurora, IL',
+              staff: 21,
+              status: 'Active',
+            },
+            {
+              id: 5,
+              name: 'Midwest Motors Luxury',
+              location: 'Chicago, IL',
+              staff: 15,
+              status: 'Active',
+            },
+            {
+              id: 6,
+              name: 'Midwest Motors Used',
+              location: 'Naperville, IL',
+              staff: 18,
+              status: 'Active',
+            },
+            {
+              id: 7,
+              name: 'Midwest Motors East',
+              location: 'Gary, IN',
+              staff: 5,
+              status: 'Inactive',
+            },
+            {
+              id: 8,
+              name: 'Midwest Motors Commercial',
+              location: 'Chicago, IL',
+              staff: 0,
+              status: 'Opening Soon',
+            },
+          ];
+
+          const tbody = document.getElementById('dealershipTableBody');
+          dealerships.forEach(d => {
+            const row = document.createElement('tr');
+
+            const nameCell = document.createElement('td');
+            nameCell.className = 'px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900';
+            nameCell.textContent = d.name;
+            row.appendChild(nameCell);
+
+            const locationCell = document.createElement('td');
+            locationCell.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-500';
+            locationCell.textContent = d.location;
+            row.appendChild(locationCell);
+
+            const staffCell = document.createElement('td');
+            staffCell.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-500';
+            staffCell.textContent = d.staff;
+            row.appendChild(staffCell);
+
+            const statusCell = document.createElement('td');
+            statusCell.className = 'px-6 py-4 whitespace-nowrap text-sm';
+            const statusBadge = document.createElement('span');
+            statusBadge.className = 'badge ';
+            if (d.status === 'Active') {
+              statusBadge.className += 'badge-green';
+            } else if (d.status === 'Opening Soon') {
+              statusBadge.className += 'badge-yellow';
+            } else {
+              statusBadge.className += 'badge-red';
+            }
+            statusBadge.textContent = d.status;
+            statusCell.appendChild(statusBadge);
+            row.appendChild(statusCell);
+
+            const actionsCell = document.createElement('td');
+            actionsCell.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-500';
+            const viewBtn = document.createElement('button');
+            viewBtn.className = 'text-indigo-600 hover:text-indigo-900 mr-3';
+            viewBtn.textContent = 'View';
+            viewBtn.addEventListener('click', () => {
+              showModal('Dealership Details', `Viewing details for ${d.name}`);
+            });
+            actionsCell.appendChild(viewBtn);
+
+            const editBtn = document.createElement('button');
+            editBtn.className = 'text-indigo-600 hover:text-indigo-900';
+            editBtn.textContent = 'Edit';
+            editBtn.addEventListener('click', () => {
+              showModal('Edit Dealership', `Editing ${d.name}`);
+            });
+            actionsCell.appendChild(editBtn);
+
+            row.appendChild(actionsCell);
+
+            tbody.appendChild(row);
+          });
+
+          // Load activity data
+          const activities = [
+            { user: 'System', action: 'Monthly report generated', time: '10 minutes ago' },
+            {
+              user: 'John Smith',
+              action: 'Added new inventory items to Midwest Motors Downtown',
+              time: '1 hour ago',
+            },
+            {
+              user: 'Sarah Johnson',
+              action: 'Updated staff list for Midwest Motors North',
+              time: '3 hours ago',
+            },
+            {
+              user: 'Mike Davis',
+              action: 'Changed status of Midwest Motors East to Inactive',
+              time: '1 day ago',
+            },
+            { user: 'Admin', action: 'Scheduled system maintenance', time: '2 days ago' },
+          ];
+
+          const activityList = document.getElementById('activityList');
+          document.getElementById('activityLoader').style.display = 'none';
+
+          activities.forEach(activity => {
+            const activityItem = document.createElement('div');
+            activityItem.className = 'p-3 bg-white rounded-lg shadow-sm';
+
+            const header = document.createElement('div');
+            header.className = 'flex justify-between';
+
+            const user = document.createElement('span');
+            user.className = 'font-medium';
+            user.textContent = activity.user;
+            header.appendChild(user);
+
+            const time = document.createElement('span');
+            time.className = 'text-sm text-gray-500';
+            time.textContent = activity.time;
+            header.appendChild(time);
+
+            activityItem.appendChild(header);
+
+            const action = document.createElement('p');
+            action.className = 'text-sm mt-1';
+            action.textContent = activity.action;
+            activityItem.appendChild(action);
+
+            activityList.appendChild(activityItem);
+          });
+        }
+
+        // Handle button clicks
+        document.getElementById('logoutBtn').addEventListener('click', function () {
+          localStorage.removeItem('sb-iugjtokydvbcvmrpeziv-auth-token');
+          sessionStorage.removeItem('is_group_admin');
+          alert('Logged out successfully!');
+          window.location.href = '/direct-login.html';
+        });
+
+        document.getElementById('addDealershipBtn').addEventListener('click', function () {
+          showModal('Add New Dealership', 'Form to add a new dealership would appear here.');
+        });
+
+        // Modal functionality
+        function showModal(title, content) {
+          document.getElementById('modalTitle').textContent = title;
+          document.getElementById('modalContent').textContent = content;
+          document.getElementById('modal').classList.remove('hidden');
+        }
+
+        document.getElementById('modalCancelBtn').addEventListener('click', function () {
+          document.getElementById('modal').classList.add('hidden');
+        });
+
+        document.getElementById('modalConfirmBtn').addEventListener('click', function () {
+          document.getElementById('modal').classList.add('hidden');
+        });
+
+        // Load mock data after a slight delay to simulate loading
+        setTimeout(loadMockData, 1000);
+      });
+    </script>
+  </body>
+</html>

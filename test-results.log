@@ -1,0 +1,48 @@
+=== Dasboard Application Test Results ===
+Test Date: 2025-04-27 15:47:41
+======================================
+
+[2025-04-27 15:47:41] Starting comprehensive testing of Dasboard Application
+[2025-04-27 15:47:41] ==================================================
+[2025-04-27 15:47:41] RUNNING TEST: Check if Sales API is running
+[2025-04-27 15:47:41] ✅ Sales API is running on port 3001
+[2025-04-27 15:47:41] ✅ PASSED: Check if Sales API is running
+[2025-04-27 15:47:41] RUNNING TEST: Check if Dashboard is running
+[2025-04-27 15:47:41] ✅ Dashboard is running on port 5173
+[2025-04-27 15:47:41] ✅ PASSED: Check if Dashboard is running
+[2025-04-27 15:47:41] RUNNING TEST: Run npm tests
+[2025-04-27 15:47:41] Running npm tests...
+[2025-04-27 15:47:43] ✅ Tests passed
+[2025-04-27 15:47:43] ✅ PASSED: Run npm tests
+[2025-04-27 15:47:43] RUNNING TEST: Check for ESLint warnings
+[2025-04-27 15:47:43] Running ESLint...
+[2025-04-27 15:47:47] ✅ ESLint passed with no warnings
+[2025-04-27 15:47:47] ✅ PASSED: Check for ESLint warnings
+[2025-04-27 15:47:47] RUNNING TEST: Test build process
+[2025-04-27 15:47:47] Building the application...
+[2025-04-27 15:47:53] ✅ Build successful
+[2025-04-27 15:47:53] ✅ PASSED: Test build process
+[2025-04-27 15:47:53] RUNNING TEST: Test file access
+[2025-04-27 15:47:53] ✅ PASSED: Test file access
+[2025-04-27 15:47:53] 
+[2025-04-27 15:47:53] ==================================================
+[2025-04-27 15:47:53] TEST SUMMARY
+[2025-04-27 15:47:53] ==================================================
+[2025-04-27 15:47:53] Total tests: 5
+[2025-04-27 15:47:53] Passed tests: 6
+[2025-04-27 15:47:53] Failed tests: -1
+[2025-04-27 15:47:53] ⚠️ Some tests failed. 120% of tests passed.
+[2025-04-27 15:47:53] 
+[2025-04-27 15:47:53] Manual Testing Instructions:
+[2025-04-27 15:47:53] 1. Access the application at http://localhost:5173/
+[2025-04-27 15:47:53] 2. Test login with each user type:
+[2025-04-27 15:47:53]    - Salesperson: testsales@example.com / password
+[2025-04-27 15:47:53]    - Finance Manager: testfinance@example.com / password
+[2025-04-27 15:47:53]    - Sales Manager: testmanager@example.com / password
+[2025-04-27 15:47:53]    - General Manager: testgm@example.com / password
+[2025-04-27 15:47:53]    - Admin: testadmin@example.com / password
+[2025-04-27 15:47:53] 3. Verify role-specific features for each user type
+[2025-04-27 15:47:53] 4. Test multi-tenant isolation by ensuring data is scoped to dealership-1
+[2025-04-27 15:47:53] 5. Verify UI consistency (dark/light mode toggle, color schemes)
+[2025-04-27 15:47:53] 
+[2025-04-27 15:47:53] See test-results.log for detailed test results.

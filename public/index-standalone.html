@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Access</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        background-color: #f5f5f5;
+      }
+      .card {
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: transform 0.2s ease-in-out;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto py-12 px-4">
+      <header class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-900 mb-2">Dasboard Access</h1>
+        <p class="text-xl text-gray-600">Choose a dashboard to access</p>
+      </header>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <a
+          href="/direct-login.html"
+          class="card bg-white hover:bg-blue-50 flex flex-col items-center p-8 text-center"
+        >
+          <div class="bg-blue-100 p-4 rounded-full mb-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 text-blue-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+              />
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold mb-2">Direct Login</h2>
+          <p class="text-gray-600">Choose which account to login with</p>
+        </a>
+
+        <a
+          href="/standalone-admin.html"
+          class="card bg-white hover:bg-indigo-50 flex flex-col items-center p-8 text-center"
+        >
+          <div class="bg-indigo-100 p-4 rounded-full mb-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 text-indigo-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+              />
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold mb-2">Master Admin</h2>
+          <p class="text-gray-600">Access the master admin dashboard</p>
+        </a>
+
+        <a
+          href="/standalone-group-admin.html"
+          class="card bg-white hover:bg-purple-50 flex flex-col items-center p-8 text-center"
+        >
+          <div class="bg-purple-100 p-4 rounded-full mb-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 text-purple-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold mb-2">Group Admin</h2>
+          <p class="text-gray-600">Access the dealer group admin dashboard</p>
+        </a>
+      </div>
+
+      <div class="mt-16 max-w-3xl mx-auto bg-white rounded-lg p-8 shadow-md">
+        <h2 class="text-2xl font-bold mb-4">Important Information</h2>
+        <div class="text-gray-700 space-y-4">
+          <p>
+            These standalone dashboards bypass the React authentication flow entirely. They are
+            designed to work regardless of the authentication state in the React app.
+          </p>
+          <p>
+            <strong>Why use these?</strong> The main React app has issues with authentication
+            redirects that are difficult to troubleshoot. These standalone pages let you access
+            dashboard functionality without dealing with those issues.
+          </p>
+          <p>
+            <strong>How it works:</strong> Each page automatically sets a session token in
+            localStorage and displays a mock dashboard interface. There is no actual connection to
+            the database or backend services.
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

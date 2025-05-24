@@ -1,0 +1,15 @@
+# Vercel Ignore File
+# This file prevents accidental deployment until auth issues are resolved
+
+# Ignore the entire project for now
+/*
+
+# Only allow specific files when we're ready to deploy again
+!/.vercel/README.txt
+
+# Only ignore node_modules and other development files
+node_modules
+.git
+.env.local
+.env.development
+.env.development.local 

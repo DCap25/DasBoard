@@ -1,0 +1,13 @@
+// First, store the signup request in Supabase using RPC
+console.log("Inserting signup request into Supabase");
+
+// Use RPC to call the stored procedure
+const { data, error: supabaseError } = await supabase
+  .rpc('handle_signup_request', {
+    p_dealership_name: dealershipName,
+    p_contact_person: contactName,
+    p_email: email,
+    p_phone: phone,
+    p_tier: selectedTier,
+    p_status: selectedTier === 'trial' ? 'trial_started' : 'pending_payment'
+  }); 

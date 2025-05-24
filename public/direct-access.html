@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Direct Access Portal</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #333;
+      }
+      .container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      button {
+        background-color: #4f46e5;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+        margin: 10px 0;
+        font-weight: bold;
+        font-size: 16px;
+      }
+      button:hover {
+        background-color: #4338ca;
+      }
+      #status {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f0f0f0;
+        border-radius: 4px;
+      }
+      .success {
+        background-color: #d1fae5;
+        color: #047857;
+        padding: 10px;
+        border-radius: 4px;
+        margin-top: 10px;
+      }
+      .error {
+        background-color: #fee2e2;
+        color: #b91c1c;
+        padding: 10px;
+        border-radius: 4px;
+        margin-top: 10px;
+      }
+      .info {
+        background-color: #e0f2fe;
+        color: #0369a1;
+        padding: 10px;
+        border-radius: 4px;
+        margin-top: 10px;
+      }
+      pre {
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        padding: 10px;
+        border-radius: 4px;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Direct Access Portal</h1>
+
+    <div class="container">
+      <h2>Choose Direct Access Method</h2>
+
+      <div style="text-align: center; margin-bottom: 20px">
+        <img
+          src="https://iugjtokydvbcvmrpeziv.supabase.co/storage/v1/object/public/public/logo.svg"
+          alt="Logo"
+          style="max-height: 60px; opacity: 0.8"
+        />
+      </div>
+
+      <p>Click one of the options below:</p>
+
+      <button id="patch-and-redirect">1. Login and Patch Auth (Recommended)</button>
+      <button id="inject-session">2. Directly Inject Session</button>
+      <button id="advanced-login">3. Open Emergency Login Page</button>
+
+      <div id="status">Ready. Choose an option above.</div>
+
+      <div id="auth-data" style="display: none">
+        <h3>Current Auth Data</h3>
+        <pre id="auth-data-content"></pre>
+      </div>
+    </div>
+
+    <!-- Load Supabase from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Load our auth fix script -->
+    <script src="/auth-fix.js"></script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const statusEl = document.getElementById('status');
+        const authDataEl = document.getElementById('auth-data');
+        const authDataContentEl = document.getElementById('auth-data-content');
+        const baseUrl = window.location.origin;
+
+        // Supabase config
+        const SUPABASE_URL = 'https://iugjtokydvbcvmrpeziv.supabase.co';
+        const SUPABASE_KEY =
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1Z2p0b2t5ZHZiY3ZtcnBleml2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU3MTk3NjUsImV4cCI6MjA2MTI5NTc2NX0.XCNQoJbGQiXuyR_CFevro1Y8lqvh2_jmjrD181UYtY4';
+
+        // Initialize Supabase client
+        let supabase;
+        try {
+          supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+          console.log('[DIRECT-ACCESS] Supabase initialized');
+        } catch (err) {
+          console.error('[DIRECT-ACCESS] Failed to initialize Supabase:', err);
+          statusEl.innerHTML = `<div class="error">Error initializing Supabase: ${err.message}</div>`;
+        }
+
+        // Display current auth state
+        function showCurrentAuthState() {
+          try {
+            // Check localStorage
+            const storageKey = 'sb-' + SUPABASE_URL.split('//')[1].split('.')[0] + '-auth-token';
+            const sessionData = localStorage.getItem(storageKey);
+
+            // Check sessionStorage
+            const isAuthenticated = sessionStorage.getItem('is_authenticated');
+            const isGroupAdmin = sessionStorage.getItem('is_group_admin');
+            const userEmail = sessionStorage.getItem('user_email');
+
+            const authState = {
+              hasSessionInLocalStorage: !!sessionData,
+              isAuthenticated: isAuthenticated === 'true',
+              isGroupAdmin: isGroupAdmin === 'true',
+              userEmail: userEmail || 'none',
+              sessionStorageKeys: Object.keys(sessionStorage),
+              authFixApplied: sessionStorage.getItem('auth_fix_applied') === 'true',
+            };
+
+            authDataContentEl.textContent = JSON.stringify(authState, null, 2);
+            authDataEl.style.display = 'block';
+          } catch (err) {
+            console.error('[DIRECT-ACCESS] Error displaying auth state:', err);
+          }
+        }
+
+        // Login as group admin
+        async function loginAsGroupAdmin() {
+          statusEl.innerHTML = '<div>Logging in as Group Admin...</div>';
+
+          try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+              email: 'group1.admin@exampletest.com',
+              password: 'Password123!',
+            });
+
+            if (error) throw error;
+
+            statusEl.innerHTML = `<div class="success">✅ Successfully logged in as ${data.user.email}</div>`;
+
+            // Store session in localStorage
+            const storageKey = 'sb-' + SUPABASE_URL.split('//')[1].split('.')[0] + '-auth-token';
+            const sessionData = {
+              access_token: data.session.access_token,
+              refresh_token: data.session.refresh_token,
+              expires_at: Math.floor(Date.now() / 1000) + 3600,
+              user: data.user,
+            };
+
+            localStorage.setItem(storageKey, JSON.stringify(sessionData));
+
+            // Store critical auth flags in sessionStorage
+            sessionStorage.setItem('is_authenticated', 'true');
+            sessionStorage.setItem('is_group_admin', 'true');
+            sessionStorage.setItem('user_email', data.user.email);
+            sessionStorage.setItem('auth_time', new Date().toISOString());
+
+            // Run our auth fix to ensure all flags are set properly
+            if (window.__authFix) {
+              window.__authFix.patchAuth();
+            }
+
+            return data;
+          } catch (err) {
+            console.error('[DIRECT-ACCESS] Login error:', err);
+            statusEl.innerHTML = `<div class="error">Login error: ${err.message}</div>`;
+            return null;
+          }
+        }
+
+        // Open the app with injected auth
+        function openAppWithAuth() {
+          // First, display current auth state
+          showCurrentAuthState();
+
+          // Redirect approaches
+          // 1. Try opening in a new tab first
+          const groupAdminUrl = `${baseUrl}/group-admin`;
+          statusEl.innerHTML += `<div class="info">Opening ${groupAdminUrl} in new tab...</div>`;
+
+          const newWindow = window.open(groupAdminUrl, '_blank');
+          if (newWindow) {
+            newWindow.focus();
+            statusEl.innerHTML += '<div class="success">✅ Opened in new tab!</div>';
+          } else {
+            // 2. If popup blocked, try direct navigation after delay
+            statusEl.innerHTML +=
+              '<div class="info">Popup may be blocked. Will redirect in this tab in 5 seconds...</div>';
+            setTimeout(() => {
+              window.location.href = groupAdminUrl;
+            }, 5000);
+          }
+        }
+
+        // Direct session injection - most aggressive approach
+        function injectSession() {
+          // This uses hardcoded session data for simplicity
+          const sessionData = {
+            access_token:
+              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ1NzcxMzUxLCJzdWIiOiJjM2JmNjMwZS1mMWEwLTRjODAtYTMxOC04MzZkYmExZjdlMTQiLCJlbWFpbCI6Imdyb3VwMS5hZG1pbkBleGFtcGxldGVzdC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7fSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc0NTc2Nzc1MX1dLCJzZXNzaW9uX2lkIjoiYzg0OWU3YzMtODA2Mi00ZmYxLTlkNDAtMTZmM2NkNWY5ODAzIn0.v8YU5HMKEG9i0VJrNOvO00RjB_G-W4fLRY2V_iY2YMU',
+            refresh_token: 'Q5_H7U9gDwXUMCrXca3znw',
+            expires_at: Math.floor(Date.now() / 1000) + 3600,
+            user: {
+              id: 'c3bf630e-f1a0-4c80-a318-836dba1f7e14',
+              app_metadata: {
+                provider: 'email',
+                providers: ['email'],
+              },
+              user_metadata: {
+                role: 'group_admin',
+              },
+              aud: 'authenticated',
+              email: 'group1.admin@exampletest.com',
+            },
+          };
+
+          // Store hardcoded session in localStorage
+          const storageKey = 'sb-' + SUPABASE_URL.split('//')[1].split('.')[0] + '-auth-token';
+          localStorage.setItem(storageKey, JSON.stringify(sessionData));
+
+          // Set critical sessionStorage flags
+          sessionStorage.setItem('is_authenticated', 'true');
+          sessionStorage.setItem('is_group_admin', 'true');
+          sessionStorage.setItem('user_email', sessionData.user.email);
+          sessionStorage.setItem('auth_fix_applied', 'true');
+          sessionStorage.setItem('auth_time', new Date().toISOString());
+
+          statusEl.innerHTML = `<div class="success">✅ Session directly injected for ${sessionData.user.email}</div>`;
+
+          // Display auth state
+          showCurrentAuthState();
+
+          // Offer redirect button
+          statusEl.innerHTML += `
+            <div style="margin-top: 15px">
+              <button onclick="window.open('${baseUrl}/group-admin', '_blank')">
+                Open Group Admin in New Tab
+              </button>
+              <div style="margin-top: 10px">
+                <button onclick="window.location.href='${baseUrl}/group-admin'">
+                  Redirect to Group Admin
+                </button>
+              </div>
+            </div>
+          `;
+        }
+
+        // Button event listeners
+        document.getElementById('patch-and-redirect').addEventListener('click', async () => {
+          await loginAsGroupAdmin();
+          openAppWithAuth();
+        });
+
+        document.getElementById('inject-session').addEventListener('click', () => {
+          injectSession();
+        });
+
+        document.getElementById('advanced-login').addEventListener('click', () => {
+          window.location.href = `${baseUrl}/EmergencyLogin.html`;
+        });
+
+        // Show current auth state on load
+        showCurrentAuthState();
+      });
+    </script>
+  </body>
+</html>

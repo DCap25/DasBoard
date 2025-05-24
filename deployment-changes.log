@@ -1,0 +1,53 @@
+# Deployment Changes Log
+
+## Date: April 27, 2025
+
+### Fixed CORS Issues
+1. Updated CORS configuration in the mock API server to properly handle credentials:
+   - Modified sales-api-new/index.js to use specific origins instead of wildcard
+   - Added proper CORS headers for credentials, methods, and allowed headers
+
+### Updated API Service
+1. Modified src/lib/apiService.ts to fix authentication issues:
+   - Improved error handling in the apiRequest function
+   - Added conditional handling for credentials based on environment
+   - Updated signIn endpoint for Supabase compatibility
+
+### Created Production Configuration
+1. Added environment configuration:
+   - Created .env.production with Supabase URL and configuration
+   - Set USE_MOCK_SUPABASE=false for production
+
+2. Added Vercel configuration:
+   - Created vercel.json with build settings and environment variables
+   - Configured SPA routing for client-side navigation
+
+### Build Optimization
+1. Verified build output size:
+   - All chunk sizes are well below the 500kB limit
+   - CSS: 21.39 kB
+   - Main JS: 41.09 kB
+   - Vendor JS: 141.73 kB
+
+2. Tested production build locally:
+   - Confirmed application loads correctly
+   - Verified API connections work as expected
+
+### Documentation
+1. Created deployment-guide.md with instructions for:
+   - GitHub repository setup
+   - Vercel project configuration
+   - Environment variable setup
+   - Post-deployment verification steps
+   - Troubleshooting guidance
+
+2. Created this log file to track deployment changes
+
+### Testing
+1. Verified authentication works with:
+   - Mock API during development
+   - Live Supabase in production mode
+
+2. Confirmed multi-tenant isolation:
+   - Dealership-specific data is properly filtered
+   - Role-based access control functions correctly 

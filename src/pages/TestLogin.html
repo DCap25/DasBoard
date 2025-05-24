@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Login Center</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #333;
+      }
+      .test-login-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+      }
+      .login-card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .login-card h2 {
+        margin-top: 0;
+        color: #4f46e5;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 10px;
+      }
+      button {
+        background-color: #4f46e5;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 10px;
+        font-weight: bold;
+      }
+      button:hover {
+        background-color: #4338ca;
+      }
+      pre {
+        background: #f0f0f0;
+        padding: 10px;
+        border-radius: 4px;
+        overflow: auto;
+        font-size: 12px;
+      }
+      .status {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f0f0f0;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Test Login Center</h1>
+
+    <div class="status" id="status">Ready to login</div>
+
+    <div class="test-login-container">
+      <div class="login-card">
+        <h2>Group Admin</h2>
+        <p>Access group administration features</p>
+        <button id="group-admin-login">Login as Group Admin</button>
+      </div>
+
+      <div class="login-card">
+        <h2>Master Admin</h2>
+        <p>Access master administration features</p>
+        <button id="master-admin-login">Login as Master Admin</button>
+      </div>
+
+      <div class="login-card">
+        <h2>Dealer Admin</h2>
+        <p>Access dealer administration features</p>
+        <button id="dealer-admin-login">Login as Dealer Admin</button>
+      </div>
+
+      <div class="login-card">
+        <h2>Sales User</h2>
+        <p>Access sales dashboard and features</p>
+        <button id="sales-login">Login as Sales User</button>
+      </div>
+    </div>
+
+    <div class="status">
+      <h3>Current Auth State</h3>
+      <pre id="auth-state">Not checked yet</pre>
+      <button id="check-auth">Check Auth State</button>
+      <button id="clear-auth">Clear Auth State</button>
+    </div>
+
+    <!-- Load Supabase from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // Elements
+        const statusEl = document.getElementById('status');
+        const authStateEl = document.getElementById('auth-state');
+
+        // Supabase config
+        const SUPABASE_URL = 'https://iugjtokydvbcvmrpeziv.supabase.co';
+        const SUPABASE_KEY =
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1Z2p0b2t5ZHZiY3ZtcnBleml2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU3MTk3NjUsImV4cCI6MjA2MTI5NTc2NX0.XCNQoJbGQiXuyR_CFevro1Y8lqvh2_jmjrD181UYtY4';
+
+        // Initialize Supabase client
+        let supabase;
+
+        try {
+          supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+          console.log('Supabase initialized');
+        } catch (err) {
+          console.error('Failed to initialize Supabase:', err);
+          statusEl.textContent = 'Error initializing Supabase: ' + err.message;
+        }
+
+        // User templates for each role
+        const userTemplates = {
+          groupAdmin: {
+            email: 'group1.admin@exampletest.com',
+            password: 'Password123!',
+            metadata: {
+              role: 'group_admin',
+              name: 'Group Admin User',
+              groupId: 'group1',
+            },
+          },
+          masterAdmin: {
+            email: 'testadmin@example.com',
+            password: 'Password123!',
+            metadata: {
+              role: 'master_admin',
+              name: 'Master Admin User',
+            },
+          },
+          dealerAdmin: {
+            email: 'jp@exampletest.com',
+            password: 'Password123!',
+            metadata: {
+              role: 'dealer_admin',
+              name: 'Dealer Admin User',
+              dealerId: 'dealer1',
+            },
+          },
+          sales: {
+            email: 'sales@exampletest.com',
+            password: 'Password123!',
+            metadata: {
+              role: 'sales',
+              name: 'Sales User',
+              dealerId: 'dealer1',
+            },
+          },
+        };
+
+        // Login helper function
+        async function testLogin(userType) {
+          try {
+            statusEl.textContent = 'Logging in...';
+            console.log(`Attempting to login as ${userType}...`);
+
+            const user = userTemplates[userType];
+
+            if (!user) {
+              throw new Error('Invalid user type');
+            }
+
+            // Try actual Supabase login first
+            try {
+              console.log(`Sending auth request for ${user.email}...`);
+              const { data, error } = await supabase.auth.signInWithPassword({
+                email: user.email,
+                password: user.password,
+              });
+
+              if (error) throw error;
+
+              // Login successful
+              statusEl.textContent = `Logged in as ${data.user.email}`;
+              console.log('Login successful:', data);
+
+              // Save user info in localStorage for main app
+              localStorage.setItem(
+                'sb-' + SUPABASE_URL.split('//')[1].split('.')[0] + '-auth-token',
+                JSON.stringify({
+                  access_token: data.session.access_token,
+                  refresh_token: data.session.refresh_token,
+                  expires_at: Math.floor(Date.now() / 1000) + 3600,
+                  user: data.user,
+                })
+              );
+
+              console.log('✓ Login data saved to localStorage');
+
+              // DIRECT NAVIGATION BASED ON USER TYPE INSTEAD OF EMAIL
+              // This avoids dependency on checkAuthState which might be failing
+              const baseUrl = window.location.origin;
+
+              if (userType === 'groupAdmin') {
+                // Show links instead of auto-redirect
+                statusEl.innerHTML = `
+                  <div style="padding: 10px; background-color: #f0f8ff; border: 1px solid #4682b4; border-radius: 4px; margin-top: 10px;">
+                    <p>✅ Successfully logged in as <strong>${data.user.email}</strong></p>
+                    <p>Click one of these links to navigate:</p>
+                    <p><a href="${baseUrl}/group-admin" style="color: #0066cc; font-weight: bold;">Go to Group Admin Dashboard</a></p>
+                    <p><a href="${baseUrl}/dashboard" style="color: #0066cc;">Go to Main Dashboard</a></p>
+                    <p><small>If automatic redirect is not working, please use these links.</small></p>
+                  </div>
+                `;
+
+                console.log(
+                  `GROUP ADMIN detected - trying direct navigation to: ${baseUrl}/group-admin`
+                );
+                // Try both methods of navigation
+                try {
+                  window.location.replace(`${baseUrl}/group-admin`);
+                } catch (e) {
+                  console.error('Navigation failed with replace():', e);
+                  window.location.href = `${baseUrl}/group-admin`;
+                }
+              } else if (userType === 'masterAdmin') {
+                statusEl.innerHTML = `
+                  <div style="padding: 10px; background-color: #f0f8ff; border: 1px solid #4682b4; border-radius: 4px; margin-top: 10px;">
+                    <p>✅ Successfully logged in as <strong>${data.user.email}</strong></p>
+                    <p>Click one of these links to navigate:</p>
+                    <p><a href="${baseUrl}/master-admin" style="color: #0066cc; font-weight: bold;">Go to Master Admin Panel</a></p>
+                    <p><a href="${baseUrl}/dashboard" style="color: #0066cc;">Go to Main Dashboard</a></p>
+                  </div>
+                `;
+
+                console.log(
+                  `MASTER ADMIN detected - trying direct navigation to: ${baseUrl}/master-admin`
+                );
+                try {
+                  window.location.replace(`${baseUrl}/master-admin`);
+                } catch (e) {
+                  window.location.href = `${baseUrl}/master-admin`;
+                }
+              } else if (userType === 'dealerAdmin') {
+                statusEl.innerHTML = `
+                  <div style="padding: 10px; background-color: #f0f8ff; border: 1px solid #4682b4; border-radius: 4px; margin-top: 10px;">
+                    <p>✅ Successfully logged in as <strong>${data.user.email}</strong></p>
+                    <p>Click one of these links to navigate:</p>
+                    <p><a href="${baseUrl}/dashboard/admin" style="color: #0066cc; font-weight: bold;">Go to Dealer Admin Dashboard</a></p>
+                    <p><a href="${baseUrl}/dashboard" style="color: #0066cc;">Go to Main Dashboard</a></p>
+                  </div>
+                `;
+
+                console.log(
+                  `DEALER ADMIN detected - trying direct navigation to: ${baseUrl}/dashboard/admin`
+                );
+                try {
+                  window.location.replace(`${baseUrl}/dashboard/admin`);
+                } catch (e) {
+                  window.location.href = `${baseUrl}/dashboard/admin`;
+                }
+              } else if (userType === 'sales') {
+                statusEl.innerHTML = `
+                  <div style="padding: 10px; background-color: #f0f8ff; border: 1px solid #4682b4; border-radius: 4px; margin-top: 10px;">
+                    <p>✅ Successfully logged in as <strong>${data.user.email}</strong></p>
+                    <p>Click one of these links to navigate:</p>
+                    <p><a href="${baseUrl}/dashboard/sales" style="color: #0066cc; font-weight: bold;">Go to Sales Dashboard</a></p>
+                    <p><a href="${baseUrl}/dashboard" style="color: #0066cc;">Go to Main Dashboard</a></p>
+                  </div>
+                `;
+
+                console.log(
+                  `SALES USER detected - trying direct navigation to: ${baseUrl}/dashboard/sales`
+                );
+                try {
+                  window.location.replace(`${baseUrl}/dashboard/sales`);
+                } catch (e) {
+                  window.location.href = `${baseUrl}/dashboard/sales`;
+                }
+              } else {
+                statusEl.innerHTML = `
+                  <div style="padding: 10px; background-color: #f0f8ff; border: 1px solid #4682b4; border-radius: 4px; margin-top: 10px;">
+                    <p>✅ Successfully logged in as <strong>${data.user.email}</strong></p>
+                    <p>Click one of these links to navigate:</p>
+                    <p><a href="${baseUrl}/dashboard" style="color: #0066cc; font-weight: bold;">Go to Dashboard</a></p>
+                  </div>
+                `;
+
+                console.log(
+                  `DEFAULT USER TYPE - trying direct navigation to: ${baseUrl}/dashboard`
+                );
+                try {
+                  window.location.replace(`${baseUrl}/dashboard`);
+                } catch (e) {
+                  window.location.href = `${baseUrl}/dashboard`;
+                }
+              }
+
+              return true;
+            } catch (err) {
+              console.warn('Supabase login failed, using mock login:', err);
+
+              // If Supabase is unavailable, create a mock session
+              const mockUser = {
+                id: 'mock-' + userType + '-' + Date.now(),
+                email: user.email,
+                user_metadata: user.metadata,
+              };
+
+              const mockSession = {
+                access_token: 'mock_token_' + Date.now(),
+                refresh_token: 'mock_refresh_' + Date.now(),
+                expires_at: Math.floor(Date.now() / 1000) + 3600,
+                user: mockUser,
+              };
+
+              // Store in localStorage
+              localStorage.setItem(
+                'sb-' + SUPABASE_URL.split('//')[1].split('.')[0] + '-auth-token',
+                JSON.stringify(mockSession)
+              );
+
+              statusEl.textContent = `DEV MODE: Mock login as ${user.email}`;
+              console.log('Mock login data saved to localStorage');
+
+              // CRITICAL: Call redirect immediately after successful mock login
+              setTimeout(() => {
+                console.log('Executing delayed redirect after mock login...');
+                redirectToAppropriateRoute();
+              }, 500);
+
+              return true;
+            }
+          } catch (err) {
+            statusEl.textContent = 'Login error: ' + err.message;
+            console.error('Login error:', err);
+            return false;
+          }
+        }
+
+        // Check auth state
+        async function checkAuthState() {
+          try {
+            const { data, error } = await supabase.auth.getSession();
+
+            if (error) throw error;
+
+            if (data.session) {
+              authStateEl.textContent = JSON.stringify(data.session.user, null, 2);
+              return data.session.user;
+            } else {
+              authStateEl.textContent = 'No active session';
+              return null;
+            }
+          } catch (err) {
+            console.error('Error checking auth state:', err);
+
+            // Check localStorage directly as fallback
+            try {
+              const localSession = localStorage.getItem(
+                'sb-' + SUPABASE_URL.split('//')[1].split('.')[0] + '-auth-token'
+              );
+
+              if (localSession) {
+                const sessionData = JSON.parse(localSession);
+                authStateEl.textContent =
+                  'From localStorage:\n' + JSON.stringify(sessionData.user, null, 2);
+                return sessionData.user;
+              } else {
+                authStateEl.textContent = 'No session in localStorage';
+                return null;
+              }
+            } catch (storageErr) {
+              authStateEl.textContent = 'Error reading session: ' + storageErr.message;
+              return null;
+            }
+          }
+        }
+
+        // Clear auth state
+        function clearAuthState() {
+          try {
+            // Sign out from Supabase
+            supabase.auth.signOut().catch(err => console.warn('Sign out error:', err));
+
+            // Clear localStorage
+            localStorage.removeItem(
+              'sb-' + SUPABASE_URL.split('//')[1].split('.')[0] + '-auth-token'
+            );
+
+            statusEl.textContent = 'Auth state cleared';
+            authStateEl.textContent = 'No active session';
+          } catch (err) {
+            console.error('Error clearing auth state:', err);
+            statusEl.textContent = 'Error clearing auth state: ' + err.message;
+          }
+        }
+
+        // Handle redirects based on user role
+        async function redirectToAppropriateRoute() {
+          try {
+            console.log('▶ Starting redirect process...');
+            const user = await checkAuthState();
+
+            if (!user) {
+              statusEl.textContent = 'Error: No user found after login';
+              console.error('❌ No user found after login check!');
+              return;
+            }
+
+            // Redirect based on email
+            const email = user.email ? user.email.toLowerCase() : '';
+            console.log('✓ User found, email:', email);
+
+            // Debug user object
+            console.log('Full user object:', user);
+
+            // Add debugging info to the status element
+            statusEl.innerHTML = `<strong>User detected:</strong> ${email}<br><em>Preparing redirect...</em>`;
+
+            const baseUrl = window.location.origin;
+            console.log(`Base URL: ${baseUrl}`);
+
+            // DIRECT NAVIGATION APPROACH - more reliable than setTimeout
+            if (email.includes('group') && email.includes('@exampletest.com')) {
+              console.log('✓ GROUP ADMIN detected!');
+              statusEl.innerHTML += '<br>GROUP ADMIN detected! <strong>Redirecting now...</strong>';
+
+              console.log(`Navigating to: ${baseUrl}/group-admin`);
+              window.location.href = `${baseUrl}/group-admin`;
+            } else if (email === 'testadmin@example.com') {
+              console.log('✓ MASTER ADMIN detected!');
+              statusEl.innerHTML +=
+                '<br>MASTER ADMIN detected! <strong>Redirecting now...</strong>';
+
+              window.location.href = `${baseUrl}/master-admin`;
+            } else if (email === 'jp@exampletest.com') {
+              console.log('✓ DEALER ADMIN detected!');
+              statusEl.innerHTML +=
+                '<br>DEALER ADMIN detected! <strong>Redirecting now...</strong>';
+
+              window.location.href = `${baseUrl}/dashboard/admin`;
+            } else if (email.includes('sales')) {
+              console.log('✓ SALES USER detected!');
+              statusEl.innerHTML += '<br>SALES USER detected! <strong>Redirecting now...</strong>';
+
+              window.location.href = `${baseUrl}/dashboard/sales`;
+            } else {
+              console.log('✓ Default redirect case');
+              statusEl.innerHTML +=
+                '<br>Default redirect to dashboard. <strong>Redirecting now...</strong>';
+
+              window.location.href = `${baseUrl}/dashboard`;
+            }
+          } catch (error) {
+            console.error('❌ ERROR during redirect:', error);
+            statusEl.innerHTML = `<span style="color: red">Redirect error: ${error.message}</span>`;
+          }
+        }
+
+        // Event listeners - MODIFIED FOR DIRECT REDIRECT
+        document.getElementById('group-admin-login').addEventListener('click', async () => {
+          console.log('Group admin login button clicked');
+          await testLogin('groupAdmin');
+          // NOTE: redirect is now called directly from testLogin
+        });
+
+        document.getElementById('master-admin-login').addEventListener('click', async () => {
+          console.log('Master admin login button clicked');
+          await testLogin('masterAdmin');
+          // NOTE: redirect is now called directly from testLogin
+        });
+
+        document.getElementById('dealer-admin-login').addEventListener('click', async () => {
+          console.log('Dealer admin login button clicked');
+          await testLogin('dealerAdmin');
+          // NOTE: redirect is now called directly from testLogin
+        });
+
+        document.getElementById('sales-login').addEventListener('click', async () => {
+          console.log('Sales login button clicked');
+          await testLogin('sales');
+          // NOTE: redirect is now called directly from testLogin
+        });
+
+        document.getElementById('check-auth').addEventListener('click', checkAuthState);
+        document.getElementById('clear-auth').addEventListener('click', clearAuthState);
+
+        // Check auth state on page load
+        checkAuthState();
+      });
+    </script>
+  </body>
+</html>

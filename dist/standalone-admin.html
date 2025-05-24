@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Standalone Admin Dashboard</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .card {
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      .btn {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        text-align: center;
+        border-radius: 0.25rem;
+        cursor: pointer;
+      }
+      .btn-primary {
+        color: white;
+        background-color: #3b82f6;
+      }
+      .btn-primary:hover {
+        background-color: #2563eb;
+      }
+      .loader {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3b82f6;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto py-8 px-4">
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-bold">Master Admin Dashboard</h1>
+        <div>
+          <span id="userEmail" class="mr-4 text-sm">Not logged in</span>
+          <button id="logoutBtn" class="btn btn-primary">Logout</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="card">
+          <h2 class="text-xl font-semibold mb-4">System Overview</h2>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-blue-50 p-4 rounded">
+              <p class="text-sm text-gray-500">Total Users</p>
+              <p class="text-2xl font-bold" id="totalUsers">--</p>
+            </div>
+            <div class="bg-green-50 p-4 rounded">
+              <p class="text-sm text-gray-500">Total Dealerships</p>
+              <p class="text-2xl font-bold" id="totalDealerships">--</p>
+            </div>
+            <div class="bg-yellow-50 p-4 rounded">
+              <p class="text-sm text-gray-500">Active Sessions</p>
+              <p class="text-2xl font-bold" id="activeSessions">--</p>
+            </div>
+            <div class="bg-purple-50 p-4 rounded">
+              <p class="text-sm text-gray-500">System Status</p>
+              <p class="text-2xl font-bold" id="systemStatus">--</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="text-xl font-semibold mb-4">Quick Actions</h2>
+          <div class="flex flex-col space-y-2">
+            <button class="btn btn-primary" id="viewUsersBtn">View All Users</button>
+            <button class="btn btn-primary" id="manageDealershipsBtn">Manage Dealerships</button>
+            <button class="btn btn-primary" id="systemSettingsBtn">System Settings</button>
+            <button class="btn btn-primary" id="activityLogsBtn">Activity Logs</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <div class="card">
+          <h2 class="text-xl font-semibold mb-4">Recent Activity</h2>
+          <div id="activityTable" class="overflow-x-auto">
+            <div class="loader" id="activityLoader"></div>
+            <table class="min-w-full hidden" id="activityTableContent">
+              <thead>
+                <tr class="bg-gray-50">
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    User
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Action
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Timestamp
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="activityTableBody" class="bg-white divide-y divide-gray-200">
+                <!-- Activity rows will be inserted here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="modal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+        <div class="absolute inset-0 bg-black opacity-50"></div>
+        <div class="bg-white p-6 rounded-lg shadow-xl z-10 w-full max-w-md">
+          <h3 class="text-lg font-semibold mb-4" id="modalTitle">Modal Title</h3>
+          <div id="modalContent">Modal content goes here</div>
+          <div class="mt-6 flex justify-end">
+            <button class="btn btn-primary mr-2" id="modalConfirmBtn">Confirm</button>
+            <button class="px-4 py-2 text-gray-600" id="modalCancelBtn">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // Directly set session data without any redirects
+        function setSessionData() {
+          // Hardcoded admin session
+          const sessionData = {
+            access_token:
+              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ1ODQxMzgwLCJzdWIiOiJjM2IyZDc5MC0wMjQzLTQ4NjAtYjc0OS1jYmEzZTI0YjJmMzYiLCJlbWFpbCI6InRlc3RhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3MTM3MDUzODB9XSwic2Vzc2lvbl9pZCI6ImM4NDRlN2MzLTgwNjItNGZmMS05ZDQwLTE2ZjRjZDVmOTgwMyJ9.6k-nkMlkIaHdKGAB5Pp4XdXv9sm52zBh8_YwgF2QWjk',
+            refresh_token: 'MOCK_REFRESH_TOKEN',
+            expires_at: Math.floor(Date.now() / 1000) + 3600,
+            user: {
+              id: 'c3b2d790-0243-4860-b749-cba3e24b2f36',
+              app_metadata: {
+                provider: 'email',
+                providers: ['email'],
+              },
+              user_metadata: {
+                role: 'admin',
+              },
+              aud: 'authenticated',
+              email: 'testadmin@example.com',
+            },
+          };
+
+          // Store in localStorage
+          localStorage.setItem('sb-iugjtokydvbcvmrpeziv-auth-token', JSON.stringify(sessionData));
+
+          // Update UI
+          const userEmailEl = document.getElementById('userEmail');
+          userEmailEl.textContent = sessionData.user.email;
+
+          console.log('Admin session set successfully');
+          return sessionData;
+        }
+
+        // Set session immediately
+        const sessionData = setSessionData();
+
+        // Load mock data
+        function loadMockData() {
+          document.getElementById('totalUsers').textContent = '142';
+          document.getElementById('totalDealerships').textContent = '27';
+          document.getElementById('activeSessions').textContent = '18';
+          document.getElementById('systemStatus').textContent = 'Online';
+
+          // Show activity table
+          document.getElementById('activityLoader').style.display = 'none';
+          document.getElementById('activityTableContent').classList.remove('hidden');
+
+          // Add mock activity data
+          const activityData = [
+            {
+              user: 'john@example.com',
+              action: 'User Login',
+              timestamp: '2023-07-15 14:32:45',
+              status: 'Success',
+            },
+            {
+              user: 'admin@dealership5.com',
+              action: 'Inventory Update',
+              timestamp: '2023-07-15 13:21:12',
+              status: 'Success',
+            },
+            {
+              user: 'sarah@dealership2.com',
+              action: 'New Deal Created',
+              timestamp: '2023-07-15 11:05:37',
+              status: 'Success',
+            },
+            {
+              user: 'system',
+              action: 'Database Backup',
+              timestamp: '2023-07-15 10:00:00',
+              status: 'Success',
+            },
+            {
+              user: 'mike@dealership3.com',
+              action: 'Password Change',
+              timestamp: '2023-07-14 16:45:22',
+              status: 'Failed',
+            },
+          ];
+
+          const tbody = document.getElementById('activityTableBody');
+          activityData.forEach(item => {
+            const row = document.createElement('tr');
+
+            const userCell = document.createElement('td');
+            userCell.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-900';
+            userCell.textContent = item.user;
+            row.appendChild(userCell);
+
+            const actionCell = document.createElement('td');
+            actionCell.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-900';
+            actionCell.textContent = item.action;
+            row.appendChild(actionCell);
+
+            const timestampCell = document.createElement('td');
+            timestampCell.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-900';
+            timestampCell.textContent = item.timestamp;
+            row.appendChild(timestampCell);
+
+            const statusCell = document.createElement('td');
+            statusCell.className = 'px-6 py-4 whitespace-nowrap text-sm';
+            if (item.status === 'Success') {
+              statusCell.className += ' text-green-600';
+            } else {
+              statusCell.className += ' text-red-600';
+            }
+            statusCell.textContent = item.status;
+            row.appendChild(statusCell);
+
+            tbody.appendChild(row);
+          });
+        }
+
+        // Handle button clicks
+        document.getElementById('logoutBtn').addEventListener('click', function () {
+          localStorage.removeItem('sb-iugjtokydvbcvmrpeziv-auth-token');
+          alert('Logged out successfully!');
+          window.location.href = '/direct-login.html';
+        });
+
+        document.getElementById('viewUsersBtn').addEventListener('click', function () {
+          showModal(
+            'User Management',
+            'This would show the user management interface in a real implementation.'
+          );
+        });
+
+        document.getElementById('manageDealershipsBtn').addEventListener('click', function () {
+          showModal(
+            'Dealership Management',
+            'This would show the dealership management interface in a real implementation.'
+          );
+        });
+
+        document.getElementById('systemSettingsBtn').addEventListener('click', function () {
+          showModal(
+            'System Settings',
+            'This would show the system settings interface in a real implementation.'
+          );
+        });
+
+        document.getElementById('activityLogsBtn').addEventListener('click', function () {
+          showModal(
+            'Activity Logs',
+            'This would show the full activity logs in a real implementation.'
+          );
+        });
+
+        // Modal functionality
+        function showModal(title, content) {
+          document.getElementById('modalTitle').textContent = title;
+          document.getElementById('modalContent').textContent = content;
+          document.getElementById('modal').classList.remove('hidden');
+        }
+
+        document.getElementById('modalCancelBtn').addEventListener('click', function () {
+          document.getElementById('modal').classList.add('hidden');
+        });
+
+        document.getElementById('modalConfirmBtn').addEventListener('click', function () {
+          document.getElementById('modal').classList.add('hidden');
+        });
+
+        // Load mock data after a slight delay to simulate loading
+        setTimeout(loadMockData, 1000);
+      });
+    </script>
+  </body>
+</html>
