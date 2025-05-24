@@ -139,9 +139,9 @@ const AuthPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-orange-500">
-      {/* Black border top section with 1" height (approximately 96px) */}
-      <div className="h-24 bg-black flex items-center justify-center">
-        <h1 className="text-white text-3xl font-bold text-center">The DAS Board</h1>
+      {/* Black border top section with 1/2" height (approximately 48px) */}
+      <div className="h-12 bg-black flex items-center">
+        <h1 className="text-white text-3xl font-bold ml-6">The DAS Board</h1>
       </div>
 
       {/* Main content area */}
