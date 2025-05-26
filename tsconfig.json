@@ -14,10 +14,10 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
-    /* Linting - Made less strict for deployment */
-    "strict": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
     /* Path aliases */
@@ -27,13 +27,5 @@
     }
   },
   "include": ["src"],
-  "exclude": [
-    "src/test.ts",
-    "src/pages/api/**",
-    "src/lib/mockData.ts",
-    "src/lib/seedData.ts",
-    "src/lib/supabase.new.ts",
-    "src/scripts/**"
-  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
