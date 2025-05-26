@@ -59,6 +59,7 @@ import SchedulePage from './pages/manager/SchedulePage';
 import SalesReportPage from './pages/manager/SalesReportPage';
 import SingleFinanceManagerDashboard from './components/dashboards/SingleFinanceManagerDashboard';
 import LogFinanceManagerDeal from './pages/finance/LogFinanceManagerDeal';
+import MasterAdminPage from './pages/admin/MasterAdminPage';
 
 // Application environment variables and deployment info
 const APP_VERSION = import.meta.env.VITE_DEPLOYMENT_VERSION || '1.0.0';
@@ -679,7 +680,7 @@ function App() {
                       element={
                         <ProtectedRoute requiredRoles={['admin']}>
                           <DashboardLayout title="Master Admin Panel">
-                            <MasterAdminPanel />
+                            <MasterAdminPage />
                           </DashboardLayout>
                         </ProtectedRoute>
                       }

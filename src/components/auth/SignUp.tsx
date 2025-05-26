@@ -138,6 +138,40 @@ export default function SignUp() {
 
       console.log('[SignUp] Signup request created successfully:', data);
 
+      // Send email notifications
+      try {
+        // Send notification to admin
+        await fetch('/.netlify/functions/send-emails', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'signup_notification',
+            data: {
+              name: formState.contactName,
+              email: formState.email,
+              companyType: formState.tier === 'dealer_group' ? 'Dealer Group' : 'Single Dealership',
+              subscriptionId: data[0].id,
+            },
+          }),
+        });
+
+        // Send welcome email to user
+        await fetch('/.netlify/functions/send-emails', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'welcome_email',
+            data: {
+              name: formState.contactName,
+              email: formState.email,
+            },
+          }),
+        });
+      } catch (emailError) {
+        console.warn('[SignUp] Email sending failed:', emailError);
+        // Don't fail the signup process if email fails
+      }
+
       // Redirect to Stripe checkout
       const stripe = await loadStripe(STRIPE_PK);
 
