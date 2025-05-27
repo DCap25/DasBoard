@@ -60,6 +60,10 @@ import SalesReportPage from './pages/manager/SalesReportPage';
 import SingleFinanceManagerDashboard from './components/dashboards/SingleFinanceManagerDashboard';
 import LogFinanceManagerDeal from './pages/finance/LogFinanceManagerDeal';
 import MasterAdminPage from './pages/admin/MasterAdminPage';
+import SignUp from './components/auth/SignUp';
+import SingleFinanceSignup from './components/auth/SingleFinanceSignup';
+import DealershipSignup from './components/auth/DealershipSignup';
+import DealerGroupSignup from './components/auth/DealerGroupSignup';
 
 // Application environment variables and deployment info
 const APP_VERSION = import.meta.env.VITE_DEPLOYMENT_VERSION || '1.0.0';
@@ -340,6 +344,7 @@ function RoleBasedRedirect() {
   // Next check by role name
   else if (
     roleValue === 'dealer_group_admin' ||
+    roleValue === 'group_dealer_admin' ||
     roleValue.includes('group_admin') ||
     roleValue.includes('group') ||
     roleValue.includes('dealergroup_admin')
@@ -355,18 +360,22 @@ function RoleBasedRedirect() {
       }
     );
   } else if (
+    roleValue === 'single_dealer_admin' ||
     roleValue === 'dealership_admin' ||
     roleValue.includes('dealership_admin') ||
     roleValue === 'admin'
   ) {
     redirectPath = '/dashboard/admin';
-    redirectReason = 'Dealership admin role';
+    redirectReason = 'Single dealership admin role';
     console.log('[AUTH DEBUG] User is redirected to Dealership Admin Dashboard', {
       user_id: user.id,
       email: user.email,
       dealership_id: dealershipId,
       role: roleValue,
     });
+  } else if (roleValue === 'single_finance_manager') {
+    redirectPath = '/dashboard/single-finance';
+    redirectReason = 'Single finance manager role';
   } else if (roleValue === 'finance_manager' || roleValue.includes('finance')) {
     redirectPath = '/dashboard/finance';
     redirectReason = 'Finance manager role';
@@ -642,6 +651,12 @@ function App() {
                   <Routes>
                     {/* Public route for authentication - the main entry point */}
                     <Route path="/" element={<AuthPage />} />
+
+                    {/* Signup routes - public access */}
+                    <Route path="/signup" element={<SignUp />} />
+                    <Route path="/signup/single-finance" element={<SingleFinanceSignup />} />
+                    <Route path="/signup/dealership" element={<DealershipSignup />} />
+                    <Route path="/signup/dealer-group" element={<DealerGroupSignup />} />
 
                     {/* New Logout Route - accessible to everyone */}
                     <Route path="/logout" element={<LogoutPage />} />

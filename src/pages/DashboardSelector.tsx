@@ -71,26 +71,24 @@ const DashboardSelector: React.FC = () => {
       localStorage.removeItem('supabase.auth.expires_at');
       localStorage.removeItem('supabase.auth.expires_in');
 
-      // Wait a moment to ensure everything is cleared
-      setTimeout(() => {
-        // Store the user info in localStorage for direct auth
-        console.log('[DashboardSelector] Setting new auth data for', dashboard.email);
-        const userData = {
-          id: `${dashboard.role}-id-${Date.now()}`,
-          email: dashboard.email,
-          role: dashboard.role,
-          isAdmin: dashboard.role === 'admin',
-          isGroupAdmin: dashboard.role === 'dealer_group_admin',
-          name: dashboard.name,
-        };
+      // Store the user info in localStorage for direct auth
+      console.log('[DashboardSelector] Setting new auth data for', dashboard.email);
+      const userData = {
+        id: `${dashboard.role}-id-${Date.now()}`,
+        email: dashboard.email,
+        role: dashboard.role,
+        isAdmin: dashboard.role === 'admin',
+        isGroupAdmin: dashboard.role === 'dealer_group_admin',
+        name: dashboard.name,
+        dealershipId: dashboard.role === 'dealership_admin' ? 1 : undefined,
+      };
 
-        localStorage.setItem('directauth_user', JSON.stringify(userData));
-        localStorage.setItem('directauth_timestamp', Date.now().toString());
+      localStorage.setItem('directauth_user', JSON.stringify(userData));
+      localStorage.setItem('directauth_timestamp', Date.now().toString());
 
-        // Force an immediate redirect
-        console.log(`[DashboardSelector] Redirecting to ${dashboard.path}`);
-        window.location.href = dashboard.path;
-      }, 100);
+      // Force an immediate redirect
+      console.log(`[DashboardSelector] Redirecting to ${dashboard.path}`);
+      window.location.href = dashboard.path;
     } catch (err) {
       console.error('[DashboardSelector] Bypass error:', err);
       setError(`Bypass failed: ${err instanceof Error ? err.message : 'Unknown error'}`);

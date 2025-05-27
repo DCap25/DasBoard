@@ -43,6 +43,8 @@ exports.handler = async (event, context) => {
         return await handleWelcomeEmail(data, headers);
       case 'temp_password':
         return await handleTempPasswordEmail(data, headers);
+      case 'large_group_notification':
+        return await handleLargeGroupNotification(data, adminEmail, headers);
       default:
         return {
           statusCode: 400,
@@ -151,5 +153,39 @@ async function handleTempPasswordEmail(data, headers) {
     statusCode: 200,
     headers,
     body: JSON.stringify({ message: 'Temporary password email sent successfully' }),
+  };
+}
+
+async function handleLargeGroupNotification(data, adminEmail, headers) {
+  const { name, email, phone, groupName, dealershipCount, level } = data;
+
+  const adminMessage = {
+    to: adminEmail,
+    from: 'noreply@thedasboard.com',
+    subject: 'Large Dealer Group Inquiry - Level 3',
+    html: `
+      <h2>Large Dealer Group Inquiry</h2>
+      <p>A large dealer group has submitted an inquiry for Level 3 service:</p>
+      <ul>
+        <li><strong>Contact Name:</strong> ${name}</li>
+        <li><strong>Email:</strong> ${email}</li>
+        <li><strong>Phone:</strong> ${phone}</li>
+        <li><strong>Dealer Group Name:</strong> ${groupName}</li>
+        <li><strong>Number of Dealerships:</strong> ${dealershipCount}</li>
+        <li><strong>Level:</strong> ${level}</li>
+        <li><strong>Inquiry Time:</strong> ${new Date().toISOString()}</li>
+      </ul>
+      <p><strong>Action Required:</strong> Please contact this prospect to discuss custom pricing and setup for their large dealer group.</p>
+      <p>This is a high-value lead that requires personal attention.</p>
+    `,
+  };
+
+  await sgMail.send(adminMessage);
+  console.log('Large group notification sent for:', email);
+
+  return {
+    statusCode: 200,
+    headers,
+    body: JSON.stringify({ message: 'Large group notification sent successfully' }),
   };
 }

@@ -9,16 +9,46 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 const dealership1Url = import.meta.env.VITE_DEALERSHIP1_SUPABASE_URL || '';
 const dealership1AnonKey = import.meta.env.VITE_DEALERSHIP1_SUPABASE_ANON_KEY || '';
 
-// Create default client
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
-
-// Client instances cache
-const clientInstances = new Map<string, ReturnType<typeof createClient<Database>>>();
-
 // Validate main configuration
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase configuration. Please check your environment variables.');
 }
+
+// Create singleton instance with proper configuration
+let supabaseInstance: ReturnType<typeof createClient<Database>> | null = null;
+
+const createSupabaseClient = () => {
+  if (supabaseInstance) {
+    return supabaseInstance;
+  }
+
+  console.log('Initializing Supabase client:', {
+    url: supabaseUrl,
+    keyLength: supabaseAnonKey.length,
+    timestamp: new Date().toISOString(),
+  });
+
+  supabaseInstance = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: false, // Disable session persistence to avoid conflicts
+      autoRefreshToken: false, // Disable auto-refresh to avoid timeouts
+      detectSessionInUrl: false, // Disable URL session detection
+    },
+    global: {
+      headers: {
+        'X-Client-Info': 'dasboard-app',
+      },
+    },
+  });
+
+  return supabaseInstance;
+};
+
+// Export the main client - this replaces the old direct createClient call
+export const supabase = createSupabaseClient();
+
+// Client instances cache
+const clientInstances = new Map<string, ReturnType<typeof createClient<Database>>>();
 
 // Get Supabase client for a specific dealership
 export const getDealershipSupabase = (dealershipId?: string | number) => {
@@ -62,87 +92,9 @@ export const getDealershipSupabase = (dealershipId?: string | number) => {
   return supabase;
 };
 
-// Create a singleton instance
-let supabaseInstance: ReturnType<typeof createClient<Database>> | null = null;
-
 // Get the default Supabase client (Master project)
 export const getSupabase = () => {
-  if (supabaseInstance) {
-    return supabaseInstance;
-  }
-
-  console.log('Initializing new Supabase client:', {
-    url: supabaseUrl,
-    keyLength: supabaseAnonKey.length,
-    timestamp: new Date().toISOString(),
-  });
-
-  // Initialize the Supabase client with explicit session handling
-  supabaseInstance = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: true,
-      storageKey: 'dealership-auth',
-      storage: window.localStorage,
-      detectSessionInUrl: true,
-      autoRefreshToken: true,
-      flowType: 'pkce',
-      debug: process.env.NODE_ENV === 'development',
-    },
-  });
-
-  // Initialize session handling
-  const initializeSession = async () => {
-    try {
-      // Get initial session
-      const {
-        data: { session },
-        error,
-      } = await supabaseInstance!.auth.getSession();
-
-      console.log('Initial session state:', {
-        hasSession: !!session,
-        error: error?.message,
-        userId: session?.user?.id,
-        timestamp: new Date().toISOString(),
-      });
-
-      if (error) {
-        console.error('Error getting initial session:', error);
-        return;
-      }
-
-      // Set up auth state change listener
-      const {
-        data: { subscription },
-      } = supabaseInstance!.auth.onAuthStateChange((event, currentSession) => {
-        console.log('Auth state changed:', {
-          event,
-          hasSession: !!currentSession,
-          userId: currentSession?.user?.id,
-          timestamp: new Date().toISOString(),
-        });
-      });
-
-      // Clean up listener on window unload
-      window.addEventListener(
-        'unload',
-        () => {
-          console.log('Cleaning up auth listener');
-          subscription.unsubscribe();
-        },
-        { once: true }
-      );
-    } catch (error) {
-      console.error('Error initializing session:', error);
-    }
-  };
-
-  // Initialize session handling immediately
-  initializeSession().catch(error => {
-    console.error('Failed to initialize session:', error);
-  });
-
-  return supabaseInstance;
+  return supabase;
 };
 
 // Helper function to check if a session exists

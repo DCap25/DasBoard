@@ -117,16 +117,21 @@ export default function LoginForm() {
       // Determine redirect path based on user role/email
       let redirectPath = '/dashboard';
 
-      // Check for admin roles
+      // Check for admin roles - more comprehensive admin detection
       if (
         email.toLowerCase() === 'testadmin@example.com' ||
-        email.toLowerCase() === 'admin@thedasboard.com'
+        email.toLowerCase() === 'admin@thedasboard.com' ||
+        email.toLowerCase() === 'admin@example.com' ||
+        email.toLowerCase().includes('admin@example.com')
       ) {
         redirectPath = '/master-admin';
+        console.log('[LoginForm] Admin user detected, redirecting to master admin');
       } else if (isGroupAdminEmail(email)) {
         redirectPath = '/group-admin';
+        console.log('[LoginForm] Group admin detected, redirecting to group admin');
       } else if (email.toLowerCase().includes('admin@exampletest.com')) {
         redirectPath = '/dashboard/admin';
+        console.log('[LoginForm] Dealership admin detected, redirecting to dealership admin');
       } else if (email.toLowerCase().includes('finance')) {
         redirectPath = '/dashboard/finance';
       } else if (email.toLowerCase().includes('sales')) {
@@ -179,16 +184,107 @@ export default function LoginForm() {
 
   // Quick test login buttons
   const testUsers = [
-    { email: 'testadmin@example.com', password: 'test123', label: 'Test Admin' },
-    { email: 'group1.admin@exampletest.com', password: 'test123', label: 'Group Admin' },
-    { email: 'dealer1.admin@exampletest.com', password: 'test123', label: 'Dealer Admin' },
-    { email: 'finance1@exampletest.com', password: 'test123', label: 'Finance Manager' },
-    { email: 'sales@exampletest.com', password: 'test123', label: 'Sales Person' },
+    { email: 'testadmin@example.com', password: 'Password123!', label: 'Test Admin' },
+    { email: 'group1.admin@exampletest.com', password: 'Password123!', label: 'Group Admin' },
+    { email: 'dealer1.admin@exampletest.com', password: 'Password123!', label: 'Dealer Admin' },
+    { email: 'finance1@exampletest.com', password: 'Password123!', label: 'Finance Manager' },
+    { email: 'sales@exampletest.com', password: 'Password123!', label: 'Sales Person' },
   ];
 
-  const handleQuickLogin = (testUser: { email: string; password: string }) => {
+  const quickLogin = (testUser: { email: string; password: string }) => {
     setEmail(testUser.email);
     setPassword(testUser.password);
+  };
+
+  const createTestUser = async (email: string, password: string, role: string, name: string) => {
+    try {
+      console.log(`[LoginForm] Creating test user: ${email}`);
+
+      // First try to sign up the user
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name: name,
+          },
+        },
+      });
+
+      if (signUpError && !signUpError.message.includes('already registered')) {
+        console.error('[LoginForm] Signup error:', signUpError);
+        return { success: false, error: signUpError.message };
+      }
+
+      // If signup succeeded or user already exists, try to create/update profile
+      if (signUpData.user || signUpError?.message.includes('already registered')) {
+        const userId =
+          signUpData.user?.id || signUpError?.message.includes('already registered')
+            ? 'existing'
+            : null;
+
+        if (userId !== 'existing') {
+          // Create profile for new user
+          const { error: profileError } = await supabase.from('profiles').upsert({
+            id: userId,
+            email,
+            role,
+            name,
+            dealership_id: role.includes('group') ? null : 1,
+            is_group_admin: role.includes('group') || email.includes('group'),
+          });
+
+          if (profileError) {
+            console.error('[LoginForm] Profile creation error:', profileError);
+          }
+        }
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('[LoginForm] Create test user error:', error);
+      return { success: false, error: (error as Error)?.message || 'Unknown error' };
+    }
+  };
+
+  const setupTestUsers = async () => {
+    setLoading(true);
+    setError('Setting up test users...');
+
+    const testUsersToCreate = [
+      {
+        email: 'testadmin@example.com',
+        password: 'Password123!',
+        role: 'admin',
+        name: 'Master Admin',
+      },
+      {
+        email: 'group1.admin@exampletest.com',
+        password: 'Password123!',
+        role: 'admin',
+        name: 'Group Admin',
+      },
+      {
+        email: 'dealer1.admin@exampletest.com',
+        password: 'Password123!',
+        role: 'dealership_admin',
+        name: 'Dealer Admin',
+      },
+      {
+        email: 'sales@exampletest.com',
+        password: 'Password123!',
+        role: 'salesperson',
+        name: 'Sales Person',
+      },
+    ];
+
+    for (const user of testUsersToCreate) {
+      await createTestUser(user.email, user.password, user.role, user.name);
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait between requests
+    }
+
+    setError('Test users setup complete! Try logging in now.');
+    setLoading(false);
   };
 
   if (isMagicLinkSent) {
@@ -288,20 +384,29 @@ export default function LoginForm() {
         {/* Quick Login Buttons for Testing */}
         <div className="mt-6 pt-6 border-t border-gray-200">
           <h4 className="text-sm font-medium text-gray-700 mb-3">Quick Test Login:</h4>
-          <div className="grid grid-cols-1 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {testUsers.map(testUser => (
-              <button
+              <Button
                 key={testUser.email}
-                type="button"
-                onClick={() => handleQuickLogin(testUser)}
-                className="text-xs px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded border text-left"
+                variant="outline"
+                size="sm"
+                onClick={() => quickLogin(testUser)}
+                className="text-xs"
               >
-                <span className="font-medium">{testUser.label}</span>
-                <br />
-                <span className="text-gray-500">{testUser.email}</span>
-              </button>
+                {testUser.label}
+              </Button>
             ))}
           </div>
+
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={setupTestUsers}
+            className="w-full mt-2"
+            disabled={loading}
+          >
+            Setup Test Users (First Time)
+          </Button>
         </div>
       </form>
     </div>

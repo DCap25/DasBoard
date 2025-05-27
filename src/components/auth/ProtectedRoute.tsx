@@ -72,6 +72,52 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <>{children}</>;
   }
 
+  // Check for direct authentication first - this should always take precedence
+  const directAuthUser = getCurrentUser();
+  const isDirectlyAuthenticated = isAuthenticated();
+
+  console.log('[ProtectedRoute] Direct auth check:', {
+    directAuthUser: directAuthUser,
+    isDirectlyAuthenticated: isDirectlyAuthenticated,
+    path: location.pathname,
+  });
+
+  if (isDirectlyAuthenticated && directAuthUser) {
+    console.log('[ProtectedRoute] Direct auth user detected:', directAuthUser.email);
+
+    // Check if this is a logout attempt
+    if (location.pathname === '/logout') {
+      console.log('[ProtectedRoute] Allowing logout for direct auth user');
+      return <>{children}</>;
+    }
+
+    // Check role requirements if specified
+    if (requiredRoles.length > 0) {
+      const hasRequiredRole = requiredRoles.some(
+        role => role.toLowerCase() === directAuthUser.role.toLowerCase()
+      );
+
+      if (!hasRequiredRole) {
+        console.warn(
+          `[ProtectedRoute] Direct auth user doesn't have required role. Redirecting to correct dashboard.`
+        );
+        return <Navigate to={getRedirectPath(directAuthUser)} replace />;
+      }
+    }
+
+    // Check dealership if required
+    if (requiredDealership && directAuthUser.dealershipId !== requiredDealership) {
+      console.warn(
+        `[ProtectedRoute] Direct auth user doesn't belong to required dealership. Redirecting.`
+      );
+      return <Navigate to={getRedirectPath(directAuthUser)} replace />;
+    }
+
+    // All checks passed for direct auth user
+    console.log(`[ProtectedRoute] Direct auth access granted to ${location.pathname}`);
+    return <>{children}</>;
+  }
+
   // If still loading or auth check not complete, show loading indicator
   if (loading || !authCheckComplete) {
     console.log(`[ProtectedRoute] Still loading authentication state for ${location.pathname}`, {
@@ -87,46 +133,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         </div>
       </div>
     );
-  }
-
-  // Check for direct authentication first
-  if (isAuthenticated()) {
-    const directUser = getCurrentUser();
-    if (directUser) {
-      console.log('[ProtectedRoute] Direct auth user detected:', directUser.email);
-
-      // Check if this is a logout attempt
-      if (location.pathname === '/logout') {
-        console.log('[ProtectedRoute] Allowing logout for direct auth user');
-        return <>{children}</>;
-      }
-
-      // Check role requirements if specified
-      if (requiredRoles.length > 0) {
-        const hasRequiredRole = requiredRoles.some(
-          role => role.toLowerCase() === directUser.role.toLowerCase()
-        );
-
-        if (!hasRequiredRole) {
-          console.warn(
-            `[ProtectedRoute] Direct auth user doesn't have required role. Redirecting to correct dashboard.`
-          );
-          return <Navigate to={getRedirectPath(directUser)} replace />;
-        }
-      }
-
-      // Check dealership if required
-      if (requiredDealership && directUser.dealershipId !== requiredDealership) {
-        console.warn(
-          `[ProtectedRoute] Direct auth user doesn't belong to required dealership. Redirecting.`
-        );
-        return <Navigate to={getRedirectPath(directUser)} replace />;
-      }
-
-      // All checks passed for direct auth user
-      console.log(`[ProtectedRoute] Direct auth access granted to ${location.pathname}`);
-      return <>{children}</>;
-    }
   }
 
   // Special handling for test users to bypass normal auth flow

@@ -11,7 +11,11 @@ import {
 import { Database } from '../lib/database.types';
 import { toast } from '../lib/use-toast';
 import { logSchemaOperation, testDealershipConnection } from '../lib/apiService';
-import { logout as directAuthLogout } from '../lib/directAuth';
+import {
+  logout as directAuthLogout,
+  isAuthenticated,
+  getCurrentUser as getDirectAuthUser,
+} from '../lib/directAuth';
 
 // Use lowercase role names to match database
 type UserRole =
@@ -738,6 +742,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           timestamp: new Date().toISOString(),
         });
 
+        // Check for direct auth first - if active, skip normal Supabase initialization
+        if (isAuthenticated && isAuthenticated()) {
+          const directUser = getDirectAuthUser();
+          if (directUser) {
+            console.log(
+              '[AuthContext] Direct auth detected during initialization:',
+              directUser.email
+            );
+
+            // Set loading to false and mark auth as complete for direct auth
+            if (mounted) {
+              setLoading(false);
+              setAuthCheckComplete(true);
+              setHasSession(true); // Direct auth counts as having a session
+              console.log('[AuthContext] Direct auth initialization completed');
+            }
+            return;
+          }
+        }
+
         // Get initial session
         const {
           data: { session },
@@ -862,6 +886,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Set a safety timeout to ensure loading state isn't stuck
     const safetyTimer = setTimeout(() => {
       if (mounted && loading) {
+        // Check if direct auth is active before forcing timeout
+        const isDirectAuth = isAuthenticated && isAuthenticated();
+        if (isDirectAuth) {
+          console.log(
+            '[AuthContext] Safety timeout reached but direct auth is active - completing auth state'
+          );
+          // Complete the auth state for direct auth
+          setLoading(false);
+          setAuthCheckComplete(true);
+          setHasSession(true); // Direct auth counts as having a session
+          return;
+        }
+
         console.error('[AuthContext] Safety timeout reached - forcing loading state to false');
         setLoading(false);
         setAuthCheckComplete(true); // Mark auth check as complete even on timeout
