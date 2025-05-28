@@ -320,7 +320,7 @@ const MasterAdminPage: React.FC = () => {
         // Don't throw error, continue with empty array
         console.log('[fetchUsers] Continuing with empty users array due to error');
         setUsers([]);
-        return;
+        return [];
       }
 
       console.log('[fetchUsers] Users data:', usersResult.data);
@@ -347,11 +347,13 @@ const MasterAdminPage: React.FC = () => {
 
       console.log('[fetchUsers] Final transformed data:', transformedData);
       setUsers(transformedData);
+      return transformedData; // Return the data directly
     } catch (err) {
       console.error('Error fetching users:', err);
       setError('Failed to fetch users - check console for details');
       // Set empty array as fallback
       setUsers([]);
+      return [];
     }
   };
 
@@ -941,37 +943,67 @@ const MasterAdminPage: React.FC = () => {
   };
 
   // New functions for view/edit/delete functionality
-  const viewDealershipDetails = (dealership: Dealership) => {
+  const viewDealershipDetails = async (dealership: Dealership) => {
     console.log('[viewDealershipDetails] Dealership data:', dealership);
+    console.log('[viewDealershipDetails] Current users array length:', users.length);
     console.log('[viewDealershipDetails] Looking for admin_user_id:', dealership.admin_user_id);
-    console.log(
-      '[viewDealershipDetails] Available users:',
-      users.map(u => ({ id: u.id, name: u.name, email: u.email }))
-    );
 
-    const adminUser = users.find(u => u.id === dealership.admin_user_id);
-    console.log('[viewDealershipDetails] Found admin user:', adminUser);
+    // ALWAYS refresh users data to ensure we have the latest information
+    console.log('[viewDealershipDetails] Refreshing user data...');
+    try {
+      const freshUsers = await fetchUsers(); // Get fresh data directly
+      console.log('[viewDealershipDetails] Fresh users fetched:', freshUsers.length);
 
-    const monthlyCost = calculateMonthlyCost(dealership);
+      // Find admin user from fresh data
+      const adminUser = freshUsers.find(u => u.id === dealership.admin_user_id);
+      console.log('[viewDealershipDetails] Found admin user:', adminUser);
 
-    setSelectedDealership(dealership);
-    setEditData({
-      name: dealership.name,
-      location: dealership.location || '',
-      manufacturer: dealership.manufacturer || '',
-      brands: Array.isArray(dealership.brands) ? dealership.brands.join(', ') : '',
-      store_hours: dealership.store_hours || '',
-      num_teams: dealership.num_teams || 1,
-      admin_user_id: dealership.admin_user_id || 'none', // Use 'none' instead of empty string
-      subscription_tier: dealership.subscription_tier || 'base',
-      monthly_cost: monthlyCost,
-      // Admin details for display
-      admin_name: adminUser?.name || 'No admin assigned',
-      admin_email: adminUser?.email || 'No admin assigned',
-      admin_phone: adminUser?.phone || 'Not provided',
-    });
-    setEditMode(false);
-    setShowEditDialog(true);
+      const monthlyCost = calculateMonthlyCost(dealership);
+
+      setSelectedDealership(dealership);
+      setEditData({
+        name: dealership.name,
+        location: dealership.location || '',
+        manufacturer: dealership.manufacturer || '',
+        brands: Array.isArray(dealership.brands) ? dealership.brands.join(', ') : '',
+        store_hours: dealership.store_hours || '',
+        num_teams: dealership.num_teams || 1,
+        admin_user_id: dealership.admin_user_id || 'none',
+        subscription_tier: dealership.subscription_tier || 'base',
+        monthly_cost: monthlyCost,
+        // Admin details for display
+        admin_name: adminUser?.name || 'No admin assigned',
+        admin_email: adminUser?.email || 'No admin assigned',
+        admin_phone: adminUser?.phone || 'Not provided',
+      });
+      setEditMode(false);
+      setShowEditDialog(true);
+    } catch (error) {
+      console.error('[viewDealershipDetails] Error refreshing users:', error);
+
+      // Proceed anyway with current data
+      const adminUser = users.find(u => u.id === dealership.admin_user_id);
+      const monthlyCost = calculateMonthlyCost(dealership);
+
+      setSelectedDealership(dealership);
+      setEditData({
+        name: dealership.name,
+        location: dealership.location || '',
+        manufacturer: dealership.manufacturer || '',
+        brands: Array.isArray(dealership.brands) ? dealership.brands.join(', ') : '',
+        store_hours: dealership.store_hours || '',
+        num_teams: dealership.num_teams || 1,
+        admin_user_id: dealership.admin_user_id || 'none',
+        subscription_tier: dealership.subscription_tier || 'base',
+        monthly_cost: monthlyCost,
+        // Admin details for display
+        admin_name: adminUser?.name || 'No admin assigned',
+        admin_email: adminUser?.email || 'No admin assigned',
+        admin_phone: adminUser?.phone || 'Not provided',
+      });
+      setEditMode(false);
+      setShowEditDialog(true);
+    }
   };
 
   const viewUserDetails = (user: User) => {
@@ -1324,7 +1356,12 @@ const MasterAdminPage: React.FC = () => {
 
   // Helper function to get available admins for assignment
   const getAvailableAdmins = () => {
-    return users.filter(u => u.role === 'single_dealer_admin' || u.role === 'group_dealer_admin');
+    console.log('[getAvailableAdmins] All users:', users);
+    const admins = users.filter(
+      u => u.role === 'single_dealer_admin' || u.role === 'group_dealer_admin'
+    );
+    console.log('[getAvailableAdmins] Filtered admin users:', admins);
+    return admins;
   };
 
   // Function to render role-specific fields
@@ -1625,7 +1662,11 @@ const MasterAdminPage: React.FC = () => {
       // Active dealership actions
       return (
         <div className="flex gap-2">
-          <Button size="sm" variant="outline" onClick={() => viewDealershipDetails(dealership)}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={async () => await viewDealershipDetails(dealership)}
+          >
             View Details
           </Button>
           <Button
@@ -2552,10 +2593,27 @@ const MasterAdminPage: React.FC = () => {
                         <Label>Change Admin User</Label>
                         {editMode ? (
                           <Select
-                            value={editData.admin_user_id || ''}
-                            onValueChange={value =>
-                              setEditData({ ...editData, admin_user_id: value })
-                            }
+                            value={editData.admin_user_id || 'none'}
+                            onValueChange={value => {
+                              console.log('[AdminSelect] Changing admin to:', value);
+                              const newAdminUser =
+                                value === 'none' ? null : users.find(u => u.id === value);
+                              console.log('[AdminSelect] Found admin user:', newAdminUser);
+
+                              setEditData({
+                                ...editData,
+                                admin_user_id: value === 'none' ? null : value,
+                                admin_name:
+                                  newAdminUser?.name ||
+                                  (value === 'none' ? 'No admin assigned' : 'Admin not found'),
+                                admin_email:
+                                  newAdminUser?.email ||
+                                  (value === 'none' ? 'No admin assigned' : 'Admin not found'),
+                                admin_phone:
+                                  newAdminUser?.phone ||
+                                  (value === 'none' ? 'Not provided' : 'Not provided'),
+                              });
+                            }}
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Select admin user" />
@@ -2566,7 +2624,7 @@ const MasterAdminPage: React.FC = () => {
                                 .filter(user => user.id && user.id.trim() !== '') // Filter out empty IDs
                                 .map(user => (
                                   <SelectItem key={user.id} value={user.id}>
-                                    {user.name} ({user.email})
+                                    {user.name} ({user.email}) - {user.role}
                                   </SelectItem>
                                 ))}
                             </SelectContent>
