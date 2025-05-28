@@ -942,7 +942,16 @@ const MasterAdminPage: React.FC = () => {
 
   // New functions for view/edit/delete functionality
   const viewDealershipDetails = (dealership: Dealership) => {
+    console.log('[viewDealershipDetails] Dealership data:', dealership);
+    console.log('[viewDealershipDetails] Looking for admin_user_id:', dealership.admin_user_id);
+    console.log(
+      '[viewDealershipDetails] Available users:',
+      users.map(u => ({ id: u.id, name: u.name, email: u.email }))
+    );
+
     const adminUser = users.find(u => u.id === dealership.admin_user_id);
+    console.log('[viewDealershipDetails] Found admin user:', adminUser);
+
     const monthlyCost = calculateMonthlyCost(dealership);
 
     setSelectedDealership(dealership);
@@ -957,9 +966,9 @@ const MasterAdminPage: React.FC = () => {
       subscription_tier: dealership.subscription_tier || 'base',
       monthly_cost: monthlyCost,
       // Admin details for display
-      admin_name: adminUser?.name || '',
-      admin_email: adminUser?.email || '',
-      admin_phone: adminUser?.phone || '',
+      admin_name: adminUser?.name || 'No admin assigned',
+      admin_email: adminUser?.email || 'No admin assigned',
+      admin_phone: adminUser?.phone || 'Not provided',
     });
     setEditMode(false);
     setShowEditDialog(true);
@@ -1001,9 +1010,9 @@ const MasterAdminPage: React.FC = () => {
         subscription_tier: selectedDealership.subscription_tier || 'base',
         monthly_cost: monthlyCost,
         // Admin details for display
-        admin_name: adminUser?.name || '',
-        admin_email: adminUser?.email || '',
-        admin_phone: adminUser?.phone || '',
+        admin_name: adminUser?.name || 'No admin assigned',
+        admin_email: adminUser?.email || 'No admin assigned',
+        admin_phone: adminUser?.phone || 'Not provided',
       });
     } else if (selectedUser) {
       setEditData({
@@ -1017,11 +1026,18 @@ const MasterAdminPage: React.FC = () => {
   };
 
   const handleSaveEdit = async () => {
+    console.log('[handleSaveEdit] Starting save operation');
+    console.log('[handleSaveEdit] Edit data:', editData);
+    console.log('[handleSaveEdit] Selected dealership:', selectedDealership);
+    console.log('[handleSaveEdit] Selected user:', selectedUser);
+
     try {
       setLoading(true);
       setError('');
 
       if (selectedDealership) {
+        console.log('[handleSaveEdit] Updating dealership...');
+
         // Update dealership
         const updateData: any = {
           name: editData.name,
@@ -1041,16 +1057,29 @@ const MasterAdminPage: React.FC = () => {
             .filter((b: string) => b);
         }
 
+        console.log('[handleSaveEdit] Update data:', updateData);
+        console.log('[handleSaveEdit] Dealership ID:', selectedDealership.id);
+
         const result = await directSupabase.update('dealerships', updateData, {
           id: selectedDealership.id,
         });
 
-        if (result.error) throw result.error;
+        console.log('[handleSaveEdit] Update result:', result);
 
+        if (result.error) {
+          console.error('[handleSaveEdit] Update error:', result.error);
+          throw result.error;
+        }
+
+        console.log('[handleSaveEdit] Dealership updated successfully');
         setSuccess('Dealership updated successfully!');
-        fetchDealerships();
-        fetchUsers();
+
+        // Refresh data
+        await Promise.all([fetchDealerships(), fetchUsers()]);
+        console.log('[handleSaveEdit] Data refreshed');
       } else if (selectedUser) {
+        console.log('[handleSaveEdit] Updating user...');
+
         // Update user profile
         const updateData = {
           name: editData.name,
@@ -1064,23 +1093,37 @@ const MasterAdminPage: React.FC = () => {
               : null,
         };
 
+        console.log('[handleSaveEdit] User update data:', updateData);
+        console.log('[handleSaveEdit] User ID:', selectedUser.id);
+
         const result = await directSupabase.update('profiles', updateData, { id: selectedUser.id });
 
-        if (result.error) throw result.error;
+        console.log('[handleSaveEdit] User update result:', result);
 
+        if (result.error) {
+          console.error('[handleSaveEdit] User update error:', result.error);
+          throw result.error;
+        }
+
+        console.log('[handleSaveEdit] User updated successfully');
         setSuccess('User updated successfully!');
-        fetchUsers();
-        fetchDealerships();
+
+        // Refresh data
+        await Promise.all([fetchUsers(), fetchDealerships()]);
+        console.log('[handleSaveEdit] Data refreshed');
       }
 
+      console.log('[handleSaveEdit] Closing dialog...');
       setEditMode(false);
       setShowEditDialog(false);
       setSelectedDealership(null);
       setSelectedUser(null);
+      console.log('[handleSaveEdit] Save operation completed successfully');
     } catch (err: any) {
-      console.error('Error updating:', err);
+      console.error('[handleSaveEdit] Error updating:', err);
       setError(err.message || 'Failed to update');
     } finally {
+      console.log('[handleSaveEdit] Setting loading to false');
       setLoading(false);
     }
   };
