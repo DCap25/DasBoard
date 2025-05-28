@@ -453,6 +453,8 @@ const MasterAdminPage: React.FC = () => {
     setError('');
     setSuccess('');
 
+    let isExistingUserUpdate = false; // Track if we're updating an existing user
+
     try {
       // Validate required fields
       if (!newUser.name || !newUser.email || !newUser.role || !newUser.tempPassword) {
@@ -668,25 +670,60 @@ const MasterAdminPage: React.FC = () => {
 
           // Check if it's just a "user already registered" error
           if (authError.message?.includes('User already registered')) {
-            console.log(
-              '[createUser] User already exists in auth, attempting to get existing user...'
-            );
+            console.log('[createUser] User already exists in auth, checking if profile exists...');
+            isExistingUserUpdate = true; // Mark this as an update
 
-            // Try to get the existing user by email
-            const { data: existingUser, error: getUserError } =
-              await supabase.auth.admin.getUserByEmail(newUser.email);
+            // Instead of trying to get the user through admin methods (which aren't available client-side),
+            // we'll check if a profile already exists for this email
+            const { data: existingProfile, error: profileCheckError } = await supabase
+              .from('profiles')
+              .select('id, email, name, role')
+              .eq('email', newUser.email)
+              .single();
 
-            if (getUserError || !existingUser.user) {
-              console.error('[createUser] Could not get existing user:', getUserError);
+            if (existingProfile) {
+              console.log('[createUser] Found existing profile for user:', existingProfile.id);
+
+              // Check if this user needs to be updated with new role/dealership
+              if (existingProfile.role !== newUser.role) {
+                console.log(
+                  `[createUser] Updating existing user role from ${existingProfile.role} to ${newUser.role}`
+                );
+
+                const { error: updateError } = await supabase
+                  .from('profiles')
+                  .update({
+                    role: newUser.role,
+                    dealership_id: dealershipId,
+                    name: newUser.name,
+                    phone: newUser.phone,
+                  })
+                  .eq('id', existingProfile.id);
+
+                if (updateError) {
+                  console.error('[createUser] Failed to update existing profile:', updateError);
+                  throw new Error(
+                    `User exists but could not update profile: ${updateError.message}`
+                  );
+                }
+
+                console.log('[createUser] Existing user profile updated successfully');
+              }
+
+              // Create a mock auth data object since we can't get the real one
+              authData = {
+                user: {
+                  id: existingProfile.id,
+                  email: existingProfile.email,
+                },
+                session: null,
+              };
+            } else {
+              console.error('[createUser] User exists in auth but no profile found');
               throw new Error(
-                `User already registered but could not access existing account: ${
-                  getUserError?.message || 'Unknown error'
-                }`
+                `User already registered but no profile found. Please contact an administrator to resolve this issue.`
               );
             }
-
-            console.log('[createUser] Found existing user:', existingUser.user.id);
-            authData = { user: existingUser.user, session: null };
           } else {
             throw authError;
           }
@@ -765,34 +802,44 @@ const MasterAdminPage: React.FC = () => {
           console.log('[createUser] Dealership updated with admin user ID');
         }
 
-        // Send temporary password email to the new user
-        try {
-          console.log('[createUser] Sending temporary password email');
-          await fetch('/.netlify/functions/send-emails', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              type: 'temp_password',
-              data: {
-                name: newUser.name,
-                email: newUser.email,
-                tempPassword: newUser.tempPassword,
-                role: roles.find(r => r.value === newUser.role)?.label || newUser.role,
-                tenantSchema: tenantSchemaName,
-              },
-            }),
-          });
-          console.log('[createUser] Temporary password email sent to:', newUser.email);
-        } catch (emailError) {
-          console.warn('[createUser] Failed to send temporary password email:', emailError);
-          // Don't fail the user creation if email fails
+        // Send temporary password email to the new user (only for new users, not updates)
+        if (!isExistingUserUpdate) {
+          try {
+            console.log('[createUser] Sending temporary password email');
+            await fetch('/.netlify/functions/send-emails', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                type: 'temp_password',
+                data: {
+                  name: newUser.name,
+                  email: newUser.email,
+                  tempPassword: newUser.tempPassword,
+                  role: roles.find(r => r.value === newUser.role)?.label || newUser.role,
+                  tenantSchema: tenantSchemaName,
+                },
+              }),
+            });
+            console.log('[createUser] Temporary password email sent to:', newUser.email);
+          } catch (emailError) {
+            console.warn('[createUser] Failed to send temporary password email:', emailError);
+            // Don't fail the user creation if email fails
+          }
+        } else {
+          console.log('[createUser] Skipping password email for existing user update');
         }
 
         const roleLabel = roles.find(r => r.value === newUser.role)?.label || newUser.role;
+
+        // Use the tracking variable we set earlier
+        const actionText = isExistingUserUpdate ? 'updated' : 'created';
+
         setSuccess(
-          `${roleLabel} created successfully! Temporary password email sent to ${
-            newUser.email
-          }. Tenant schema: ${tenantSchemaName || 'No dedicated schema'}`
+          `${roleLabel} ${actionText} successfully! ${
+            isExistingUserUpdate
+              ? 'User profile updated.'
+              : 'Temporary password email sent to ' + newUser.email + '.'
+          } Tenant schema: ${tenantSchemaName || 'No dedicated schema'}`
         );
         console.log('[createUser] User creation completed successfully');
 
