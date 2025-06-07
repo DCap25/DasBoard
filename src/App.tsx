@@ -22,7 +22,7 @@ import TempAdminDashboard from './components/TempAdminDashboard';
 import MasterAdminPanel from './components/admin/MasterAdminPanel';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { DebugPanel } from './components/DebugPanel';
+
 import { queryClient } from './lib/react-query';
 import { DealLogEditor } from './components/manager/DealLogEditor';
 import { ScheduleEditor } from './components/manager/ScheduleEditor';
@@ -236,6 +236,18 @@ function RoleBasedRedirect() {
   } = useAuth();
   const location = useLocation();
 
+  // Add specific debugging for finance users
+  if (user?.email === 'testfinance@example.com' || user?.email === 'finance1@exampletest.com') {
+    console.warn('[FINANCE DEBUG] Finance user detected in RoleBasedRedirect:', {
+      email: user.email,
+      userRole,
+      role,
+      dealershipId,
+      isGroupAdmin,
+      userMetadata: user.user_metadata,
+    });
+  }
+
   // First check for direct auth
   if (isAuthenticated()) {
     const directUser = getCurrentUser();
@@ -319,13 +331,22 @@ function RoleBasedRedirect() {
     dealershipId,
   });
 
-  // Special case for testadmin@example.com
+  // Special case for admin accounts
   let redirectPath = '/dashboard/sales';
   let redirectReason = 'Default to sales dashboard';
 
-  if (user?.email === 'testadmin@example.com') {
+  // Always redirect admin@thedasboard.com to master admin
+  if (user?.email === 'admin@thedasboard.com') {
     redirectPath = '/master-admin';
-    redirectReason = 'Test admin account';
+    redirectReason = 'Main admin account';
+  }
+  // Only redirect testadmin@example.com to master-admin if they actually have admin role
+  else if (
+    user?.email === 'testadmin@example.com' &&
+    (roleValue === 'admin' || roleValue === 'master_admin')
+  ) {
+    redirectPath = '/master-admin';
+    redirectReason = 'Test admin account with admin role';
   }
   // Check if user is a group admin first (this takes priority)
   else if (isGroupAdmin) {
@@ -373,12 +394,21 @@ function RoleBasedRedirect() {
       dealership_id: dealershipId,
       role: roleValue,
     });
-  } else if (roleValue === 'single_finance_manager') {
+  } else if (
+    roleValue === 'single_finance_manager' ||
+    (roleValue === 'finance_manager' &&
+      (user?.email?.includes('finance') || user?.email?.includes('testfinance')))
+  ) {
     redirectPath = '/dashboard/single-finance';
-    redirectReason = 'Single finance manager role';
+    redirectReason = 'Single finance manager role (email-based routing)';
+    console.log('[AUTH DEBUG] User is redirected to Single Finance Manager Dashboard', {
+      user_id: user.id,
+      email: user.email,
+      role: roleValue,
+    });
   } else if (roleValue === 'finance_manager' || roleValue.includes('finance')) {
     redirectPath = '/dashboard/finance';
-    redirectReason = 'Finance manager role';
+    redirectReason = 'Finance manager role (regular)';
   } else if (roleValue === 'sales_manager' || roleValue.includes('sales_manager')) {
     redirectPath = '/dashboard/sales-manager';
     redirectReason = 'Sales manager role';
@@ -396,6 +426,19 @@ function RoleBasedRedirect() {
     roleValue,
     isGroupAdmin,
     email: user.email,
+    userEmail: user.email,
+    isTestFinanceUser:
+      user.email === 'testfinance@example.com' || user.email === 'finance1@exampletest.com',
+    roleConditions: {
+      isSingleFinanceManager: roleValue === 'single_finance_manager',
+      isFinanceManagerWithEmail:
+        roleValue === 'finance_manager' &&
+        (user?.email?.includes('finance') || user?.email?.includes('testfinance')),
+      combinedFinanceCondition:
+        roleValue === 'single_finance_manager' ||
+        (roleValue === 'finance_manager' &&
+          (user?.email?.includes('finance') || user?.email?.includes('testfinance'))),
+    },
   });
 
   logAccessAttempt(redirectPath, true, {
@@ -729,7 +772,9 @@ function App() {
                     <Route
                       path="/dashboard/admin"
                       element={
-                        <ProtectedRoute requiredRoles={['admin', 'dealership_admin']}>
+                        <ProtectedRoute
+                          requiredRoles={['admin', 'dealership_admin', 'single_dealer_admin']}
+                        >
                           <AdminDashboardPage />
                         </ProtectedRoute>
                       }
@@ -749,7 +794,9 @@ function App() {
                     <Route
                       path="/dashboard/finance/*"
                       element={
-                        <ProtectedRoute requiredRoles={['finance_manager']}>
+                        <ProtectedRoute
+                          requiredRoles={['finance_manager', 'single_finance_manager']}
+                        >
                           <DashboardLayout>
                             <FinanceDashboard />
                           </DashboardLayout>
@@ -761,7 +808,9 @@ function App() {
                     <Route
                       path="/dashboard/single-finance/*"
                       element={
-                        <ProtectedRoute requiredRoles={['finance_manager']}>
+                        <ProtectedRoute
+                          requiredRoles={['finance_manager', 'single_finance_manager']}
+                        >
                           <DashboardLayout>
                             <SingleFinanceManagerDashboard />
                           </DashboardLayout>
@@ -773,7 +822,9 @@ function App() {
                     <Route
                       path="/finance-manager/log-deal"
                       element={
-                        <ProtectedRoute requiredRoles={['finance_manager']}>
+                        <ProtectedRoute
+                          requiredRoles={['finance_manager', 'single_finance_manager']}
+                        >
                           <DashboardLayout>
                             <LogFinanceManagerDeal />
                           </DashboardLayout>
@@ -785,7 +836,9 @@ function App() {
                     <Route
                       path="/deal-log"
                       element={
-                        <ProtectedRoute requiredRoles={['finance_manager']}>
+                        <ProtectedRoute
+                          requiredRoles={['finance_manager', 'single_finance_manager']}
+                        >
                           <DashboardLayout>
                             <DealLogPage />
                           </DashboardLayout>
@@ -797,7 +850,9 @@ function App() {
                     <Route
                       path="/finance-deal-log"
                       element={
-                        <ProtectedRoute requiredRoles={['finance_manager']}>
+                        <ProtectedRoute
+                          requiredRoles={['finance_manager', 'single_finance_manager']}
+                        >
                           <DashboardLayout>
                             <DealLogPage dashboardType="finance" />
                           </DashboardLayout>
@@ -809,7 +864,9 @@ function App() {
                     <Route
                       path="/single-finance-deal-log"
                       element={
-                        <ProtectedRoute requiredRoles={['finance_manager']}>
+                        <ProtectedRoute
+                          requiredRoles={['finance_manager', 'single_finance_manager']}
+                        >
                           <DashboardLayout>
                             <DealLogPage dashboardType="single-finance" />
                           </DashboardLayout>

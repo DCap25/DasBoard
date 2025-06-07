@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { logFinanceManagerDeal } from '../../lib/apiService';
 import { Card } from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
@@ -18,20 +17,6 @@ const SALESPEOPLE = [
   { id: 3, initials: 'MR', firstName: 'Maria', lastName: 'Rodriguez' },
   { id: 4, initials: 'AK', firstName: 'Anna', lastName: 'Kim' },
   { id: 5, initials: 'BH', firstName: 'Brandon', lastName: 'Harris' },
-];
-
-// Define product options for finance managers with profit tracking
-const PRODUCT_OPTIONS = [
-  { id: 'vsc', name: 'Vehicle Service Contract (VSC)', defaultProfit: 500 },
-  { id: 'gap', name: 'GAP Insurance', defaultProfit: 300 },
-  { id: 'ppm', name: 'PrePaid Maintenance (PPM)', defaultProfit: 200 },
-  { id: 'tirewheel', name: 'Tire & Wheel Protection', defaultProfit: 150 },
-  { id: 'appearance', name: 'Appearance Protection', defaultProfit: 100 },
-  { id: 'keyreplacement', name: 'Key Replacement', defaultProfit: 50 },
-  { id: 'theft', name: 'Theft Protection', defaultProfit: 150 },
-  { id: 'windshield', name: 'Windshield Protection', defaultProfit: 75 },
-  { id: 'lojack', name: 'LoJack/Tracking System', defaultProfit: 200 },
-  { id: 'extwarranty', name: 'Extended Warranty', defaultProfit: 450 },
 ];
 
 // Status options
@@ -77,7 +62,7 @@ interface DealFormData {
   notes: string;
 }
 
-export default function LogFinanceManagerDeal() {
+export default function LogSingleFinanceDeal() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -114,9 +99,6 @@ export default function LogFinanceManagerDeal() {
     status: 'pending',
     notes: '',
   });
-
-  // Get schema name from user metadata
-  const schemaName = user?.user_metadata?.schema_name || '';
 
   // Calculate back end gross and total gross whenever profit fields change
   useEffect(() => {
@@ -175,20 +157,8 @@ export default function LogFinanceManagerDeal() {
   ]);
 
   useEffect(() => {
-    console.log('[LogFinanceManagerDeal] Component mounted');
-
-    // Check if we have a schema to work with
-    if (!schemaName) {
-      console.error('[LogFinanceManagerDeal] No schema name found in user metadata');
-      toast({
-        title: 'Error',
-        description: 'Missing configuration for deal logging. Please contact support.',
-        variant: 'destructive',
-      });
-    } else {
-      console.log(`[LogFinanceManagerDeal] Using schema: ${schemaName}`);
-    }
-  }, [schemaName]);
+    console.log('[LogSingleFinanceDeal] Component mounted');
+  }, []);
 
   // Handle input changes
   const handleInputChange = (
@@ -233,15 +203,6 @@ export default function LogFinanceManagerDeal() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!schemaName) {
-      toast({
-        title: 'Error',
-        description: 'Missing schema information. Please contact support.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
     if (!formData.customerName || !formData.vehicleDescription) {
       toast({
         title: 'Validation Error',
@@ -254,10 +215,10 @@ export default function LogFinanceManagerDeal() {
     setIsSubmitting(true);
 
     try {
-      console.log(`[LogFinanceManagerDeal] Submitting deal to schema: ${schemaName}`);
+      console.log(`[LogSingleFinanceDeal] Submitting deal for Single Finance Dashboard`);
 
       // Generate deal ID if not provided
-      const dealId = formData.dealNumber || `D${Math.floor(1000 + Math.random() * 9000)}`;
+      const dealId = formData.dealNumber || `SF${Math.floor(1000 + Math.random() * 9000)}`;
 
       // Get salesperson information
       const salesperson = SALESPEOPLE.find(s => s.id.toString() === formData.salespersonId);
@@ -290,16 +251,18 @@ export default function LogFinanceManagerDeal() {
       if (parseFloat(formData.extWarrantyProfit) > 0) productsSold.push('Extended Warranty');
       if (parseFloat(formData.otherProfit) > 0) productsSold.push('Other');
 
-      // Prepare deal data for metrics calculation
+      // Prepare deal data for metrics calculation - SINGLE FINANCE SPECIFIC
       const dealData = {
         id: dealId,
         customer_name: formData.customerName,
+        customer: formData.customerName, // Backward compatibility
         vehicle: `${
           formData.vehicleType === 'N' ? 'New' : formData.vehicleType === 'U' ? 'Used' : 'CPO'
         } - ${formData.vehicleDescription}`,
         vin: formData.vinLast8,
         stock_number: formData.stockNumber,
         sale_date: formData.saleDate,
+        saleDate: formData.saleDate, // Backward compatibility
         deal_type: formData.dealType,
         salesperson: salespersonDisplay,
         salesperson_id: formData.salespersonId,
@@ -309,6 +272,8 @@ export default function LogFinanceManagerDeal() {
         front_end_gross: parseFloat(formData.frontEndGross) || 0,
         back_end_gross: parseFloat(formData.backEndGross) || 0,
         total_gross: parseFloat(formData.totalGross) || 0,
+        amount: parseFloat(formData.totalGross) || 0, // Backward compatibility
+        profit: parseFloat(formData.backEndGross) || 0, // Backward compatibility
         reserve_flat: parseFloat(formData.reserveFlat) || 0,
         vsc_profit: parseFloat(formData.vscProfit) || 0,
         gap_profit: parseFloat(formData.gapProfit) || 0,
@@ -327,38 +292,30 @@ export default function LogFinanceManagerDeal() {
         vsc_sold: parseFloat(formData.vscProfit) > 0,
         created_by: user?.email || 'unknown',
         created_at: new Date().toISOString(),
+        // Mark as Single Finance deal
+        dashboard_type: 'single_finance',
       };
 
-      // Save to localStorage for backward compatibility
+      // Save to SEPARATE localStorage key for Single Finance Dashboard
       try {
-        const existingDealsJson = localStorage.getItem('financeDeals');
+        const existingDealsJson = localStorage.getItem('singleFinanceDeals');
         const existingDeals = existingDealsJson ? JSON.parse(existingDealsJson) : [];
         const updatedDeals = [dealData, ...existingDeals];
-        localStorage.setItem('financeDeals', JSON.stringify(updatedDeals));
+        localStorage.setItem('singleFinanceDeals', JSON.stringify(updatedDeals));
+
+        console.log('[LogSingleFinanceDeal] Deal saved to singleFinanceDeals storage:', dealData);
       } catch (error) {
         console.error('Error saving to localStorage:', error);
       }
 
-      // Call API to log the deal
-      const result = await logFinanceManagerDeal(schemaName, dealData);
+      toast({
+        title: 'Success',
+        description: 'Deal logged successfully to Single Finance Dashboard!',
+      });
 
-      if (result.success) {
-        toast({
-          title: 'Success',
-          description: 'Deal logged successfully!',
-        });
-
-        navigate('/dashboard/single-finance');
-      } else {
-        console.error('[LogFinanceManagerDeal] Error logging deal:', result.error);
-        toast({
-          title: 'Error',
-          description: result.message || 'Failed to log deal. Please try again.',
-          variant: 'destructive',
-        });
-      }
+      navigate('/dashboard/single-finance');
     } catch (error) {
-      console.error('[LogFinanceManagerDeal] Exception logging deal:', error);
+      console.error('[LogSingleFinanceDeal] Exception logging deal:', error);
       toast({
         title: 'Error',
         description: 'An unexpected error occurred. Please try again.',
@@ -372,7 +329,7 @@ export default function LogFinanceManagerDeal() {
   return (
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Log New Deal</h1>
+        <h1 className="text-2xl font-bold">Log New Deal - Single Finance Dashboard</h1>
         <Button
           variant="outline"
           onClick={() => navigate('/dashboard/single-finance')}
@@ -381,6 +338,13 @@ export default function LogFinanceManagerDeal() {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Dashboard
         </Button>
+      </div>
+
+      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <p className="text-blue-800 text-sm">
+          <strong>Note:</strong> This deal will only appear on your Single Finance Manager Dashboard
+          and will not affect other dashboards in the system.
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
@@ -22,6 +22,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const location = useLocation();
   const deploymentEnv = import.meta.env.MODE || 'development';
   const isProduction = deploymentEnv === 'production';
+
+  // Add timeout for extra loading to prevent infinite loops
+  const [extraLoadingStartTime, setExtraLoadingStartTime] = useState<number | null>(null);
 
   // Enhanced debug logging for access control
   useEffect(() => {
@@ -72,17 +75,105 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <>{children}</>;
   }
 
-  // Check for direct authentication first - this should always take precedence
+  // Check for direct authentication first - but only if not overridden by recent login
   const directAuthUser = getCurrentUser();
   const isDirectlyAuthenticated = isAuthenticated();
+  const recentLoginCleared = localStorage.getItem('recent_login_cleared') === 'true';
+  const recentSupabaseLogin = localStorage.getItem('recent_supabase_login') === 'true';
 
   console.log('[ProtectedRoute] Direct auth check:', {
     directAuthUser: directAuthUser,
     isDirectlyAuthenticated: isDirectlyAuthenticated,
+    recentLoginCleared: recentLoginCleared,
+    recentSupabaseLogin: recentSupabaseLogin,
     path: location.pathname,
   });
 
-  if (isDirectlyAuthenticated && directAuthUser) {
+  // If we have a fresh login flag, give auth state time to propagate
+  if (recentSupabaseLogin && (!user || !hasSession)) {
+    console.log(
+      '[ProtectedRoute] Recent Supabase login detected, waiting for auth state to propagate...'
+    );
+
+    // Check direct Supabase auth as fallback to bypass context issues
+    const checkDirectSupabaseAuth = async () => {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (session?.user?.email === 'testfinance@example.com') {
+          console.log(
+            '[ProtectedRoute] Direct Supabase check confirmed finance user, allowing access'
+          );
+          localStorage.removeItem('recent_supabase_login');
+          return true;
+        }
+      } catch (error) {
+        console.error('[ProtectedRoute] Direct auth check failed:', error);
+      }
+      return false;
+    };
+
+    // For finance routes, try direct auth check
+    if (location.pathname === '/dashboard/single-finance') {
+      checkDirectSupabaseAuth().then(isAuthenticated => {
+        if (isAuthenticated) {
+          window.location.reload(); // Force reload to refresh auth context
+        }
+      });
+    }
+
+    // Set timeout start time if not already set
+    if (!extraLoadingStartTime) {
+      setExtraLoadingStartTime(Date.now());
+    }
+
+    // Clear the flag and give auth state time to propagate (max 8 seconds)
+    const timeElapsed = extraLoadingStartTime ? Date.now() - extraLoadingStartTime : 0;
+
+    if (timeElapsed > 8000) {
+      console.warn(
+        '[ProtectedRoute] Auth state timeout reached, clearing flags and redirecting to login'
+      );
+      localStorage.removeItem('recent_supabase_login');
+      setExtraLoadingStartTime(null);
+      return <Navigate to="/" replace state={{ from: location }} />;
+    }
+
+    // Add debugging for auth state
+    console.log('[ProtectedRoute] Waiting for auth state...', {
+      timeElapsed: timeElapsed,
+      user: user?.email || 'none',
+      hasSession: hasSession,
+      loading: loading,
+      authCheckComplete: authCheckComplete,
+    });
+
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
+          <p className="text-sm text-gray-500">Completing authentication...</p>
+          <p className="text-xs text-gray-400 mt-1">
+            Please wait ({Math.round((8000 - timeElapsed) / 1000)}s)
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Clear timeout if we have auth state
+  if (user && hasSession && extraLoadingStartTime) {
+    setExtraLoadingStartTime(null);
+    localStorage.removeItem('recent_supabase_login');
+  }
+
+  // If we have a Supabase session and recently logged in, prioritize Supabase auth
+  if (hasSession && user && recentSupabaseLogin) {
+    console.log('[ProtectedRoute] Recent Supabase login detected, skipping direct auth check');
+    // Clear the flag after using it
+    localStorage.removeItem('recent_supabase_login');
+  } else if (isDirectlyAuthenticated && directAuthUser) {
     console.log('[ProtectedRoute] Direct auth user detected:', directAuthUser.email);
 
     // Check if this is a logout attempt
@@ -135,9 +226,57 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
+  // Add a simple delay for auth state to propagate on fresh logins
+  // If we just came from login and don't have auth state yet, wait a bit
+  const isComingFromLogin = document.referrer.includes('/') || location.pathname !== '/';
+
+  if (!user && !hasSession && isComingFromLogin && !extraLoadingStartTime) {
+    console.log(
+      '[ProtectedRoute] Detected navigation from login without auth state, adding delay...'
+    );
+    setExtraLoadingStartTime(Date.now());
+  }
+
+  if (extraLoadingStartTime && !user && !hasSession) {
+    const timeElapsed = Date.now() - extraLoadingStartTime;
+
+    if (timeElapsed < 2000) {
+      // Wait up to 2 seconds for auth state
+      return (
+        <div className="flex h-screen items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
+            <p className="text-sm text-gray-500">Completing authentication...</p>
+            <p className="text-xs text-gray-400 mt-1">
+              Please wait ({Math.round((2000 - timeElapsed) / 1000)}s)
+            </p>
+          </div>
+        </div>
+      );
+    } else {
+      console.warn('[ProtectedRoute] Auth state timeout reached, redirecting to login');
+      setExtraLoadingStartTime(null);
+      return <Navigate to="/" replace state={{ from: location }} />;
+    }
+  }
+
+  // Clear loading state if we got auth
+  if ((user || hasSession) && extraLoadingStartTime) {
+    setExtraLoadingStartTime(null);
+  }
+
   // Special handling for test users to bypass normal auth flow
   if (user?.email && isTestEmail(user.email)) {
     console.log(`[ProtectedRoute] Test user detected: ${user.email}`);
+
+    // Add specific debug for testfinance users
+    if (user.email === 'testfinance@example.com' || user.email === 'finance1@exampletest.com') {
+      console.warn('[ProtectedRoute] FINANCE USER DETECTED:', {
+        email: user.email,
+        currentPath: location.pathname,
+        willBeRedirectedToMaster: user.email === 'testadmin@example.com',
+      });
+    }
 
     // Special case for testadmin@example.com - always allow access to master-admin
     if (user.email === 'testadmin@example.com') {
@@ -272,6 +411,34 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     });
 
     return <Navigate to="/dashboard" replace />;
+  }
+
+  // Special handling for single-finance route - add extra loading time for auth propagation
+  if (location.pathname === '/dashboard/single-finance' && !user && !hasSession && !loading) {
+    console.log(
+      '[ProtectedRoute] Single finance route accessed without immediate auth state, waiting...'
+    );
+
+    if (!extraLoadingStartTime) {
+      setExtraLoadingStartTime(Date.now());
+    }
+
+    const timeElapsed = extraLoadingStartTime ? Date.now() - extraLoadingStartTime : 0;
+
+    if (timeElapsed < 2000) {
+      // Wait up to 2 seconds
+      return (
+        <div className="flex h-screen items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
+            <p className="text-sm text-gray-500">Loading your dashboard...</p>
+            <p className="text-xs text-gray-400 mt-1">
+              Please wait ({Math.round((2000 - timeElapsed) / 1000)}s)
+            </p>
+          </div>
+        </div>
+      );
+    }
   }
 
   // All checks passed, render the protected content

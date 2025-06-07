@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Routes, Route, Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../../components/ui/card';
@@ -20,6 +20,7 @@ import {
 import DealLogPage from '../../pages/DealLogPage';
 import { SingleFinanceHomePage } from '../../pages/finance/SingleFinanceHomePage';
 import FinanceDealsPage from '../../pages/finance/FinanceDealsPage';
+import LogSingleFinanceDeal from '../../pages/finance/LogSingleFinanceDeal';
 import { getFinanceManagerDeals } from '../../lib/apiService';
 
 // Interface for a deal
@@ -50,21 +51,57 @@ const SingleFinanceManagerDashboard = () => {
   // Get the schema name from user metadata
   const schemaName = user?.user_metadata?.schema_name || '';
 
+  // Function to load deals from localStorage for Single Finance Dashboard
+  const loadDealsFromLocalStorage = () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      console.log('[SingleFinanceManagerDashboard] Loading deals from localStorage');
+
+      const existingDealsJson = localStorage.getItem('singleFinanceDeals');
+      const existingDeals = existingDealsJson ? JSON.parse(existingDealsJson) : [];
+
+      console.log(
+        `[SingleFinanceManagerDashboard] Found ${existingDeals.length} deals in localStorage`
+      );
+
+      // Map localStorage deal format to the component's Deal interface
+      const formattedDeals: Deal[] = existingDeals.map((localDeal: any) => ({
+        id: localDeal.id || localDeal.deal_number || 'unknown',
+        customer: localDeal.customer_name || localDeal.customer,
+        vehicle: localDeal.vehicle,
+        vin: localDeal.vin || '',
+        saleDate: localDeal.sale_date || localDeal.saleDate,
+        salesperson: localDeal.salesperson || 'Self',
+        amount: localDeal.amount || localDeal.total_gross || 0,
+        status: localDeal.status || 'pending',
+        products: Array.isArray(localDeal.products) ? localDeal.products : [],
+        profit: localDeal.profit || localDeal.back_end_gross || 0,
+        created_at: localDeal.created_at || new Date().toISOString(),
+      }));
+
+      setDeals(formattedDeals);
+    } catch (error) {
+      console.error(
+        '[SingleFinanceManagerDashboard] Error loading deals from localStorage:',
+        error
+      );
+      setError('Failed to load deals from local storage.');
+      setDeals([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Load deals from the schema if it exists
   useEffect(() => {
     if (schemaName) {
       fetchDealsFromSchema();
     } else {
-      // Fallback to localStorage if no schema is available (for backward compatibility)
-      try {
-        const storedDeals = localStorage.getItem('financeDeals');
-        if (storedDeals) {
-          const parsedDeals = JSON.parse(storedDeals);
-          setDeals(parsedDeals);
-        }
-      } catch (error) {
-        console.error('Error loading deals from localStorage:', error);
-      }
+      // No schema available - load from localStorage for single finance deals
+      console.log('[SingleFinanceManagerDashboard] No schema available, loading from localStorage');
+      loadDealsFromLocalStorage();
     }
   }, [schemaName, timePeriod]);
 
@@ -176,8 +213,13 @@ const SingleFinanceManagerDashboard = () => {
       setShowLogDealForm(true);
     } else {
       setShowLogDealForm(false);
+      // When returning to main dashboard, refresh deals from localStorage
+      if (location.pathname === '/dashboard/single-finance' && !schemaName) {
+        console.log('[SingleFinanceManagerDashboard] Returned to main dashboard, refreshing deals');
+        loadDealsFromLocalStorage();
+      }
     }
-  }, [location.pathname]);
+  }, [location.pathname, schemaName]);
 
   useEffect(() => {
     console.log('[SingleFinanceManagerDashboard] Rendering single finance manager dashboard', {
@@ -197,7 +239,7 @@ const SingleFinanceManagerDashboard = () => {
   // Simple function to handle the "Log New Deal" button click
   const handleLogNewDealClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    navigate('/finance-manager/log-deal'); // Updated route for the new Finance Manager Deal logging page
+    navigate('/dashboard/single-finance/log-deal'); // Updated route for Single Finance specific Log Deal page
   };
 
   // Helper to get the current month and year for display
@@ -312,30 +354,43 @@ const SingleFinanceManagerDashboard = () => {
           </select>
         </div>
 
-        <Button
-          size="lg"
-          className="bg-green-600 hover:bg-green-700"
-          onClick={handleLogNewDealClick}
-        >
-          <span className="flex items-center">
-            <PlusCircle className="mr-2 h-5 w-5" />
-            Log New Deal
-          </span>
-        </Button>
+        <div className="flex space-x-4">
+          <Button
+            size="lg"
+            className="bg-orange-600 hover:bg-orange-700"
+            onClick={handleLogNewDealClick}
+          >
+            <span className="flex items-center">
+              <PlusCircle className="mr-2 h-5 w-5" />
+              Log New Deal
+            </span>
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => {
+              console.log('[SingleFinanceManagerDashboard] Manual refresh clicked');
+              loadDealsFromLocalStorage();
+            }}
+          >
+            <span className="flex items-center">🔄 Refresh Deals ({deals.length})</span>
+          </Button>
+        </div>
       </div>
 
       {/* Main Dashboard Content */}
-      <div className="mb-8">
+      <div>
         <Routes>
           <Route path="/" element={<SingleFinanceHomePage />} />
           <Route path="/deals" element={<FinanceDealsPage />} />
+          <Route path="/log-deal" element={<LogSingleFinanceDeal />} />
           <Route path="*" element={<Navigate to="/dashboard/single-finance" replace />} />
         </Routes>
       </div>
 
       {/* Deals Log Section */}
-      <Card className="border hover:shadow-md transition-shadow mt-6">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 border-b">
+      <Card className="col-span-12 bg-white border-slate-200 shadow-sm">
+        <CardHeader className="py-2 px-4 border-b flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-lg font-medium flex items-center">
             <FileText className="mr-2 h-5 w-5 text-blue-500" />
             Deals Log
@@ -344,7 +399,7 @@ const SingleFinanceManagerDashboard = () => {
             <Link to="/dashboard/single-finance/deals">View All</Link>
           </Button>
         </CardHeader>
-        <CardContent className="pt-4 px-0">
+        <CardContent className="p-4">
           {deals.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">

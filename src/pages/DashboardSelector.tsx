@@ -28,14 +28,14 @@ const DashboardSelector: React.FC = () => {
     {
       name: 'Finance Manager',
       path: '/dashboard/finance',
-      email: 'finance1@exampletest.com',
+      email: 'finance@exampletest.com',
       role: 'finance_manager',
     },
     {
       name: 'Single Finance Manager',
       path: '/dashboard/single-finance',
-      email: 'finance.single@exampletest.com',
-      role: 'finance_manager',
+      email: 'testfinance@example.com',
+      role: 'single_finance_manager',
     },
     {
       name: 'Sales Manager',
@@ -80,7 +80,10 @@ const DashboardSelector: React.FC = () => {
         isAdmin: dashboard.role === 'admin',
         isGroupAdmin: dashboard.role === 'dealer_group_admin',
         name: dashboard.name,
-        dealershipId: dashboard.role === 'dealership_admin' ? 1 : undefined,
+        dealershipId:
+          dashboard.role === 'dealership_admin' || dashboard.role === 'single_finance_manager'
+            ? 1
+            : undefined,
       };
 
       localStorage.setItem('directauth_user', JSON.stringify(userData));
@@ -134,8 +137,11 @@ const DashboardSelector: React.FC = () => {
       console.log(`[DashboardSelector] Logged in as ${dashboard.email}`);
 
       // Special case for fast routing - skip the metadata updates to avoid issues
-      if (dashboard.role === 'finance_manager') {
-        console.log('[DashboardSelector] Using direct navigation for Finance Manager');
+      if (dashboard.role === 'single_finance_manager' || dashboard.role === 'finance_manager') {
+        console.log(
+          '[DashboardSelector] Using direct navigation for Finance Manager:',
+          dashboard.role
+        );
         // Force direct navigation instead of React Router to avoid auth redirects
         window.location.href = dashboard.path;
         return; // Exit early
@@ -228,7 +234,11 @@ const DashboardSelector: React.FC = () => {
                   ${loading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}
                   ${dashboard.name === 'Master Admin' ? 'bg-purple-700 hover:bg-purple-800' : ''}
                   ${dashboard.name === 'Group Admin' ? 'bg-green-600 hover:bg-green-700' : ''}
-                  ${dashboard.name === 'Finance Manager' ? 'bg-indigo-600 hover:bg-indigo-700' : ''}
+                  ${
+                    dashboard.name.includes('Finance Manager')
+                      ? 'bg-indigo-600 hover:bg-indigo-700'
+                      : ''
+                  }
                 `}
               >
                 {dashboard.name}

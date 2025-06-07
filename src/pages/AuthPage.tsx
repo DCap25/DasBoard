@@ -165,44 +165,10 @@ const AuthPage: React.FC = () => {
               <p className="text-sm text-gray-500 text-center">
                 Don't have an account? Contact your administrator.
               </p>
-              <div className="text-center mt-2 flex flex-col gap-1">
-                <a
-                  href="/debug-auth"
-                  className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
-                >
-                  Test User Login
-                </a>
-                <a
-                  href="/direct-login"
-                  className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-bold"
-                >
-                  Reliable Direct Login
-                </a>
-                <a
-                  href="/force-login"
-                  className="text-xs text-red-600 hover:text-red-800 hover:underline"
-                >
-                  Emergency Force Login
-                </a>
-                <a
-                  href="/group-admin-bypass?auto=true"
-                  className="text-xs text-green-600 hover:text-green-800 hover:underline font-bold"
-                >
-                  ★ Direct Group Admin Login ★
-                </a>
-                <a
-                  href="/logout"
-                  className="text-xs text-red-600 hover:text-red-800 hover:underline mt-2"
-                >
-                  Force Logout
-                </a>
-              </div>
             </CardFooter>
           </Card>
         </div>
       </div>
-
-      <AuthDebugButton placement="bottom-right" />
     </div>
   );
 };

@@ -61,7 +61,7 @@ const FinanceDashboard = () => {
   // Simple function to handle the "Log New Deal" button click
   const handleLogNewDealClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    navigate('/finance-deal-log'); // Specific route for Finance Dashboard
+    navigate('/finance-manager/log-deal'); // Updated to point to the correct Finance Manager Deal logging page
   };
 
   // Helper to get the current month and year for display
@@ -178,7 +178,7 @@ const FinanceDashboard = () => {
 
         <Button
           size="lg"
-          className="bg-green-600 hover:bg-green-700"
+          className="bg-orange-600 hover:bg-orange-700"
           onClick={handleLogNewDealClick}
         >
           <span className="flex items-center">

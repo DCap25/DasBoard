@@ -48,6 +48,27 @@ export const TEST_USERS: DirectAuthUser[] = [
     dealershipId: 1,
     name: 'Salesperson',
   },
+  {
+    id: 'finance-manager-1-id',
+    email: 'finance@exampletest.com',
+    role: 'finance_manager',
+    dealershipId: 1,
+    name: 'Finance Manager',
+  },
+  {
+    id: 'finance-manager-2-id',
+    email: 'testfinance@example.com',
+    role: 'single_finance_manager',
+    dealershipId: 1,
+    name: 'Single Finance Manager',
+  },
+  {
+    id: 'finance-manager-3-id',
+    email: 'finance1@exampletest.com',
+    role: 'single_finance_manager',
+    dealershipId: 1,
+    name: 'Single Finance Manager 2',
+  },
 ];
 
 // Storage key for the auth user
@@ -139,6 +160,10 @@ export function getRedirectPath(user: DirectAuthUser): string {
 
   if (user.role === 'finance_manager') {
     return '/dashboard/finance';
+  }
+
+  if (user.role === 'single_finance_manager') {
+    return '/dashboard/single-finance';
   }
 
   if (user.role === 'general_manager') {

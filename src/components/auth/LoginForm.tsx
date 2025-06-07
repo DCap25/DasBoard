@@ -114,11 +114,43 @@ export default function LoginForm() {
         timestamp: new Date().toISOString(),
       });
 
+      // Fetch user profile to get actual role from database
+      console.log('[LoginForm] Fetching user profile to determine role-based redirect');
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('role, is_group_admin')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profileError) {
+        console.error('[LoginForm] Error fetching user profile:', profileError);
+        // Fall back to basic dashboard if we can't get the role
+        navigate('/dashboard', { replace: true });
+        return;
+      }
+
+      const userRole = profileData?.role;
+      const isGroupAdmin = profileData?.is_group_admin;
+
+      console.log('[LoginForm] User role from database:', { userRole, isGroupAdmin, email });
+
+      // Set coordination flag for ProtectedRoute
+      localStorage.setItem('recent_supabase_login', 'true');
+      console.log('[LoginForm] Set recent_supabase_login flag for ProtectedRoute coordination');
+      localStorage.setItem('last_login_email', email); // Track email for bypass
+
       // Determine redirect path based on user role/email
       let redirectPath = '/dashboard';
 
+      // Special case for testfinance@example.com - redirect to single finance dashboard
+      if (email.toLowerCase() === 'testfinance@example.com') {
+        redirectPath = '/dashboard/single-finance';
+        console.log(
+          '[LoginForm] Test finance user detected, redirecting to single finance dashboard'
+        );
+      }
       // Check for admin roles - more comprehensive admin detection
-      if (
+      else if (
         email.toLowerCase() === 'testadmin@example.com' ||
         email.toLowerCase() === 'admin@thedasboard.com' ||
         email.toLowerCase() === 'admin@example.com' ||
@@ -252,6 +284,12 @@ export default function LoginForm() {
     setError('Setting up test users...');
 
     const testUsersToCreate = [
+      {
+        email: 'testfinance@example.com',
+        password: 'Password123!',
+        role: 'single_finance_manager',
+        name: 'Test Finance Manager',
+      },
       {
         email: 'testadmin@example.com',
         password: 'Password123!',

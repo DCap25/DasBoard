@@ -30,9 +30,10 @@ const createSupabaseClient = () => {
 
   supabaseInstance = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     auth: {
-      persistSession: false, // Disable session persistence to avoid conflicts
-      autoRefreshToken: false, // Disable auto-refresh to avoid timeouts
-      detectSessionInUrl: false, // Disable URL session detection
+      persistSession: true, // Enable session persistence
+      autoRefreshToken: true, // Enable auto-refresh
+      detectSessionInUrl: true, // Enable URL session detection for redirects
+      storage: window.localStorage, // Use localStorage for session storage
     },
     global: {
       headers: {

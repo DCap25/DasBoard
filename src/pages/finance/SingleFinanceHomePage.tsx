@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Link } from 'react-router-dom';
-import { DealLog } from '../../components/finance/DealLog';
 import {
   DollarSign,
   ChevronUp,
@@ -40,6 +39,18 @@ interface Deal {
   products: string[];
   profit: number;
   created_at: string;
+  back_end_gross?: number;
+  vsc_profit?: number;
+  gap_profit?: number;
+  appearance_profit?: number;
+  tire_wheel_profit?: number;
+  ppm_profit?: number;
+  ext_warranty_profit?: number;
+  key_replacement_profit?: number;
+  theft_profit?: number;
+  windshield_profit?: number;
+  lojack_profit?: number;
+  other_profit?: number;
 }
 
 // Interface for metrics
@@ -73,84 +84,8 @@ const SCHEDULE_DATA = [
   { day: 'Sunday', date: '18', shift: 'Off', team: '' },
 ];
 
-// Mock deals
-const MOCK_DEALS: Deal[] = [
-  {
-    id: 'D12345',
-    customer: 'John Smith',
-    vehicle: '2023 Toyota Camry',
-    vin: '1HGCM82633A123456',
-    saleDate: '2023-05-02',
-    salesperson: 'Mike Johnson',
-    amount: 32500,
-    status: 'Completed',
-    products: ['Vehicle Service Contract (VSC)', 'GAP', 'Tire and Wheel Bundle'],
-    profit: 2200,
-    created_at: '2023-05-02T14:30:00Z',
-  },
-  {
-    id: 'D12346',
-    customer: 'Sarah Williams',
-    vehicle: '2023 Honda Accord',
-    vin: '1HGCM82633A789012',
-    saleDate: '2023-05-03',
-    salesperson: 'Jessica Lee',
-    amount: 28900,
-    status: 'Pending',
-    products: ['PrePaid Maintenance (PPM)'],
-    profit: 1750,
-    created_at: '2023-05-03T11:15:00Z',
-  },
-  {
-    id: 'D12347',
-    customer: 'Robert Davis',
-    vehicle: '2023 Ford Explorer',
-    vin: '1FMHK7D83CGA12345',
-    saleDate: '2023-05-05',
-    salesperson: 'Alex Martinez',
-    amount: 42500,
-    status: 'Completed',
-    products: [
-      'Vehicle Service Contract (VSC)',
-      'GAP',
-      'PrePaid Maintenance (PPM)',
-      'Tire and Wheel Bundle',
-    ],
-    profit: 3100,
-    created_at: '2023-05-05T16:45:00Z',
-  },
-  {
-    id: 'D12348',
-    customer: 'Emily Johnson',
-    vehicle: '2022 Nissan Altima',
-    vin: '1N4AL3AP8DC234567',
-    saleDate: '2023-05-07',
-    salesperson: 'Mike Johnson',
-    amount: 26900,
-    status: 'Pending',
-    products: ['GAP'],
-    profit: 1450,
-    created_at: '2023-05-07T09:30:00Z',
-  },
-  {
-    id: 'D12349',
-    customer: 'Thomas Wilson',
-    vehicle: '2023 Chevrolet Tahoe',
-    vin: '1GNSKBE72DR345678',
-    saleDate: '2023-05-10',
-    salesperson: 'Jessica Lee',
-    amount: 58900,
-    status: 'Completed',
-    products: [
-      'Vehicle Service Contract (VSC)',
-      'GAP',
-      'Paint Protection',
-      'Tire and Wheel Bundle',
-    ],
-    profit: 4200,
-    created_at: '2023-05-10T15:00:00Z',
-  },
-];
+// Mock deals - cleared for testing
+const MOCK_DEALS: Deal[] = [];
 
 export const SingleFinanceHomePage: React.FC = () => {
   const [deals, setDeals] = useState<Deal[]>([]);
@@ -179,31 +114,98 @@ export const SingleFinanceHomePage: React.FC = () => {
   // State to control promotional banner visibility
   const [showPromoBanner, setShowPromoBanner] = useState(true);
 
-  // Load mock data on component mount
+  // Load deals from localStorage and recalculate when component mounts or data changes
   useEffect(() => {
-    // In a real application, this would be an API call
-    setDeals(MOCK_DEALS);
-    setPendingDeals(MOCK_DEALS.filter(deal => deal.status === 'Pending'));
+    loadDealsFromStorage();
 
-    // Filter deals based on selected time period
-    filterDealsByDateRange();
-  }, [timePeriod, customDateRange]);
+    // Listen for storage changes from other tabs/windows
+    const handleStorageChange = (e: any) => {
+      if (e.key === 'singleFinanceDeals') {
+        console.log('[SingleFinanceHomePage] Storage change detected, reloading deals');
+        loadDealsFromStorage();
+      }
+    };
+
+    // Listen for window focus to refresh data when returning to tab
+    const handleWindowFocus = () => {
+      console.log('[SingleFinanceHomePage] Window focus detected, refreshing deals');
+      loadDealsFromStorage();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('focus', handleWindowFocus);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('focus', handleWindowFocus);
+    };
+  }, []);
+
+  // Function to manually refresh deals (can be called by buttons)
+  const refreshDeals = () => {
+    console.log('[SingleFinanceHomePage] Manual refresh triggered');
+    loadDealsFromStorage();
+  };
+
+  // Expose refresh function globally for debugging
+  useEffect(() => {
+    (window as any).refreshSingleFinanceDeals = refreshDeals;
+    return () => {
+      delete (window as any).refreshSingleFinanceDeals;
+    };
+  }, []);
+
+  // Separate effect for time period changes
+  useEffect(() => {
+    if (deals.length > 0) {
+      filterDealsByDateRange();
+    }
+  }, [timePeriod, customDateRange, deals]);
+
+  // Function to load deals from localStorage
+  const loadDealsFromStorage = useCallback(() => {
+    try {
+      // Load from SEPARATE storage for Single Finance Dashboard
+      const storedDeals = localStorage.getItem('singleFinanceDeals');
+      if (storedDeals) {
+        const parsedDeals = JSON.parse(storedDeals);
+        console.log(
+          '[SingleFinanceHomePage] Loaded deals from singleFinanceDeals storage:',
+          parsedDeals
+        );
+        setDeals(parsedDeals);
+        setPendingDeals(
+          parsedDeals.filter((deal: Deal) => deal.status === 'Pending' || deal.status === 'pending')
+        );
+      } else {
+        // Fallback to mock data if no stored deals
+        console.log('[SingleFinanceHomePage] No stored deals found, using mock data');
+        setDeals(MOCK_DEALS);
+        setPendingDeals(MOCK_DEALS.filter(deal => deal.status === 'Pending'));
+      }
+    } catch (error) {
+      console.error('[SingleFinanceHomePage] Error loading deals from localStorage:', error);
+      // Fallback to mock data
+      setDeals(MOCK_DEALS);
+      setPendingDeals(MOCK_DEALS.filter(deal => deal.status === 'Pending'));
+    }
+  }, []);
 
   // Filter deals based on selected time period
-  const filterDealsByDateRange = () => {
+  const filterDealsByDateRange = useCallback(() => {
     const { startDate, endDate } = getDateRange(timePeriod);
 
-    const filtered = MOCK_DEALS.filter(deal => {
+    const filtered = deals.filter(deal => {
       const dealDate = new Date(deal.saleDate);
       return dealDate >= startDate && dealDate <= endDate;
     });
 
     setFilteredDeals(filtered);
     calculateMetrics(filtered);
-  };
+  }, [deals, timePeriod, customDateRange]);
 
   // Calculate metrics based on filtered deals
-  const calculateMetrics = (deals: Deal[]) => {
+  const calculateMetrics = useCallback((deals: Deal[]) => {
     if (deals.length === 0) {
       setMetrics({
         mtdRevenue: 0,
@@ -222,10 +224,16 @@ export const SingleFinanceHomePage: React.FC = () => {
       return;
     }
 
-    const totalRevenue = deals.reduce((acc, deal) => acc + deal.profit, 0);
+    // Calculate total revenue - handle both new and old data structures
+    const totalRevenue = deals.reduce((acc, deal) => {
+      // New structure has back_end_gross, old structure has profit
+      const dealProfit = deal.back_end_gross || deal.profit || 0;
+      return acc + dealProfit;
+    }, 0);
+
     const totalDeals = deals.length;
 
-    // Count products
+    // Count products - handle both new and old structures
     let extendedWarrantyCount = 0;
     let gapInsuranceCount = 0;
     let paintProtectionCount = 0;
@@ -234,21 +242,45 @@ export const SingleFinanceHomePage: React.FC = () => {
     let otherCount = 0;
 
     deals.forEach(deal => {
-      deal.products.forEach(product => {
-        if (product.includes('Vehicle Service Contract') || product.includes('VSC')) {
-          extendedWarrantyCount++;
-        } else if (product.includes('GAP')) {
-          gapInsuranceCount++;
-        } else if (product.includes('Paint Protection')) {
-          paintProtectionCount++;
-        } else if (product.includes('Tire and Wheel')) {
-          tireWheelCount++;
-        } else if (product.includes('PrePaid Maintenance') || product.includes('PPM')) {
-          ppmCount++;
-        } else {
-          otherCount++;
-        }
-      });
+      // Check if deal has new structure with individual profit fields
+      if (deal.vsc_profit && deal.vsc_profit > 0) extendedWarrantyCount++;
+      if (deal.gap_profit && deal.gap_profit > 0) gapInsuranceCount++;
+      if (deal.appearance_profit && deal.appearance_profit > 0) paintProtectionCount++;
+      if (deal.tire_wheel_profit && deal.tire_wheel_profit > 0) tireWheelCount++;
+      if (deal.ppm_profit && deal.ppm_profit > 0) ppmCount++;
+      if (
+        (deal.ext_warranty_profit && deal.ext_warranty_profit > 0) ||
+        (deal.key_replacement_profit && deal.key_replacement_profit > 0) ||
+        (deal.theft_profit && deal.theft_profit > 0) ||
+        (deal.windshield_profit && deal.windshield_profit > 0) ||
+        (deal.lojack_profit && deal.lojack_profit > 0) ||
+        (deal.other_profit && deal.other_profit > 0)
+      ) {
+        otherCount++;
+      }
+
+      // Fallback to products array for older deals
+      if (deal.products && Array.isArray(deal.products)) {
+        deal.products.forEach(product => {
+          const productLower = product.toLowerCase();
+          if (productLower.includes('vehicle service contract') || productLower.includes('vsc')) {
+            extendedWarrantyCount++;
+          } else if (productLower.includes('gap')) {
+            gapInsuranceCount++;
+          } else if (
+            productLower.includes('paint protection') ||
+            productLower.includes('appearance')
+          ) {
+            paintProtectionCount++;
+          } else if (productLower.includes('tire') && productLower.includes('wheel')) {
+            tireWheelCount++;
+          } else if (productLower.includes('prepaid maintenance') || productLower.includes('ppm')) {
+            ppmCount++;
+          } else {
+            otherCount++;
+          }
+        });
+      }
     });
 
     const totalProductCount =
@@ -265,8 +297,8 @@ export const SingleFinanceHomePage: React.FC = () => {
     setMetrics({
       mtdRevenue: totalRevenue,
       dealsProcessed: totalDeals,
-      productsPerDeal: totalProductCount / totalDeals,
-      pvr: totalRevenue / totalDeals,
+      productsPerDeal: totalDeals > 0 ? totalProductCount / totalDeals : 0,
+      pvr: totalDeals > 0 ? totalRevenue / totalDeals : 0,
       productMix: {
         extendedWarranty: calculatePercentage(extendedWarrantyCount),
         gapInsurance: calculatePercentage(gapInsuranceCount),
@@ -276,7 +308,7 @@ export const SingleFinanceHomePage: React.FC = () => {
         other: calculatePercentage(otherCount),
       },
     });
-  };
+  }, []);
 
   // Helper to get the current month and year for display
   const getCurrentMonthYear = () => {
@@ -285,48 +317,52 @@ export const SingleFinanceHomePage: React.FC = () => {
   };
 
   // Get date range based on selected time period
-  const getDateRange = (period: TimePeriod) => {
-    const today = new Date();
-    let startDate = new Date();
-    let endDate = new Date();
+  const getDateRange = useCallback(
+    (period: TimePeriod) => {
+      const today = new Date();
+      let startDate = new Date();
+      let endDate = new Date();
 
-    switch (period) {
-      case 'this-month':
-        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-        endDate = today;
-        break;
+      switch (period) {
+        case 'this-month':
+          startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+          endDate = today;
+          break;
 
-      case 'last-month':
-        startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-        endDate = new Date(today.getFullYear(), today.getMonth(), 0);
-        break;
+        case 'last-month':
+          startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+          endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+          break;
 
-      case 'last-quarter':
-        const currentQuarter = Math.floor(today.getMonth() / 3);
-        startDate = new Date(today.getFullYear(), currentQuarter * 3 - 3, 1);
-        endDate = new Date(today.getFullYear(), currentQuarter * 3, 0);
-        break;
-
-      case 'ytd':
-        startDate = new Date(today.getFullYear(), 0, 1);
-        endDate = today;
-        break;
-
-      case 'last-year':
-        startDate = new Date(today.getFullYear() - 1, 0, 1);
-        endDate = new Date(today.getFullYear() - 1, 11, 31);
-        break;
-
-      case 'custom':
-        if (customDateRange.start && customDateRange.end) {
-          startDate = new Date(customDateRange.start);
-          endDate = new Date(customDateRange.end);
+        case 'last-quarter': {
+          const currentQuarter = Math.floor(today.getMonth() / 3);
+          startDate = new Date(today.getFullYear(), currentQuarter * 3 - 3, 1);
+          endDate = new Date(today.getFullYear(), currentQuarter * 3, 0);
+          break;
         }
-        break;
-    }
 
-    return { startDate, endDate };
-  };
+        case 'ytd':
+          startDate = new Date(today.getFullYear(), 0, 1);
+          endDate = today;
+          break;
+
+        case 'last-year':
+          startDate = new Date(today.getFullYear() - 1, 0, 1);
+          endDate = new Date(today.getFullYear() - 1, 11, 31);
+          break;
+
+        case 'custom':
+          if (customDateRange.start && customDateRange.end) {
+            startDate = new Date(customDateRange.start);
+            endDate = new Date(customDateRange.end);
+          }
+          break;
+      }
+
+      return { startDate, endDate };
+    },
+    [customDateRange]
+  );
 
   // Check if the day is today for styling
   const isToday = (day: string) => {
@@ -340,12 +376,22 @@ export const SingleFinanceHomePage: React.FC = () => {
       {/* Promotional Banner */}
       {showPromoBanner && (
         <div className="mb-6 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-lg shadow-sm relative">
-          <button 
+          <button
             className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
             onClick={() => setShowPromoBanner(false)}
             aria-label="Close promotional banner"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
@@ -357,8 +403,9 @@ export const SingleFinanceHomePage: React.FC = () => {
             <div>
               <h3 className="font-medium text-blue-800">Special Promotion Active!</h3>
               <p className="text-blue-600">
-                Your Finance Manager subscription is currently <span className="line-through text-gray-500 mr-1">$5/month</span> 
-                <span className="font-bold text-red-500">FREE</span> 
+                Your Finance Manager subscription is currently{' '}
+                <span className="line-through text-gray-500 mr-1">$5/month</span>
+                <span className="font-bold text-red-500">FREE</span>
                 <span className="text-gray-500 text-sm italic ml-1">for a limited time</span>
               </p>
             </div>
@@ -370,15 +417,15 @@ export const SingleFinanceHomePage: React.FC = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Finance Manager Dashboard</h1>
         <div className="space-x-2">
-          <Link to="/dashboard/single-finance/log-deal">
-            <Button className="bg-green-600 hover:bg-green-700">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Log New Deal
-            </Button>
-          </Link>
-          <DropdownMenu>
-            {/* ... existing dropdown menu code ... */}
-          </DropdownMenu>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={refreshDeals}
+            className="bg-blue-50 hover:bg-blue-100"
+          >
+            🔄 Refresh Data ({deals.length} deals)
+          </Button>
+          <DropdownMenu>{/* ... existing dropdown menu code ... */}</DropdownMenu>
         </div>
       </div>
 
@@ -477,7 +524,7 @@ export const SingleFinanceHomePage: React.FC = () => {
       </div>
 
       {/* Product Mix Section - Now Full Width */}
-      <Card className="col-span-12 bg-white border-slate-200 shadow-sm">
+      <Card className="col-span-12 bg-white border-slate-200 shadow-sm mt-6">
         <CardHeader className="py-2 px-4 border-b">
           <CardTitle className="flex items-center text-lg font-medium">
             <BarChart4 className="mr-2 h-5 w-5 text-blue-500" />
@@ -669,13 +716,8 @@ export const SingleFinanceHomePage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Deal Log Section */}
-      <div className="mt-8">
-        <DealLog />
-      </div>
-
       {/* Schedule Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         {/* ... existing schedule section ... */}
       </div>
     </div>
