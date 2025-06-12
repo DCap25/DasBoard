@@ -354,28 +354,16 @@ const SingleFinanceManagerDashboard = () => {
           </select>
         </div>
 
-        <div className="flex space-x-4">
-          <Button
-            size="lg"
-            className="bg-orange-600 hover:bg-orange-700"
-            onClick={handleLogNewDealClick}
-          >
-            <span className="flex items-center">
-              <PlusCircle className="mr-2 h-5 w-5" />
-              Log New Deal
-            </span>
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => {
-              console.log('[SingleFinanceManagerDashboard] Manual refresh clicked');
-              loadDealsFromLocalStorage();
-            }}
-          >
-            <span className="flex items-center">🔄 Refresh Deals ({deals.length})</span>
-          </Button>
-        </div>
+        <Button
+          size="lg"
+          className="bg-orange-600 hover:bg-orange-700"
+          onClick={handleLogNewDealClick}
+        >
+          <span className="flex items-center">
+            <PlusCircle className="mr-2 h-5 w-5" />
+            Log New Deal
+          </span>
+        </Button>
       </div>
 
       {/* Main Dashboard Content */}

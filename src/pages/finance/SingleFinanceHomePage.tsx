@@ -417,14 +417,6 @@ export const SingleFinanceHomePage: React.FC = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Finance Manager Dashboard</h1>
         <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={refreshDeals}
-            className="bg-blue-50 hover:bg-blue-100"
-          >
-            🔄 Refresh Data ({deals.length} deals)
-          </Button>
           <DropdownMenu>{/* ... existing dropdown menu code ... */}</DropdownMenu>
         </div>
       </div>
