@@ -45,7 +45,13 @@ const USER_ROLES = [
   { id: 'general_manager', name: 'General Manager', category: 'management' },
   { id: 'gsm', name: 'GSM', category: 'management' },
   { id: 'dealership_admin', name: 'Dealership Admin', category: 'admin' },
-  { id: 'viewer', name: 'Viewer', category: 'other' },
+];
+
+// Employment status options
+const EMPLOYMENT_STATUS = [
+  { id: 'employed', name: 'Employed', color: 'bg-green-100 text-green-800' },
+  { id: 'suspended', name: 'Suspended', color: 'bg-yellow-100 text-yellow-800' },
+  { id: 'terminated', name: 'Terminated', color: 'bg-red-100 text-red-800' },
 ];
 
 // Interfaces
@@ -56,6 +62,7 @@ interface User {
   email: string;
   role: string;
   role_id: string;
+  employment_status?: string;
   created_at: string;
   start_date?: string;
   isEditing?: boolean;
@@ -178,7 +185,7 @@ export function AdminDashboard() {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, email, role, created_at, start_date, first_name, last_name')
+        .select('id, email, role, created_at, start_date, first_name, last_name, employment_status')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -200,6 +207,7 @@ export function AdminDashboard() {
           email: user.email,
           role: user.role || 'viewer',
           role_id: user.role || 'viewer',
+          employment_status: user.employment_status,
           created_at: user.created_at,
           start_date: user.start_date,
         })) || [];
@@ -313,14 +321,54 @@ export function AdminDashboard() {
     }
   };
 
+  // Update user employment status
+  const updateEmploymentStatus = async (userId: string, status: string) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ employment_status: status })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Success',
+        description: `Employment status updated to ${status}`,
+      });
+
+      await fetchUsers();
+    } catch (error) {
+      console.error('Error updating employment status:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update employment status',
+        variant: 'destructive',
+      });
+    }
+  };
+
   // Toggle edit mode
   const toggleEditMode = (userId: string) => {
     setEditingUserId(editingUserId === userId ? null : userId);
   };
 
-  // Filter users by role
+  // Filter users by role and sort by employment status
   const getUsersByRole = (role: string) => {
-    return users.filter(user => (user.role || user.role_id) === role);
+    const filteredUsers = users.filter(user => (user.role || user.role_id) === role);
+
+    // Sort by employment status: employed first, then suspended, then terminated
+    return filteredUsers.sort((a, b) => {
+      const statusOrder = { employed: 0, suspended: 1, terminated: 2 };
+      const statusA = a.employment_status || 'employed';
+      const statusB = b.employment_status || 'employed';
+      return statusOrder[statusA] - statusOrder[statusB];
+    });
+  };
+
+  // Get status badge styling
+  const getStatusBadge = (status: string = 'employed') => {
+    const statusConfig = EMPLOYMENT_STATUS.find(s => s.id === status) || EMPLOYMENT_STATUS[0];
+    return <Badge className={statusConfig.color}>{statusConfig.name}</Badge>;
   };
 
   // Format currency
@@ -448,11 +496,24 @@ export function AdminDashboard() {
                             ? new Date(user.start_date).toLocaleDateString()
                             : 'Not set'}
                         </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">Active</Badge>
-                        </TableCell>
+                        <TableCell>{getStatusBadge(user.employment_status)}</TableCell>
                         <TableCell>
                           <div className="flex items-center space-x-2">
+                            <Select
+                              value={user.employment_status || 'employed'}
+                              onValueChange={value => updateEmploymentStatus(user.id, value)}
+                            >
+                              <SelectTrigger className="w-32">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {EMPLOYMENT_STATUS.map(status => (
+                                  <SelectItem key={status.id} value={status.id}>
+                                    {status.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                             <Button
                               variant="outline"
                               size="sm"
@@ -500,11 +561,24 @@ export function AdminDashboard() {
                             ? new Date(user.start_date).toLocaleDateString()
                             : 'Not set'}
                         </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">Active</Badge>
-                        </TableCell>
+                        <TableCell>{getStatusBadge(user.employment_status)}</TableCell>
                         <TableCell>
                           <div className="flex items-center space-x-2">
+                            <Select
+                              value={user.employment_status || 'employed'}
+                              onValueChange={value => updateEmploymentStatus(user.id, value)}
+                            >
+                              <SelectTrigger className="w-32">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {EMPLOYMENT_STATUS.map(status => (
+                                  <SelectItem key={status.id} value={status.id}>
+                                    {status.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                             <Button
                               variant="outline"
                               size="sm"
@@ -552,11 +626,24 @@ export function AdminDashboard() {
                             ? new Date(user.start_date).toLocaleDateString()
                             : 'Not set'}
                         </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">Active</Badge>
-                        </TableCell>
+                        <TableCell>{getStatusBadge(user.employment_status)}</TableCell>
                         <TableCell>
                           <div className="flex items-center space-x-2">
+                            <Select
+                              value={user.employment_status || 'employed'}
+                              onValueChange={value => updateEmploymentStatus(user.id, value)}
+                            >
+                              <SelectTrigger className="w-32">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {EMPLOYMENT_STATUS.map(status => (
+                                  <SelectItem key={status.id} value={status.id}>
+                                    {status.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                             <Button
                               variant="outline"
                               size="sm"

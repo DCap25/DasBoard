@@ -1,8 +1,132 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../lib/supabaseClient';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { useToast } from '../../lib/use-toast';
 import {
+  Building2,
+  Users,
+  Car,
+  TrendingUp,
+  Plus,
+  Edit,
+  MapPin,
+  BarChart3,
+  UserCircle,
+  Calculator,
+  Target,
+  Crown,
+} from 'lucide-react';
+
+// Interfaces
+interface Dealership {
+  id: string;
+  name: string;
+  location: string;
+  created_at: string;
+  salespeople_count: number;
+  finance_count: number;
+  managers_count: number;
+  total_staff: number;
+  monthly_sales: number;
+  monthly_revenue: number;
+}
+
+interface GroupMetrics {
+  total_dealerships: number;
+  total_users: number;
+  monthly_vehicles_sold: number;
+  total_revenue: number;
+}
+
+interface NewDealershipData {
+  name: string;
+  location: string;
+  phone: string;
+  email: string;
+}
+
+export function GroupAdminDashboard() {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  // Check for direct auth
+  const directAuthData = localStorage.getItem('directauth_user');
+  const directUser = directAuthData ? JSON.parse(directAuthData) : null;
+  const currentUser = user || directUser;
+
+  // State
+  const [dealerships, setDealerships] = useState<Dealership[]>([]);
+  const [groupMetrics, setGroupMetrics] = useState<GroupMetrics>({
+    total_dealerships: 0,
+    total_users: 0,
+    monthly_vehicles_sold: 0,
+    total_revenue: 0,
+  });
+  const [loading, setLoading] = useState(false);
+  const [showAddDealership, setShowAddDealership] = useState(false);
+  const [newDealershipData, setNewDealershipData] = useState<NewDealershipData>({
+    name: '',
+    location: '',
+    phone: '',
+    email: '',
+  });
+
+  // Fetch data on component mount
+  useEffect(() => {
+    console.log('[GroupAdminDashboard] Component mounting - currentUser:', currentUser?.email);
+    if (currentUser) {
+      fetchDashboardData();
+    }
+  }, [currentUser]);
+
+  // Fetch all dashboard data
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      
+      // Mock data for demonstration
+      const mockDealerships: Dealership[] = [
+        {
+          id: '1',
+          name: 'Downtown Toyota',
+          location: 'Chicago, IL',
+          created_at: '2024-01-15',
+          salespeople_count: 12,
+          finance_count: 3,
+          managers_count: 4,
+          total_staff: 19,
+          monthly_sales: 145,
+          monthly_revenue: 4350000,
+        },
+        {
+          id: '2',
+          name: 'Suburban Honda',
+          location: 'Naperville, IL',
+          created_at: '2024-02-01',
+          salespeople_count: 8,
+          finance_count: 2,
+          managers_count: 3,
+          total_staff: 13,
+          monthly_sales: 98,
+          monthly_revenue: 2940000,
+        },
+        {
+          id: '3',
+          name: 'Metro Ford',
+          location: 'Aurora, IL',
+          created_at: '2024-01-20',
+          salespeople_count: 15,
+          finance_count: 4,
+          managers_count: 5,
+          total_staff: 24,
+          monthly_sales: 187,
+          monthly_revenue: 5610000,
   Card,
   CardContent,
   CardDescription,
@@ -43,6 +167,12 @@ import {
   LayoutGrid,
   ClipboardList,
   User,
+  Car,
+  TrendingUp,
+  Target,
+  Crown,
+  Building,
+  MapPin,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -78,6 +208,14 @@ import {
   createDealershipUser,
   getDealershipUsers,
 } from '../../lib/apiService';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../../components/ui/table';
 
 // Define interfaces
 interface User {
@@ -155,6 +293,13 @@ interface Dealership {
   pay_config_name: string;
   schedule?: WeekSchedule;
   scheduler_config?: SchedulerConfig;
+  salespeople_count: number;
+  finance_count: number;
+  managers_count: number;
+  total_staff: number;
+  monthly_sales: number;
+  monthly_revenue: number;
+  avg_deal_value: number;
 }
 
 interface PayPlanTemplate {
@@ -182,6 +327,20 @@ interface AreaVP {
   email: string;
   dealerships: number[];
   created_at: string;
+}
+
+interface GroupMetrics {
+  total_dealerships: number;
+  total_users: number;
+  monthly_vehicles_sold: number;
+  total_revenue: number;
+}
+
+interface NewDealershipData {
+  name: string;
+  location: string;
+  phone: string;
+  email: string;
 }
 
 export function GroupAdminDashboard() {
@@ -222,6 +381,13 @@ export function GroupAdminDashboard() {
     schedule_type: 'Standard',
     pay_config_id: 1,
   });
+  const [groupMetrics, setGroupMetrics] = useState<GroupMetrics>({
+    total_dealerships: 0,
+    total_users: 0,
+    monthly_vehicles_sold: 0,
+    total_revenue: 0,
+  });
+  const [showAddDealership, setShowAddDealership] = useState(false);
 
   // Get admin name
   const [adminName, setAdminName] = useState<string>('');
@@ -313,6 +479,13 @@ export function GroupAdminDashboard() {
                 target_sales_per_month: 15,
                 optimal_team_size: 6,
               },
+              salespeople_count: 12,
+              finance_count: 3,
+              managers_count: 4,
+              total_staff: 19,
+              monthly_sales: 145,
+              monthly_revenue: 4350000,
+              avg_deal_value: 30000,
             },
             {
               id: 2,
@@ -338,6 +511,13 @@ export function GroupAdminDashboard() {
                 min_sales_per_month: 8,
                 target_sales_per_month: 12,
               },
+              salespeople_count: 8,
+              finance_count: 2,
+              managers_count: 3,
+              total_staff: 13,
+              monthly_sales: 98,
+              monthly_revenue: 2940000,
+              avg_deal_value: 30000,
             },
             {
               id: 3,
@@ -357,6 +537,13 @@ export function GroupAdminDashboard() {
                 optimal_team_size: 4,
                 max_teams: 3,
               },
+              salespeople_count: 15,
+              finance_count: 4,
+              managers_count: 5,
+              total_staff: 24,
+              monthly_sales: 187,
+              monthly_revenue: 5610000,
+              avg_deal_value: 30000,
             },
           ];
 
@@ -1096,6 +1283,13 @@ export function GroupAdminDashboard() {
         saturday: { open: '10:00', close: '18:00', closed: false },
         sunday: { open: '11:00', close: '16:00', closed: true },
       },
+      salespeople_count: 0,
+      finance_count: 0,
+      managers_count: 0,
+      total_staff: 0,
+      monthly_sales: 0,
+      monthly_revenue: 0,
+      avg_deal_value: 0,
     };
 
     // Add the new dealership to the state
@@ -1240,6 +1434,13 @@ export function GroupAdminDashboard() {
             pay_config_id: dealership.settings?.pay_config_id || 1,
             pay_config_name: getPayConfigName(dealership.settings?.pay_config_id),
             schedule,
+            salespeople_count: 0,
+            finance_count: 0,
+            managers_count: 0,
+            total_staff: 0,
+            monthly_sales: 0,
+            monthly_revenue: 0,
+            avg_deal_value: 0,
           };
         });
 
@@ -1319,11 +1520,11 @@ export function GroupAdminDashboard() {
     }
   };
 
-  // Add a function to add an Area VP  
-  const addAreaVP = async () => {    
-    try {      
-      setIsAddingAvp(true);      
-      
+  // Add a function to add an Area VP
+  const addAreaVP = async () => {
+    try {
+      setIsAddingAvp(true);
+
       // Initial validation and logging
       console.log('[GroupAdminDashboard] Adding Area VP:', {
         name: newAvpName,
@@ -1333,7 +1534,7 @@ export function GroupAdminDashboard() {
         groupLevel: groupLevel,
         addOns: groupAddOns,
         currentAvpCount: avpCount,
-        maxAvpCount: maxAvpCount
+        maxAvpCount: maxAvpCount,
       });
 
       if (!newAvpEmail || !newAvpName || selectedDealershipIds.length === 0 || !dealershipGroup) {
@@ -1349,7 +1550,7 @@ export function GroupAdminDashboard() {
       if (avpCount >= maxAvpCount && maxAvpCount !== 999) {
         // Special case for ++ Version which has unlimited AVPs
         const hasUnlimitedAvps = groupAddOns.includes('plusplus');
-        
+
         if (!hasUnlimitedAvps) {
           toast({
             title: 'Limit Reached',
@@ -1388,7 +1589,7 @@ export function GroupAdminDashboard() {
           dealership_ids: selectedDealershipIds,
           group_level: groupLevel,
           group_add_ons: groupAddOns,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         },
       });
 
@@ -1405,7 +1606,7 @@ export function GroupAdminDashboard() {
         is_area_vp: true,
         group_id: dealershipGroup.id,
         created_at: new Date().toISOString(),
-        last_sign_in: null
+        last_sign_in: null,
       });
 
       if (profileError) {
@@ -1425,8 +1626,8 @@ export function GroupAdminDashboard() {
           settings: {
             group_level: groupLevel,
             add_ons: groupAddOns,
-            dealership_count: selectedDealershipIds.length
-          }
+            dealership_count: selectedDealershipIds.length,
+          },
         })
         .select()
         .single();
@@ -1439,7 +1640,7 @@ export function GroupAdminDashboard() {
       console.log('[GroupAdminDashboard] Area VP created successfully:', {
         id: avpData.id,
         userId: authData.user.id,
-        dealershipCount: selectedDealershipIds.length
+        dealershipCount: selectedDealershipIds.length,
       });
 
       // Update state with new AVP
@@ -1455,7 +1656,7 @@ export function GroupAdminDashboard() {
         },
       ]);
       setAvpCount(avpCount + 1);
-      
+
       // Reset form fields
       setNewAvpEmail('');
       setNewAvpName('');
@@ -1466,11 +1667,11 @@ export function GroupAdminDashboard() {
         title: 'Success',
         description: `Area VP ${newAvpName} added successfully. An email with login instructions will be sent.`,
       });
-      
+
       // In a real implementation, you'd send an email with the password
       // For demo purposes, we'll log it securely
       console.log(`[GroupAdminDashboard] Temporary password for ${newAvpName}: ${tempPassword}`);
-      
+
       // Show temporary password in a separate toast for demo purposes
       toast({
         title: 'Demo: Temporary Password',
