@@ -35,6 +35,8 @@ import {
   Clock,
   Info,
 } from 'lucide-react';
+import { EnhancedPayPlanManager } from '../payplan/EnhancedPayPlanManager';
+import { PayPlan } from '../../types/payPlan';
 
 // User roles configuration
 const USER_ROLES = [
@@ -75,6 +77,7 @@ interface UserFormData {
   roleId: string;
   startDate: string;
   tempPassword: string;
+  payPlanId: string;
 }
 
 interface StaffCounts {
@@ -111,6 +114,7 @@ export function AdminDashboard() {
 
   // State
   const [users, setUsers] = useState<User[]>([]);
+  const [payPlans, setPayPlans] = useState<PayPlan[]>([]);
   const [staffCounts, setStaffCounts] = useState<StaffCounts>({
     salesperson: 0,
     finance_manager: 0,
@@ -131,6 +135,7 @@ export function AdminDashboard() {
     roleId: 'salesperson',
     startDate: '',
     tempPassword: '',
+    payPlanId: '',
   });
 
   // Generate temporary password function
@@ -214,11 +219,122 @@ export function AdminDashboard() {
 
       setUsers(mappedUsers);
       console.log('Fetched users:', mappedUsers);
+
+      // Fetch pay plans after fetching users
+      await fetchPayPlans();
     } catch (error) {
       console.error('Error fetching users:', error);
       toast({
         title: 'Error',
         description: 'Failed to fetch users',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  // Fetch pay plans function
+  const fetchPayPlans = async () => {
+    try {
+      // For now, use mock data since we don't have Supabase tables yet
+      const mockPayPlans: PayPlan[] = [
+        {
+          id: '1',
+          name: 'John Valentine Advanced Plan',
+          description: 'Advanced F&I plan with complex bonus structures',
+          role: 'finance_manager',
+          dealership_id: dealershipId || 'demo',
+          created_by: 'admin',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          is_active: true,
+          plan_type: 'advanced',
+          base_commission: {
+            enabled: true,
+            base_percentage: 25,
+            tiers: [],
+            applies_to: 'total_fi_income',
+          },
+          draw_structure: {
+            enabled: true,
+            amount: 2500,
+            frequency: 'monthly',
+            deducted_from_commissions: true,
+          },
+          penetration_bonuses: [],
+          provider_bonuses: [],
+          vehicle_allowance: {
+            enabled: true,
+            allowance_amount: 300,
+            demo_privileges_available: true,
+            description: '$300 vehicle allowance or demo privileges',
+          },
+          pto_structure: {
+            enabled: true,
+            annual_days: 12,
+            prorated: true,
+          },
+          chargeback_protection: {
+            enabled: true,
+            protection_period_days: 90,
+          },
+        } as PayPlan,
+        {
+          id: '2',
+          name: 'Lloyd Hatter Simple Plan',
+          description: 'Simple PVR-based F&I plan',
+          role: 'finance_manager',
+          dealership_id: dealershipId || 'demo',
+          created_by: 'admin',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          is_active: true,
+          plan_type: 'simple',
+          commission_structure: {
+            base_fi_percentage: 12,
+            pvr_tiers: [
+              { min_value: 0, max_value: 999, percentage: 12, label: '$999 or below' },
+              { min_value: 1000, max_value: 1199, percentage: 13, label: '$1,000 - $1,199' },
+              { min_value: 1200, max_value: 1299, percentage: 14, label: '$1,200 - $1,299' },
+              { min_value: 1300, percentage: 14.5, label: '$1,300+' },
+            ],
+          },
+          monthly_draw: 2500,
+          provider_bonuses: [],
+          vehicle_allowance: {
+            enabled: true,
+            allowance_amount: 300,
+            demo_privileges_available: true,
+            description: '$300 vehicle allowance or demo privileges',
+          },
+          pto_structure: {
+            enabled: true,
+            annual_days: 12,
+            prorated: true,
+          },
+        } as PayPlan,
+        {
+          id: '3',
+          name: 'Basic Salesperson Plan',
+          description: 'Standard salesperson compensation',
+          role: 'salesperson',
+          dealership_id: dealershipId || 'demo',
+          created_by: 'admin',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          is_active: true,
+          plan_type: 'simple',
+          front_end_gross_percentage: 25,
+          back_end_gross_percentage: 10,
+          minimum_monthly_pay: 3000,
+        } as PayPlan,
+      ];
+
+      setPayPlans(mockPayPlans);
+    } catch (error) {
+      console.error('Error fetching pay plans:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch pay plans',
         variant: 'destructive',
       });
     }
@@ -279,6 +395,7 @@ export function AdminDashboard() {
         roleId: 'salesperson',
         startDate: '',
         tempPassword: '',
+        payPlanId: '',
       });
 
       // Generate new password for next user
@@ -460,11 +577,12 @@ export function AdminDashboard() {
         </CardHeader>
         <CardContent>
           <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="salesperson">Sales People</TabsTrigger>
               <TabsTrigger value="finance_manager">Finance Managers</TabsTrigger>
               <TabsTrigger value="sales_manager">Sales Managers</TabsTrigger>
               <TabsTrigger value="scheduler">Scheduler</TabsTrigger>
+              <TabsTrigger value="payplans">Pay Plans</TabsTrigger>
             </TabsList>
 
             {/* Sales People Tab */}
@@ -794,6 +912,11 @@ export function AdminDashboard() {
                 </CardContent>
               </Card>
             </TabsContent>
+
+            {/* Pay Plans Tab */}
+            <TabsContent value="payplans" className="space-y-4">
+              <EnhancedPayPlanManager dealershipId={dealershipId || 'demo'} isGroupAdmin={false} />
+            </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
@@ -899,6 +1022,41 @@ export function AdminDashboard() {
               </div>
               <p className="text-xs text-muted-foreground">
                 User will be required to change their password on first login.
+              </p>
+            </div>
+
+            {/* Pay Plan Selection */}
+            <div className="space-y-2">
+              <Label htmlFor="payPlan">Pay Plan</Label>
+              <Select
+                value={userForm.payPlanId}
+                onValueChange={value => setUserForm({ ...userForm, payPlanId: value })}
+              >
+                <SelectTrigger id="payPlan">
+                  <SelectValue placeholder="Select a pay plan" />
+                </SelectTrigger>
+                <SelectContent>
+                  {payPlans
+                    .filter(plan => plan.role === userForm.roleId && plan.is_active)
+                    .map(plan => (
+                      <SelectItem key={plan.id} value={plan.id}>
+                        <div className="flex flex-col">
+                          <span>{plan.name}</span>
+                          <span className="text-xs text-muted-foreground">{plan.description}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  {payPlans.filter(plan => plan.role === userForm.roleId && plan.is_active)
+                    .length === 0 && (
+                    <SelectItem value="no-plans" disabled>
+                      No active pay plans for this role
+                    </SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Pay plan determines the compensation structure for this employee. You can create new
+                pay plans in the Pay Plans tab above.
               </p>
             </div>
 
