@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import { EnhancedPayPlanManager } from '../payplan/EnhancedPayPlanManager';
 import { PayPlan } from '../../types/payPlan';
+import { PayCalculator } from '../payplan/PayCalculator';
 
 // User roles configuration
 const USER_ROLES = [
@@ -326,6 +327,119 @@ export function AdminDashboard() {
           front_end_gross_percentage: 25,
           back_end_gross_percentage: 10,
           minimum_monthly_pay: 3000,
+        } as PayPlan,
+        {
+          id: '4',
+          name: 'Advanced Salesperson Plan',
+          description:
+            'Complex salesperson plan with unit flats, pack deductions, and minimum guarantees',
+          role: 'salesperson',
+          dealership_id: dealershipId || 'demo',
+          created_by: 'admin',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          is_active: true,
+          plan_type: 'advanced',
+          front_end_commission: {
+            gross_percentage: 15,
+            unit_flat_structure: {
+              enabled: true,
+              tiers: [
+                {
+                  min_units: 0,
+                  max_units: 14,
+                  flat_amount: 14.5,
+                  label: '0-14 units: $14.50',
+                  retroactive: true,
+                },
+                {
+                  min_units: 15,
+                  max_units: 19,
+                  flat_amount: 19.5,
+                  label: '15-19 units: $19.50',
+                  retroactive: true,
+                },
+                { min_units: 20, flat_amount: 25.0, label: '20+ units: $25.00', retroactive: true },
+              ],
+            },
+            take_higher: true,
+          },
+          back_end_commission: {
+            enabled: true,
+            base_percentage: 10,
+            tiers: [
+              {
+                min_units: 0,
+                max_units: 14,
+                percentage: 10,
+                label: '0-14 units: 10%',
+                retroactive: true,
+              },
+              {
+                min_units: 15,
+                max_units: 19,
+                percentage: 12.5,
+                label: '15-19 units: 12.5%',
+                retroactive: true,
+              },
+              { min_units: 20, percentage: 15, label: '20+ units: 15%', retroactive: true },
+            ],
+          },
+          used_vehicle_pack: {
+            enabled: true,
+            high_value_pack: {
+              threshold: 10000,
+              pack_amount: 10000,
+            },
+            low_value_pack: {
+              min_threshold: 2000,
+              max_threshold: 10000,
+              pack_amount: 450,
+            },
+          },
+          csi_bonus: {
+            enabled: true,
+            benchmark_bonus: {
+              enabled: true,
+              bonus_percentage: 5,
+              description: 'Additional 5% on back-end if CSI above benchmark',
+            },
+          },
+          minimum_guarantee: {
+            enabled: true,
+            tiers: [
+              {
+                min_units: 15,
+                max_units: 19,
+                guarantee_amount: 5000,
+                label: '15-19 units: $5,000',
+              },
+              {
+                min_units: 20,
+                max_units: 24,
+                guarantee_amount: 7500,
+                label: '20-24 units: $7,500',
+              },
+              { min_units: 25, guarantee_amount: 10000, label: '25+ units: $10,000' },
+            ],
+          },
+          conditions: {
+            no_prepaid_commission: true,
+            complete_paperwork_required: true,
+            trade_payoff_discrepancy_flat: true,
+            weekly_verification_required: true,
+          },
+          vehicle_allowance: {
+            enabled: false,
+            allowance_amount: 0,
+            demo_privileges_available: false,
+            description: 'No vehicle allowance',
+          },
+          pto_structure: {
+            enabled: true,
+            annual_days: 10,
+            prorated: true,
+          },
         } as PayPlan,
       ];
 
@@ -915,7 +1029,16 @@ export function AdminDashboard() {
 
             {/* Pay Plans Tab */}
             <TabsContent value="payplans" className="space-y-4">
-              <EnhancedPayPlanManager dealershipId={dealershipId || 'demo'} isGroupAdmin={false} />
+              <div className="grid gap-6">
+                {/* Pay Plan Management */}
+                <EnhancedPayPlanManager
+                  dealershipId={dealershipId || 'demo'}
+                  isGroupAdmin={false}
+                />
+
+                {/* Pay Calculator */}
+                <PayCalculator payPlans={payPlans} />
+              </div>
             </TabsContent>
           </Tabs>
         </CardContent>
