@@ -62,14 +62,17 @@ interface PayPlanFormData {
   role: string;
   plan_type: 'simple' | 'advanced';
   is_active: boolean;
-  
+
   // Dynamic structure based on plan type and role
   structure: any;
 }
 
-export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: EnhancedPayPlanManagerProps) {
+export function EnhancedPayPlanManager({
+  dealershipId,
+  isGroupAdmin = false,
+}: EnhancedPayPlanManagerProps) {
   const { toast } = useToast();
-  
+
   // State
   const [payPlans, setPayPlans] = useState<PayPlan[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -229,7 +232,7 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
           },
         } as SimpleFinanceManagerPayPlan,
       ];
-      
+
       setPayPlans(mockPlans);
     } catch (error) {
       console.error('Error fetching pay plans:', error);
@@ -262,7 +265,7 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
           current_pay_plan: 'fm_simple_1',
         },
       ];
-      
+
       setUsers(mockUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -292,7 +295,7 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
           is_active: true,
         },
       ];
-      
+
       setAssignments(mockAssignments);
     } catch (error) {
       console.error('Error fetching assignments:', error);
@@ -302,7 +305,7 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
   const handleCreatePayPlan = async () => {
     try {
       setLoading(true);
-      
+
       const errors = validatePayPlan(formData);
       if (errors.length > 0) {
         toast({
@@ -358,7 +361,7 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
     try {
       const user = users.find(u => u.id === userId);
       const payPlan = payPlans.find(p => p.id === payPlanId);
-      
+
       if (!user || !payPlan) {
         toast({
           title: 'Error',
@@ -389,9 +392,7 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
       };
 
       setAssignments([...assignments, newAssignment]);
-      setUsers(users.map(u => 
-        u.id === userId ? { ...u, current_pay_plan: payPlanId } : u
-      ));
+      setUsers(users.map(u => (u.id === userId ? { ...u, current_pay_plan: payPlanId } : u)));
 
       toast({
         title: 'Success',
@@ -437,7 +438,17 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
     if (formData.role === 'finance_manager' || formData.role === 'finance_director') {
       return <FinanceManagerForm formData={formData} setFormData={setFormData} />;
     }
-    return null;
+    if (formData.role === 'salesperson') {
+      return <SalespersonForm formData={formData} setFormData={setFormData} />;
+    }
+    return (
+      <div className="space-y-4 border-t pt-4">
+        <div className="text-center py-8 text-muted-foreground">
+          <Settings className="w-12 h-12 mx-auto mb-4 opacity-50" />
+          <p>Configuration form for {formData.role} role is coming soon.</p>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -467,7 +478,7 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
             <span className="font-semibold">Security Notice:</span>
           </div>
           <p className="text-orange-700 mt-2 text-sm">
-            Pay plans can only be assigned to users with matching roles. The system prevents 
+            Pay plans can only be assigned to users with matching roles. The system prevents
             accidental assignment of incorrect compensation structures.
           </p>
         </CardContent>
@@ -496,7 +507,7 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
                 </p>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Advanced Plans</CardTitle>
@@ -506,9 +517,7 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
                 <div className="text-2xl font-bold">
                   {payPlans.filter(p => p.plan_type === 'advanced').length}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Complex bonus structures
-                </p>
+                <p className="text-xs text-muted-foreground">Complex bonus structures</p>
               </CardContent>
             </Card>
 
@@ -521,9 +530,7 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
                 <div className="text-2xl font-bold">
                   {payPlans.filter(p => p.plan_type === 'simple').length}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Basic commission structures
-                </p>
+                <p className="text-xs text-muted-foreground">Basic commission structures</p>
               </CardContent>
             </Card>
 
@@ -533,54 +540,13 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{assignments.filter(a => a.is_active).length}</div>
-                <p className="text-xs text-muted-foreground">
-                  Out of {users.length} total users
-                </p>
+                <div className="text-2xl font-bold">
+                  {assignments.filter(a => a.is_active).length}
+                </div>
+                <p className="text-xs text-muted-foreground">Out of {users.length} total users</p>
               </CardContent>
             </Card>
           </div>
-
-          {/* Pay Plan Templates */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Pay Plan Examples</CardTitle>
-              <CardDescription>
-                Pre-configured templates based on real dealership pay plans
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="p-4 border rounded-lg">
-                  <h4 className="font-semibold mb-2">John Valentine Advanced F&I Plan</h4>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Complex plan with CIT bonuses, penetration tiers, and multiple bonus structures
-                  </p>
-                  <div className="space-y-2 text-sm">
-                    <div>• 25% base F&I commission</div>
-                    <div>• $4,000 monthly draw</div>
-                    <div>• CIT deal bonuses</div>
-                    <div>• Service contract penetration bonuses</div>
-                    <div>• EasyCare 10.99% year-end bonus</div>
-                  </div>
-                </div>
-                
-                <div className="p-4 border rounded-lg">
-                  <h4 className="font-semibold mb-2">Lloyd Hatter Simple F&I Plan</h4>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    PVR-based tiered commission structure
-                  </p>
-                  <div className="space-y-2 text-sm">
-                    <div>• PVR-based commission (12%-14.5%)</div>
-                    <div>• $2,500 monthly draw</div>
-                    <div>• EasyCare 10.99% year-end bonus</div>
-                    <div>• Vehicle allowance option</div>
-                    <div>• 12 days PTO annually</div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
 
         {/* Pay Plans Tab */}
@@ -588,9 +554,7 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
           <Card>
             <CardHeader>
               <CardTitle>All Pay Plans</CardTitle>
-              <CardDescription>
-                Manage compensation structures for different roles
-              </CardDescription>
+              <CardDescription>Manage compensation structures for different roles</CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -606,8 +570,10 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
                 </TableHeader>
                 <TableBody>
                   {payPlans.map(plan => {
-                    const assignedCount = assignments.filter(a => a.pay_plan_id === plan.id && a.is_active).length;
-                    
+                    const assignedCount = assignments.filter(
+                      a => a.pay_plan_id === plan.id && a.is_active
+                    ).length;
+
                     return (
                       <TableRow key={plan.id}>
                         <TableCell>
@@ -627,8 +593,8 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={plan.is_active ? "default" : "secondary"}>
-                            {plan.is_active ? "Active" : "Inactive"}
+                          <Badge variant={plan.is_active ? 'default' : 'secondary'}>
+                            {plan.is_active ? 'Active' : 'Inactive'}
                           </Badge>
                         </TableCell>
                         <TableCell>{assignedCount} users</TableCell>
@@ -656,9 +622,7 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
           <Card>
             <CardHeader>
               <CardTitle>Pay Plan Assignments</CardTitle>
-              <CardDescription>
-                Assign pay plans to users (roles must match)
-              </CardDescription>
+              <CardDescription>Assign pay plans to users (roles must match)</CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -673,15 +637,21 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
                 </TableHeader>
                 <TableBody>
                   {users.map(user => {
-                    const currentAssignment = assignments.find(a => a.user_id === user.id && a.is_active);
-                    const currentPlan = currentAssignment ? payPlans.find(p => p.id === currentAssignment.pay_plan_id) : null;
+                    const currentAssignment = assignments.find(
+                      a => a.user_id === user.id && a.is_active
+                    );
+                    const currentPlan = currentAssignment
+                      ? payPlans.find(p => p.id === currentAssignment.pay_plan_id)
+                      : null;
                     const availablePlans = getPayPlansByRole(user.role);
-                    
+
                     return (
                       <TableRow key={user.id}>
                         <TableCell>
                           <div>
-                            <div className="font-medium">{user.first_name} {user.last_name}</div>
+                            <div className="font-medium">
+                              {user.first_name} {user.last_name}
+                            </div>
                             <div className="text-sm text-muted-foreground">{user.email}</div>
                           </div>
                         </TableCell>
@@ -697,13 +667,17 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
                         </TableCell>
                         <TableCell>
                           {currentPlan && (
-                            <Badge variant={currentPlan.plan_type === 'advanced' ? 'default' : 'secondary'}>
+                            <Badge
+                              variant={
+                                currentPlan.plan_type === 'advanced' ? 'default' : 'secondary'
+                              }
+                            >
                               {currentPlan.plan_type === 'advanced' ? 'Advanced' : 'Simple'}
                             </Badge>
                           )}
                         </TableCell>
                         <TableCell>
-                          <Select onValueChange={(value) => handleAssignPayPlan(user.id, value)}>
+                          <Select onValueChange={value => handleAssignPayPlan(user.id, value)}>
                             <SelectTrigger className="w-48">
                               <SelectValue placeholder="Assign Plan" />
                             </SelectTrigger>
@@ -738,7 +712,9 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
               <div className="text-center py-8 text-muted-foreground">
                 <Calculator className="w-12 h-12 mx-auto mb-4 opacity-50" />
                 <p>Pay calculator will integrate with deal data</p>
-                <p className="text-sm">Enter deal information to calculate real-time estimated pay</p>
+                <p className="text-sm">
+                  Enter deal information to calculate real-time estimated pay
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -771,15 +747,15 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
                     <Input
                       id="name"
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      onChange={e => setFormData({ ...formData, name: e.target.value })}
                       placeholder="e.g., Senior Finance Manager Plan"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="role">Role</Label>
-                    <Select 
-                      value={formData.role} 
-                      onValueChange={(value) => setFormData({ ...formData, role: value })}
+                    <Select
+                      value={formData.role}
+                      onValueChange={value => setFormData({ ...formData, role: value })}
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -798,9 +774,11 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
                 <div className="grid grid-cols-1 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="plan_type">Plan Type</Label>
-                    <Select 
-                      value={formData.plan_type} 
-                      onValueChange={(value: 'simple' | 'advanced') => setFormData({ ...formData, plan_type: value })}
+                    <Select
+                      value={formData.plan_type}
+                      onValueChange={(value: 'simple' | 'advanced') =>
+                        setFormData({ ...formData, plan_type: value })
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -810,7 +788,9 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
                           <SelectItem key={type.id} value={type.id}>
                             <div>
                               <div className="font-medium">{type.name}</div>
-                              <div className="text-sm text-muted-foreground">{type.description}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {type.description}
+                              </div>
                             </div>
                           </SelectItem>
                         ))}
@@ -824,7 +804,7 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
                   <Textarea
                     id="description"
                     value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    onChange={e => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Brief description of this pay plan"
                     rows={3}
                   />
@@ -838,7 +818,7 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
                     Cancel
                   </Button>
                   <Button onClick={handleCreatePayPlan} disabled={loading}>
-                    {loading ? "Creating..." : "Create Pay Plan"}
+                    {loading ? 'Creating...' : 'Create Pay Plan'}
                   </Button>
                 </div>
               </CardContent>
@@ -851,17 +831,18 @@ export function EnhancedPayPlanManager({ dealershipId, isGroupAdmin = false }: E
 }
 
 // Enhanced Finance Manager Form Component
-function FinanceManagerForm({ formData, setFormData }: { 
-  formData: PayPlanFormData, 
-  setFormData: (data: PayPlanFormData) => void 
+function FinanceManagerForm({
+  formData,
+  setFormData,
+}: {
+  formData: PayPlanFormData;
+  setFormData: (data: PayPlanFormData) => void;
 }) {
   const [expandedSections, setExpandedSections] = useState<string[]>(['basic']);
 
   const toggleSection = (section: string) => {
-    setExpandedSections(prev => 
-      prev.includes(section) 
-        ? prev.filter(s => s !== section)
-        : [...prev, section]
+    setExpandedSections(prev =>
+      prev.includes(section) ? prev.filter(s => s !== section) : [...prev, section]
     );
   };
 
@@ -929,19 +910,17 @@ function FinanceManagerForm({ formData, setFormData }: {
   return (
     <div className="space-y-4 border-t pt-4">
       <h4 className="font-medium">Advanced Finance Manager Plan Configuration</h4>
-      
+
       {/* Basic Commission Section */}
       <Card>
-        <CardHeader 
-          className="pb-3 cursor-pointer" 
-          onClick={() => toggleSection('basic')}
-        >
+        <CardHeader className="pb-3 cursor-pointer" onClick={() => toggleSection('basic')}>
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm">Base Commission Structure</CardTitle>
-            {isExpanded('basic') ? 
-              <ChevronUp className="w-4 h-4" /> : 
+            {isExpanded('basic') ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
               <ChevronDown className="w-4 h-4" />
-            }
+            )}
           </div>
         </CardHeader>
         {isExpanded('basic') && (
@@ -982,16 +961,14 @@ function FinanceManagerForm({ formData, setFormData }: {
 
       {/* Draw Structure Section */}
       <Card>
-        <CardHeader 
-          className="pb-3 cursor-pointer" 
-          onClick={() => toggleSection('draw')}
-        >
+        <CardHeader className="pb-3 cursor-pointer" onClick={() => toggleSection('draw')}>
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm">Draw Structure</CardTitle>
-            {isExpanded('draw') ? 
-              <ChevronUp className="w-4 h-4" /> : 
+            {isExpanded('draw') ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
               <ChevronDown className="w-4 h-4" />
-            }
+            )}
           </div>
         </CardHeader>
         {isExpanded('draw') && (
@@ -1041,16 +1018,14 @@ function FinanceManagerForm({ formData, setFormData }: {
 
       {/* CIT Bonuses Section */}
       <Card>
-        <CardHeader 
-          className="pb-3 cursor-pointer" 
-          onClick={() => toggleSection('cit')}
-        >
+        <CardHeader className="pb-3 cursor-pointer" onClick={() => toggleSection('cit')}>
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm">CIT Deal Bonuses</CardTitle>
-            {isExpanded('cit') ? 
-              <ChevronUp className="w-4 h-4" /> : 
+            {isExpanded('cit') ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
               <ChevronDown className="w-4 h-4" />
-            }
+            )}
           </div>
         </CardHeader>
         {isExpanded('cit') && (
@@ -1083,16 +1058,14 @@ function FinanceManagerForm({ formData, setFormData }: {
 
       {/* Penetration Bonuses Section */}
       <Card>
-        <CardHeader 
-          className="pb-3 cursor-pointer" 
-          onClick={() => toggleSection('penetration')}
-        >
+        <CardHeader className="pb-3 cursor-pointer" onClick={() => toggleSection('penetration')}>
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm">Penetration Bonuses</CardTitle>
-            {isExpanded('penetration') ? 
-              <ChevronUp className="w-4 h-4" /> : 
+            {isExpanded('penetration') ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
               <ChevronDown className="w-4 h-4" />
-            }
+            )}
           </div>
         </CardHeader>
         {isExpanded('penetration') && (
@@ -1103,7 +1076,8 @@ function FinanceManagerForm({ formData, setFormData }: {
                 Add Penetration Bonus
               </Button>
               <div className="text-sm text-muted-foreground">
-                Configure bonuses based on product penetration rates (Service Contracts, GAP, Warranties, etc.)
+                Configure bonuses based on product penetration rates (Service Contracts, GAP,
+                Warranties, etc.)
               </div>
             </div>
           </CardContent>
@@ -1112,16 +1086,14 @@ function FinanceManagerForm({ formData, setFormData }: {
 
       {/* Provider Bonuses Section */}
       <Card>
-        <CardHeader 
-          className="pb-3 cursor-pointer" 
-          onClick={() => toggleSection('providers')}
-        >
+        <CardHeader className="pb-3 cursor-pointer" onClick={() => toggleSection('providers')}>
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm">Provider Bonuses</CardTitle>
-            {isExpanded('providers') ? 
-              <ChevronUp className="w-4 h-4" /> : 
+            {isExpanded('providers') ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
               <ChevronDown className="w-4 h-4" />
-            }
+            )}
           </div>
         </CardHeader>
         {isExpanded('providers') && (
@@ -1133,7 +1105,10 @@ function FinanceManagerForm({ formData, setFormData }: {
               </Button>
               <div className="grid grid-cols-1 gap-3">
                 {PAY_PLAN_CONFIG.PROVIDER_OPTIONS.map(provider => (
-                  <div key={provider.id} className="flex items-center justify-between p-3 border rounded">
+                  <div
+                    key={provider.id}
+                    className="flex items-center justify-between p-3 border rounded"
+                  >
                     <div>
                       <span className="font-medium">{provider.name}</span>
                       <span className="text-sm text-muted-foreground ml-2">
@@ -1151,16 +1126,14 @@ function FinanceManagerForm({ formData, setFormData }: {
 
       {/* Benefits Section */}
       <Card>
-        <CardHeader 
-          className="pb-3 cursor-pointer" 
-          onClick={() => toggleSection('benefits')}
-        >
+        <CardHeader className="pb-3 cursor-pointer" onClick={() => toggleSection('benefits')}>
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm">Benefits & Allowances</CardTitle>
-            {isExpanded('benefits') ? 
-              <ChevronUp className="w-4 h-4" /> : 
+            {isExpanded('benefits') ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
               <ChevronDown className="w-4 h-4" />
-            }
+            )}
           </div>
         </CardHeader>
         {isExpanded('benefits') && (
@@ -1186,4 +1159,467 @@ function FinanceManagerForm({ formData, setFormData }: {
       </Card>
     </div>
   );
-} 
+}
+
+// Salesperson Form Component
+function SalespersonForm({
+  formData,
+  setFormData,
+}: {
+  formData: PayPlanFormData;
+  setFormData: (data: PayPlanFormData) => void;
+}) {
+  const [expandedSections, setExpandedSections] = useState<string[]>(['basic']);
+
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev =>
+      prev.includes(section) ? prev.filter(s => s !== section) : [...prev, section]
+    );
+  };
+
+  const isExpanded = (section: string) => expandedSections.includes(section);
+
+  if (formData.plan_type === 'simple') {
+    return (
+      <div className="space-y-4 border-t pt-4">
+        <h4 className="font-medium">Simple Salesperson Plan</h4>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Front-End Commission %</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select front-end percentage" />
+              </SelectTrigger>
+              <SelectContent>
+                {PAY_PLAN_CONFIG.PERCENTAGE_OPTIONS.map(option => (
+                  <SelectItem key={option.value} value={option.value.toString()}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Back-End Commission %</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select back-end percentage" />
+              </SelectTrigger>
+              <SelectContent>
+                {PAY_PLAN_CONFIG.PERCENTAGE_OPTIONS.map(option => (
+                  <SelectItem key={option.value} value={option.value.toString()}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Minimum Monthly Pay</Label>
+          <Select>
+            <SelectTrigger>
+              <SelectValue placeholder="Select minimum guarantee" />
+            </SelectTrigger>
+            <SelectContent>
+              {PAY_PLAN_CONFIG.MINIMUM_GUARANTEES.map(option => (
+                <SelectItem key={option.value} value={option.value.toString()}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+    );
+  }
+
+  // Advanced salesperson plan configuration
+  return (
+    <div className="space-y-4 border-t pt-4">
+      <h4 className="font-medium">Advanced Salesperson Plan Configuration</h4>
+
+      {/* Front-End Commission Section */}
+      <Card>
+        <CardHeader className="pb-3 cursor-pointer" onClick={() => toggleSection('frontend')}>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm">Front-End Commission Structure</CardTitle>
+            {isExpanded('frontend') ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+          </div>
+        </CardHeader>
+        {isExpanded('frontend') && (
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Gross Profit Percentage</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select percentage" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PAY_PLAN_CONFIG.PERCENTAGE_OPTIONS.map(option => (
+                        <SelectItem key={option.value} value={option.value.toString()}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center space-x-2 pt-6">
+                  <Checkbox id="take-higher" />
+                  <Label htmlFor="take-higher" className="text-sm">
+                    Take higher of percentage or unit flat
+                  </Label>
+                </div>
+              </div>
+
+              {/* Unit Flat Structure */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Unit Flat Rate Tiers</Label>
+                <div className="space-y-2">
+                  <div className="grid grid-cols-4 gap-2 text-xs font-medium text-muted-foreground">
+                    <span>Min Units</span>
+                    <span>Max Units</span>
+                    <span>Flat Amount</span>
+                    <span>Retroactive</span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    <Input placeholder="0" />
+                    <Input placeholder="14" />
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Amount" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PAY_PLAN_CONFIG.UNIT_FLAT_AMOUNTS.map(option => (
+                          <SelectItem key={option.value} value={option.value.toString()}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <div className="flex items-center justify-center">
+                      <Checkbox />
+                    </div>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Tier
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
+      {/* Back-End Commission Section */}
+      <Card>
+        <CardHeader className="pb-3 cursor-pointer" onClick={() => toggleSection('backend')}>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm">Back-End Commission Structure</CardTitle>
+            {isExpanded('backend') ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+          </div>
+        </CardHeader>
+        {isExpanded('backend') && (
+          <CardContent>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Base Back-End Percentage</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select base percentage" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PAY_PLAN_CONFIG.PERCENTAGE_OPTIONS.map(option => (
+                      <SelectItem key={option.value} value={option.value.toString()}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Volume-Based Tiers */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Volume-Based Percentage Tiers</Label>
+                <div className="space-y-2">
+                  <div className="grid grid-cols-4 gap-2 text-xs font-medium text-muted-foreground">
+                    <span>Min Units</span>
+                    <span>Max Units</span>
+                    <span>Percentage</span>
+                    <span>Retroactive</span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    <Input placeholder="0" />
+                    <Input placeholder="14" />
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="%" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PAY_PLAN_CONFIG.PERCENTAGE_OPTIONS.map(option => (
+                          <SelectItem key={option.value} value={option.value.toString()}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <div className="flex items-center justify-center">
+                      <Checkbox />
+                    </div>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Tier
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
+      {/* Used Vehicle Pack Section */}
+      <Card>
+        <CardHeader className="pb-3 cursor-pointer" onClick={() => toggleSection('pack')}>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm">Used Vehicle Pack Deductions</CardTitle>
+            {isExpanded('pack') ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+          </div>
+        </CardHeader>
+        {isExpanded('pack') && (
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox id="enable-pack" />
+                <Label htmlFor="enable-pack">Enable used vehicle pack deductions</Label>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>High Value Pack (≥$10,000)</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Threshold" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PAY_PLAN_CONFIG.PACK_THRESHOLDS.map(option => (
+                          <SelectItem key={option.value} value={option.value.toString()}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pack Amount" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PAY_PLAN_CONFIG.PACK_AMOUNTS.map(option => (
+                          <SelectItem key={option.value} value={option.value.toString()}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Low Value Pack ($2,000-$10,000)</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Min Threshold" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PAY_PLAN_CONFIG.PACK_THRESHOLDS.map(option => (
+                          <SelectItem key={option.value} value={option.value.toString()}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pack Amount" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PAY_PLAN_CONFIG.PACK_AMOUNTS.map(option => (
+                          <SelectItem key={option.value} value={option.value.toString()}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
+      {/* CSI Bonus Section */}
+      <Card>
+        <CardHeader className="pb-3 cursor-pointer" onClick={() => toggleSection('csi')}>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm">CSI Bonus Structure</CardTitle>
+            {isExpanded('csi') ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+          </div>
+        </CardHeader>
+        {isExpanded('csi') && (
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox id="enable-csi" />
+                <Label htmlFor="enable-csi">Enable CSI benchmark bonus</Label>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Bonus Percentage</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select bonus %" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PAY_PLAN_CONFIG.PERCENTAGE_OPTIONS.filter(opt => opt.value <= 10).map(
+                        option => (
+                          <SelectItem key={option.value} value={option.value.toString()}>
+                            {option.label}
+                          </SelectItem>
+                        )
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Description</Label>
+                  <Input placeholder="e.g., Additional 5% on back-end if CSI above benchmark" />
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
+      {/* Minimum Guarantee Section */}
+      <Card>
+        <CardHeader className="pb-3 cursor-pointer" onClick={() => toggleSection('guarantee')}>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm">Minimum Unit Guarantee</CardTitle>
+            {isExpanded('guarantee') ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+          </div>
+        </CardHeader>
+        {isExpanded('guarantee') && (
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox id="enable-guarantee" />
+                <Label htmlFor="enable-guarantee">Enable minimum unit guarantees</Label>
+              </div>
+
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Guarantee Tiers</Label>
+                <div className="space-y-2">
+                  <div className="grid grid-cols-3 gap-2 text-xs font-medium text-muted-foreground">
+                    <span>Min Units</span>
+                    <span>Max Units</span>
+                    <span>Guarantee Amount</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <Input placeholder="15" />
+                    <Input placeholder="19" />
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Amount" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PAY_PLAN_CONFIG.MINIMUM_GUARANTEES.map(option => (
+                          <SelectItem key={option.value} value={option.value.toString()}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Guarantee Tier
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
+      {/* Benefits Section */}
+      <Card>
+        <CardHeader className="pb-3 cursor-pointer" onClick={() => toggleSection('benefits')}>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm">Benefits & Allowances</CardTitle>
+            {isExpanded('benefits') ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+          </div>
+        </CardHeader>
+        {isExpanded('benefits') && (
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Vehicle Allowance</Label>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="vehicle-allowance" />
+                    <Label htmlFor="vehicle-allowance" className="text-sm">
+                      Enable
+                    </Label>
+                  </div>
+                  <Input placeholder="Monthly allowance amount" />
+                </div>
+                <div className="space-y-2">
+                  <Label>PTO Structure</Label>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="pto" />
+                    <Label htmlFor="pto" className="text-sm">
+                      Enable
+                    </Label>
+                  </div>
+                  <Input placeholder="Annual PTO days" />
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        )}
+      </Card>
+    </div>
+  );
+}

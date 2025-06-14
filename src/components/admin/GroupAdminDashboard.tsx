@@ -761,7 +761,7 @@ export function GroupAdminDashboard() {
 
           {/* Pay Plans Tab */}
           <TabsContent value="payplans" className="space-y-6">
-            {/* Pay Plans Content */}
+            <EnhancedPayPlanManager dealershipId={selectedDealership.id} isGroupAdmin={true} />
           </TabsContent>
 
           {/* Settings Tab */}
