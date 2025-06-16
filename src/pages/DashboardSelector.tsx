@@ -32,6 +32,12 @@ const DashboardSelector: React.FC = () => {
       role: 'finance_manager',
     },
     {
+      name: 'Finance Director',
+      path: '/dashboard/finance-director',
+      email: 'finance.director@exampletest.com',
+      role: 'finance_director',
+    },
+    {
       name: 'Single Finance Manager',
       path: '/dashboard/single-finance',
       email: 'testfinance@example.com',

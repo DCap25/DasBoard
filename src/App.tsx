@@ -58,6 +58,7 @@ import GoalsPage from './pages/manager/GoalsPage';
 import SchedulePage from './pages/manager/SchedulePage';
 import SalesReportPage from './pages/manager/SalesReportPage';
 import SingleFinanceManagerDashboard from './components/dashboards/SingleFinanceManagerDashboard';
+import FinanceDirectorDashboard from './components/dashboards/FinanceDirectorDashboard';
 import LogFinanceManagerDeal from './pages/finance/LogFinanceManagerDeal';
 import MasterAdminPage from './pages/admin/MasterAdminPage';
 import SignUp from './components/auth/SignUp';
@@ -813,6 +814,18 @@ function App() {
                         >
                           <DashboardLayout>
                             <SingleFinanceManagerDashboard />
+                          </DashboardLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    {/* Finance Director Dashboard */}
+                    <Route
+                      path="/dashboard/finance-director/*"
+                      element={
+                        <ProtectedRoute requiredRoles={['finance_director']}>
+                          <DashboardLayout>
+                            <FinanceDirectorDashboard />
                           </DashboardLayout>
                         </ProtectedRoute>
                       }
