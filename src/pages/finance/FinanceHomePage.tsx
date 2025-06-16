@@ -17,6 +17,9 @@ import {
   ChevronLeft,
   ChevronRight,
   MoreVertical,
+  Calculator,
+  Target,
+  Badge,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -1064,6 +1067,160 @@ const FinanceHomePage: React.FC = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Pay Tracker and Goal Tracker Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          {/* Pay Tracker */}
+          <Card className="border hover:shadow-md transition-shadow">
+            <CardHeader className="pb-2 border-b bg-gradient-to-r from-green-400 to-teal-500">
+              <CardTitle className="text-lg font-medium flex items-center text-white">
+                <Calculator className="mr-2 h-5 w-5 text-white" />
+                Pay Tracker
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <div className="flex items-center justify-center mb-3">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-green-600">
+                    ${Math.round(metrics.mtdRevenue * 0.25).toLocaleString()}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">Month-to-Date Earnings</div>
+                </div>
+              </div>
+
+              <div className="space-y-2 mt-2">
+                <div className="flex justify-between">
+                  <span className="text-xs text-gray-600">Base Commission (25%)</span>
+                  <span className="text-xs font-medium">
+                    ${Math.round(metrics.mtdRevenue * 0.25).toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-xs text-gray-600">Volume Bonus</span>
+                  <span className="text-xs font-medium">
+                    ${metrics.dealsProcessed >= 20 ? '500' : '0'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-xs text-gray-600">PPD Bonus</span>
+                  <span className="text-xs font-medium">
+                    ${metrics.productsPerDeal >= 2.5 ? '300' : '0'}
+                  </span>
+                </div>
+                <div className="pt-2 border-t">
+                  <div className="flex justify-between">
+                    <span className="text-xs font-semibold text-gray-700">
+                      Potential Monthly Total
+                    </span>
+                    <span className="text-xs font-bold text-green-600">
+                      $
+                      {Math.round(
+                        metrics.mtdRevenue * 0.25 * 2.2 +
+                          (metrics.dealsProcessed >= 20 ? 500 : 0) +
+                          (metrics.productsPerDeal >= 2.5 ? 300 : 0)
+                      ).toLocaleString()}
+                    </span>
+                  </div>
+                  {(metrics.dealsProcessed >= 20 || metrics.productsPerDeal >= 2.5) && (
+                    <div className="text-xs text-green-600 mt-1 font-medium">
+                      {metrics.dealsProcessed >= 20 && 'Volume bonus earned! '}
+                      {metrics.productsPerDeal >= 2.5 && 'PPD bonus earned!'}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-3 pt-2 border-t">
+                <p className="text-[10px] text-gray-400 italic">
+                  <strong>Disclaimer:</strong> These figures are estimates only and not actual
+                  earnings. Final compensation may vary based on dealership policies and deal
+                  structures.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Goal Tracker */}
+          <Card className="border hover:shadow-md transition-shadow">
+            <CardHeader className="pb-2 border-b">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-lg font-medium flex items-center">
+                  <Target className="mr-2 h-5 w-5 text-blue-600" />
+                  Goal Tracker
+                </CardTitle>
+                <Badge variant="outline" className="text-xs">
+                  {Math.round((metrics.dealsProcessed / 25) * 100)}% Complete
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <div className="space-y-4">
+                {/* Deals Progress */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">Monthly Deals</span>
+                    <span className="text-sm text-gray-600">{metrics.dealsProcessed} / 25</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${Math.min(100, (metrics.dealsProcessed / 25) * 100)}%` }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* PPD Progress */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">Products Per Deal</span>
+                    <span className="text-sm text-gray-600">{metrics.productsPerDeal} / 2.5</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-purple-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${Math.min(100, (metrics.productsPerDeal / 2.5) * 100)}%` }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* PVR Progress */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">Per Vehicle Retail</span>
+                    <span className="text-sm text-gray-600">${metrics.pvr} / $1,500</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${Math.min(100, (metrics.pvr / 1500) * 100)}%` }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* Status Summary */}
+                <div className="pt-3 border-t">
+                  <div className="text-center">
+                    {metrics.dealsProcessed >= 25 &&
+                    metrics.productsPerDeal >= 2.5 &&
+                    metrics.pvr >= 1500 ? (
+                      <div className="text-green-600 font-medium text-sm">
+                        🎉 All goals achieved!
+                      </div>
+                    ) : (
+                      <div className="text-gray-600 text-sm">
+                        {25 - metrics.dealsProcessed > 0 &&
+                          `${25 - metrics.dealsProcessed} more deals needed`}
+                        {metrics.productsPerDeal < 2.5 && metrics.dealsProcessed < 25 && ' • '}
+                        {metrics.productsPerDeal < 2.5 &&
+                          `PPD needs ${(2.5 - metrics.productsPerDeal).toFixed(1)} improvement`}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </>
   );
