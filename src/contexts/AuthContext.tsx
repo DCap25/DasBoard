@@ -21,10 +21,13 @@ import {
 type UserRole =
   | 'salesperson'
   | 'finance_manager'
+  | 'single_finance_manager'
   | 'sales_manager'
   | 'general_manager'
   | 'admin'
-  | 'dealership_admin';
+  | 'dealership_admin'
+  | 'dealer_group_admin'
+  | 'area_vice_president';
 
 interface AuthContextType {
   user: User | null;
@@ -751,12 +754,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               directUser.email
             );
 
-            // Set loading to false and mark auth as complete for direct auth
+            // Set user data from direct auth
             if (mounted) {
+              // Create a mock Supabase user object from direct auth user
+              const mockUser = {
+                id: directUser.id,
+                email: directUser.email,
+                user_metadata: { role: directUser.role },
+                app_metadata: {},
+                aud: 'authenticated',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              };
+
+              setUser(mockUser as any);
+              setRole(directUser.role as any);
+              setIsGroupAdmin(directUser.isGroupAdmin || false);
               setLoading(false);
               setAuthCheckComplete(true);
               setHasSession(true); // Direct auth counts as having a session
-              console.log('[AuthContext] Direct auth initialization completed');
+              console.log('[AuthContext] Direct auth initialization completed with user data', {
+                email: directUser.email,
+                role: directUser.role,
+                isGroupAdmin: directUser.isGroupAdmin,
+              });
             }
             return;
           }
@@ -912,7 +933,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         authListener.data.subscription.unsubscribe();
       }
     };
-  }, [handleAuthStateChange, initialized, user, role, fetchUserRole, loading]);
+  }, [handleAuthStateChange, initialized, fetchUserRole]);
 
   // Sign in with email and password
   const signIn = async (email: string, password: string, rememberMe?: boolean) => {

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase, isTestEmail } from '../../lib/supabaseClient';
+import { isAuthenticated } from '../../lib/directAuth';
 import { Loader2 } from 'lucide-react';
 
 /**
@@ -14,6 +15,11 @@ const TestUserMiddleware: React.FC<{ children: React.ReactNode }> = ({ children 
   const [hasProcessed, setHasProcessed] = useState(false); // Prevent infinite loops
   const location = useLocation();
   const navigate = useNavigate();
+
+  // 🔑 EARLY EXIT – place right here, before the first useEffect
+  if (isAuthenticated()) {
+    return <>{children}</>;
+  }
 
   // Add debug function to window for clearing processing flags
   useEffect(() => {
@@ -38,6 +44,14 @@ const TestUserMiddleware: React.FC<{ children: React.ReactNode }> = ({ children 
     const checkTestUser = async () => {
       try {
         console.log('[TestUserMiddleware] Checking for test user...');
+
+        // Check if direct auth is active - if so, bypass this middleware
+        if (isAuthenticated && isAuthenticated()) {
+          console.log('[TestUserMiddleware] Direct auth active, bypassing');
+          setChecking(false);
+          setHasProcessed(true);
+          return;
+        }
 
         // Get current session
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();

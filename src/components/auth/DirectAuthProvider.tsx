@@ -86,6 +86,7 @@ const DirectAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             location.pathname.startsWith('/dashboard/') ||
             location.pathname === '/master-admin' ||
             location.pathname === '/group-admin' ||
+            location.pathname === '/avp-full-dashboard' ||
             location.pathname === '/deal-log'
           ) {
             console.log('[DirectAuthProvider] Allowing access to path:', location.pathname);
@@ -109,6 +110,16 @@ const DirectAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           // Allow deal-log path for finance managers
           if (isFinanceManager && isDealLogPath) {
             console.log('[DirectAuthProvider] Allowing finance manager to access deal-log path');
+            setChecking(false);
+            return;
+          }
+
+          // Allow both AVP dashboard paths for area_vice_president users
+          const isAreaVicePresident = user.role === 'area_vice_president';
+          const isAVPDashboardPath = location.pathname === '/avp-full-dashboard';
+
+          if (isAreaVicePresident && isAVPDashboardPath) {
+            console.log('[DirectAuthProvider] Allowing AVP user to access:', location.pathname);
             setChecking(false);
             return;
           }

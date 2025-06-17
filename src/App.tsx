@@ -34,9 +34,8 @@ import {
   GMDashboard,
 } from './components/dashboards';
 import AdminDashboardPage from './pages/AdminDashboardPage';
-import { AdminDashboard } from './components/admin/AdminDashboard';
+import AVPFullDashboard from './components/dashboards/AVPDashboard';
 import { GroupAdminDashboard } from './components/admin/GroupAdminDashboard';
-import { AVPDashboard } from './components/admin/AVPDashboard';
 import { supabase } from './lib/supabaseClient';
 import { Loader2 } from 'lucide-react';
 import DebugAuthPage from './pages/DebugAuthPage';
@@ -65,6 +64,16 @@ import SignUp from './components/auth/SignUp';
 import SingleFinanceSignup from './components/auth/SingleFinanceSignup';
 import DealershipSignup from './components/auth/DealershipSignup';
 import DealerGroupSignup from './components/auth/DealerGroupSignup';
+
+// Add global type declaration for app event tracking
+declare global {
+  interface Window {
+    appEvents?: Array<{
+      event: string;
+      details: any;
+    }>;
+  }
+}
 
 // Application environment variables and deployment info
 const APP_VERSION = import.meta.env.VITE_DEPLOYMENT_VERSION || '1.0.0';
@@ -168,25 +177,32 @@ function RouteLogger() {
       user_role: role,
     });
 
-    // Measure render time
-    const start = performance.now();
-    const navigationStart = performance.timeOrigin + performance.now();
+    // Measure render time - only if performance API is available
+    const hasPerformanceAPI = typeof window !== 'undefined' && window.performance;
+    const start = hasPerformanceAPI ? window.performance.now() : 0;
+    const navigationStart = hasPerformanceAPI
+      ? window.performance.timeOrigin + window.performance.now()
+      : 0;
 
     return () => {
-      const end = performance.now();
-      const renderTime = end - start;
+      if (hasPerformanceAPI) {
+        const end = window.performance.now();
+        const renderTime = end - start;
 
-      logAppEvent('Route render completed', {
-        path: location.pathname,
-        render_time_ms: renderTime.toFixed(2),
-        total_time_ms: (end - navigationStart).toFixed(2),
-      });
+        logAppEvent('Route render completed', {
+          path: location.pathname,
+          render_time_ms: renderTime.toFixed(2),
+          total_time_ms: (end - navigationStart).toFixed(2),
+        });
 
-      // Report to analytics if render time is too long (over 1000ms)
-      if (renderTime > 1000) {
-        console.warn(
-          `[Performance Warning] Slow render (${renderTime.toFixed(2)}ms) for ${location.pathname}`
-        );
+        // Report to analytics if render time is too long (over 1000ms)
+        if (renderTime > 1000) {
+          console.warn(
+            `[Performance Warning] Slow render (${renderTime.toFixed(2)}ms) for ${
+              location.pathname
+            }`
+          );
+        }
       }
     };
   }, [location, navigationType, user, role]);
@@ -238,29 +254,18 @@ function RoleBasedRedirect() {
   const location = useLocation();
 
   // Add specific debugging for finance users
-  if (user?.email === 'testfinance@example.com' || user?.email === 'finance1@exampletest.com') {
-    console.warn('[FINANCE DEBUG] Finance user detected in RoleBasedRedirect:', {
-      email: user.email,
-      userRole,
-      role,
-      dealershipId,
-      isGroupAdmin,
-      userMetadata: user.user_metadata,
-    });
-  }
-
-  // First check for direct auth
-  if (isAuthenticated()) {
-    const directUser = getCurrentUser();
-    if (directUser) {
-      console.log('[ROLE REDIRECT] Direct auth user detected, redirecting to appropriate route', {
-        email: directUser.email,
-        role: directUser.role,
-        redirectPath: getRedirectPath(directUser),
+  useEffect(() => {
+    if (user?.email === 'testfinance@example.com' || user?.email === 'finance1@exampletest.com') {
+      console.warn('[FINANCE DEBUG] Finance user detected in RoleBasedRedirect:', {
+        email: user.email,
+        userRole,
+        role,
+        dealershipId,
+        isGroupAdmin,
+        userMetadata: user.user_metadata,
       });
-      return <Navigate to={getRedirectPath(directUser)} replace />;
     }
-  }
+  }, [user, userRole, role, dealershipId, isGroupAdmin]);
 
   useEffect(() => {
     console.warn('[DEBUG REDIRECT] Role-based redirect check', {
@@ -287,6 +292,19 @@ function RoleBasedRedirect() {
     isGroupAdmin,
     authCheckComplete,
   ]);
+
+  // First check for direct auth
+  if (isAuthenticated()) {
+    const directUser = getCurrentUser();
+    if (directUser) {
+      console.log('[ROLE REDIRECT] Direct auth user detected, redirecting to appropriate route', {
+        email: directUser.email,
+        role: directUser.role,
+        redirectPath: getRedirectPath(directUser),
+      });
+      return <Navigate to={getRedirectPath(directUser)} replace />;
+    }
+  }
 
   // Wait for auth check to complete before redirecting
   if (loading || !authCheckComplete) {
@@ -416,6 +434,9 @@ function RoleBasedRedirect() {
   } else if (roleValue === 'general_manager' || roleValue.includes('general')) {
     redirectPath = '/dashboard/gm';
     redirectReason = 'General manager role';
+  } else if (roleValue === 'area_vice_president' || roleValue.includes('vice_president')) {
+    redirectPath = '/avp-full-dashboard';
+    redirectReason = 'Area Vice President role';
   } else {
     redirectPath = '/dashboard/sales';
     redirectReason = 'Sales role (default)';
@@ -503,7 +524,9 @@ function GroupAdminAccessCheck({ children }: { children: React.ReactNode }) {
 
   // Default to protected route for other cases
   return (
-    <ProtectedRoute requiredRoles={['admin', 'dealer_group_admin', 'dealership_admin']}>
+    <ProtectedRoute
+      requiredRoles={['admin', 'dealer_group_admin', 'dealership_admin', 'area_vice_president']}
+    >
       {children}
     </ProtectedRoute>
   );
@@ -529,16 +552,22 @@ function ResetAuth() {
       console.log('[ResetAuth] Clearing localStorage and sessionStorage');
 
       // Clear localStorage
-      localStorage.clear();
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.clear();
+      }
 
       // Clear sessionStorage
-      sessionStorage.clear();
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        window.sessionStorage.clear();
+      }
 
       // Clear cookies (non-HTTP only cookies)
-      document.cookie.split(';').forEach(cookie => {
-        const [name] = cookie.trim().split('=');
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-      });
+      if (typeof document !== 'undefined') {
+        document.cookie.split(';').forEach(cookie => {
+          const [name] = cookie.trim().split('=');
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        });
+      }
 
       console.log('[ResetAuth] All storage cleared');
     } catch (error) {
@@ -548,7 +577,9 @@ function ResetAuth() {
     // Redirect to login page after a short delay
     setTimeout(() => {
       console.log('[ResetAuth] Redirecting to login page');
-      window.location.href = '/';
+      if (typeof window !== 'undefined') {
+        window.location.href = '/';
+      }
     }, 1000);
 
     return () => {
@@ -574,8 +605,11 @@ function App() {
           console.warn('[App] Found authenticated user on app load:', data.session.user.email);
 
           // Skip redirection if a special query parameter is present
-          const searchParams = new URLSearchParams(window.location.search);
-          if (searchParams.has('noredirect') || searchParams.has('forcelogin')) {
+          const searchParams =
+            typeof window !== 'undefined' && window.URLSearchParams
+              ? new window.URLSearchParams(window.location.search)
+              : null;
+          if (searchParams && (searchParams.has('noredirect') || searchParams.has('forcelogin'))) {
             console.log('[App] Skipping redirect due to special parameter');
             return;
           }
@@ -593,7 +627,7 @@ function App() {
             console.warn('[App] FAILSAFE - Detected group admin user, redirecting');
 
             // Check if we're not already on the group admin page
-            if (window.location.pathname !== '/group-admin') {
+            if (typeof window !== 'undefined' && window.location.pathname !== '/group-admin') {
               console.warn('[App] Forcing redirection to group admin dashboard');
               window.location.href = '/group-admin';
             }
@@ -601,7 +635,7 @@ function App() {
             console.warn('[App] FAILSAFE - Detected test admin user');
 
             // Check if we're not already on the master admin page
-            if (window.location.pathname !== '/master-admin') {
+            if (typeof window !== 'undefined' && window.location.pathname !== '/master-admin') {
               console.warn('[App] Forcing redirection to master admin dashboard');
               window.location.href = '/master-admin';
             }
@@ -613,11 +647,14 @@ function App() {
     };
 
     // Skip check if we're on the logout page or have noredirect parameter
-    const searchParams = new URLSearchParams(window.location.search);
+    const searchParams =
+      typeof window !== 'undefined' && window.URLSearchParams
+        ? new window.URLSearchParams(window.location.search)
+        : null;
     if (
+      typeof window !== 'undefined' &&
       window.location.pathname !== '/logout' &&
-      !searchParams.has('noredirect') &&
-      !searchParams.has('forcelogin')
+      (!searchParams || (!searchParams.has('noredirect') && !searchParams.has('forcelogin')))
     ) {
       checkForAuthenticatedGroupAdmin();
     }
@@ -630,9 +667,12 @@ function App() {
       environment: APP_ENV,
       app_url: APP_URL,
       marketing_url: MARKETING_URL,
-      user_agent: navigator.userAgent,
-      language: navigator.language,
-      screen_size: `${window.innerWidth}x${window.innerHeight}`,
+      user_agent:
+        typeof window !== 'undefined' && window.navigator ? window.navigator.userAgent : 'unknown',
+      language:
+        typeof window !== 'undefined' && window.navigator ? window.navigator.language : 'unknown',
+      screen_size:
+        typeof window !== 'undefined' ? `${window.innerWidth}x${window.innerHeight}` : 'unknown',
     });
 
     // Add listener for authentication state changes
@@ -669,17 +709,21 @@ function App() {
     // Listen for network changes
     const handleNetworkChange = () => {
       logAppEvent('Network status change', {
-        online: navigator.onLine,
+        online: typeof window !== 'undefined' && window.navigator ? window.navigator.onLine : true,
       });
     };
 
-    window.addEventListener('online', handleNetworkChange);
-    window.addEventListener('offline', handleNetworkChange);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('online', handleNetworkChange);
+      window.addEventListener('offline', handleNetworkChange);
+    }
 
     return () => {
       subscription.unsubscribe();
-      window.removeEventListener('online', handleNetworkChange);
-      window.removeEventListener('offline', handleNetworkChange);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('online', handleNetworkChange);
+        window.removeEventListener('offline', handleNetworkChange);
+      }
     };
   }, []);
 
@@ -757,15 +801,15 @@ function App() {
                       }
                     />
 
-                    {/* Area VP Dashboard Route */}
+                    {/* Area VP Full Dashboard Route */}
                     <Route
-                      path="/avp-dashboard"
+                      path="/avp-full-dashboard"
                       element={
-                        <GroupAdminAccessCheck>
-                          <DashboardLayout title="Area VP Dashboard">
-                            <AVPDashboard />
+                        <ProtectedRoute requiredRoles={['area_vice_president']}>
+                          <DashboardLayout title="Area VP Full Dashboard">
+                            <AVPFullDashboard />
                           </DashboardLayout>
-                        </GroupAdminAccessCheck>
+                        </ProtectedRoute>
                       }
                     />
 
@@ -1047,7 +1091,7 @@ function DealershipLayoutContent({ dealershipId }: { dealershipId: number }) {
             requiredRoles={['admin', 'dealership_admin']}
             requiredDealership={dealershipId}
           >
-            <AdminDashboard />
+            <AdminDashboardPage />
           </ProtectedRoute>
         }
       />
@@ -1065,16 +1109,6 @@ function DealershipLayoutContent({ dealershipId }: { dealershipId: number }) {
       <Route path="*" element={<Navigate to={`/dealership/${dealershipId}/sales`} replace />} />
     </Routes>
   );
-}
-
-// Add global type declaration for app event tracking
-declare global {
-  interface Window {
-    appEvents?: Array<{
-      event: string;
-      details: any;
-    }>;
-  }
 }
 
 export default App;

@@ -69,12 +69,73 @@ export const TEST_USERS: DirectAuthUser[] = [
     dealershipId: 1,
     name: 'Single Finance Manager 2',
   },
+  {
+    id: 'avp-id',
+    email: 'avp@exampletest.com',
+    role: 'area_vice_president',
+    name: 'Area Vice President',
+  },
+  {
+    id: 'avp-id',
+    email: 'avp@exampletest.com',
+    role: 'area_vice_president',
+    name: 'Area Vice President',
+  },
 ];
 
 // Storage key for the auth user
 const STORAGE_KEY = 'direct_auth_user';
 // New key used by dashboard selector
 const DASHBOARD_SELECTOR_KEY = 'directauth_user';
+
+// ---------- Memoised helpers ----------
+let _cachedUser: DirectAuthUser | null | undefined;
+let _lastCacheTime = 0;
+const CACHE_TTL_MS = 1000; // 1 second cache window is enough to prevent thrashing
+
+function _readUserFromStorage(): DirectAuthUser | null {
+  // 1) Original storage key (legacy)
+  const jsonA = localStorage.getItem(STORAGE_KEY);
+  if (jsonA) {
+    try {
+      return JSON.parse(jsonA) as DirectAuthUser;
+    } catch {}
+  }
+
+  // 2) New dashboard-selector key
+  const jsonB = localStorage.getItem(DASHBOARD_SELECTOR_KEY);
+  if (jsonB) {
+    try {
+      console.log('[directAuth] Found user from dashboard selector');
+      return JSON.parse(jsonB) as DirectAuthUser;
+    } catch {}
+  }
+  return null;
+}
+
+export function getCurrentUser(): DirectAuthUser | null {
+  const now = Date.now();
+  if (_cachedUser !== undefined && now - _lastCacheTime < CACHE_TTL_MS) {
+    return _cachedUser;
+  }
+
+  _cachedUser = _readUserFromStorage();
+  _lastCacheTime = now;
+  return _cachedUser;
+}
+
+export function isAuthenticated(): boolean {
+  return getCurrentUser() !== null;
+}
+
+// Reset cache on logout
+export function logout(): void {
+  console.log('[directAuth] Logging out - clearing all auth keys');
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(DASHBOARD_SELECTOR_KEY);
+  localStorage.removeItem('directauth_timestamp');
+  _cachedUser = undefined;
+}
 
 // Login with a test account
 export function loginWithTestAccount(email: string): { success: boolean; message: string } {
@@ -95,49 +156,6 @@ export function loginWithTestAccount(email: string): { success: boolean; message
     success: true,
     message: `Logged in as ${user.name || user.email}`,
   };
-}
-
-// Get the current user
-export function getCurrentUser(): DirectAuthUser | null {
-  // First try the original storage key
-  const userJson = localStorage.getItem(STORAGE_KEY);
-
-  if (userJson) {
-    try {
-      return JSON.parse(userJson) as DirectAuthUser;
-    } catch (e) {
-      console.error('[directAuth] Error parsing user from STORAGE_KEY', e);
-    }
-  }
-
-  // Then try the dashboard selector key
-  const dashboardSelectorJson = localStorage.getItem(DASHBOARD_SELECTOR_KEY);
-  if (dashboardSelectorJson) {
-    try {
-      console.log('[directAuth] Found user from dashboard selector');
-      return JSON.parse(dashboardSelectorJson) as DirectAuthUser;
-    } catch (e) {
-      console.error('[directAuth] Error parsing user from DASHBOARD_SELECTOR_KEY', e);
-    }
-  }
-
-  return null;
-}
-
-// Check if the user is authenticated
-export function isAuthenticated(): boolean {
-  return getCurrentUser() !== null;
-}
-
-// Log out
-export function logout(): void {
-  console.log('[directAuth] Logging out - clearing all auth keys');
-  localStorage.removeItem(STORAGE_KEY);
-  localStorage.removeItem(DASHBOARD_SELECTOR_KEY);
-  localStorage.removeItem('directauth_timestamp');
-
-  // Also clear any potential Supabase auth data to be thorough
-  localStorage.removeItem('supabase.auth.token');
 }
 
 // Get redirect path based on role
@@ -168,6 +186,10 @@ export function getRedirectPath(user: DirectAuthUser): string {
 
   if (user.role === 'general_manager') {
     return '/dashboard/gm';
+  }
+
+  if (user.role === 'area_vice_president') {
+    return '/avp-full-dashboard';
   }
 
   // Default to sales dashboard

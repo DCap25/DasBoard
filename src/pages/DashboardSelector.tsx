@@ -61,6 +61,12 @@ const DashboardSelector: React.FC = () => {
       email: 'sales@exampletest.com',
       role: 'salesperson',
     },
+    {
+      name: 'Area Vice President',
+      path: '/avp-full-dashboard',
+      email: 'avp@exampletest.com',
+      role: 'area_vice_president',
+    },
   ];
 
   // Direct bypass method - just store user info and redirect
