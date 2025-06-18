@@ -179,6 +179,107 @@ const FINANCE_DATA = {
   gapPenetration: 72,
 };
 
+// Sample detailed sales metrics data
+const DETAILED_SALES_METRICS = {
+  lastUpdate: '06/18/2025',
+  totalSold: 23,
+  totalBooked: 21,
+  tracking: 42,
+  currentFront: 10145,
+  currentBack: 62438,
+  total: 69006,
+  avgFront: 483,
+  avgBack: 2973,
+  pvr: 3456,
+  fiChargebacks: 1129,
+  wholesaleProfitLoss: -2448,
+  trackingGross: 154086,
+  forecastGross: 159000,
+  overUnderGross: -9914,
+  trackingUnits: 42,
+  forecastUnits: 55,
+  overUnderUnits: -13,
+};
+
+// Sample store comparison data for single stores vs dealer groups
+const STORE_COMPARISON_DATA = [
+  {
+    id: 1,
+    name: 'Central Motors - Main Location',
+    type: 'single',
+    lastUpdate: '06/18/2025',
+    metrics: {
+      totalSold: 23,
+      totalBooked: 21,
+      tracking: 42,
+      currentFront: 10145,
+      currentBack: 62438,
+      total: 69006,
+      avgFront: 483,
+      avgBack: 2973,
+      pvr: 3456,
+      fiChargebacks: 1129,
+      wholesaleProfitLoss: -2448,
+      trackingGross: 154086,
+      forecastGross: 159000,
+      overUnderGross: -9914,
+      trackingUnits: 42,
+      forecastUnits: 55,
+      overUnderUnits: -13,
+    },
+  },
+  {
+    id: 2,
+    name: 'Premier Auto Group',
+    type: 'group',
+    lastUpdate: '06/18/2025',
+    metrics: {
+      totalSold: 87,
+      totalBooked: 79,
+      tracking: 158,
+      currentFront: 42580,
+      currentBack: 198750,
+      total: 241330,
+      avgFront: 489,
+      avgBack: 2284,
+      pvr: 2773,
+      fiChargebacks: 3890,
+      wholesaleProfitLoss: -8920,
+      trackingGross: 445320,
+      forecastGross: 475000,
+      overUnderGross: -29680,
+      trackingUnits: 158,
+      forecastUnits: 185,
+      overUnderUnits: -27,
+    },
+  },
+  {
+    id: 3,
+    name: 'AutoMax Dealerships',
+    type: 'group',
+    lastUpdate: '06/18/2025',
+    metrics: {
+      totalSold: 134,
+      totalBooked: 127,
+      tracking: 248,
+      currentFront: 68920,
+      currentBack: 312480,
+      total: 381400,
+      avgFront: 515,
+      avgBack: 2333,
+      pvr: 2848,
+      fiChargebacks: 5670,
+      wholesaleProfitLoss: -12350,
+      trackingGross: 698540,
+      forecastGross: 720000,
+      overUnderGross: -21460,
+      trackingUnits: 248,
+      forecastUnits: 275,
+      overUnderUnits: -27,
+    },
+  },
+];
+
 // Update the DEALER_GROUP_DATA to use a real dealership name and adjust colors
 const DEALER_GROUP_DATA = [
   {
@@ -391,34 +492,375 @@ const DEALER_GROUP_DATA = [
       },
     ],
   },
+  {
+    id: 4,
+    name: 'Premier Auto - New Division',
+    isManagerStore: false,
+    storeType: 'new',
+    lastUpdated: '2025-05-08 13:20',
+    totalSold: 38,
+    totalPending: 12,
+    totalBooked: 32,
+    tracking: 44,
+    currentFrontGross: 58200,
+    currentBackGross: 32100,
+    totalGross: 90300,
+    avgFront: 1532,
+    avgBack: 845,
+    pvr: 2377,
+    trackingGross: 101500,
+    forecastGross: 95000,
+    overUnderGross: 6500,
+    trackingUnits: 48,
+    forecastUnits: 44,
+    actualUnits: 44,
+    overUnderUnits: 0,
+    locations: [],
+  },
+  {
+    id: 5,
+    name: 'AutoMax New Cars',
+    isManagerStore: false,
+    storeType: 'new',
+    lastUpdated: '2025-05-08 12:45',
+    totalSold: 29,
+    totalPending: 9,
+    totalBooked: 25,
+    tracking: 34,
+    currentFrontGross: 44800,
+    currentBackGross: 24600,
+    totalGross: 69400,
+    avgFront: 1545,
+    avgBack: 848,
+    pvr: 2393,
+    trackingGross: 78000,
+    forecastGross: 72000,
+    overUnderGross: 6000,
+    trackingUnits: 37,
+    forecastUnits: 34,
+    actualUnits: 34,
+    overUnderUnits: 0,
+    locations: [],
+  },
+  {
+    id: 6,
+    name: 'Premier Auto - Used Division',
+    isManagerStore: false,
+    storeType: 'used',
+    lastUpdated: '2025-05-08 13:15',
+    totalSold: 41,
+    totalPending: 13,
+    totalBooked: 35,
+    tracking: 46,
+    currentFrontGross: 52300,
+    currentBackGross: 33100,
+    totalGross: 85400,
+    avgFront: 1276,
+    avgBack: 807,
+    pvr: 2083,
+    trackingGross: 96000,
+    forecastGross: 90000,
+    overUnderGross: 6000,
+    trackingUnits: 50,
+    forecastUnits: 46,
+    actualUnits: 46,
+    overUnderUnits: 0,
+    locations: [],
+  },
+  {
+    id: 7,
+    name: 'AutoMax Used Cars',
+    isManagerStore: false,
+    storeType: 'used',
+    lastUpdated: '2025-05-08 12:30',
+    totalSold: 35,
+    totalPending: 11,
+    totalBooked: 30,
+    tracking: 39,
+    currentFrontGross: 43500,
+    currentBackGross: 28800,
+    totalGross: 72300,
+    avgFront: 1243,
+    avgBack: 823,
+    pvr: 2066,
+    trackingGross: 81000,
+    forecastGross: 78000,
+    overUnderGross: 3000,
+    trackingUnits: 42,
+    forecastUnits: 39,
+    actualUnits: 39,
+    overUnderUnits: 0,
+    locations: [],
+  },
 ];
 
-// Update the SalesPerformanceSummary component to make it more compact
+// Update the SalesPerformanceSummary component to include tabs for different views
 const SalesPerformanceSummary = ({ data }) => {
+  const [viewMode, setViewMode] = useState('cards'); // 'cards' or 'comparison'
+
+  const formatCurrency = amount => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const formatNumber = value => {
+    return value.toLocaleString();
+  };
+
+  // Cards view (original view)
+  const CardsView = () => (
+    <div className="space-y-3">
+      {/* Render Central Motors - New Cars first */}
+      {data.find(group => group.id === 1) && (
+        <DealerGroupSummary key={1} dealerGroup={data.find(group => group.id === 1)} />
+      )}
+
+      {/* Render Central Motors - Used Cars second */}
+      {data.find(group => group.id === 2) && (
+        <DealerGroupSummary key={2} dealerGroup={data.find(group => group.id === 2)} />
+      )}
+
+      {/* Render all other dealerships */}
+      {data
+        .filter(group => group.id !== 1 && group.id !== 2)
+        .map(dealerGroup => (
+          <DealerGroupSummary key={dealerGroup.id} dealerGroup={dealerGroup} />
+        ))}
+    </div>
+  );
+
+  // Comparison table view (new side-by-side view with metrics as rows, dealerships as columns)
+  const ComparisonView = () => {
+    // Separate dealerships by type
+    const newCarDealerships = data.filter(dealer => dealer.storeType === 'new');
+    const usedCarDealerships = data.filter(dealer => dealer.storeType === 'used');
+    const mixedDealerships = data.filter(
+      dealer => dealer.storeType !== 'new' && dealer.storeType !== 'used'
+    );
+
+    // Define metrics to display based on deal log data and forecasts
+    const metrics = [
+      { key: 'lastUpdated', label: 'Last Updated', format: 'date' },
+      { key: 'totalSold', label: 'Total Sold', format: 'number' },
+      { key: 'totalBooked', label: 'Total Booked/Funded', format: 'number' },
+      { key: 'tracking', label: 'Tracking', format: 'number', highlight: true },
+      { key: 'currentFrontGross', label: 'Current Front Gross', format: 'currency' },
+      { key: 'currentBackGross', label: 'Current Back Gross', format: 'currency' },
+      { key: 'totalGross', label: 'Current Total Gross', format: 'currency', color: 'green' },
+      { key: 'avgFront', label: 'Avg Front Gross', format: 'currency' },
+      { key: 'avgBack', label: 'Avg Back Gross', format: 'currency' },
+      { key: 'pvr', label: 'Total PVR', format: 'currency', color: 'blue' },
+      { key: 'trackingGross', label: 'Tracking Gross', format: 'currency', highlight: true },
+      { key: 'forecastGross', label: 'Forecast Gross', format: 'currency' },
+      { key: 'overUnderGross', label: 'Over/Under Gross', format: 'currency', conditional: true },
+      { key: 'trackingUnits', label: 'Tracking Units', format: 'number', highlight: true },
+      { key: 'forecastUnits', label: 'Forecast Units', format: 'number' },
+      { key: 'overUnderUnits', label: 'Over/Under Units', format: 'number', conditional: true },
+    ];
+
+    const formatValue = (value, format, conditional = false) => {
+      if (format === 'currency') {
+        return formatCurrency(value);
+      } else if (format === 'number') {
+        return formatNumber(value);
+      } else if (format === 'date') {
+        return value; // Already formatted as string in the data
+      }
+      return value;
+    };
+
+    const getValueClassName = (value, color, conditional = false, highlight = false) => {
+      let className = 'text-center font-medium';
+
+      if (highlight) {
+        className += ' text-amber-600 bg-yellow-50';
+      } else if (conditional) {
+        className += value < 0 ? ' text-red-600' : ' text-green-600';
+      } else if (color === 'green') {
+        className += ' text-green-600';
+      } else if (color === 'blue') {
+        className += ' text-blue-600';
+      }
+
+      return className;
+    };
+
+    const renderComparisonTable = (dealerships, title, bgColor) => {
+      if (dealerships.length === 0) return null;
+
+      return (
+        <div className="mb-6">
+          <h4 className={`text-lg font-semibold mb-3 px-3 py-2 ${bgColor} rounded-t-lg border-b`}>
+            {title}
+          </h4>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50">
+                  <TableHead className="w-40 font-semibold sticky left-0 bg-gray-50 z-10">
+                    Metric
+                  </TableHead>
+                  {dealerships.map(dealer => (
+                    <TableHead key={dealer.id} className="text-center font-semibold min-w-32">
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="text-sm">{dealer.name}</span>
+                        {dealer.isManagerStore && (
+                          <span className="px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded-full">
+                            Your Store
+                          </span>
+                        )}
+                      </div>
+                    </TableHead>
+                  ))}
+                  <TableHead className="text-center font-semibold bg-gray-100 min-w-32">
+                    Total
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {metrics.map(metric => (
+                  <TableRow key={metric.key} className="hover:bg-gray-50">
+                    <TableCell className="font-medium sticky left-0 bg-white z-10 border-r">
+                      {metric.label}
+                    </TableCell>
+                    {dealerships.map(dealer => (
+                      <TableCell
+                        key={dealer.id}
+                        className={getValueClassName(
+                          dealer[metric.key],
+                          metric.color,
+                          metric.conditional,
+                          metric.highlight
+                        )}
+                      >
+                        {formatValue(dealer[metric.key], metric.format, metric.conditional)}
+                      </TableCell>
+                    ))}
+                    <TableCell className="text-center font-semibold bg-gray-50">
+                      {metric.key === 'lastUpdated'
+                        ? 'Various'
+                        : metric.format === 'currency' &&
+                          !['avgFront', 'avgBack', 'pvr'].includes(metric.key)
+                        ? formatCurrency(
+                            dealerships.reduce((sum, dealer) => sum + dealer[metric.key], 0)
+                          )
+                        : metric.format === 'number'
+                        ? formatNumber(
+                            dealerships.reduce((sum, dealer) => sum + dealer[metric.key], 0)
+                          )
+                        : ['avgFront', 'avgBack', 'pvr'].includes(metric.key)
+                        ? formatCurrency(
+                            dealerships.reduce((sum, dealer) => sum + dealer[metric.key], 0) /
+                              dealerships.length
+                          )
+                        : '--'}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      );
+    };
+
+    return (
+      <div className="space-y-6">
+        {/* New Cars Section */}
+        {renderComparisonTable(
+          newCarDealerships,
+          '🚗 New Cars Performance',
+          'bg-blue-50 text-blue-800'
+        )}
+
+        {/* Used Cars Section */}
+        {renderComparisonTable(
+          usedCarDealerships,
+          '🚙 Used Cars Performance',
+          'bg-green-50 text-green-800'
+        )}
+
+        {/* Mixed/Other Dealerships Section */}
+        {mixedDealerships.length > 0 &&
+          renderComparisonTable(
+            mixedDealerships,
+            '🏢 Mixed Dealerships',
+            'bg-gray-50 text-gray-800'
+          )}
+
+        {/* Overall Summary */}
+        <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg border">
+          <h4 className="font-semibold text-gray-700 mb-3">📊 Overall Performance Summary</h4>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div className="bg-white p-3 rounded shadow-sm">
+              <span className="text-gray-600 block">Total Units Sold</span>
+              <span className="font-bold text-lg text-blue-600">
+                {formatNumber(data.reduce((sum, dealer) => sum + dealer.totalSold, 0))}
+              </span>
+            </div>
+            <div className="bg-white p-3 rounded shadow-sm">
+              <span className="text-gray-600 block">Total Gross</span>
+              <span className="font-bold text-lg text-green-600">
+                {formatCurrency(data.reduce((sum, dealer) => sum + dealer.totalGross, 0))}
+              </span>
+            </div>
+            <div className="bg-white p-3 rounded shadow-sm">
+              <span className="text-gray-600 block">Avg PVR</span>
+              <span className="font-bold text-lg text-blue-600">
+                {formatCurrency(data.reduce((sum, dealer) => sum + dealer.pvr, 0) / data.length)}
+              </span>
+            </div>
+            <div className="bg-white p-3 rounded shadow-sm">
+              <span className="text-gray-600 block">Total Over/Under</span>
+              <span
+                className={`font-bold text-lg ${
+                  data.reduce((sum, dealer) => sum + dealer.overUnderGross, 0) < 0
+                    ? 'text-red-600'
+                    : 'text-green-600'
+                }`}
+              >
+                {formatCurrency(data.reduce((sum, dealer) => sum + dealer.overUnderGross, 0))}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <Card className="mb-5">
       <CardHeader className="pb-2 pt-4">
-        <CardTitle className="text-xl">Sales Performance</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-xl">Sales Performance</CardTitle>
+          <div className="flex gap-2">
+            <Button
+              variant={viewMode === 'cards' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setViewMode('cards')}
+              className="flex items-center gap-2"
+            >
+              <BarChart className="h-4 w-4" />
+              Cards View
+            </Button>
+            <Button
+              variant={viewMode === 'comparison' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setViewMode('comparison')}
+              className="flex items-center gap-2"
+            >
+              <FileText className="h-4 w-4" />
+              Comparison Table
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="p-3">
-        <div className="space-y-3">
-          {/* Render Central Motors - New Cars first */}
-          {data.find(group => group.id === 1) && (
-            <DealerGroupSummary key={1} dealerGroup={data.find(group => group.id === 1)} />
-          )}
-
-          {/* Render Central Motors - Used Cars second */}
-          {data.find(group => group.id === 2) && (
-            <DealerGroupSummary key={2} dealerGroup={data.find(group => group.id === 2)} />
-          )}
-
-          {/* Render all other dealerships */}
-          {data
-            .filter(group => group.id !== 1 && group.id !== 2)
-            .map(dealerGroup => (
-              <DealerGroupSummary key={dealerGroup.id} dealerGroup={dealerGroup} />
-            ))}
-        </div>
+        {viewMode === 'cards' ? <CardsView /> : <ComparisonView />}
       </CardContent>
     </Card>
   );
@@ -790,6 +1232,338 @@ const DealerGroupSummary = ({ dealerGroup }) => {
 };
 
 // Update MetricCard to be more compact and use appropriate colors
+// Detailed Sales Report Component
+const DetailedSalesReport = () => {
+  const [selectedView, setSelectedView] = useState('single'); // 'single' or 'group'
+  const [selectedStore, setSelectedStore] = useState(STORE_COMPARISON_DATA[0]);
+
+  const formatCurrency = value => {
+    if (value < 0) {
+      return `-$${Math.abs(value).toLocaleString()}`;
+    }
+    return `$${value.toLocaleString()}`;
+  };
+
+  const formatNumber = value => {
+    return value.toLocaleString();
+  };
+
+  // Filter stores based on selected view
+  const filteredStores = STORE_COMPARISON_DATA.filter(store => store.type === selectedView);
+
+  // Highlighted metrics (with yellow background)
+  const highlightedMetrics = [
+    'tracking',
+    'wholesaleProfitLoss',
+    'overUnderGross',
+    'trackingUnits',
+    'forecastUnits',
+    'overUnderUnits',
+  ];
+
+  const MetricRow = ({
+    label,
+    value,
+    isHighlighted = false,
+    isCurrency = false,
+    isNegative = false,
+  }) => (
+    <div
+      className={`grid grid-cols-2 py-3 px-4 border-b border-gray-100 ${
+        isHighlighted ? 'bg-yellow-50' : 'bg-white'
+      } hover:bg-gray-50 transition-colors`}
+    >
+      <div className="text-sm font-medium text-gray-700">{label}</div>
+      <div
+        className={`text-sm font-semibold text-right ${
+          isNegative ? 'text-red-600' : 'text-gray-900'
+        }`}
+      >
+        {isCurrency ? formatCurrency(value) : formatNumber(value)}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      {/* View Selection and Store Selector */}
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Detailed Sales Report</h2>
+          <p className="text-sm text-gray-600">
+            Comprehensive sales metrics for performance tracking
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Select value={selectedView} onValueChange={setSelectedView}>
+            <SelectTrigger className="w-44">
+              <Filter className="mr-2 h-4 w-4" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="single">Single Stores</SelectItem>
+              <SelectItem value="group">Dealer Groups</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={selectedStore.id.toString()}
+            onValueChange={value =>
+              setSelectedStore(filteredStores.find(store => store.id.toString() === value))
+            }
+          >
+            <SelectTrigger className="w-64">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {filteredStores.map(store => (
+                <SelectItem key={store.id} value={store.id.toString()}>
+                  {store.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Detailed Metrics Table */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Main Metrics Card */}
+        <Card className="lg:col-span-1">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg">{selectedStore.name}</CardTitle>
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <Clock className="h-4 w-4" />
+                Last Update: {selectedStore.lastUpdate}
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span
+                className={`px-2 py-1 text-xs font-medium rounded-full ${
+                  selectedStore.type === 'single'
+                    ? 'bg-blue-100 text-blue-800'
+                    : 'bg-purple-100 text-purple-800'
+                }`}
+              >
+                {selectedStore.type === 'single' ? 'Single Store' : 'Dealer Group'}
+              </span>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="border rounded-lg overflow-hidden">
+              <MetricRow label="Total Sold" value={selectedStore.metrics.totalSold} />
+              <MetricRow label="Total Booked" value={selectedStore.metrics.totalBooked} />
+              <MetricRow
+                label="Tracking"
+                value={selectedStore.metrics.tracking}
+                isHighlighted={true}
+              />
+              <MetricRow
+                label="Current Front"
+                value={selectedStore.metrics.currentFront}
+                isCurrency={true}
+              />
+              <MetricRow
+                label="Current Back"
+                value={selectedStore.metrics.currentBack}
+                isCurrency={true}
+              />
+              <MetricRow label="Total" value={selectedStore.metrics.total} isCurrency={true} />
+              <MetricRow
+                label="Avg Front"
+                value={selectedStore.metrics.avgFront}
+                isCurrency={true}
+              />
+              <MetricRow label="Avg Back" value={selectedStore.metrics.avgBack} isCurrency={true} />
+              <MetricRow label="PVR" value={selectedStore.metrics.pvr} isCurrency={true} />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Advanced Metrics Card */}
+        <Card className="lg:col-span-1">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Performance Analysis</CardTitle>
+            <p className="text-sm text-gray-600">Key performance indicators and forecasts</p>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="border rounded-lg overflow-hidden">
+              <MetricRow
+                label="F&I Charge Backs"
+                value={selectedStore.metrics.fiChargebacks}
+                isCurrency={true}
+              />
+              <MetricRow
+                label="Wholesale Profit / Loss (+/-)"
+                value={selectedStore.metrics.wholesaleProfitLoss}
+                isCurrency={true}
+                isHighlighted={true}
+                isNegative={selectedStore.metrics.wholesaleProfitLoss < 0}
+              />
+              <MetricRow
+                label="Tracking Gross"
+                value={selectedStore.metrics.trackingGross}
+                isCurrency={true}
+                isHighlighted={true}
+              />
+              <MetricRow
+                label="Forecast Gross"
+                value={selectedStore.metrics.forecastGross}
+                isCurrency={true}
+                isHighlighted={true}
+              />
+              <MetricRow
+                label="Over/Under Gross"
+                value={selectedStore.metrics.overUnderGross}
+                isCurrency={true}
+                isHighlighted={true}
+                isNegative={selectedStore.metrics.overUnderGross < 0}
+              />
+              <MetricRow
+                label="Tracking Units"
+                value={selectedStore.metrics.trackingUnits}
+                isHighlighted={true}
+              />
+              <MetricRow
+                label="Forecast Units"
+                value={selectedStore.metrics.forecastUnits}
+                isHighlighted={true}
+              />
+              <MetricRow
+                label="Over/Under Units"
+                value={selectedStore.metrics.overUnderUnits}
+                isHighlighted={true}
+                isNegative={selectedStore.metrics.overUnderUnits < 0}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Summary Cards for Quick Overview */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="border-l-4 border-l-blue-500">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Total Sales</p>
+                <p className="text-2xl font-bold">{selectedStore.metrics.totalSold}</p>
+              </div>
+              <Car className="h-8 w-8 text-blue-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-green-500">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Total Gross</p>
+                <p className="text-2xl font-bold">{formatCurrency(selectedStore.metrics.total)}</p>
+              </div>
+              <DollarSign className="h-8 w-8 text-green-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-amber-500">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">PVR</p>
+                <p className="text-2xl font-bold">{formatCurrency(selectedStore.metrics.pvr)}</p>
+              </div>
+              <TrendingUp className="h-8 w-8 text-amber-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card
+          className={`border-l-4 ${
+            selectedStore.metrics.overUnderGross < 0 ? 'border-l-red-500' : 'border-l-green-500'
+          }`}
+        >
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Over/Under</p>
+                <p
+                  className={`text-2xl font-bold ${
+                    selectedStore.metrics.overUnderGross < 0 ? 'text-red-600' : 'text-green-600'
+                  }`}
+                >
+                  {formatCurrency(selectedStore.metrics.overUnderGross)}
+                </p>
+              </div>
+              {selectedStore.metrics.overUnderGross < 0 ? (
+                <TrendingDown className="h-8 w-8 text-red-500" />
+              ) : (
+                <TrendingUp className="h-8 w-8 text-green-500" />
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Comparison Table for Multiple Stores/Groups */}
+      {selectedView === 'group' && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Dealer Group Comparison</CardTitle>
+            <p className="text-sm text-gray-600">Compare performance across dealer groups</p>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Dealer Group</TableHead>
+                    <TableHead className="text-right">Total Sold</TableHead>
+                    <TableHead className="text-right">Total Gross</TableHead>
+                    <TableHead className="text-right">PVR</TableHead>
+                    <TableHead className="text-right">Over/Under Gross</TableHead>
+                    <TableHead className="text-right">Over/Under Units</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {STORE_COMPARISON_DATA.filter(store => store.type === 'group').map(store => (
+                    <TableRow key={store.id} className="hover:bg-gray-50">
+                      <TableCell className="font-medium">{store.name}</TableCell>
+                      <TableCell className="text-right">{store.metrics.totalSold}</TableCell>
+                      <TableCell className="text-right">
+                        {formatCurrency(store.metrics.total)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {formatCurrency(store.metrics.pvr)}
+                      </TableCell>
+                      <TableCell
+                        className={`text-right font-medium ${
+                          store.metrics.overUnderGross < 0 ? 'text-red-600' : 'text-green-600'
+                        }`}
+                      >
+                        {formatCurrency(store.metrics.overUnderGross)}
+                      </TableCell>
+                      <TableCell
+                        className={`text-right font-medium ${
+                          store.metrics.overUnderUnits < 0 ? 'text-red-600' : 'text-green-600'
+                        }`}
+                      >
+                        {store.metrics.overUnderUnits}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+};
+
 const MetricCard = ({ label, value, icon, color = 'blue' }) => {
   const getColorClasses = () => {
     switch (color) {
@@ -1024,6 +1798,10 @@ const SalesReportPage = () => {
           <TabsTrigger value="finance">
             <DollarSign className="h-4 w-4 mr-2" />
             Finance
+          </TabsTrigger>
+          <TabsTrigger value="detailed">
+            <FileText className="h-4 w-4 mr-2" />
+            Detailed Report
           </TabsTrigger>
         </TabsList>
 
@@ -1586,6 +2364,10 @@ const SalesReportPage = () => {
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+
+        <TabsContent value="detailed" className="mt-6">
+          <DetailedSalesReport />
         </TabsContent>
       </Tabs>
     </div>
