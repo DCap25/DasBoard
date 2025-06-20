@@ -239,7 +239,7 @@ const SingleFinanceManagerDashboard = () => {
   // Simple function to handle the "Log New Deal" button click
   const handleLogNewDealClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    navigate('/single-finance-deal-log'); // Navigate to the dedicated single finance deal log route
+    navigate('log-deal'); // Navigate to the internal log-deal route within single-finance dashboard
   };
 
   // Helper to get the current month and year for display
