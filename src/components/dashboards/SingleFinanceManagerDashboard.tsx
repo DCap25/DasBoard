@@ -4,6 +4,11 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import {
+  getDashboardData,
+  loadDealsFromStorage,
+  aggregateDealsForDashboard,
+} from '../../utils/dealMapper';
+import {
   DollarSign,
   Calculator,
   FileText,
@@ -58,29 +63,38 @@ const SingleFinanceManagerDashboard = () => {
     try {
       console.log('[SingleFinanceManagerDashboard] Loading deals from localStorage');
 
-      const existingDealsJson = localStorage.getItem('singleFinanceDeals');
-      const existingDeals = existingDealsJson ? JSON.parse(existingDealsJson) : [];
+      // Use the new deal mapper utility
+      const dashboardData = getDashboardData('single-finance', {
+        userRole: 'single_finance_manager',
+        timePeriod,
+        includeInactive: false,
+      });
 
       console.log(
-        `[SingleFinanceManagerDashboard] Found ${existingDeals.length} deals in localStorage`
+        `[SingleFinanceManagerDashboard] Found ${dashboardData.deals.length} deals in localStorage`
       );
 
-      // Map localStorage deal format to the component's Deal interface
-      const formattedDeals: Deal[] = existingDeals.map((localDeal: any) => ({
-        id: localDeal.id || localDeal.deal_number || 'unknown',
-        customer: localDeal.customer_name || localDeal.customer,
-        vehicle: localDeal.vehicle,
-        vin: localDeal.vin || '',
-        saleDate: localDeal.sale_date || localDeal.saleDate,
-        salesperson: localDeal.salesperson || 'Self',
-        amount: localDeal.amount || localDeal.total_gross || 0,
-        status: localDeal.status || 'pending',
-        products: Array.isArray(localDeal.products) ? localDeal.products : [],
-        profit: localDeal.profit || localDeal.back_end_gross || 0,
-        created_at: localDeal.created_at || new Date().toISOString(),
+      // Convert mapped deals to the component's Deal interface for backward compatibility
+      const formattedDeals: Deal[] = dashboardData.deals.map((mappedDeal: any) => ({
+        id: mappedDeal.id,
+        customer: mappedDeal.customer || mappedDeal.lastName,
+        vehicle: mappedDeal.vehicle,
+        vin: mappedDeal.vin || mappedDeal.vinLast8,
+        saleDate: mappedDeal.saleDate || mappedDeal.dealDate,
+        salesperson: mappedDeal.salesperson || 'Self',
+        amount: mappedDeal.amount || mappedDeal.totalGross,
+        status: mappedDeal.status || mappedDeal.dealStatus,
+        products: mappedDeal.products || mappedDeal.productMix?.map(p => p.name) || [],
+        profit: mappedDeal.profit || mappedDeal.backEndGross,
+        created_at: mappedDeal.created_at || new Date().toISOString(),
       }));
 
       setDeals(formattedDeals);
+
+      if (dashboardData.error) {
+        console.error('[SingleFinanceManagerDashboard] Deal mapper error:', dashboardData.error);
+        setError(`Warning: ${dashboardData.error}`);
+      }
     } catch (error) {
       console.error(
         '[SingleFinanceManagerDashboard] Error loading deals from localStorage:',

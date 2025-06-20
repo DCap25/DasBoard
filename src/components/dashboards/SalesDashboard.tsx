@@ -6,6 +6,12 @@ import { Button } from '../../components/ui/button';
 import { DealLogEditor } from '../manager/DealLogEditor';
 import GoalTracking from '../GoalTracking';
 import {
+  getDashboardData,
+  loadDealsFromStorage,
+  aggregateDealsForDashboard,
+} from '../../utils/dealMapper';
+import { useSalesDealsData } from '../../hooks/useDealsData';
+import {
   ShoppingBag,
   Target,
   Calculator,
@@ -136,6 +142,26 @@ const SalesDashboard = () => {
   const [goalProgress, setGoalProgress] = useState(60);
   const [timePeriod, setTimePeriod] = useState<string>('this-month');
 
+  // Use the custom hook to manage deal data
+  const salespersonId = user?.id || user?.user_metadata?.salesperson_id;
+  const {
+    dealData,
+    loading,
+    error,
+    setTimePeriod: setHookTimePeriod,
+  } = useSalesDealsData(salespersonId, timePeriod);
+
+  // Update goal progress based on actual deals
+  useEffect(() => {
+    if (dealData?.metrics) {
+      const progressPercentage =
+        dealData.metrics.totalDeals > 0
+          ? Math.min((dealData.metrics.totalDeals / 15) * 100, 100) // Assuming 15 deals goal
+          : 0;
+      setGoalProgress(progressPercentage);
+    }
+  }, [dealData]);
+
   // Get the current car based on goal progress
   const getCurrentCar = progress => {
     for (let i = CAR_PROGRESSION.length - 1; i >= 0; i--) {
@@ -159,17 +185,25 @@ const SalesDashboard = () => {
     return 'green';
   };
 
+  // Use real deal data or fallback to mock data
+  const currentDeals = dealData?.deals || MOCK_DEALS;
+  const metrics = dealData?.metrics || {};
+
   // Calculate front end gross
-  const totalFrontEndGross = MOCK_DEALS.reduce((sum, deal) => sum + deal.frontGross, 0);
+  const totalFrontEndGross =
+    metrics.totalFrontGross || MOCK_DEALS.reduce((sum, deal) => sum + deal.frontGross, 0);
 
   // Calculate back end gross
-  const totalBackEndGross = MOCK_DEALS.reduce((sum, deal) => sum + deal.backEndGross, 0);
+  const totalBackEndGross =
+    metrics.totalBackGross || MOCK_DEALS.reduce((sum, deal) => sum + deal.backEndGross, 0);
 
   // Calculate total gross
-  const totalGross = totalFrontEndGross + totalBackEndGross;
+  const totalGross = metrics.totalGross || totalFrontEndGross + totalBackEndGross;
 
   // Calculate mini deals (deals with $0 front end gross)
-  const miniDeals = MOCK_DEALS.filter(deal => deal.frontGross === 0).length;
+  const miniDeals = currentDeals.filter(
+    deal => deal.frontEndGross === 0 || deal.frontGross === 0
+  ).length;
 
   // Current car in progression
   const currentCar = getCurrentCar(goalProgress);
@@ -190,7 +224,7 @@ const SalesDashboard = () => {
   const potentialEarnings = currentEarnings * remainingDaysFactor;
 
   // Add bonus if deals threshold is met
-  const projectedDeals = MOCK_DEALS.length * remainingDaysFactor;
+  const projectedDeals = (metrics.totalDeals || MOCK_DEALS.length) * remainingDaysFactor;
   const projectedEarningsWithBonus =
     potentialEarnings +
     (projectedDeals >= PAY_CALCULATOR.bonusThreshold ? PAY_CALCULATOR.bonusAmount : 0);
@@ -230,7 +264,9 @@ const SalesDashboard = () => {
 
   // Handle time period change
   const handleTimePeriodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setTimePeriod(e.target.value);
+    const newPeriod = e.target.value;
+    setTimePeriod(newPeriod);
+    setHookTimePeriod(newPeriod);
   };
 
   useEffect(() => {
@@ -322,6 +358,36 @@ const SalesDashboard = () => {
         </div>
       </div>
 
+      {/* Error Display */}
+      {error && (
+        <div className="mb-6">
+          <div className="bg-red-50 border border-red-200 rounded-md p-4">
+            <div className="flex">
+              <AlertTriangle className="h-5 w-5 text-red-400 mr-2 mt-0.5" />
+              <div>
+                <h3 className="text-sm font-medium text-red-800">Deal Data Warning</h3>
+                <p className="text-sm text-red-700 mt-1">{error}</p>
+                <p className="text-xs text-red-600 mt-1">
+                  Showing fallback data. New deals will update automatically.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Loading Indicator */}
+      {loading && (
+        <div className="mb-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+            <div className="flex items-center">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+              <p className="text-sm text-blue-700">Loading deal data...</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-6">
         <Card className="border-l-4 border-l-blue-500">
           <CardHeader className="pb-2">
@@ -331,7 +397,9 @@ const SalesDashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{MOCK_DEALS.length}</div>
+            <div className="text-2xl font-bold">
+              {dealData?.metrics?.totalDeals || MOCK_DEALS.length}
+            </div>
             <p className="text-xs text-green-600 flex items-center mt-1">
               <ChevronUp className="h-3 w-3 mr-1" />
               8% from last month

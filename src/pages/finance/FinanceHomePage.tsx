@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Link } from 'react-router-dom';
+import { useFinanceDealsData } from '../../hooks/useDealsData';
 import {
   DollarSign,
   ChevronUp,
@@ -75,20 +76,46 @@ const SCHEDULE_DATA = [
 ];
 
 const FinanceHomePage: React.FC = () => {
-  const [deals, setDeals] = useState<Deal[]>([]);
-  const [pendingDeals, setPendingDeals] = useState<Deal[]>([]);
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('this-month');
   const [customDateRange, setCustomDateRange] = useState({
     start: '',
     end: '',
   });
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
-  const [filteredDeals, setFilteredDeals] = useState<Deal[]>([]);
-  const [metrics, setMetrics] = useState<Metrics>({
-    mtdRevenue: 0,
-    dealsProcessed: 0,
-    productsPerDeal: 0,
-    pvr: 0,
+
+  // Use the finance deals data hook
+  const {
+    dealData,
+    loading,
+    error,
+    setTimePeriod: setHookTimePeriod,
+  } = useFinanceDealsData(timePeriod);
+
+  // Extract data from the hook
+  const deals = dealData?.deals || [];
+  const metrics = dealData?.metrics || {
+    totalDeals: 0,
+    fundedDeals: 0,
+    pendingDeals: 0,
+    totalFrontGross: 0,
+    totalBackGross: 0,
+    totalGross: 0,
+    avgFrontGross: 0,
+    avgBackGross: 0,
+    totalPVR: 0,
+    avgPVR: 0,
+  };
+
+  // Filter deals by status
+  const fundedDeals = deals.filter(deal => deal.isFunded);
+  const pendingDeals = deals.filter(deal => deal.isPending);
+
+  // Legacy metrics calculation for backward compatibility
+  const legacyMetrics: Metrics = {
+    mtdRevenue: metrics.totalBackGross,
+    dealsProcessed: metrics.totalDeals,
+    productsPerDeal: metrics.totalDeals > 0 ? metrics.totalPVR / metrics.totalDeals : 0,
+    pvr: metrics.avgPVR,
     productMix: {
       extendedWarranty: 0,
       gapInsurance: 0,
@@ -97,7 +124,7 @@ const FinanceHomePage: React.FC = () => {
       ppm: 0,
       other: 0,
     },
-  });
+  };
 
   // Get current month and year for display
   const getCurrentMonthYear = () => {
@@ -184,6 +211,11 @@ const FinanceHomePage: React.FC = () => {
     const newPeriod = e.target.value as TimePeriod;
     setTimePeriod(newPeriod);
     setShowCustomDatePicker(newPeriod === 'custom');
+
+    // Update the hook's time period if it's not custom
+    if (newPeriod !== 'custom') {
+      setHookTimePeriod(newPeriod);
+    }
   };
 
   // Handle custom date range change

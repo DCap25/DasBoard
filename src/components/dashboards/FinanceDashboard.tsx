@@ -20,6 +20,11 @@ import {
 import FinanceHomePage from '../../pages/finance/FinanceHomePage';
 import FinanceDealsPage from '../../pages/finance/FinanceDealsPage';
 import FinanceSchedulePage from '../../pages/finance/FinanceSchedulePage';
+import {
+  getDashboardData,
+  loadDealsFromStorage,
+  aggregateDealsForDashboard,
+} from '../../utils/dealMapper';
 
 const FinanceDashboard = () => {
   const { user, role, dealershipId } = useAuth();
