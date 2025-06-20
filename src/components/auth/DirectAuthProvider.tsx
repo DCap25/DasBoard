@@ -49,6 +49,9 @@ const DirectAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       '/auth',
       '/dashboard-selector',
       '/deal-log',
+      '/finance-deal-log',
+      '/single-finance-deal-log',
+      '/finance-manager/log-deal',
     ];
     if (excludedPaths.includes(location.pathname)) {
       console.log(`[DirectAuthProvider] Skipping redirect for excluded path: ${location.pathname}`);
