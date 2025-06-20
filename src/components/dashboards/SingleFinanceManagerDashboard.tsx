@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Routes, Route, Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
@@ -20,7 +20,6 @@ import {
 import DealLogPage from '../../pages/DealLogPage';
 import { SingleFinanceHomePage } from '../../pages/finance/SingleFinanceHomePage';
 import FinanceDealsPage from '../../pages/finance/FinanceDealsPage';
-import LogSingleFinanceDeal from '../../pages/finance/LogSingleFinanceDeal';
 import { getFinanceManagerDeals } from '../../lib/apiService';
 
 // Interface for a deal
@@ -239,7 +238,7 @@ const SingleFinanceManagerDashboard = () => {
   // Simple function to handle the "Log New Deal" button click
   const handleLogNewDealClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    navigate('log-deal'); // Navigate to the internal log-deal route within single-finance dashboard
+    navigate('/single-finance-deal-log'); // Navigate to the external single finance deal log route
   };
 
   // Helper to get the current month and year for display
@@ -368,12 +367,7 @@ const SingleFinanceManagerDashboard = () => {
 
       {/* Main Dashboard Content */}
       <div>
-        <Routes>
-          <Route path="/" element={<SingleFinanceHomePage />} />
-          <Route path="/deals" element={<FinanceDealsPage />} />
-          <Route path="/log-deal" element={<LogSingleFinanceDeal />} />
-          <Route path="*" element={<Navigate to="/dashboard/single-finance" replace />} />
-        </Routes>
+        <SingleFinanceHomePage />
       </div>
 
       {/* Deals Log Section */}
