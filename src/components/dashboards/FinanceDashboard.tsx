@@ -20,28 +20,13 @@ import {
 import FinanceHomePage from '../../pages/finance/FinanceHomePage';
 import FinanceDealsPage from '../../pages/finance/FinanceDealsPage';
 import FinanceSchedulePage from '../../pages/finance/FinanceSchedulePage';
-import DealLogPage from '../../pages/DealLogPage';
 
 const FinanceDashboard = () => {
   const { user, role, dealershipId } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [showLogDealForm, setShowLogDealForm] = useState(false);
-  const [timePeriod, setTimePeriod] = useState<string>('this-month');
 
-  // Check the URL to see if we should show the log deal form
-  useEffect(() => {
-    // Check if the current URL includes any of the deal-log paths
-    if (
-      location.pathname.includes('/log-deal') ||
-      location.pathname.includes('/deal-log') ||
-      location.pathname.includes('/finance-deal-log')
-    ) {
-      setShowLogDealForm(true);
-    } else {
-      setShowLogDealForm(false);
-    }
-  }, [location.pathname]);
+  const [timePeriod, setTimePeriod] = useState<string>('this-month');
 
   useEffect(() => {
     console.log('[FinanceDashboard] Rendering finance dashboard', {
@@ -61,6 +46,7 @@ const FinanceDashboard = () => {
   // Simple function to handle the "Log New Deal" button click
   const handleLogNewDealClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    console.log('[FinanceDashboard] Log New Deal button clicked, navigating to /finance-deal-log');
     navigate('/finance-deal-log'); // Navigate to the dedicated finance deal log route
   };
 
@@ -96,30 +82,6 @@ const FinanceDashboard = () => {
         return `${month} ${year}`;
     }
   };
-
-  // If showing the log deal form, render it instead of the normal dashboard
-  if (showLogDealForm) {
-    return (
-      <div className="container py-4">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold">Finance Manager Dashboard</h1>
-            <p className="text-gray-600 mt-1">
-              Finance Manager: {user?.email?.split('@')[0] || 'Not Assigned'}
-            </p>
-          </div>
-          <Button
-            size="lg"
-            className="bg-green-600 hover:bg-green-700"
-            onClick={() => navigate('/dashboard/finance')}
-          >
-            Back to Dashboard
-          </Button>
-        </div>
-        <DealLogPage dashboardType="finance" />
-      </div>
-    );
-  }
 
   // Best practices tips for finance managers
   const bestPractices = [

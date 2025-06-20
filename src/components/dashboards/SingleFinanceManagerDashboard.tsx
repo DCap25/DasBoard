@@ -17,7 +17,7 @@ import {
   PlusCircle,
   Lightbulb,
 } from 'lucide-react';
-import DealLogPage from '../../pages/DealLogPage';
+
 import { SingleFinanceHomePage } from '../../pages/finance/SingleFinanceHomePage';
 import FinanceDealsPage from '../../pages/finance/FinanceDealsPage';
 import { getFinanceManagerDeals } from '../../lib/apiService';
@@ -41,7 +41,7 @@ const SingleFinanceManagerDashboard = () => {
   const { user, role, dealershipId } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [showLogDealForm, setShowLogDealForm] = useState(false);
+
   const [timePeriod, setTimePeriod] = useState<string>('this-month');
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(false);
@@ -201,25 +201,6 @@ const SingleFinanceManagerDashboard = () => {
     }
   };
 
-  // Check the URL to see if we should show the log deal form
-  useEffect(() => {
-    // Check if the current URL includes any of the deal-log paths
-    if (
-      location.pathname.includes('/log-deal') ||
-      location.pathname.includes('/deal-log') ||
-      location.pathname.includes('/single-finance-deal-log')
-    ) {
-      setShowLogDealForm(true);
-    } else {
-      setShowLogDealForm(false);
-      // When returning to main dashboard, refresh deals from localStorage
-      if (location.pathname === '/dashboard/single-finance' && !schemaName) {
-        console.log('[SingleFinanceManagerDashboard] Returned to main dashboard, refreshing deals');
-        loadDealsFromLocalStorage();
-      }
-    }
-  }, [location.pathname, schemaName]);
-
   useEffect(() => {
     console.log('[SingleFinanceManagerDashboard] Rendering single finance manager dashboard', {
       userId: user?.id,
@@ -238,6 +219,9 @@ const SingleFinanceManagerDashboard = () => {
   // Simple function to handle the "Log New Deal" button click
   const handleLogNewDealClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    console.log(
+      '[SingleFinanceManagerDashboard] Log New Deal button clicked, navigating to /single-finance-deal-log'
+    );
     navigate('/single-finance-deal-log'); // Navigate to the external single finance deal log route
   };
 
@@ -273,30 +257,6 @@ const SingleFinanceManagerDashboard = () => {
         return `${month} ${year}`;
     }
   };
-
-  // If showing the log deal form, render it instead of the normal dashboard
-  if (showLogDealForm) {
-    return (
-      <div className="container py-4">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold">Finance Manager Dashboard</h1>
-            <p className="text-gray-600 mt-1">
-              Finance Manager: {user?.email?.split('@')[0] || 'Not Assigned'}
-            </p>
-          </div>
-          <Button
-            size="lg"
-            className="bg-green-600 hover:bg-green-700"
-            onClick={() => navigate('/dashboard/single-finance')}
-          >
-            Back to Dashboard
-          </Button>
-        </div>
-        <DealLogPage dashboardType="single-finance" />
-      </div>
-    );
-  }
 
   // Best practices tips for finance managers
   const bestPractices = [
