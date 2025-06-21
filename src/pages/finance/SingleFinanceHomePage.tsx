@@ -18,6 +18,7 @@ import {
   ChevronRight,
   MoreVertical,
   PlusCircle,
+  Car,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -59,7 +60,20 @@ interface Metrics {
   dealsProcessed: number;
   productsPerDeal: number;
   pvr: number;
+  dealTypes: {
+    finance: number;
+    cash: number;
+    lease: number;
+  };
   productMix: {
+    extendedWarranty: number;
+    gapInsurance: number;
+    paintProtection: number;
+    tireWheel: number;
+    ppm: number;
+    other: number;
+  };
+  avgProfits: {
     extendedWarranty: number;
     gapInsurance: number;
     paintProtection: number;
@@ -102,7 +116,20 @@ export const SingleFinanceHomePage: React.FC = () => {
     dealsProcessed: 0,
     productsPerDeal: 0,
     pvr: 0,
+    dealTypes: {
+      finance: 0,
+      cash: 0,
+      lease: 0,
+    },
     productMix: {
+      extendedWarranty: 0,
+      gapInsurance: 0,
+      paintProtection: 0,
+      tireWheel: 0,
+      ppm: 0,
+      other: 0,
+    },
+    avgProfits: {
       extendedWarranty: 0,
       gapInsurance: 0,
       paintProtection: 0,
@@ -212,7 +239,20 @@ export const SingleFinanceHomePage: React.FC = () => {
         dealsProcessed: 0,
         productsPerDeal: 0,
         pvr: 0,
+        dealTypes: {
+          finance: 0,
+          cash: 0,
+          lease: 0,
+        },
         productMix: {
+          extendedWarranty: 0,
+          gapInsurance: 0,
+          paintProtection: 0,
+          tireWheel: 0,
+          ppm: 0,
+          other: 0,
+        },
+        avgProfits: {
           extendedWarranty: 0,
           gapInsurance: 0,
           paintProtection: 0,
@@ -311,7 +351,32 @@ export const SingleFinanceHomePage: React.FC = () => {
       }
     });
 
-    // Calculate average profit per product (not percentages)
+    // Calculate deal types (Finance, Cash, Lease)
+    let financeDealsCount = 0;
+    let cashDealsCount = 0;
+    let leaseDealsCount = 0;
+
+    deals.forEach(deal => {
+      const dealData = deal as any;
+      const dealType = (dealData.dealType || '').toLowerCase();
+
+      if (dealType === 'finance' || dealType === 'financing') {
+        financeDealsCount++;
+      } else if (dealType === 'cash') {
+        cashDealsCount++;
+      } else if (dealType === 'lease' || dealType === 'leasing') {
+        leaseDealsCount++;
+      } else {
+        // Default to finance if not specified
+        financeDealsCount++;
+      }
+    });
+
+    // Calculate penetration percentage (how often each product is sold)
+    const calculatePenetration = (count: number) =>
+      totalDeals > 0 ? Math.round((count / totalDeals) * 100) : 0;
+
+    // Calculate average profit per product
     const calculateAverage = (total: number, count: number) =>
       count > 0 ? Math.round(total / count) : 0;
 
@@ -329,7 +394,21 @@ export const SingleFinanceHomePage: React.FC = () => {
             totalDeals
           : 0,
       pvr: totalDeals > 0 ? totalRevenue / totalDeals : 0,
+      dealTypes: {
+        finance: financeDealsCount,
+        cash: cashDealsCount,
+        lease: leaseDealsCount,
+      },
       productMix: {
+        extendedWarranty: calculatePenetration(extendedWarrantyCount),
+        gapInsurance: calculatePenetration(gapInsuranceCount),
+        paintProtection: calculatePenetration(paintProtectionCount),
+        tireWheel: calculatePenetration(tireWheelCount),
+        ppm: calculatePenetration(ppmCount),
+        other: calculatePenetration(otherCount),
+      },
+      // Add average profits as a separate property
+      avgProfits: {
         extendedWarranty: calculateAverage(extendedWarrantyTotal, extendedWarrantyCount),
         gapInsurance: calculateAverage(gapInsuranceTotal, gapInsuranceCount),
         paintProtection: calculateAverage(paintProtectionTotal, paintProtectionCount),
@@ -452,10 +531,10 @@ export const SingleFinanceHomePage: React.FC = () => {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <Card className="border-l-4 border-l-green-500 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-700">F&I Gross</CardTitle>
+            <CardTitle className="text-base font-semibold text-slate-700">F&I Gross</CardTitle>
             <DollarSign className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
@@ -480,7 +559,9 @@ export const SingleFinanceHomePage: React.FC = () => {
 
         <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-700">Deals Processed</CardTitle>
+            <CardTitle className="text-base font-semibold text-slate-700">
+              Deals Processed
+            </CardTitle>
             <FileText className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
@@ -494,9 +575,36 @@ export const SingleFinanceHomePage: React.FC = () => {
           </CardContent>
         </Card>
 
+        <Card className="border-l-4 border-l-indigo-500 hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-base font-semibold text-slate-700">Deal Types</CardTitle>
+            <Car className="h-4 w-4 text-indigo-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1">
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-600">Finance:</span>
+                <span className="text-sm font-bold text-indigo-600">
+                  {metrics.dealTypes.finance}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-600">Cash:</span>
+                <span className="text-sm font-bold text-green-600">{metrics.dealTypes.cash}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-600">Lease:</span>
+                <span className="text-sm font-bold text-blue-600">{metrics.dealTypes.lease}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card className="border-l-4 border-l-purple-500 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-700">Products Per Deal</CardTitle>
+            <CardTitle className="text-base font-semibold text-slate-700">
+              Products Per Deal
+            </CardTitle>
             <BarChart4 className="h-4 w-4 text-purple-500" />
           </CardHeader>
           <CardContent>
@@ -521,7 +629,7 @@ export const SingleFinanceHomePage: React.FC = () => {
 
         <Card className="border-l-4 border-l-amber-500 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-700">
+            <CardTitle className="text-base font-semibold text-slate-700">
               PVR (Per Vehicle Retailed)
             </CardTitle>
             <CreditCard className="h-4 w-4 text-amber-500" />
@@ -548,9 +656,9 @@ export const SingleFinanceHomePage: React.FC = () => {
       {/* Product Mix Section - Now Full Width */}
       <Card className="col-span-12 bg-white border-slate-200 shadow-sm mt-6">
         <CardHeader className="py-2 px-4 border-b">
-          <CardTitle className="flex items-center text-lg font-medium">
-            <BarChart4 className="mr-2 h-5 w-5 text-blue-500" />
-            F&I Product Mix & Avg. Profit
+          <CardTitle className="flex items-center text-xl font-semibold">
+            <BarChart4 className="mr-2 h-6 w-6 text-blue-500" />
+            F&I Product Mix - Penetration % & Avg. Profit
           </CardTitle>
         </CardHeader>
         <CardContent className="p-4">
@@ -559,43 +667,47 @@ export const SingleFinanceHomePage: React.FC = () => {
             <div className="space-y-2">
               {/* VSC */}
               <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                <div className="font-medium flex items-center text-sm">
+                <div className="font-medium flex items-center text-base">
                   <div className="w-3 h-3 bg-blue-600 rounded-full mr-2"></div>
                   Vehicle Service Contract (VSC)
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-lg text-blue-600">
-                    ${metrics.productMix.extendedWarranty.toLocaleString()}
+                  <div className="font-bold text-2xl text-blue-600">
+                    ${metrics.avgProfits.extendedWarranty.toLocaleString()}
                   </div>
-                  <div className="text-xs text-gray-500">Avg. Profit</div>
+                  <div className="text-sm text-gray-600">
+                    {metrics.productMix.extendedWarranty}% Penetration
+                  </div>
                 </div>
               </div>
 
               {/* GAP Insurance */}
               <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                <div className="font-medium flex items-center text-sm">
+                <div className="font-medium flex items-center text-base">
                   <div className="w-3 h-3 bg-green-600 rounded-full mr-2"></div>
                   GAP Insurance
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-lg text-green-600">
-                    ${metrics.productMix.gapInsurance.toLocaleString()}
+                  <div className="font-bold text-2xl text-green-600">
+                    ${metrics.avgProfits.gapInsurance.toLocaleString()}
                   </div>
-                  <div className="text-xs text-gray-500">Avg. Profit</div>
+                  <div className="text-sm text-gray-600">
+                    {metrics.productMix.gapInsurance}% Penetration
+                  </div>
                 </div>
               </div>
 
               {/* PPM */}
               <div className="flex items-center justify-between py-2">
-                <div className="font-medium flex items-center text-sm">
+                <div className="font-medium flex items-center text-base">
                   <div className="w-3 h-3 bg-purple-600 rounded-full mr-2"></div>
                   PrePaid Maintenance (PPM)
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-lg text-purple-600">
-                    ${metrics.productMix.ppm.toLocaleString()}
+                  <div className="font-bold text-2xl text-purple-600">
+                    ${metrics.avgProfits.ppm.toLocaleString()}
                   </div>
-                  <div className="text-xs text-gray-500">Avg. Profit</div>
+                  <div className="text-sm text-gray-600">{metrics.productMix.ppm}% Penetration</div>
                 </div>
               </div>
             </div>
@@ -604,43 +716,49 @@ export const SingleFinanceHomePage: React.FC = () => {
             <div className="space-y-2">
               {/* Paint Protection */}
               <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                <div className="font-medium flex items-center text-sm">
+                <div className="font-medium flex items-center text-base">
                   <div className="w-3 h-3 bg-orange-600 rounded-full mr-2"></div>
                   Paint Protection
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-lg text-orange-600">
-                    ${metrics.productMix.paintProtection.toLocaleString()}
+                  <div className="font-bold text-2xl text-orange-600">
+                    ${metrics.avgProfits.paintProtection.toLocaleString()}
                   </div>
-                  <div className="text-xs text-gray-500">Avg. Profit</div>
+                  <div className="text-sm text-gray-600">
+                    {metrics.productMix.paintProtection}% Penetration
+                  </div>
                 </div>
               </div>
 
               {/* Tire & Wheel */}
               <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                <div className="font-medium flex items-center text-sm">
+                <div className="font-medium flex items-center text-base">
                   <div className="w-3 h-3 bg-amber-600 rounded-full mr-2"></div>
                   Tire and Wheel Bundle
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-lg text-amber-600">
-                    ${metrics.productMix.tireWheel.toLocaleString()}
+                  <div className="font-bold text-2xl text-amber-600">
+                    ${metrics.avgProfits.tireWheel.toLocaleString()}
                   </div>
-                  <div className="text-xs text-gray-500">Avg. Profit</div>
+                  <div className="text-sm text-gray-600">
+                    {metrics.productMix.tireWheel}% Penetration
+                  </div>
                 </div>
               </div>
 
               {/* Other */}
               <div className="flex items-center justify-between py-2">
-                <div className="font-medium flex items-center text-sm">
+                <div className="font-medium flex items-center text-base">
                   <div className="w-3 h-3 bg-gray-600 rounded-full mr-2"></div>
                   Other Products
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-lg text-gray-600">
-                    ${metrics.productMix.other.toLocaleString()}
+                  <div className="font-bold text-2xl text-gray-600">
+                    ${metrics.avgProfits.other.toLocaleString()}
                   </div>
-                  <div className="text-xs text-gray-500">Avg. Profit</div>
+                  <div className="text-sm text-gray-600">
+                    {metrics.productMix.other}% Penetration
+                  </div>
                 </div>
               </div>
             </div>
