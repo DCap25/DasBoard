@@ -483,6 +483,9 @@ const SingleFinanceManagerDashboard = () => {
                 </thead>
                 <tbody>
                   {deals.slice(0, 10).map((deal, index) => {
+                    // Get individual product profits from deal data or calculate from legacy data
+                    const dealData = deal as any; // Type assertion to access extended properties
+
                     // Extract last name from customer
                     const lastName = deal.customer.split(' ').pop() || '';
 
@@ -504,23 +507,48 @@ const SingleFinanceManagerDashboard = () => {
                         ? 'C'
                         : 'U');
 
-                    // Get individual product profits from deal data or calculate from legacy data
-                    const dealData = deal as any; // Type assertion to access extended properties
-
                     console.log(`[Dashboard] Processing deal ${deal.id}:`, {
                       dealData: dealData,
                       vscProfit: dealData.vscProfit,
+                      ppmProfit: dealData.ppmProfit,
+                      gapProfit: dealData.gapProfit,
+                      tireAndWheelProfit: dealData.tireAndWheelProfit,
+                      appearanceProfit: dealData.appearanceProfit,
+                      otherProfit: dealData.otherProfit,
                       dealNumber: dealData.dealNumber,
                       stockNumber: dealData.stockNumber,
                       dealDate: dealData.dealDate,
                       vehicleType: dealData.vehicleType,
+                      frontEndGross: dealData.frontEndGross,
+                      backEndGross: dealData.backEndGross,
+                      totalGross: dealData.totalGross,
                     });
 
-                    const vscProfit = dealData.vscProfit || 0;
-
-                    const ppmProfit = dealData.ppmProfit || 0;
-                    const gapProfit = dealData.gapProfit || 0;
-                    const twProfit = dealData.tireAndWheelProfit || 0;
+                    // Get individual product profits - ensure we handle both number and string values
+                    const vscProfit =
+                      typeof dealData.vscProfit === 'number'
+                        ? dealData.vscProfit
+                        : parseFloat(dealData.vscProfit) || 0;
+                    const ppmProfit =
+                      typeof dealData.ppmProfit === 'number'
+                        ? dealData.ppmProfit
+                        : parseFloat(dealData.ppmProfit) || 0;
+                    const gapProfit =
+                      typeof dealData.gapProfit === 'number'
+                        ? dealData.gapProfit
+                        : parseFloat(dealData.gapProfit) || 0;
+                    const twProfit =
+                      typeof dealData.tireAndWheelProfit === 'number'
+                        ? dealData.tireAndWheelProfit
+                        : parseFloat(dealData.tireAndWheelProfit) || 0;
+                    const appearanceProfit =
+                      typeof dealData.appearanceProfit === 'number'
+                        ? dealData.appearanceProfit
+                        : parseFloat(dealData.appearanceProfit) || 0;
+                    const otherProfit =
+                      typeof dealData.otherProfit === 'number'
+                        ? dealData.otherProfit
+                        : parseFloat(dealData.otherProfit) || 0;
 
                     // Products per deal
                     const ppd = deal.products.length;
@@ -636,7 +664,11 @@ const SingleFinanceManagerDashboard = () => {
                         .slice(0, 10)
                         .reduce((sum, deal) => {
                           const dealData = deal as any;
-                          return sum + (dealData.frontEndGross || 0);
+                          const frontEndGross =
+                            typeof dealData.frontEndGross === 'number'
+                              ? dealData.frontEndGross
+                              : parseFloat(dealData.frontEndGross) || 0;
+                          return sum + frontEndGross;
                         }, 0)
                         .toLocaleString()}
                     </td>
@@ -646,7 +678,11 @@ const SingleFinanceManagerDashboard = () => {
                         .slice(0, 10)
                         .reduce((sum, deal) => {
                           const dealData = deal as any;
-                          return sum + (dealData.vscProfit || 0);
+                          const vscProfit =
+                            typeof dealData.vscProfit === 'number'
+                              ? dealData.vscProfit
+                              : parseFloat(dealData.vscProfit) || 0;
+                          return sum + vscProfit;
                         }, 0)
                         .toLocaleString()}
                     </td>
@@ -656,7 +692,11 @@ const SingleFinanceManagerDashboard = () => {
                         .slice(0, 10)
                         .reduce((sum, deal) => {
                           const dealData = deal as any;
-                          return sum + (dealData.ppmProfit || 0);
+                          const ppmProfit =
+                            typeof dealData.ppmProfit === 'number'
+                              ? dealData.ppmProfit
+                              : parseFloat(dealData.ppmProfit) || 0;
+                          return sum + ppmProfit;
                         }, 0)
                         .toLocaleString()}
                     </td>
@@ -666,7 +706,11 @@ const SingleFinanceManagerDashboard = () => {
                         .slice(0, 10)
                         .reduce((sum, deal) => {
                           const dealData = deal as any;
-                          return sum + (dealData.gapProfit || 0);
+                          const gapProfit =
+                            typeof dealData.gapProfit === 'number'
+                              ? dealData.gapProfit
+                              : parseFloat(dealData.gapProfit) || 0;
+                          return sum + gapProfit;
                         }, 0)
                         .toLocaleString()}
                     </td>
@@ -676,7 +720,11 @@ const SingleFinanceManagerDashboard = () => {
                         .slice(0, 10)
                         .reduce((sum, deal) => {
                           const dealData = deal as any;
-                          return sum + (dealData.tireAndWheelProfit || 0);
+                          const tireAndWheelProfit =
+                            typeof dealData.tireAndWheelProfit === 'number'
+                              ? dealData.tireAndWheelProfit
+                              : parseFloat(dealData.tireAndWheelProfit) || 0;
+                          return sum + tireAndWheelProfit;
                         }, 0)
                         .toLocaleString()}
                     </td>

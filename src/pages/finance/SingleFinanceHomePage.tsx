@@ -233,79 +233,109 @@ export const SingleFinanceHomePage: React.FC = () => {
 
     const totalDeals = deals.length;
 
-    // Count products - handle both new and old structures
+    // Calculate AVERAGE PROFIT per product across all deals (not percentages)
+    let extendedWarrantyTotal = 0;
     let extendedWarrantyCount = 0;
+    let gapInsuranceTotal = 0;
     let gapInsuranceCount = 0;
+    let paintProtectionTotal = 0;
     let paintProtectionCount = 0;
+    let tireWheelTotal = 0;
     let tireWheelCount = 0;
+    let ppmTotal = 0;
     let ppmCount = 0;
+    let otherTotal = 0;
     let otherCount = 0;
 
     deals.forEach(deal => {
-      // Check if deal has new structure with individual profit fields
-      if (deal.vsc_profit && deal.vsc_profit > 0) extendedWarrantyCount++;
-      if (deal.gap_profit && deal.gap_profit > 0) gapInsuranceCount++;
-      if (deal.appearance_profit && deal.appearance_profit > 0) paintProtectionCount++;
-      if (deal.tire_wheel_profit && deal.tire_wheel_profit > 0) tireWheelCount++;
-      if (deal.ppm_profit && deal.ppm_profit > 0) ppmCount++;
-      if (
-        (deal.ext_warranty_profit && deal.ext_warranty_profit > 0) ||
-        (deal.key_replacement_profit && deal.key_replacement_profit > 0) ||
-        (deal.theft_profit && deal.theft_profit > 0) ||
-        (deal.windshield_profit && deal.windshield_profit > 0) ||
-        (deal.lojack_profit && deal.lojack_profit > 0) ||
-        (deal.other_profit && deal.other_profit > 0)
-      ) {
-        otherCount++;
+      // Access deal data properly - cast to any to access extended properties
+      const dealData = deal as any;
+
+      // VSC/Extended Warranty
+      if (dealData.vscProfit && dealData.vscProfit > 0) {
+        extendedWarrantyTotal += dealData.vscProfit;
+        extendedWarrantyCount++;
+      } else if (deal.vsc_profit && deal.vsc_profit > 0) {
+        extendedWarrantyTotal += deal.vsc_profit;
+        extendedWarrantyCount++;
       }
 
-      // Fallback to products array for older deals
-      if (deal.products && Array.isArray(deal.products)) {
-        deal.products.forEach(product => {
-          const productLower = product.toLowerCase();
-          if (productLower.includes('vehicle service contract') || productLower.includes('vsc')) {
-            extendedWarrantyCount++;
-          } else if (productLower.includes('gap')) {
-            gapInsuranceCount++;
-          } else if (
-            productLower.includes('paint protection') ||
-            productLower.includes('appearance')
-          ) {
-            paintProtectionCount++;
-          } else if (productLower.includes('tire') && productLower.includes('wheel')) {
-            tireWheelCount++;
-          } else if (productLower.includes('prepaid maintenance') || productLower.includes('ppm')) {
-            ppmCount++;
-          } else {
-            otherCount++;
-          }
-        });
+      // GAP Insurance
+      if (dealData.gapProfit && dealData.gapProfit > 0) {
+        gapInsuranceTotal += dealData.gapProfit;
+        gapInsuranceCount++;
+      } else if (deal.gap_profit && deal.gap_profit > 0) {
+        gapInsuranceTotal += deal.gap_profit;
+        gapInsuranceCount++;
+      }
+
+      // Paint Protection/Appearance
+      if (dealData.appearanceProfit && dealData.appearanceProfit > 0) {
+        paintProtectionTotal += dealData.appearanceProfit;
+        paintProtectionCount++;
+      } else if (deal.appearance_profit && deal.appearance_profit > 0) {
+        paintProtectionTotal += deal.appearance_profit;
+        paintProtectionCount++;
+      }
+
+      // Tire & Wheel
+      if (dealData.tireAndWheelProfit && dealData.tireAndWheelProfit > 0) {
+        tireWheelTotal += dealData.tireAndWheelProfit;
+        tireWheelCount++;
+      } else if (deal.tire_wheel_profit && deal.tire_wheel_profit > 0) {
+        tireWheelTotal += deal.tire_wheel_profit;
+        tireWheelCount++;
+      }
+
+      // PPM (Prepaid Maintenance)
+      if (dealData.ppmProfit && dealData.ppmProfit > 0) {
+        ppmTotal += dealData.ppmProfit;
+        ppmCount++;
+      } else if (deal.ppm_profit && deal.ppm_profit > 0) {
+        ppmTotal += deal.ppm_profit;
+        ppmCount++;
+      }
+
+      // Other products
+      const otherProfit =
+        (dealData.extWarrantyProfit || deal.ext_warranty_profit || 0) +
+        (dealData.keyReplacementProfit || deal.key_replacement_profit || 0) +
+        (dealData.theftProfit || deal.theft_profit || 0) +
+        (dealData.windshieldProfit || deal.windshield_profit || 0) +
+        (dealData.lojackProfit || deal.lojack_profit || 0) +
+        (dealData.otherProfit || deal.other_profit || 0);
+
+      if (otherProfit > 0) {
+        otherTotal += otherProfit;
+        otherCount++;
       }
     });
 
-    const totalProductCount =
-      extendedWarrantyCount +
-      gapInsuranceCount +
-      paintProtectionCount +
-      tireWheelCount +
-      ppmCount +
-      otherCount;
-
-    const calculatePercentage = (count: number) =>
-      totalProductCount > 0 ? Math.round((count / totalProductCount) * 100) : 0;
+    // Calculate average profit per product (not percentages)
+    const calculateAverage = (total: number, count: number) =>
+      count > 0 ? Math.round(total / count) : 0;
 
     setMetrics({
       mtdRevenue: totalRevenue,
       dealsProcessed: totalDeals,
-      productsPerDeal: totalDeals > 0 ? totalProductCount / totalDeals : 0,
+      productsPerDeal:
+        totalDeals > 0
+          ? (extendedWarrantyCount +
+              gapInsuranceCount +
+              paintProtectionCount +
+              tireWheelCount +
+              ppmCount +
+              otherCount) /
+            totalDeals
+          : 0,
       pvr: totalDeals > 0 ? totalRevenue / totalDeals : 0,
       productMix: {
-        extendedWarranty: calculatePercentage(extendedWarrantyCount),
-        gapInsurance: calculatePercentage(gapInsuranceCount),
-        paintProtection: calculatePercentage(paintProtectionCount),
-        tireWheel: calculatePercentage(tireWheelCount),
-        ppm: calculatePercentage(ppmCount),
-        other: calculatePercentage(otherCount),
+        extendedWarranty: calculateAverage(extendedWarrantyTotal, extendedWarrantyCount),
+        gapInsurance: calculateAverage(gapInsuranceTotal, gapInsuranceCount),
+        paintProtection: calculateAverage(paintProtectionTotal, paintProtectionCount),
+        tireWheel: calculateAverage(tireWheelTotal, tireWheelCount),
+        ppm: calculateAverage(ppmTotal, ppmCount),
+        other: calculateAverage(otherTotal, otherCount),
       },
     });
   }, []);
@@ -528,170 +558,90 @@ export const SingleFinanceHomePage: React.FC = () => {
             {/* First Column: VSC, GAP, PPM */}
             <div className="space-y-2">
               {/* VSC */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <div className="font-medium flex items-center text-sm">
-                    <div className="w-3 h-3 bg-blue-600 rounded-full mr-2"></div>
-                    Vehicle Service Contract (VSC)
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-gray-500">Avg. Profit</div>
-                    <div className="font-medium text-sm">
-                      $
-                      {Math.round(
-                        (metrics.mtdRevenue * metrics.productMix.extendedWarranty) / 100
-                      ).toLocaleString()}
-                    </div>
-                  </div>
+              <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                <div className="font-medium flex items-center text-sm">
+                  <div className="w-3 h-3 bg-blue-600 rounded-full mr-2"></div>
+                  Vehicle Service Contract (VSC)
                 </div>
-                <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
-                  <div
-                    className="absolute inset-y-0 left-0 rounded-full bg-blue-600"
-                    style={{ width: `${metrics.productMix.extendedWarranty}%` }}
-                  />
-                </div>
-                <div className="text-right text-xs text-gray-500">
-                  {metrics.productMix.extendedWarranty}%
+                <div className="text-right">
+                  <div className="font-bold text-lg text-blue-600">
+                    ${metrics.productMix.extendedWarranty.toLocaleString()}
+                  </div>
+                  <div className="text-xs text-gray-500">Avg. Profit</div>
                 </div>
               </div>
 
               {/* GAP Insurance */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <div className="font-medium flex items-center text-sm">
-                    <div className="w-3 h-3 bg-green-600 rounded-full mr-2"></div>
-                    GAP Insurance
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-gray-500">Avg. Profit</div>
-                    <div className="font-medium text-sm">
-                      $
-                      {Math.round(
-                        (metrics.mtdRevenue * metrics.productMix.gapInsurance) / 100
-                      ).toLocaleString()}
-                    </div>
-                  </div>
+              <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                <div className="font-medium flex items-center text-sm">
+                  <div className="w-3 h-3 bg-green-600 rounded-full mr-2"></div>
+                  GAP Insurance
                 </div>
-                <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
-                  <div
-                    className="absolute inset-y-0 left-0 rounded-full bg-green-600"
-                    style={{ width: `${metrics.productMix.gapInsurance}%` }}
-                  />
-                </div>
-                <div className="text-right text-xs text-gray-500">
-                  {metrics.productMix.gapInsurance}%
+                <div className="text-right">
+                  <div className="font-bold text-lg text-green-600">
+                    ${metrics.productMix.gapInsurance.toLocaleString()}
+                  </div>
+                  <div className="text-xs text-gray-500">Avg. Profit</div>
                 </div>
               </div>
 
               {/* PPM */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <div className="font-medium flex items-center text-sm">
-                    <div className="w-3 h-3 bg-purple-600 rounded-full mr-2"></div>
-                    PrePaid Maintenance (PPM)
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-gray-500">Avg. Profit</div>
-                    <div className="font-medium text-sm">
-                      $
-                      {Math.round(
-                        (metrics.mtdRevenue * metrics.productMix.ppm) / 100
-                      ).toLocaleString()}
-                    </div>
-                  </div>
+              <div className="flex items-center justify-between py-2">
+                <div className="font-medium flex items-center text-sm">
+                  <div className="w-3 h-3 bg-purple-600 rounded-full mr-2"></div>
+                  PrePaid Maintenance (PPM)
                 </div>
-                <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
-                  <div
-                    className="absolute inset-y-0 left-0 rounded-full bg-purple-600"
-                    style={{ width: `${metrics.productMix.ppm}%` }}
-                  />
+                <div className="text-right">
+                  <div className="font-bold text-lg text-purple-600">
+                    ${metrics.productMix.ppm.toLocaleString()}
+                  </div>
+                  <div className="text-xs text-gray-500">Avg. Profit</div>
                 </div>
-                <div className="text-right text-xs text-gray-500">{metrics.productMix.ppm}%</div>
               </div>
             </div>
 
             {/* Second Column: Paint, Tire & Wheel, Other */}
             <div className="space-y-2">
               {/* Paint Protection */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <div className="font-medium flex items-center text-sm">
-                    <div className="w-3 h-3 bg-blue-600 rounded-full mr-2"></div>
-                    Paint Protection
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-gray-500">Avg. Profit</div>
-                    <div className="font-medium text-sm">
-                      $
-                      {Math.round(
-                        (metrics.mtdRevenue * metrics.productMix.paintProtection) / 100
-                      ).toLocaleString()}
-                    </div>
-                  </div>
+              <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                <div className="font-medium flex items-center text-sm">
+                  <div className="w-3 h-3 bg-orange-600 rounded-full mr-2"></div>
+                  Paint Protection
                 </div>
-                <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
-                  <div
-                    className="absolute inset-y-0 left-0 rounded-full bg-blue-600"
-                    style={{ width: `${metrics.productMix.paintProtection}%` }}
-                  />
-                </div>
-                <div className="text-right text-xs text-gray-500">
-                  {metrics.productMix.paintProtection}%
+                <div className="text-right">
+                  <div className="font-bold text-lg text-orange-600">
+                    ${metrics.productMix.paintProtection.toLocaleString()}
+                  </div>
+                  <div className="text-xs text-gray-500">Avg. Profit</div>
                 </div>
               </div>
 
               {/* Tire & Wheel */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <div className="font-medium flex items-center text-sm">
-                    <div className="w-3 h-3 bg-amber-600 rounded-full mr-2"></div>
-                    Tire and Wheel Bundle
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-gray-500">Avg. Profit</div>
-                    <div className="font-medium text-sm">
-                      $
-                      {Math.round(
-                        (metrics.mtdRevenue * metrics.productMix.tireWheel) / 100
-                      ).toLocaleString()}
-                    </div>
-                  </div>
+              <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                <div className="font-medium flex items-center text-sm">
+                  <div className="w-3 h-3 bg-amber-600 rounded-full mr-2"></div>
+                  Tire and Wheel Bundle
                 </div>
-                <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
-                  <div
-                    className="absolute inset-y-0 left-0 rounded-full bg-amber-600"
-                    style={{ width: `${metrics.productMix.tireWheel}%` }}
-                  />
-                </div>
-                <div className="text-right text-xs text-gray-500">
-                  {metrics.productMix.tireWheel}%
+                <div className="text-right">
+                  <div className="font-bold text-lg text-amber-600">
+                    ${metrics.productMix.tireWheel.toLocaleString()}
+                  </div>
+                  <div className="text-xs text-gray-500">Avg. Profit</div>
                 </div>
               </div>
 
               {/* Other */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <div className="font-medium flex items-center text-sm">
-                    <div className="w-3 h-3 bg-gray-600 rounded-full mr-2"></div>
-                    Other
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-gray-500">Avg. Profit</div>
-                    <div className="font-medium text-sm">
-                      $
-                      {Math.round(
-                        (metrics.mtdRevenue * metrics.productMix.other) / 100
-                      ).toLocaleString()}
-                    </div>
-                  </div>
+              <div className="flex items-center justify-between py-2">
+                <div className="font-medium flex items-center text-sm">
+                  <div className="w-3 h-3 bg-gray-600 rounded-full mr-2"></div>
+                  Other Products
                 </div>
-                <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
-                  <div
-                    className="absolute inset-y-0 left-0 rounded-full bg-gray-600"
-                    style={{ width: `${metrics.productMix.other}%` }}
-                  />
+                <div className="text-right">
+                  <div className="font-bold text-lg text-gray-600">
+                    ${metrics.productMix.other.toLocaleString()}
+                  </div>
+                  <div className="text-xs text-gray-500">Avg. Profit</div>
                 </div>
-                <div className="text-right text-xs text-gray-500">{metrics.productMix.other}%</div>
               </div>
             </div>
           </div>
