@@ -432,20 +432,27 @@ const SingleFinanceManagerDashboard = () => {
                     <th className="font-medium text-white py-2 pl-3 text-center bg-gray-600 w-12">
                       #
                     </th>
+                    <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
+                      Last Name
+                    </th>
                     <th className="font-medium text-white py-2 pl-4 pr-2 text-left bg-blue-600">
                       Deal #
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
                       Stock #
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
-                      Last Name
-                    </th>
                     <th className="font-medium text-white py-2 px-2 text-center bg-gray-600">
                       Date
                     </th>
+                    <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">VIN</th>
                     <th className="font-medium text-white py-2 px-2 text-center bg-indigo-600">
                       N/U/CPO
+                    </th>
+                    <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
+                      Lender
+                    </th>
+                    <th className="font-medium text-white py-2 px-2 text-right bg-blue-600">
+                      Front End
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-right bg-teal-600">VSC</th>
                     <th className="font-medium text-white py-2 px-2 text-right bg-purple-600">
@@ -475,56 +482,45 @@ const SingleFinanceManagerDashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {deals.slice(0, 5).map((deal, index) => {
+                  {deals.slice(0, 10).map((deal, index) => {
                     // Extract last name from customer
                     const lastName = deal.customer.split(' ').pop() || '';
 
-                    // Format date for display
-                    const dealDate = new Date(deal.saleDate);
+                    // Format date for display - use actual deal date from form
+                    const actualDealDate = dealData.dealDate || deal.saleDate;
+                    const dealDate = new Date(actualDealDate);
                     const formattedDate = dealDate.toLocaleDateString('en-US', {
                       month: '2-digit',
                       day: '2-digit',
                       year: '2-digit',
                     });
 
-                    // Determine if New, Used or CPO - simulating for now
-                    const vehicleType = deal.vehicle.toLowerCase().includes('new')
-                      ? 'N'
-                      : deal.vehicle.toLowerCase().includes('cpo')
-                      ? 'C'
-                      : 'U';
+                    // Determine if New, Used or CPO - use actual form data
+                    const vehicleType =
+                      dealData.vehicleType ||
+                      (deal.vehicle.toLowerCase().includes('new')
+                        ? 'N'
+                        : deal.vehicle.toLowerCase().includes('cpo')
+                        ? 'C'
+                        : 'U');
 
                     // Get individual product profits from deal data or calculate from legacy data
                     const dealData = deal as any; // Type assertion to access extended properties
 
-                    const vscProfit =
-                      dealData.vscProfit ||
-                      (deal.products.includes('Extended Warranty') ||
-                      deal.products.includes('Vehicle Service Contract (VSC)')
-                        ? Math.round(deal.profit * 0.35)
-                        : 0);
+                    console.log(`[Dashboard] Processing deal ${deal.id}:`, {
+                      dealData: dealData,
+                      vscProfit: dealData.vscProfit,
+                      dealNumber: dealData.dealNumber,
+                      stockNumber: dealData.stockNumber,
+                      dealDate: dealData.dealDate,
+                      vehicleType: dealData.vehicleType,
+                    });
 
-                    const ppmProfit =
-                      dealData.ppmProfit ||
-                      (deal.products.includes('Paint Protection') ||
-                      deal.products.includes('Paint and Fabric Protection') ||
-                      deal.products.includes('PPM') ||
-                      deal.products.includes('PrePaid Maintenance (PPM)')
-                        ? Math.round(deal.profit * 0.2)
-                        : 0);
+                    const vscProfit = dealData.vscProfit || 0;
 
-                    const gapProfit =
-                      dealData.gapProfit ||
-                      (deal.products.includes('GAP Insurance')
-                        ? Math.round(deal.profit * 0.25)
-                        : 0);
-
-                    const twProfit =
-                      dealData.tireAndWheelProfit ||
-                      (deal.products.includes('Tire & Wheel') ||
-                      deal.products.includes('Tire & Wheel Bundle')
-                        ? Math.round(deal.profit * 0.2)
-                        : 0);
+                    const ppmProfit = dealData.ppmProfit || 0;
+                    const gapProfit = dealData.gapProfit || 0;
+                    const twProfit = dealData.tireAndWheelProfit || 0;
 
                     // Products per deal
                     const ppd = deal.products.length;
@@ -558,12 +554,17 @@ const SingleFinanceManagerDashboard = () => {
                         <td className="py-2 px-2 text-center font-medium">
                           {deals.length - index}
                         </td>
-                        <td className="py-2 pl-4 pr-2 text-left font-medium text-blue-600">
-                          {deal.id}
-                        </td>
-                        <td className="py-2 px-2 text-left">{deal.id.replace('D', 'S')}</td>
                         <td className="py-2 px-2 text-left font-medium">{lastName}</td>
+                        <td className="py-2 pl-4 pr-2 text-left font-medium text-blue-600">
+                          {dealData.dealNumber || deal.id}
+                        </td>
+                        <td className="py-2 px-2 text-left">
+                          {dealData.stockNumber || deal.id.replace('D', 'S')}
+                        </td>
                         <td className="py-2 px-2 text-center text-gray-600">{formattedDate}</td>
+                        <td className="py-2 px-2 text-left text-gray-600 font-mono text-xs">
+                          {dealData.vinLast8 || deal.vin || 'N/A'}
+                        </td>
                         <td className="py-2 px-2 text-center">
                           <span
                             className={`px-1.5 py-0.5 rounded text-xs font-medium ${
@@ -576,6 +577,12 @@ const SingleFinanceManagerDashboard = () => {
                           >
                             {vehicleType}
                           </span>
+                        </td>
+                        <td className="py-2 px-2 text-left text-gray-600 text-xs">
+                          {dealData.lender || 'N/A'}
+                        </td>
+                        <td className="py-2 px-2 text-right bg-blue-50 font-medium">
+                          ${(dealData.frontEndGross || 0).toLocaleString()}
                         </td>
                         <td className="py-2 px-2 text-right bg-teal-50">
                           ${vscProfit.toLocaleString()}
@@ -620,95 +627,76 @@ const SingleFinanceManagerDashboard = () => {
                 </tbody>
                 <tfoot>
                   <tr className="bg-gray-100 border-t border-t-gray-200 font-medium">
-                    <td colSpan={6} className="py-2 pl-4 text-left">
+                    <td colSpan={8} className="py-2 pl-4 text-left">
                       TOTALS
+                    </td>
+                    <td className="py-2 px-2 text-right bg-blue-50">
+                      $
+                      {deals
+                        .slice(0, 10)
+                        .reduce((sum, deal) => {
+                          const dealData = deal as any;
+                          return sum + (dealData.frontEndGross || 0);
+                        }, 0)
+                        .toLocaleString()}
                     </td>
                     <td className="py-2 px-2 text-right bg-teal-50">
                       $
                       {deals
-                        .slice(0, 5)
+                        .slice(0, 10)
                         .reduce((sum, deal) => {
                           const dealData = deal as any;
-                          return (
-                            sum +
-                            (dealData.vscProfit ||
-                              (deal.products.includes('Extended Warranty') ||
-                              deal.products.includes('Vehicle Service Contract (VSC)')
-                                ? Math.round(deal.profit * 0.35)
-                                : 0))
-                          );
+                          return sum + (dealData.vscProfit || 0);
                         }, 0)
                         .toLocaleString()}
                     </td>
                     <td className="py-2 px-2 text-right bg-purple-50">
                       $
                       {deals
-                        .slice(0, 5)
+                        .slice(0, 10)
                         .reduce((sum, deal) => {
                           const dealData = deal as any;
-                          return (
-                            sum +
-                            (dealData.ppmProfit ||
-                              (deal.products.includes('Paint Protection') ||
-                              deal.products.includes('Paint and Fabric Protection') ||
-                              deal.products.includes('PPM') ||
-                              deal.products.includes('PrePaid Maintenance (PPM)')
-                                ? Math.round(deal.profit * 0.2)
-                                : 0))
-                          );
+                          return sum + (dealData.ppmProfit || 0);
                         }, 0)
                         .toLocaleString()}
                     </td>
                     <td className="py-2 px-2 text-right bg-green-50">
                       $
                       {deals
-                        .slice(0, 5)
+                        .slice(0, 10)
                         .reduce((sum, deal) => {
                           const dealData = deal as any;
-                          return (
-                            sum +
-                            (dealData.gapProfit ||
-                              (deal.products.includes('GAP Insurance')
-                                ? Math.round(deal.profit * 0.25)
-                                : 0))
-                          );
+                          return sum + (dealData.gapProfit || 0);
                         }, 0)
                         .toLocaleString()}
                     </td>
                     <td className="py-2 px-2 text-right bg-amber-50">
                       $
                       {deals
-                        .slice(0, 5)
+                        .slice(0, 10)
                         .reduce((sum, deal) => {
                           const dealData = deal as any;
-                          return (
-                            sum +
-                            (dealData.tireAndWheelProfit ||
-                              (deal.products.includes('Tire & Wheel') ||
-                              deal.products.includes('Tire & Wheel Bundle')
-                                ? Math.round(deal.profit * 0.2)
-                                : 0))
-                          );
+                          return sum + (dealData.tireAndWheelProfit || 0);
                         }, 0)
                         .toLocaleString()}
                     </td>
                     <td className="py-2 px-2 text-center bg-pink-50">
                       {(
-                        deals.slice(0, 5).reduce((sum, deal) => sum + deal.products.length, 0) /
-                        Math.max(1, deals.slice(0, 5).length)
+                        deals.slice(0, 10).reduce((sum, deal) => sum + deal.products.length, 0) /
+                        Math.max(1, deals.slice(0, 10).length)
                       ).toFixed(1)}
                     </td>
                     <td className="py-2 px-2 text-right bg-purple-50">
                       $
                       {Math.round(
-                        deals.slice(0, 5).reduce((sum, deal) => sum + deal.profit, 0) /
-                          Math.max(1, deals.slice(0, 5).length)
+                        deals.slice(0, 10).reduce((sum, deal) => sum + deal.profit, 0) /
+                          Math.max(1, deals.slice(0, 10).length)
                       ).toLocaleString()}
                     </td>
                     <td className="py-2 px-2 text-right font-medium text-green-600">
                       $
                       {deals
-                        .slice(0, 5)
+                        .slice(0, 10)
                         .reduce((sum, deal) => sum + deal.profit, 0)
                         .toLocaleString()}
                     </td>
