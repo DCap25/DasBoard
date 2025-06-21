@@ -407,10 +407,8 @@ export const getDashboardData = (dashboardType, options = {}) => {
 
   switch (dashboardType) {
     case 'single-finance':
-      // Try both possible keys for single finance deals
-      const singleFinanceDeals = loadDealsFromStorage('singleFinanceDeals');
-      const fallbackDeals = loadDealsFromStorage('financeDeals');
-      rawDeals = singleFinanceDeals.length > 0 ? singleFinanceDeals : fallbackDeals;
+      // Load from singleFinanceDeals storage key
+      rawDeals = loadDealsFromStorage('singleFinanceDeals');
       break;
     case 'sales':
       rawDeals = loadDealsFromStorage('financeDeals'); // Sales people see deals from financeDeals

@@ -259,36 +259,69 @@ const DealLogPage: React.FC<DealLogPageProps> = ({ dashboardType = 'finance' }) 
     if (parseFloat(formData.ppmProfit) > 0) products.push('PPM');
     if (parseFloat(formData.otherProfit) > 0) products.push('Other');
 
-    // Create a new deal object in the format expected by the finance dashboard
+    // Create a new deal object in the format expected by the deal mapper
     const newDeal = {
+      // Use dealId as the primary identifier
       id: dealId,
+
+      // Original form data (what the deal mapper expects)
+      dealNumber: formData.dealNumber || dealId,
+      stockNumber: formData.stockNumber,
+      vinLast8: formData.vinLast8,
+      vehicleType: formData.vehicleType,
+      lastName: formData.lastName,
+      dealType: formData.dealType,
+      frontEndGross: parseFloat(formData.frontEndGross) || 0,
+      vscProfit: parseFloat(formData.vscProfit) || 0,
+      ppmProfit: parseFloat(formData.ppmProfit) || 0,
+      gapProfit: parseFloat(formData.gapProfit) || 0,
+      tireAndWheelProfit: parseFloat(formData.tireAndWheelProfit) || 0,
+      appearanceProfit: parseFloat(formData.appearanceProfit) || 0,
+      otherProfit: parseFloat(formData.otherProfit) || 0,
+      reserveFlat: parseFloat(formData.reserveFlat) || 0,
+      backEndGross: parseFloat(formData.backEndGross) || 0,
+      totalGross: parseFloat(formData.totalGross) || 0,
+      lender: formData.lender,
+      salespersonId: formData.salespersonId,
+      salesManagerId: formData.salesManagerId,
+      isSplitDeal: formData.isSplitDeal,
+      secondSalespersonId: formData.isSplitDeal ? formData.secondSalespersonId : null,
+      dealStatus: formData.dealStatus,
+      outsideFunding: formData.outsideFunding,
+      dealDate: currentDate,
+
+      // Calculated/derived fields
+      salesperson: salespersonDisplay,
+      products: products,
+
+      // Metadata
+      created_at: new Date().toISOString(),
+
+      // Legacy compatibility fields (for backward compatibility with existing dashboards)
       customer: formData.lastName,
       vehicle: `${
         formData.vehicleType === 'N' ? 'New' : formData.vehicleType === 'U' ? 'Used' : 'CPO'
       } - Stock #${formData.stockNumber}`,
       vin: formData.vinLast8,
       saleDate: currentDate,
-      salesperson: salespersonDisplay,
-      isSplitDeal: formData.isSplitDeal,
-      primarySalespersonId: formData.salespersonId,
-      secondarySalespersonId: formData.isSplitDeal ? formData.secondSalespersonId : null,
-      amount: frontEndGross + backEndGross, // Total deal amount
-      status: formData.dealStatus, // Use selected deal status
-      products: products,
-      profit: backEndGross, // F&I profit is back end gross
-      created_at: new Date().toISOString(),
+      amount: totalGross,
+      status: formData.dealStatus,
+      profit: backEndGross,
     };
 
     // Save to localStorage - first get existing deals
+    // Use the correct storage key based on dashboard type
+    const storageKey = dashboardType === 'single-finance' ? 'singleFinanceDeals' : 'financeDeals';
+
     try {
-      const existingDealsJson = localStorage.getItem('financeDeals');
+      const existingDealsJson = localStorage.getItem(storageKey);
       const existingDeals = existingDealsJson ? JSON.parse(existingDealsJson) : [];
 
       // Add new deal to the beginning of the array
       const updatedDeals = [newDeal, ...existingDeals];
 
       // Save back to localStorage
-      localStorage.setItem('financeDeals', JSON.stringify(updatedDeals));
+      localStorage.setItem(storageKey, JSON.stringify(updatedDeals));
 
       // Show success message
       alert(`Deal ${dealId} successfully logged!`);

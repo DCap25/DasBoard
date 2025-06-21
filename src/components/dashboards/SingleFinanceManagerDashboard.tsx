@@ -63,6 +63,15 @@ const SingleFinanceManagerDashboard = () => {
     try {
       console.log('[SingleFinanceManagerDashboard] Loading deals from localStorage');
 
+      // Debug: Check what's in localStorage
+      const singleFinanceDealsJson = localStorage.getItem('singleFinanceDeals');
+      const financeDealsJson = localStorage.getItem('financeDeals');
+      console.log(
+        '[SingleFinanceManagerDashboard] Raw singleFinanceDeals:',
+        singleFinanceDealsJson
+      );
+      console.log('[SingleFinanceManagerDashboard] Raw financeDeals:', financeDealsJson);
+
       // Use the new deal mapper utility
       const dashboardData = getDashboardData('single-finance', {
         userRole: 'single_finance_manager',
@@ -73,6 +82,7 @@ const SingleFinanceManagerDashboard = () => {
       console.log(
         `[SingleFinanceManagerDashboard] Found ${dashboardData.deals.length} deals in localStorage`
       );
+      console.log('[SingleFinanceManagerDashboard] Dashboard data:', dashboardData);
 
       // Convert mapped deals to the component's Deal interface for backward compatibility
       const formattedDeals: Deal[] = dashboardData.deals.map((mappedDeal: any) => ({
@@ -272,6 +282,64 @@ const SingleFinanceManagerDashboard = () => {
     }
   };
 
+  // Handle status change for a deal
+  const handleStatusChange = (dealId: string, newStatus: string) => {
+    try {
+      // Use the correct storage key for single finance deals
+      const storageKey = 'singleFinanceDeals';
+
+      // Get existing deals from localStorage
+      const existingDealsJson = localStorage.getItem(storageKey);
+      const existingDeals = existingDealsJson ? JSON.parse(existingDealsJson) : [];
+
+      // Update the deal status
+      const updatedDeals = existingDeals.map((deal: any) =>
+        deal.id === dealId ? { ...deal, status: newStatus } : deal
+      );
+
+      // Save back to localStorage
+      localStorage.setItem(storageKey, JSON.stringify(updatedDeals));
+
+      // Reload deals to reflect the change
+      loadDealsFromLocalStorage();
+
+      console.log(`[SingleFinanceManagerDashboard] Updated deal ${dealId} status to ${newStatus}`);
+    } catch (error) {
+      console.error('[SingleFinanceManagerDashboard] Error updating deal status:', error);
+      setError('Failed to update deal status');
+    }
+  };
+
+  // Handle deal deletion
+  const handleDeleteDeal = (dealId: string, shouldDelete: boolean) => {
+    if (!shouldDelete) return;
+
+    if (confirm('Are you sure you want to delete this deal? This action cannot be undone.')) {
+      try {
+        // Use the correct storage key for single finance deals
+        const storageKey = 'singleFinanceDeals';
+
+        // Get existing deals from localStorage
+        const existingDealsJson = localStorage.getItem(storageKey);
+        const existingDeals = existingDealsJson ? JSON.parse(existingDealsJson) : [];
+
+        // Remove the deal
+        const updatedDeals = existingDeals.filter((deal: any) => deal.id !== dealId);
+
+        // Save back to localStorage
+        localStorage.setItem(storageKey, JSON.stringify(updatedDeals));
+
+        // Reload deals to reflect the change
+        loadDealsFromLocalStorage();
+
+        console.log(`[SingleFinanceManagerDashboard] Deleted deal ${dealId}`);
+      } catch (error) {
+        console.error('[SingleFinanceManagerDashboard] Error deleting deal:', error);
+        setError('Failed to delete deal');
+      }
+    }
+  };
+
   // Best practices tips for finance managers
   const bestPractices = [
     'Present every product to every customer every time - consistency is key.',
@@ -398,8 +466,11 @@ const SingleFinanceManagerDashboard = () => {
                     <th className="font-medium text-white py-2 px-2 text-right bg-green-600">
                       Total
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-center bg-gray-600 rounded-tr-md w-20">
+                    <th className="font-medium text-white py-2 px-2 text-center bg-gray-600 w-20">
                       Status
+                    </th>
+                    <th className="font-medium text-white py-2 px-2 text-center bg-red-600 rounded-tr-md w-16">
+                      Delete
                     </th>
                   </tr>
                 </thead>
@@ -423,27 +494,37 @@ const SingleFinanceManagerDashboard = () => {
                       ? 'C'
                       : 'U';
 
-                    // Calculate individual product profits
+                    // Get individual product profits from deal data or calculate from legacy data
+                    const dealData = deal as any; // Type assertion to access extended properties
+
                     const vscProfit =
-                      deal.products.includes('Extended Warranty') ||
+                      dealData.vscProfit ||
+                      (deal.products.includes('Extended Warranty') ||
                       deal.products.includes('Vehicle Service Contract (VSC)')
                         ? Math.round(deal.profit * 0.35)
-                        : 0;
+                        : 0);
+
                     const ppmProfit =
-                      deal.products.includes('Paint Protection') ||
+                      dealData.ppmProfit ||
+                      (deal.products.includes('Paint Protection') ||
                       deal.products.includes('Paint and Fabric Protection') ||
                       deal.products.includes('PPM') ||
                       deal.products.includes('PrePaid Maintenance (PPM)')
                         ? Math.round(deal.profit * 0.2)
-                        : 0;
-                    const gapProfit = deal.products.includes('GAP Insurance')
-                      ? Math.round(deal.profit * 0.25)
-                      : 0;
+                        : 0);
+
+                    const gapProfit =
+                      dealData.gapProfit ||
+                      (deal.products.includes('GAP Insurance')
+                        ? Math.round(deal.profit * 0.25)
+                        : 0);
+
                     const twProfit =
-                      deal.products.includes('Tire & Wheel') ||
+                      dealData.tireAndWheelProfit ||
+                      (deal.products.includes('Tire & Wheel') ||
                       deal.products.includes('Tire & Wheel Bundle')
                         ? Math.round(deal.profit * 0.2)
-                        : 0;
+                        : 0);
 
                     // Products per deal
                     const ppd = deal.products.length;
@@ -516,9 +597,22 @@ const SingleFinanceManagerDashboard = () => {
                           ${deal.profit.toLocaleString()}
                         </td>
                         <td className="py-2 px-2 text-center">
-                          <span className={`text-xs px-2 py-1 rounded-full ${statusColor}`}>
-                            {status}
-                          </span>
+                          <select
+                            value={status}
+                            onChange={e => handleStatusChange(deal.id, e.target.value)}
+                            className={`text-xs px-2 py-1 rounded border-0 focus:ring-1 focus:ring-blue-500 ${statusColor}`}
+                          >
+                            <option value="Pending">Pending</option>
+                            <option value="Funded">Funded</option>
+                            <option value="Unwound">Unwound</option>
+                          </select>
+                        </td>
+                        <td className="py-2 px-2 text-center">
+                          <input
+                            type="checkbox"
+                            onChange={e => handleDeleteDeal(deal.id, e.target.checked)}
+                            className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                          />
                         </td>
                       </tr>
                     );
@@ -533,61 +627,69 @@ const SingleFinanceManagerDashboard = () => {
                       $
                       {deals
                         .slice(0, 5)
-                        .reduce(
-                          (sum, deal) =>
+                        .reduce((sum, deal) => {
+                          const dealData = deal as any;
+                          return (
                             sum +
-                            (deal.products.includes('Extended Warranty') ||
-                            deal.products.includes('Vehicle Service Contract (VSC)')
-                              ? Math.round(deal.profit * 0.35)
-                              : 0),
-                          0
-                        )
+                            (dealData.vscProfit ||
+                              (deal.products.includes('Extended Warranty') ||
+                              deal.products.includes('Vehicle Service Contract (VSC)')
+                                ? Math.round(deal.profit * 0.35)
+                                : 0))
+                          );
+                        }, 0)
                         .toLocaleString()}
                     </td>
                     <td className="py-2 px-2 text-right bg-purple-50">
                       $
                       {deals
                         .slice(0, 5)
-                        .reduce(
-                          (sum, deal) =>
+                        .reduce((sum, deal) => {
+                          const dealData = deal as any;
+                          return (
                             sum +
-                            (deal.products.includes('Paint Protection') ||
-                            deal.products.includes('Paint and Fabric Protection') ||
-                            deal.products.includes('PPM') ||
-                            deal.products.includes('PrePaid Maintenance (PPM)')
-                              ? Math.round(deal.profit * 0.2)
-                              : 0),
-                          0
-                        )
+                            (dealData.ppmProfit ||
+                              (deal.products.includes('Paint Protection') ||
+                              deal.products.includes('Paint and Fabric Protection') ||
+                              deal.products.includes('PPM') ||
+                              deal.products.includes('PrePaid Maintenance (PPM)')
+                                ? Math.round(deal.profit * 0.2)
+                                : 0))
+                          );
+                        }, 0)
                         .toLocaleString()}
                     </td>
                     <td className="py-2 px-2 text-right bg-green-50">
                       $
                       {deals
                         .slice(0, 5)
-                        .reduce(
-                          (sum, deal) =>
+                        .reduce((sum, deal) => {
+                          const dealData = deal as any;
+                          return (
                             sum +
-                            (deal.products.includes('GAP Insurance')
-                              ? Math.round(deal.profit * 0.25)
-                              : 0),
-                          0
-                        )
+                            (dealData.gapProfit ||
+                              (deal.products.includes('GAP Insurance')
+                                ? Math.round(deal.profit * 0.25)
+                                : 0))
+                          );
+                        }, 0)
                         .toLocaleString()}
                     </td>
                     <td className="py-2 px-2 text-right bg-amber-50">
                       $
                       {deals
                         .slice(0, 5)
-                        .reduce(
-                          (sum, deal) =>
+                        .reduce((sum, deal) => {
+                          const dealData = deal as any;
+                          return (
                             sum +
-                            (deal.products.includes('Tire & Wheel') ||
-                            deal.products.includes('Tire & Wheel Bundle')
-                              ? Math.round(deal.profit * 0.2)
-                              : 0),
-                          0
-                        )
+                            (dealData.tireAndWheelProfit ||
+                              (deal.products.includes('Tire & Wheel') ||
+                              deal.products.includes('Tire & Wheel Bundle')
+                                ? Math.round(deal.profit * 0.2)
+                                : 0))
+                          );
+                        }, 0)
                         .toLocaleString()}
                     </td>
                     <td className="py-2 px-2 text-center bg-pink-50">
@@ -610,6 +712,7 @@ const SingleFinanceManagerDashboard = () => {
                         .reduce((sum, deal) => sum + deal.profit, 0)
                         .toLocaleString()}
                     </td>
+                    <td className="py-2 px-2"></td>
                     <td className="py-2 px-2"></td>
                   </tr>
                 </tfoot>
