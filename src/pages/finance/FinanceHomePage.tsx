@@ -8,6 +8,7 @@ import {
   ChevronUp,
   ChevronDown,
   BarChart4,
+  CreditCard,
   Percent,
   Calendar,
   Filter,
@@ -20,7 +21,6 @@ import {
   Calculator,
   Target,
   Badge,
-  Car,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -29,13 +29,61 @@ import {
   DropdownMenuTrigger,
 } from '../../components/ui/dropdown-menu';
 
-// Legacy interface for backward compatibility with existing components
+// Interface for a deal
+interface Deal {
+  id: string;
+  customer: string;
+  vehicle: string;
+  vin: string;
+  saleDate: string;
+  salesperson: string;
+  amount: number;
+  status: string;
+  products: string[];
+  profit: number;
+  created_at: string;
+  // Additional fields for new deal structure
+  back_end_gross?: number;
+  vsc_profit?: number;
+  gap_profit?: number;
+  appearance_profit?: number;
+  tire_wheel_profit?: number;
+  ppm_profit?: number;
+  ext_warranty_profit?: number;
+  key_replacement_profit?: number;
+  theft_profit?: number;
+  windshield_profit?: number;
+  lojack_profit?: number;
+  other_profit?: number;
+  // Camel case variants for backward compatibility
+  vscProfit?: number;
+  gapProfit?: number;
+  appearanceProfit?: number;
+  tireWheelProfit?: number;
+  ppmProfit?: number;
+  extWarrantyProfit?: number;
+  keyReplacementProfit?: number;
+  theftProfit?: number;
+  windshieldProfit?: number;
+  lojackProfit?: number;
+  otherProfit?: number;
+}
+
+// Interface for metrics
 interface Metrics {
   mtdRevenue: number;
   dealsProcessed: number;
   productsPerDeal: number;
   pvr: number;
   productMix: {
+    extendedWarranty: number;
+    gapInsurance: number;
+    paintProtection: number;
+    tireWheel: number;
+    ppm: number;
+    other: number;
+  };
+  avgProfits: {
     extendedWarranty: number;
     gapInsurance: number;
     paintProtection: number;
@@ -68,6 +116,33 @@ const FinanceHomePage: React.FC = () => {
   });
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
 
+  // Local state for deal management
+  const [localDeals, setDeals] = useState<Deal[]>([]);
+  const [filteredDeals, setFilteredDeals] = useState<Deal[]>([]);
+  const [localPendingDeals, setPendingDeals] = useState<Deal[]>([]);
+  const [localMetrics, setMetrics] = useState<Metrics>({
+    mtdRevenue: 0,
+    dealsProcessed: 0,
+    productsPerDeal: 0,
+    pvr: 0,
+    productMix: {
+      extendedWarranty: 0,
+      gapInsurance: 0,
+      paintProtection: 0,
+      tireWheel: 0,
+      ppm: 0,
+      other: 0,
+    },
+    avgProfits: {
+      extendedWarranty: 0,
+      gapInsurance: 0,
+      paintProtection: 0,
+      tireWheel: 0,
+      ppm: 0,
+      other: 0,
+    },
+  });
+
   // Use the finance deals data hook
   const {
     dealData,
@@ -77,8 +152,8 @@ const FinanceHomePage: React.FC = () => {
   } = useFinanceDealsData(timePeriod);
 
   // Extract data from the hook
-  const deals = dealData?.deals || [];
-  const metrics = dealData?.metrics || {
+  const hookDeals = dealData?.deals || [];
+  const hookMetrics = dealData?.metrics || {
     totalDeals: 0,
     fundedDeals: 0,
     pendingDeals: 0,
@@ -91,25 +166,39 @@ const FinanceHomePage: React.FC = () => {
     avgPVR: 0,
   };
 
-  // Filter deals by status
-  const fundedDeals = deals.filter(deal => deal.isFunded);
-  const pendingDeals = deals.filter(deal => deal.isPending);
+  // Use local deals for table display and hook deals for other metrics
+  const deals = localDeals.length > 0 ? localDeals : hookDeals;
+  const metrics =
+    localMetrics.mtdRevenue > 0
+      ? localMetrics
+      : {
+          mtdRevenue: hookMetrics.totalBackGross,
+          dealsProcessed: hookMetrics.totalDeals,
+          productsPerDeal:
+            hookMetrics.totalDeals > 0 ? hookMetrics.totalPVR / hookMetrics.totalDeals : 0,
+          pvr: hookMetrics.avgPVR,
+          productMix: {
+            extendedWarranty: 0,
+            gapInsurance: 0,
+            paintProtection: 0,
+            tireWheel: 0,
+            ppm: 0,
+            other: 0,
+          },
+          avgProfits: {
+            extendedWarranty: 0,
+            gapInsurance: 0,
+            paintProtection: 0,
+            tireWheel: 0,
+            ppm: 0,
+            other: 0,
+          },
+        };
 
-  // Legacy metrics calculation for backward compatibility
-  const legacyMetrics: Metrics = {
-    mtdRevenue: metrics.totalBackGross,
-    dealsProcessed: metrics.totalDeals,
-    productsPerDeal: metrics.totalDeals > 0 ? metrics.totalPVR / metrics.totalDeals : 0,
-    pvr: metrics.avgPVR,
-    productMix: {
-      extendedWarranty: 0,
-      gapInsurance: 0,
-      paintProtection: 0,
-      tireWheel: 0,
-      ppm: 0,
-      other: 0,
-    },
-  };
+  // Filter deals by status
+  const fundedDeals = deals.filter((deal: any) => deal.isFunded);
+  const pendingDeals =
+    localPendingDeals.length > 0 ? localPendingDeals : deals.filter((deal: any) => deal.isPending);
 
   // Get current month and year for display
   const getCurrentMonthYear = () => {
@@ -215,16 +304,258 @@ const FinanceHomePage: React.FC = () => {
   // Apply custom date range
   const applyCustomDateRange = () => {
     if (customDateRange.start && customDateRange.end) {
-      // The hook will handle the filtering based on the custom date range
-      setHookTimePeriod('custom');
+      filterDealsByDateRange();
     }
   };
 
   // Load deals from localStorage
-  // Update the hook when time period changes
   useEffect(() => {
-    setHookTimePeriod(timePeriod);
-  }, [timePeriod, setHookTimePeriod]);
+    try {
+      const storedDeals = localStorage.getItem('financeDeals');
+      if (storedDeals) {
+        const parsedDeals = JSON.parse(storedDeals);
+        setDeals(parsedDeals);
+
+        // Filter for pending deals
+        const pendingDealsFilter = parsedDeals.filter(
+          (deal: any) =>
+            deal.status === 'Pending' ||
+            deal.status === 'Bank Approval' ||
+            deal.status === 'Pending Documents' ||
+            deal.status === 'Contract Review' ||
+            deal.status === 'Insurance Verification'
+        );
+        setPendingDeals(pendingDealsFilter);
+      }
+    } catch (error) {
+      console.error('Error loading deals from localStorage:', error);
+    }
+  }, []);
+
+  // Filter deals by date range when time period changes
+  useEffect(() => {
+    if (localDeals.length > 0) {
+      filterDealsByDateRange();
+    }
+  }, [timePeriod, customDateRange, localDeals]);
+
+  // Filter deals by selected date range
+  const filterDealsByDateRange = () => {
+    if (!localDeals.length) return;
+
+    const { startDate, endDate } = getDateRange(timePeriod);
+
+    const filtered = localDeals.filter((deal: any) => {
+      const dealDate = new Date(deal.saleDate);
+      return dealDate >= startDate && dealDate <= endDate;
+    });
+
+    setFilteredDeals(filtered);
+    calculateMetrics(filtered);
+  };
+
+  // Handle status change for a deal
+  const handleStatusChange = (dealId: string, newStatus: string) => {
+    try {
+      // Get existing deals from localStorage
+      const existingDealsJson = localStorage.getItem('financeDeals');
+      const existingDeals = existingDealsJson ? JSON.parse(existingDealsJson) : [];
+
+      // Update the deal status
+      const updatedDeals = existingDeals.map((deal: any) =>
+        deal.id === dealId ? { ...deal, status: newStatus } : deal
+      );
+
+      // Save back to localStorage
+      localStorage.setItem('financeDeals', JSON.stringify(updatedDeals));
+
+      // Update local state
+      setDeals(updatedDeals);
+
+      console.log(`[FinanceHomePage] Updated deal ${dealId} status to ${newStatus}`);
+    } catch (error) {
+      console.error('[FinanceHomePage] Error updating deal status:', error);
+    }
+  };
+
+  // Handle deal deletion
+  const handleDeleteDeal = (dealId: string, shouldDelete: boolean) => {
+    if (!shouldDelete) return;
+
+    if (confirm('Are you sure you want to delete this deal? This action cannot be undone.')) {
+      try {
+        // Get existing deals from localStorage
+        const existingDealsJson = localStorage.getItem('financeDeals');
+        const existingDeals = existingDealsJson ? JSON.parse(existingDealsJson) : [];
+
+        // Remove the deal
+        const updatedDeals = existingDeals.filter((deal: any) => deal.id !== dealId);
+
+        // Save back to localStorage
+        localStorage.setItem('financeDeals', JSON.stringify(updatedDeals));
+
+        // Update local state
+        setDeals(updatedDeals);
+
+        console.log(`[FinanceHomePage] Deleted deal ${dealId}`);
+      } catch (error) {
+        console.error('[FinanceHomePage] Error deleting deal:', error);
+      }
+    }
+  };
+
+  // Calculate metrics based on deals
+  const calculateMetrics = (deals: Deal[]) => {
+    if (deals.length === 0) {
+      setMetrics({
+        mtdRevenue: 0,
+        dealsProcessed: 0,
+        productsPerDeal: 0,
+        pvr: 0,
+        productMix: {
+          extendedWarranty: 0,
+          gapInsurance: 0,
+          paintProtection: 0,
+          tireWheel: 0,
+          ppm: 0,
+          other: 0,
+        },
+        avgProfits: {
+          extendedWarranty: 0,
+          gapInsurance: 0,
+          paintProtection: 0,
+          tireWheel: 0,
+          ppm: 0,
+          other: 0,
+        },
+      });
+      return;
+    }
+
+    // Calculate total F&I revenue for the time period - handle both new and old data structures
+    const totalRevenue = deals.reduce((total, deal) => {
+      // New structure has back_end_gross, old structure has profit
+      const dealProfit = deal.back_end_gross || deal.profit || 0;
+      return total + dealProfit;
+    }, 0);
+
+    // Calculate deals processed in this time period
+    const dealsProcessed = deals.length;
+
+    // Calculate product penetration and average profits based on actual profit values
+    let extendedWarrantyCount = 0;
+    let extendedWarrantyTotal = 0;
+    let gapInsuranceCount = 0;
+    let gapInsuranceTotal = 0;
+    let paintProtectionCount = 0;
+    let paintProtectionTotal = 0;
+    let tireWheelCount = 0;
+    let tireWheelTotal = 0;
+    let ppmCount = 0;
+    let ppmTotal = 0;
+    let otherCount = 0;
+    let otherTotal = 0;
+
+    deals.forEach(deal => {
+      // VSC/Extended Warranty
+      const vscProfit = deal.vsc_profit || deal.vscProfit || 0;
+      if (vscProfit > 0) {
+        extendedWarrantyCount++;
+        extendedWarrantyTotal += vscProfit;
+      }
+
+      // GAP Insurance
+      const gapProfit = deal.gap_profit || deal.gapProfit || 0;
+      if (gapProfit > 0) {
+        gapInsuranceCount++;
+        gapInsuranceTotal += gapProfit;
+      }
+
+      // Paint Protection/Appearance
+      const appearanceProfit = deal.appearance_profit || deal.appearanceProfit || 0;
+      if (appearanceProfit > 0) {
+        paintProtectionCount++;
+        paintProtectionTotal += appearanceProfit;
+      }
+
+      // Tire & Wheel
+      const tireWheelProfit = deal.tire_wheel_profit || deal.tireWheelProfit || 0;
+      if (tireWheelProfit > 0) {
+        tireWheelCount++;
+        tireWheelTotal += tireWheelProfit;
+      }
+
+      // PPM (Prepaid Maintenance)
+      const ppmProfit = deal.ppm_profit || deal.ppmProfit || 0;
+      if (ppmProfit > 0) {
+        ppmCount++;
+        ppmTotal += ppmProfit;
+      }
+
+      // Other products (Extended Warranty, Key Replacement, Theft, Windshield, LoJack, Other)
+      const otherProfit =
+        (deal.ext_warranty_profit || deal.extWarrantyProfit || 0) +
+        (deal.key_replacement_profit || deal.keyReplacementProfit || 0) +
+        (deal.theft_profit || deal.theftProfit || 0) +
+        (deal.windshield_profit || deal.windshieldProfit || 0) +
+        (deal.lojack_profit || deal.lojackProfit || 0) +
+        (deal.other_profit || deal.otherProfit || 0);
+
+      if (otherProfit > 0) {
+        otherCount++;
+        otherTotal += otherProfit;
+      }
+    });
+
+    // Calculate penetration percentage (how often each product is sold)
+    const calculatePenetration = (count: number) =>
+      dealsProcessed > 0 ? Math.round((count / dealsProcessed) * 100) : 0;
+
+    // Calculate average profit per product
+    const calculateAverage = (total: number, count: number) =>
+      count > 0 ? Math.round(total / count) : 0;
+
+    // Calculate average products per deal
+    const totalProductsSold =
+      extendedWarrantyCount +
+      gapInsuranceCount +
+      paintProtectionCount +
+      tireWheelCount +
+      ppmCount +
+      otherCount;
+    const productsPerDeal = dealsProcessed > 0 ? totalProductsSold / dealsProcessed : 0;
+
+    // Calculate PVR (Per Vehicle Retailed)
+    const pvr = dealsProcessed > 0 ? totalRevenue / dealsProcessed : 0;
+
+    const productMix = {
+      extendedWarranty: calculatePenetration(extendedWarrantyCount),
+      gapInsurance: calculatePenetration(gapInsuranceCount),
+      paintProtection: calculatePenetration(paintProtectionCount),
+      tireWheel: calculatePenetration(tireWheelCount),
+      ppm: calculatePenetration(ppmCount),
+      other: calculatePenetration(otherCount),
+    };
+
+    const avgProfits = {
+      extendedWarranty: calculateAverage(extendedWarrantyTotal, extendedWarrantyCount),
+      gapInsurance: calculateAverage(gapInsuranceTotal, gapInsuranceCount),
+      paintProtection: calculateAverage(paintProtectionTotal, paintProtectionCount),
+      tireWheel: calculateAverage(tireWheelTotal, tireWheelCount),
+      ppm: calculateAverage(ppmTotal, ppmCount),
+      other: calculateAverage(otherTotal, otherCount),
+    };
+
+    // Update metrics state
+    setMetrics({
+      mtdRevenue: totalRevenue,
+      dealsProcessed,
+      productsPerDeal,
+      pvr,
+      productMix,
+      avgProfits,
+    });
+  };
 
   // Helper to highlight today in the schedule
   const isToday = (day: string) => {
@@ -280,131 +611,85 @@ const FinanceHomePage: React.FC = () => {
       </div>
 
       <div className="space-y-6">
-        {/* 5 Metric Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+        {/* 4 Metric Cards */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card className="border-l-4 border-l-green-500 hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-base font-semibold text-slate-700">F&I Gross</CardTitle>
-              <DollarSign className="h-4 w-4 text-green-500" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium flex items-center">
+                <DollarSign className="mr-2 h-4 w-4 text-green-500" />
+                F&I Gross
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-slate-900">
-                ${metrics.totalBackGross.toLocaleString()}
+              <div className="text-2xl font-bold">
+                {metrics.mtdRevenue > 0 ? `$${metrics.mtdRevenue.toLocaleString()}` : 'No data yet'}
               </div>
-              <p className="text-xs text-muted-foreground">
-                {metrics.totalBackGross > 12000 ? (
-                  <span className="text-green-500 flex items-center">
-                    <ChevronUp className="mr-1 h-4 w-4" />
-                    +12% from last month
-                  </span>
-                ) : (
-                  <span className="text-red-600 flex items-center">
-                    <ChevronDown className="mr-1 h-4 w-4" />
-                    -8% from last month
-                  </span>
-                )}
-              </p>
+              {metrics.mtdRevenue > 0 && (
+                <div className="flex items-center pt-1 text-green-500">
+                  <ChevronUp className="h-3 w-3 mr-1" />
+                  <span className="text-xs">8.2% from previous period</span>
+                </div>
+              )}
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-base font-semibold text-slate-700">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium flex items-center">
+                <CreditCard className="mr-2 h-4 w-4 text-blue-500" />
                 Deals Processed
               </CardTitle>
-              <FileText className="h-4 w-4 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-slate-900">{metrics.totalDeals}</div>
-              <p className="text-xs text-muted-foreground">
-                <span className="text-green-500 flex items-center">
-                  <ChevronUp className="mr-1 h-4 w-4" />
-                  +3% from last month
-                </span>
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-l-4 border-l-indigo-500 hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-base font-semibold text-slate-700">Deal Types</CardTitle>
-              <Car className="h-4 w-4 text-indigo-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-1">
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-600">Finance:</span>
-                  <span className="text-sm font-bold text-indigo-600">
-                    {Math.round(metrics.totalDeals * 0.65)}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-600">Cash:</span>
-                  <span className="text-sm font-bold text-green-600">
-                    {Math.round(metrics.totalDeals * 0.25)}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-600">Lease:</span>
-                  <span className="text-sm font-bold text-blue-600">
-                    {Math.round(metrics.totalDeals * 0.1)}
-                  </span>
-                </div>
+              <div className="text-2xl font-bold">
+                {metrics.dealsProcessed > 0 ? metrics.dealsProcessed : 'No deals yet'}
               </div>
+              {metrics.dealsProcessed > 0 && (
+                <div className="flex items-center pt-1 text-green-500">
+                  <ChevronUp className="h-3 w-3 mr-1" />
+                  <span className="text-xs">10.5% from previous period</span>
+                </div>
+              )}
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-purple-500 hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-base font-semibold text-slate-700">
-                Products Per Deal
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium flex items-center">
+                <BarChart4 className="mr-2 h-4 w-4 text-purple-500" />
+                Pay Calculator MTD
               </CardTitle>
-              <BarChart4 className="h-4 w-4 text-purple-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-slate-900">
-                {(metrics.totalDeals > 0 ? metrics.totalPVR / metrics.totalDeals : 0).toFixed(1)}
+              <div className="text-2xl font-bold">
+                ${Math.round(metrics.mtdRevenue * 0.15).toLocaleString()}
               </div>
-              <p className="text-xs text-muted-foreground">
-                {(metrics.totalDeals > 0 ? metrics.totalPVR / metrics.totalDeals : 0) >= 2.0 ? (
-                  <span className="text-green-500 flex items-center">
-                    <ChevronUp className="mr-1 h-4 w-4" />
-                    +0.2 from last month
-                  </span>
-                ) : (
-                  <span className="text-red-600 flex items-center">
-                    <ChevronDown className="mr-1 h-4 w-4" />
-                    -0.3 from last month
-                  </span>
-                )}
-              </p>
+              {metrics.dealsProcessed > 0 && (
+                <div className="flex items-center pt-1 text-green-500">
+                  <ChevronUp className="h-3 w-3 mr-1" />
+                  <span className="text-xs">15% of F&I revenue</span>
+                </div>
+              )}
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-amber-500 hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-base font-semibold text-slate-700">
-                PVR (Per Vehicle Retailed)
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium flex items-center">
+                <Percent className="mr-2 h-4 w-4 text-amber-500" />
+                PVR
               </CardTitle>
-              <Percent className="h-4 w-4 text-amber-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-slate-900">
-                ${metrics.avgPVR.toLocaleString()}
+              <div className="text-2xl font-bold">
+                {metrics.dealsProcessed > 0 ? `$${metrics.pvr.toLocaleString()}` : 'No data yet'}
               </div>
-              <p className="text-xs text-muted-foreground">
-                {metrics.avgPVR > 1500 ? (
-                  <span className="text-green-500 flex items-center">
-                    <ChevronUp className="mr-1 h-4 w-4" />
-                    +$125 from last month
-                  </span>
-                ) : (
-                  <span className="text-red-600 flex items-center">
-                    <ChevronDown className="mr-1 h-4 w-4" />
-                    -$89 from last month
-                  </span>
-                )}
-              </p>
+              {metrics.dealsProcessed > 0 && (
+                <div className="flex items-center pt-1 text-green-500">
+                  <ChevronUp className="h-3 w-3 mr-1" />
+                  <span className="text-xs">$120 from previous period</span>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -460,157 +745,86 @@ const FinanceHomePage: React.FC = () => {
           </Card>
         </div>
 
-        {/* Product Mix Section - Now Full Width */}
-        <Card className="col-span-12 bg-white border-slate-200 shadow-sm mt-6">
-          <CardHeader className="py-2 px-4 border-b">
-            <CardTitle className="flex items-center text-xl font-semibold">
-              <BarChart4 className="mr-2 h-6 w-6 text-blue-500" />
-              F&I Product Mix - Penetration % & Avg. Profit
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* First Column: VSC, GAP, PPM */}
-              <div className="space-y-2">
-                {/* VSC */}
-                <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <div className="font-medium flex items-center text-base">
-                    <div className="w-3 h-3 bg-blue-600 rounded-full mr-2"></div>
-                    Vehicle Service Contract (VSC)
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold text-2xl text-blue-600">
-                      ${Math.round(
-                        (metrics.totalBackGross * 0.35) / Math.max(1, Math.round(metrics.totalDeals * 0.60))
-                      ).toLocaleString()}
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      {Math.round(metrics.totalDeals * 0.60 / Math.max(1, metrics.totalDeals) * 100)}% Penetration
-                    </div>
-                  </div>
-                </div>
-
-                {/* GAP Insurance */}
-                <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <div className="font-medium flex items-center text-base">
-                    <div className="w-3 h-3 bg-green-600 rounded-full mr-2"></div>
-                    GAP Insurance
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold text-2xl text-green-600">
-                      ${Math.round(
-                        (metrics.totalBackGross * 0.20) / Math.max(1, Math.round(metrics.totalDeals * 0.75))
-                      ).toLocaleString()}
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      {Math.round(metrics.totalDeals * 0.75 / Math.max(1, metrics.totalDeals) * 100)}% Penetration
-                    </div>
-                  </div>
-                </div>
-
-                {/* PPM */}
-                <div className="flex items-center justify-between py-2">
-                  <div className="font-medium flex items-center text-base">
-                    <div className="w-3 h-3 bg-purple-600 rounded-full mr-2"></div>
-                    PrePaid Maintenance (PPM)
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold text-2xl text-purple-600">
-                      ${Math.round(
-                        (metrics.totalBackGross * 0.15) / Math.max(1, Math.round(metrics.totalDeals * 0.45))
-                      ).toLocaleString()}
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      {Math.round(metrics.totalDeals * 0.45 / Math.max(1, metrics.totalDeals) * 100)}% Penetration
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Second Column: Paint, Tire & Wheel, Other */}
-              <div className="space-y-2">
-                {/* Paint Protection */}
-                <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <div className="font-medium flex items-center text-base">
-                    <div className="w-3 h-3 bg-orange-600 rounded-full mr-2"></div>
-                    Paint Protection
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold text-2xl text-orange-600">
-                      ${Math.round(
-                        (metrics.totalBackGross * 0.15) / Math.max(1, Math.round(metrics.totalDeals * 0.55))
-                      ).toLocaleString()}
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      {Math.round(metrics.totalDeals * 0.55 / Math.max(1, metrics.totalDeals) * 100)}% Penetration
-                    </div>
-                  </div>
-                </div>
-
-                {/* Tire & Wheel */}
-                <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <div className="font-medium flex items-center text-base">
-                    <div className="w-3 h-3 bg-amber-600 rounded-full mr-2"></div>
-                    Tire and Wheel Bundle
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold text-2xl text-amber-600">
-                      ${Math.round(
-                        (metrics.totalBackGross * 0.10) / Math.max(1, Math.round(metrics.totalDeals * 0.30))
-                      ).toLocaleString()}
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      {Math.round(metrics.totalDeals * 0.30 / Math.max(1, metrics.totalDeals) * 100)}% Penetration
-                    </div>
-                  </div>
-                </div>
-
-                {/* Other */}
-                <div className="flex items-center justify-between py-2">
-                  <div className="font-medium flex items-center text-base">
-                    <div className="w-3 h-3 bg-gray-600 rounded-full mr-2"></div>
-                    Other Products
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold text-2xl text-gray-600">
-                      ${Math.round(
-                        (metrics.totalBackGross * 0.05) / Math.max(1, Math.round(metrics.totalDeals * 0.20))
-                      ).toLocaleString()}
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      {Math.round(metrics.totalDeals * 0.20 / Math.max(1, metrics.totalDeals) * 100)}% Penetration
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Products Per Deal (PPD) metric at the bottom */}
-            <div className="mt-4 pt-3 border-t border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="font-medium text-sm">Products Per Deal (PPD)</div>
-                <div className="font-bold text-lg text-purple-600">
-                  {(metrics.totalDeals > 0 ? metrics.totalPVR / metrics.totalDeals : 0).toFixed(1)}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         <div className="grid gap-6 md:grid-cols-2">
           <Card className="border hover:shadow-md transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center text-lg font-medium">
                 <BarChart4 className="mr-2 h-5 w-5 text-blue-500" />
-                Deal Performance (Legacy View)
+                F&I Product Mix & Avg. Profit
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {metrics.totalDeals > 0 ? (
+              {metrics.dealsProcessed > 0 ? (
                 <div className="space-y-2">
-                  <div className="text-sm text-gray-600">
-                    This section shows legacy metrics for comparison. The new F&I Product Mix section above provides more detailed and accurate data.
+                  {[
+                    {
+                      name: 'Vehicle Service Contract (VSC)',
+                      percent: metrics.productMix.extendedWarranty,
+                      value: `$${metrics.avgProfits.extendedWarranty.toLocaleString()}`,
+                      color: 'bg-teal-600',
+                    },
+                    {
+                      name: 'PrePaid Maintenance (PPM)',
+                      percent: metrics.productMix.ppm,
+                      value: `$${metrics.avgProfits.ppm.toLocaleString()}`,
+                      color: 'bg-purple-600',
+                    },
+                    {
+                      name: 'GAP Insurance',
+                      percent: metrics.productMix.gapInsurance,
+                      value: `$${metrics.avgProfits.gapInsurance.toLocaleString()}`,
+                      color: 'bg-green-600',
+                    },
+                    {
+                      name: 'Paint and Fabric Protection',
+                      percent: metrics.productMix.paintProtection,
+                      value: `$${metrics.avgProfits.paintProtection.toLocaleString()}`,
+                      color: 'bg-blue-600',
+                    },
+                    {
+                      name: 'Tire & Wheel Bundle',
+                      percent: metrics.productMix.tireWheel,
+                      value: `$${metrics.avgProfits.tireWheel.toLocaleString()}`,
+                      color: 'bg-amber-600',
+                    },
+                    {
+                      name: 'Other Products',
+                      percent: metrics.productMix.other,
+                      value: `$${metrics.avgProfits.other.toLocaleString()}`,
+                      color: 'bg-gray-600',
+                    },
+                  ].map((product, index) => (
+                    <div key={index} className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <div className="font-medium flex items-center text-sm">
+                          <div className={`w-3 h-3 ${product.color} rounded-full mr-2`}></div>
+                          {product.name}
+                        </div>
+                        <div className="text-right">
+                          <div className="text-xs text-gray-500">Avg. Profit</div>
+                          <div className="font-medium text-sm">{product.value}</div>
+                        </div>
+                      </div>
+                      <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                        <div
+                          className={`absolute inset-y-0 left-0 rounded-full ${product.color}`}
+                          style={{ width: `${product.percent}%` }}
+                        />
+                      </div>
+                      <div className="text-right text-xs text-gray-500">{product.percent}%</div>
+                    </div>
+                  ))}
+
+                  {/* Add PPD metric at the bottom */}
+                  <div className="mt-4 pt-3 border-t border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div className="font-medium text-sm">Products Per Deal (PPD)</div>
+                      <div className="font-bold text-lg text-purple-600">
+                        {metrics.productsPerDeal.toFixed(1)}
+                      </div>
+                    </div>
                   </div>
+                </div>
               ) : (
                 <div className="py-8 text-center text-gray-500">
                   No F&I product data available yet. Log deals with products to see the mix.
@@ -765,20 +979,29 @@ const FinanceHomePage: React.FC = () => {
                       <th className="font-medium text-white py-2 pl-3 text-center bg-gray-600 w-12">
                         #
                       </th>
+                      <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
+                        Last Name
+                      </th>
                       <th className="font-medium text-white py-2 pl-4 pr-2 text-left bg-blue-600">
                         Deal #
                       </th>
                       <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
                         Stock #
                       </th>
-                      <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
-                        Last Name
-                      </th>
                       <th className="font-medium text-white py-2 px-2 text-center bg-gray-600">
                         Date
                       </th>
+                      <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
+                        VIN
+                      </th>
                       <th className="font-medium text-white py-2 px-2 text-center bg-indigo-600">
                         N/U/CPO
+                      </th>
+                      <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
+                        Lender
+                      </th>
+                      <th className="font-medium text-white py-2 px-2 text-right bg-blue-600">
+                        Front End
                       </th>
                       <th className="font-medium text-white py-2 px-2 text-right bg-teal-600">
                         VSC
@@ -801,52 +1024,77 @@ const FinanceHomePage: React.FC = () => {
                       <th className="font-medium text-white py-2 px-2 text-right bg-green-600">
                         Total
                       </th>
-                      <th className="font-medium text-white py-2 px-2 text-center bg-gray-600 rounded-tr-md w-20">
+                      <th className="font-medium text-white py-2 px-2 text-center bg-gray-600 w-20">
                         Status
+                      </th>
+                      <th className="font-medium text-white py-2 px-2 text-center bg-red-600 rounded-tr-md w-16">
+                        Delete
                       </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {deals.slice(0, 5).map((deal, index) => {
+                    {deals.slice(0, 10).map((deal, index) => {
+                      // Get individual product profits from deal data or calculate from legacy data
+                      const dealData = deal as any; // Type assertion to access extended properties
+
                       // Extract last name from customer
                       const lastName = deal.customer.split(' ').pop() || '';
 
-                      // Format date for display
-                      const dealDate = new Date(deal.saleDate);
+                      // Format date for display - use actual deal date from form
+                      const actualDealDate = dealData.dealDate || deal.saleDate;
+                      const dealDate = new Date(actualDealDate);
                       const formattedDate = dealDate.toLocaleDateString('en-US', {
                         month: '2-digit',
                         day: '2-digit',
                         year: '2-digit',
                       });
 
-                      // Determine if New, Used or CPO - simulating for now
-                      const vehicleType = deal.vehicle.toLowerCase().includes('new')
-                        ? 'N'
-                        : deal.vehicle.toLowerCase().includes('cpo')
-                        ? 'C'
-                        : 'U';
+                      // Determine if New, Used or CPO - use actual form data
+                      const vehicleType =
+                        dealData.vehicleType ||
+                        (deal.vehicle.toLowerCase().includes('new')
+                          ? 'N'
+                          : deal.vehicle.toLowerCase().includes('cpo')
+                          ? 'C'
+                          : 'U');
 
-                      // Calculate individual product profits
+                      // Get individual product profits - ensure we handle both number and string values
                       const vscProfit =
-                        deal.products.includes('Extended Warranty') ||
-                        deal.products.includes('Vehicle Service Contract (VSC)')
-                          ? Math.round(deal.profit * 0.35)
-                          : 0;
+                        typeof dealData.vscProfit === 'number'
+                          ? dealData.vscProfit
+                          : parseFloat(dealData.vscProfit) ||
+                            (deal.products.includes('Extended Warranty') ||
+                            deal.products.includes('Vehicle Service Contract (VSC)')
+                              ? Math.round(deal.profit * 0.35)
+                              : 0);
+
                       const ppmProfit =
-                        deal.products.includes('Paint Protection') ||
-                        deal.products.includes('Paint and Fabric Protection') ||
-                        deal.products.includes('PPM') ||
-                        deal.products.includes('PrePaid Maintenance (PPM)')
-                          ? Math.round(deal.profit * 0.2)
-                          : 0;
-                      const gapProfit = deal.products.includes('GAP Insurance')
-                        ? Math.round(deal.profit * 0.25)
-                        : 0;
+                        typeof dealData.ppmProfit === 'number'
+                          ? dealData.ppmProfit
+                          : parseFloat(dealData.ppmProfit) ||
+                            (deal.products.includes('Paint Protection') ||
+                            deal.products.includes('Paint and Fabric Protection') ||
+                            deal.products.includes('PPM') ||
+                            deal.products.includes('PrePaid Maintenance (PPM)')
+                              ? Math.round(deal.profit * 0.2)
+                              : 0);
+
+                      const gapProfit =
+                        typeof dealData.gapProfit === 'number'
+                          ? dealData.gapProfit
+                          : parseFloat(dealData.gapProfit) ||
+                            (deal.products.includes('GAP Insurance')
+                              ? Math.round(deal.profit * 0.25)
+                              : 0);
+
                       const twProfit =
-                        deal.products.includes('Tire & Wheel') ||
-                        deal.products.includes('Tire & Wheel Bundle')
-                          ? Math.round(deal.profit * 0.2)
-                          : 0;
+                        typeof dealData.tireAndWheelProfit === 'number'
+                          ? dealData.tireAndWheelProfit
+                          : parseFloat(dealData.tireAndWheelProfit) ||
+                            (deal.products.includes('Tire & Wheel') ||
+                            deal.products.includes('Tire & Wheel Bundle')
+                              ? Math.round(deal.profit * 0.2)
+                              : 0);
 
                       // Products per deal
                       const ppd = deal.products.length;
@@ -880,12 +1128,17 @@ const FinanceHomePage: React.FC = () => {
                           <td className="py-2 px-2 text-center font-medium">
                             {deals.length - index}
                           </td>
-                          <td className="py-2 pl-4 pr-2 text-left font-medium text-blue-600">
-                            {deal.id}
-                          </td>
-                          <td className="py-2 px-2 text-left">{deal.id.replace('D', 'S')}</td>
                           <td className="py-2 px-2 text-left font-medium">{lastName}</td>
+                          <td className="py-2 pl-4 pr-2 text-left font-medium text-blue-600">
+                            {dealData.dealNumber || deal.id}
+                          </td>
+                          <td className="py-2 px-2 text-left font-mono">
+                            {dealData.stockNumber || deal.id.replace('D', 'S')}
+                          </td>
                           <td className="py-2 px-2 text-center text-gray-600">{formattedDate}</td>
+                          <td className="py-2 px-2 text-left font-mono text-xs">
+                            {deal.vin ? `...${deal.vin.slice(-8)}` : dealData.vinLast8 || 'N/A'}
+                          </td>
                           <td className="py-2 px-2 text-center">
                             <span
                               className={`px-1.5 py-0.5 rounded text-xs font-medium ${
@@ -898,6 +1151,13 @@ const FinanceHomePage: React.FC = () => {
                             >
                               {vehicleType}
                             </span>
+                          </td>
+                          <td className="py-2 px-2 text-left">{dealData.lender || 'N/A'}</td>
+                          <td className="py-2 px-2 text-right bg-blue-50 font-medium">
+                            $
+                            {(
+                              dealData.frontEndGross || Math.round(deal.amount * 0.7)
+                            ).toLocaleString()}
                           </td>
                           <td className="py-2 px-2 text-right bg-teal-50">
                             ${vscProfit.toLocaleString()}
@@ -919,9 +1179,23 @@ const FinanceHomePage: React.FC = () => {
                             ${deal.profit.toLocaleString()}
                           </td>
                           <td className="py-2 px-2 text-center">
-                            <span className={`text-xs px-2 py-1 rounded-full ${statusColor}`}>
-                              {status}
-                            </span>
+                            <select
+                              value={status}
+                              onChange={e => handleStatusChange(deal.id, e.target.value)}
+                              className={`text-xs px-2 py-1 rounded border-0 focus:ring-1 focus:ring-blue-500 ${statusColor}`}
+                            >
+                              <option value="Pending">Pending</option>
+                              <option value="Funded">Funded</option>
+                              <option value="Unwound">Unwound</option>
+                              <option value="Dead Deal">Dead Deal</option>
+                            </select>
+                          </td>
+                          <td className="py-2 px-2 text-center">
+                            <input
+                              type="checkbox"
+                              onChange={e => handleDeleteDeal(deal.id, e.target.checked)}
+                              className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                            />
                           </td>
                         </tr>
                       );
@@ -929,90 +1203,103 @@ const FinanceHomePage: React.FC = () => {
                   </tbody>
                   <tfoot>
                     <tr className="bg-gray-100 border-t border-t-gray-200 font-medium">
-                      <td colSpan={6} className="py-2 pl-4 text-left">
+                      <td colSpan={9} className="py-2 pl-4 text-left">
                         TOTALS
                       </td>
                       <td className="py-2 px-2 text-right bg-teal-50">
                         $
                         {deals
-                          .slice(0, 5)
-                          .reduce(
-                            (sum, deal) =>
-                              sum +
-                              (deal.products.includes('Extended Warranty') ||
-                              deal.products.includes('Vehicle Service Contract (VSC)')
-                                ? Math.round(deal.profit * 0.35)
-                                : 0),
-                            0
-                          )
+                          .slice(0, 10)
+                          .reduce((sum, deal) => {
+                            const dealData = deal as any;
+                            const vscProfit =
+                              typeof dealData.vscProfit === 'number'
+                                ? dealData.vscProfit
+                                : parseFloat(dealData.vscProfit) ||
+                                  (deal.products.includes('Extended Warranty') ||
+                                  deal.products.includes('Vehicle Service Contract (VSC)')
+                                    ? Math.round(deal.profit * 0.35)
+                                    : 0);
+                            return sum + vscProfit;
+                          }, 0)
                           .toLocaleString()}
                       </td>
                       <td className="py-2 px-2 text-right bg-purple-50">
                         $
                         {deals
-                          .slice(0, 5)
-                          .reduce(
-                            (sum, deal) =>
-                              sum +
-                              (deal.products.includes('Paint Protection') ||
-                              deal.products.includes('Paint and Fabric Protection') ||
-                              deal.products.includes('PPM') ||
-                              deal.products.includes('PrePaid Maintenance (PPM)')
-                                ? Math.round(deal.profit * 0.2)
-                                : 0),
-                            0
-                          )
+                          .slice(0, 10)
+                          .reduce((sum, deal) => {
+                            const dealData = deal as any;
+                            const ppmProfit =
+                              typeof dealData.ppmProfit === 'number'
+                                ? dealData.ppmProfit
+                                : parseFloat(dealData.ppmProfit) ||
+                                  (deal.products.includes('Paint Protection') ||
+                                  deal.products.includes('Paint and Fabric Protection') ||
+                                  deal.products.includes('PPM') ||
+                                  deal.products.includes('PrePaid Maintenance (PPM)')
+                                    ? Math.round(deal.profit * 0.2)
+                                    : 0);
+                            return sum + ppmProfit;
+                          }, 0)
                           .toLocaleString()}
                       </td>
                       <td className="py-2 px-2 text-right bg-green-50">
                         $
                         {deals
-                          .slice(0, 5)
-                          .reduce(
-                            (sum, deal) =>
-                              sum +
-                              (deal.products.includes('GAP Insurance')
-                                ? Math.round(deal.profit * 0.25)
-                                : 0),
-                            0
-                          )
+                          .slice(0, 10)
+                          .reduce((sum, deal) => {
+                            const dealData = deal as any;
+                            const gapProfit =
+                              typeof dealData.gapProfit === 'number'
+                                ? dealData.gapProfit
+                                : parseFloat(dealData.gapProfit) ||
+                                  (deal.products.includes('GAP Insurance')
+                                    ? Math.round(deal.profit * 0.25)
+                                    : 0);
+                            return sum + gapProfit;
+                          }, 0)
                           .toLocaleString()}
                       </td>
                       <td className="py-2 px-2 text-right bg-amber-50">
                         $
                         {deals
-                          .slice(0, 5)
-                          .reduce(
-                            (sum, deal) =>
-                              sum +
-                              (deal.products.includes('Tire & Wheel') ||
-                              deal.products.includes('Tire & Wheel Bundle')
-                                ? Math.round(deal.profit * 0.2)
-                                : 0),
-                            0
-                          )
+                          .slice(0, 10)
+                          .reduce((sum, deal) => {
+                            const dealData = deal as any;
+                            const twProfit =
+                              typeof dealData.tireAndWheelProfit === 'number'
+                                ? dealData.tireAndWheelProfit
+                                : parseFloat(dealData.tireAndWheelProfit) ||
+                                  (deal.products.includes('Tire & Wheel') ||
+                                  deal.products.includes('Tire & Wheel Bundle')
+                                    ? Math.round(deal.profit * 0.2)
+                                    : 0);
+                            return sum + twProfit;
+                          }, 0)
                           .toLocaleString()}
                       </td>
                       <td className="py-2 px-2 text-center bg-pink-50">
                         {(
-                          deals.slice(0, 5).reduce((sum, deal) => sum + deal.products.length, 0) /
-                          Math.max(1, deals.slice(0, 5).length)
+                          deals.slice(0, 10).reduce((sum, deal) => sum + deal.products.length, 0) /
+                          Math.max(1, deals.slice(0, 10).length)
                         ).toFixed(1)}
                       </td>
                       <td className="py-2 px-2 text-right bg-purple-50">
                         $
                         {Math.round(
-                          deals.slice(0, 5).reduce((sum, deal) => sum + deal.profit, 0) /
-                            Math.max(1, deals.slice(0, 5).length)
+                          deals.slice(0, 10).reduce((sum, deal) => sum + deal.profit, 0) /
+                            Math.max(1, deals.slice(0, 10).length)
                         ).toLocaleString()}
                       </td>
                       <td className="py-2 px-2 text-right font-medium text-green-600">
                         $
                         {deals
-                          .slice(0, 5)
+                          .slice(0, 10)
                           .reduce((sum, deal) => sum + deal.profit, 0)
                           .toLocaleString()}
                       </td>
+                      <td className="py-2 px-2"></td>
                       <td className="py-2 px-2"></td>
                     </tr>
                   </tfoot>

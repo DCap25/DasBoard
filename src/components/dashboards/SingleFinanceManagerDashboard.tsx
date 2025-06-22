@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 
 import { SingleFinanceHomePage } from '../../pages/finance/SingleFinanceHomePage';
-import FinanceDealsPage from '../../pages/finance/FinanceDealsPage';
+import SingleFinanceDealsPage from '../../pages/finance/SingleFinanceDealsPage';
 import { getFinanceManagerDeals } from '../../lib/apiService';
 
 // Interface for a deal
@@ -63,48 +63,54 @@ const SingleFinanceManagerDashboard = () => {
     try {
       console.log('[SingleFinanceManagerDashboard] Loading deals from localStorage');
 
-      // Debug: Check what's in localStorage
+      // Load raw deals directly from localStorage to preserve all form data
       const singleFinanceDealsJson = localStorage.getItem('singleFinanceDeals');
-      const financeDealsJson = localStorage.getItem('financeDeals');
       console.log(
         '[SingleFinanceManagerDashboard] Raw singleFinanceDeals:',
         singleFinanceDealsJson
       );
-      console.log('[SingleFinanceManagerDashboard] Raw financeDeals:', financeDealsJson);
 
-      // Use the new deal mapper utility
-      const dashboardData = getDashboardData('single-finance', {
-        userRole: 'single_finance_manager',
-        timePeriod,
-        includeInactive: false,
+      if (!singleFinanceDealsJson) {
+        console.log('[SingleFinanceManagerDashboard] No deals found in localStorage');
+        setDeals([]);
+        return;
+      }
+
+      const rawDeals = JSON.parse(singleFinanceDealsJson);
+      console.log(`[SingleFinanceManagerDashboard] Found ${rawDeals.length} raw deals`);
+      console.log('[SingleFinanceManagerDashboard] First deal sample:', rawDeals[0]);
+
+      // Convert raw deals to component's Deal interface while preserving all extended properties
+      const formattedDeals: Deal[] = rawDeals.map((rawDeal: any) => {
+        // Create the base Deal interface
+        const deal: Deal = {
+          id: rawDeal.id,
+          customer: rawDeal.customer || rawDeal.lastName,
+          vehicle:
+            rawDeal.vehicle ||
+            `${
+              rawDeal.vehicleType === 'N' ? 'New' : rawDeal.vehicleType === 'U' ? 'Used' : 'CPO'
+            } - Stock #${rawDeal.stockNumber}`,
+          vin: rawDeal.vin || rawDeal.vinLast8,
+          saleDate: rawDeal.saleDate || rawDeal.dealDate,
+          salesperson: rawDeal.salesperson || 'Self',
+          amount: rawDeal.amount || rawDeal.totalGross,
+          status: rawDeal.status || rawDeal.dealStatus,
+          products: rawDeal.products || [],
+          profit: rawDeal.profit || rawDeal.backEndGross,
+          created_at: rawDeal.created_at || new Date().toISOString(),
+        };
+
+        // Preserve all the extended properties by copying them to the deal object
+        // This allows the table to access dealData.dealNumber, dealData.vscProfit, etc.
+        return Object.assign(deal, rawDeal);
       });
 
       console.log(
-        `[SingleFinanceManagerDashboard] Found ${dashboardData.deals.length} deals in localStorage`
+        '[SingleFinanceManagerDashboard] Formatted deals with extended properties:',
+        formattedDeals[0]
       );
-      console.log('[SingleFinanceManagerDashboard] Dashboard data:', dashboardData);
-
-      // Convert mapped deals to the component's Deal interface for backward compatibility
-      const formattedDeals: Deal[] = dashboardData.deals.map((mappedDeal: any) => ({
-        id: mappedDeal.id,
-        customer: mappedDeal.customer || mappedDeal.lastName,
-        vehicle: mappedDeal.vehicle,
-        vin: mappedDeal.vin || mappedDeal.vinLast8,
-        saleDate: mappedDeal.saleDate || mappedDeal.dealDate,
-        salesperson: mappedDeal.salesperson || 'Self',
-        amount: mappedDeal.amount || mappedDeal.totalGross,
-        status: mappedDeal.status || mappedDeal.dealStatus,
-        products: mappedDeal.products || mappedDeal.productMix?.map(p => p.name) || [],
-        profit: mappedDeal.profit || mappedDeal.backEndGross,
-        created_at: mappedDeal.created_at || new Date().toISOString(),
-      }));
-
       setDeals(formattedDeals);
-
-      if (dashboardData.error) {
-        console.error('[SingleFinanceManagerDashboard] Deal mapper error:', dashboardData.error);
-        setError(`Warning: ${dashboardData.error}`);
-      }
     } catch (error) {
       console.error(
         '[SingleFinanceManagerDashboard] Error loading deals from localStorage:',
@@ -353,22 +359,23 @@ const SingleFinanceManagerDashboard = () => {
     "Explain how each product benefits the customer's specific vehicle and usage patterns.",
   ];
 
-  return (
-    <div className="container py-4">
+  // Component for the main dashboard content
+  const MainDashboardContent = () => (
+    <>
       {/* Dashboard header */}
       <div className="flex justify-between items-start mb-6">
         <div className="flex-grow">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
             <div>
-              <h1 className="text-3xl font-bold">Finance Manager Dashboard</h1>
+              <h1 className="text-3xl font-bold">Single Finance Manager Dashboard</h1>
               <p className="text-gray-600 mt-1">
                 Finance Manager: {user?.email?.split('@')[0] || 'Not Assigned'}
               </p>
             </div>
 
             {/* Daily Finance Tip - Best Practices */}
-            <div className="bg-blue-50 p-2 rounded-md mt-2 md:mt-0 border border-blue-100 max-w-2xl">
-              <p className="text-xs italic text-blue-800">
+            <div className="bg-orange-50 p-2 rounded-md mt-2 md:mt-0 border border-orange-100 max-w-2xl">
+              <p className="text-xs italic text-orange-800">
                 <Lightbulb className="h-3 w-3 inline-block mr-1" />
                 <strong>F&I Best Practice:</strong>{' '}
                 {bestPractices[new Date().getDay() % bestPractices.length]}
@@ -416,7 +423,7 @@ const SingleFinanceManagerDashboard = () => {
       <Card className="col-span-12 bg-white border-slate-200 shadow-sm">
         <CardHeader className="py-2 px-4 border-b flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-lg font-medium flex items-center">
-            <FileText className="mr-2 h-5 w-5 text-blue-500" />
+            <FileText className="mr-2 h-5 w-5 text-orange-500" />
             Deals Log
           </CardTitle>
           <Button variant="outline" size="sm" asChild>
@@ -435,7 +442,7 @@ const SingleFinanceManagerDashboard = () => {
                     <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
                       Last Name
                     </th>
-                    <th className="font-medium text-white py-2 pl-4 pr-2 text-left bg-blue-600">
+                    <th className="font-medium text-white py-2 pl-4 pr-2 text-left bg-orange-600">
                       Deal #
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
@@ -451,7 +458,7 @@ const SingleFinanceManagerDashboard = () => {
                     <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
                       Lender
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-right bg-blue-600">
+                    <th className="font-medium text-white py-2 px-2 text-right bg-orange-600">
                       Front End
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-right bg-teal-600">VSC</th>
@@ -658,7 +665,7 @@ const SingleFinanceManagerDashboard = () => {
                     <td colSpan={8} className="py-2 pl-4 text-left">
                       TOTALS
                     </td>
-                    <td className="py-2 px-2 text-right bg-blue-50">
+                    <td className="py-2 px-2 text-right bg-orange-50">
                       $
                       {deals
                         .slice(0, 10)
@@ -761,6 +768,16 @@ const SingleFinanceManagerDashboard = () => {
           )}
         </CardContent>
       </Card>
+    </>
+  );
+
+  return (
+    <div className="container py-4">
+      <Routes>
+        <Route path="/" element={<MainDashboardContent />} />
+        <Route path="/deals" element={<SingleFinanceDealsPage />} />
+        <Route path="*" element={<Navigate to="/dashboard/single-finance" replace />} />
+      </Routes>
     </div>
   );
 };

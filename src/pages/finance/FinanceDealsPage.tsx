@@ -38,6 +38,56 @@ const FinanceDealsPage: React.FC = () => {
   const [sortField, setSortField] = useState('saleDate');
   const [sortDirection, setSortDirection] = useState('desc');
 
+  // Handle status change for a deal
+  const handleStatusChange = (dealId: string, newStatus: string) => {
+    try {
+      // Get existing deals from localStorage
+      const existingDealsJson = localStorage.getItem('financeDeals');
+      const existingDeals = existingDealsJson ? JSON.parse(existingDealsJson) : [];
+
+      // Update the deal status
+      const updatedDeals = existingDeals.map((deal: any) =>
+        deal.id === dealId ? { ...deal, status: newStatus } : deal
+      );
+
+      // Save back to localStorage
+      localStorage.setItem('financeDeals', JSON.stringify(updatedDeals));
+
+      // Update local state
+      setDeals(updatedDeals);
+
+      console.log(`[FinanceDealsPage] Updated deal ${dealId} status to ${newStatus}`);
+    } catch (error) {
+      console.error('[FinanceDealsPage] Error updating deal status:', error);
+    }
+  };
+
+  // Handle deal deletion
+  const handleDeleteDeal = (dealId: string, shouldDelete: boolean) => {
+    if (!shouldDelete) return;
+
+    if (confirm('Are you sure you want to delete this deal? This action cannot be undone.')) {
+      try {
+        // Get existing deals from localStorage
+        const existingDealsJson = localStorage.getItem('financeDeals');
+        const existingDeals = existingDealsJson ? JSON.parse(existingDealsJson) : [];
+
+        // Remove the deal
+        const updatedDeals = existingDeals.filter((deal: any) => deal.id !== dealId);
+
+        // Save back to localStorage
+        localStorage.setItem('financeDeals', JSON.stringify(updatedDeals));
+
+        // Update local state
+        setDeals(updatedDeals);
+
+        console.log(`[FinanceDealsPage] Deleted deal ${dealId}`);
+      } catch (error) {
+        console.error('[FinanceDealsPage] Error deleting deal:', error);
+      }
+    }
+  };
+
   const handleBackToDashboard = () => {
     navigate('/dashboard/finance');
   };
@@ -169,93 +219,241 @@ const FinanceDealsPage: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-50 border-b">
-                  <th className="py-3 px-4 text-left font-medium">
+                <tr className="text-xs">
+                  <th className="font-medium text-white py-2 pl-3 text-center bg-gray-600 w-12">
+                    #
+                  </th>
+                  <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
+                    Last Name
+                  </th>
+                  <th className="font-medium text-white py-2 pl-4 pr-2 text-left bg-blue-600">
                     <button className="flex items-center" onClick={() => toggleSort('id')}>
                       Deal #
-                      {sortField === 'id' && (
-                        <ArrowUpDown size={14} className="ml-1 text-gray-500" />
-                      )}
+                      {sortField === 'id' && <ArrowUpDown size={14} className="ml-1 text-white" />}
                     </button>
                   </th>
-                  <th className="py-3 px-4 text-left font-medium">
+                  <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
+                    Stock #
+                  </th>
+                  <th className="font-medium text-white py-2 px-2 text-center bg-gray-600">
                     <button className="flex items-center" onClick={() => toggleSort('saleDate')}>
                       Date
                       {sortField === 'saleDate' && (
-                        <ArrowUpDown size={14} className="ml-1 text-gray-500" />
+                        <ArrowUpDown size={14} className="ml-1 text-white" />
                       )}
                     </button>
                   </th>
-                  <th className="py-3 px-4 text-left font-medium">
-                    <button className="flex items-center" onClick={() => toggleSort('customer')}>
-                      Customer
-                      {sortField === 'customer' && (
-                        <ArrowUpDown size={14} className="ml-1 text-gray-500" />
-                      )}
-                    </button>
+                  <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">VIN</th>
+                  <th className="font-medium text-white py-2 px-2 text-center bg-indigo-600">
+                    N/U/CPO
                   </th>
-                  <th className="py-3 px-4 text-left font-medium">Vehicle</th>
-                  <th className="py-3 px-4 text-left font-medium">Salesperson</th>
-                  <th className="py-3 px-4 text-right font-medium">
-                    <button
-                      className="flex items-center justify-end ml-auto"
-                      onClick={() => toggleSort('amount')}
-                    >
-                      Amount
-                      {sortField === 'amount' && (
-                        <ArrowUpDown size={14} className="ml-1 text-gray-500" />
-                      )}
-                    </button>
+                  <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">Lender</th>
+                  <th className="font-medium text-white py-2 px-2 text-right bg-blue-600">
+                    Front End
                   </th>
-                  <th className="py-3 px-4 text-right font-medium">
+                  <th className="font-medium text-white py-2 px-2 text-right bg-teal-600">VSC</th>
+                  <th className="font-medium text-white py-2 px-2 text-right bg-purple-600">PPM</th>
+                  <th className="font-medium text-white py-2 px-2 text-right bg-green-600">GAP</th>
+                  <th className="font-medium text-white py-2 px-2 text-right bg-amber-600">
+                    T&W/Bundle
+                  </th>
+                  <th className="font-medium text-white py-2 px-2 text-center bg-pink-600">PPD</th>
+                  <th className="font-medium text-white py-2 px-2 text-right bg-purple-600">PVR</th>
+                  <th className="font-medium text-white py-2 px-2 text-right bg-green-600">
                     <button
                       className="flex items-center justify-end ml-auto"
                       onClick={() => toggleSort('profit')}
                     >
-                      F&I Profit
+                      Total
                       {sortField === 'profit' && (
-                        <ArrowUpDown size={14} className="ml-1 text-gray-500" />
+                        <ArrowUpDown size={14} className="ml-1 text-white" />
                       )}
                     </button>
                   </th>
-                  <th className="py-3 px-4 text-center font-medium">Status</th>
-                  <th className="py-3 px-4 text-center font-medium">Actions</th>
+                  <th className="font-medium text-white py-2 px-2 text-center bg-gray-600 w-20">
+                    Status
+                  </th>
+                  <th className="font-medium text-white py-2 px-2 text-center bg-red-600 rounded-tr-md w-16">
+                    Delete
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {filteredDeals.length > 0 ? (
-                  filteredDeals.map(deal => (
-                    <tr key={deal.id} className="border-b hover:bg-gray-50">
-                      <td className="py-3 px-4 text-left font-medium text-blue-600">{deal.id}</td>
-                      <td className="py-3 px-4 text-left">{deal.saleDate}</td>
-                      <td className="py-3 px-4 text-left font-medium">{deal.customer}</td>
-                      <td className="py-3 px-4 text-left">
-                        <div>{deal.vehicle}</div>
-                        <div className="text-xs text-gray-500">VIN: {deal.vin}</div>
-                      </td>
-                      <td className="py-3 px-4 text-left">{deal.salesperson}</td>
-                      <td className="py-3 px-4 text-right font-medium">
-                        ${deal.amount.toLocaleString()}
-                      </td>
-                      <td className="py-3 px-4 text-right font-medium text-green-600">
-                        ${deal.profit.toLocaleString()}
-                      </td>
-                      <td className="py-3 px-4 text-center">{getStatusBadge(deal.status)}</td>
-                      <td className="py-3 px-4 text-center">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="bg-blue-50 text-blue-600 hover:bg-blue-100"
-                        >
-                          <FileEdit size={16} className="mr-1" />
-                          Edit
-                        </Button>
-                      </td>
-                    </tr>
-                  ))
+                  filteredDeals.map((deal, index) => {
+                    // Get individual product profits from deal data or calculate from legacy data
+                    const dealData = deal as any; // Type assertion to access extended properties
+
+                    // Extract last name from customer
+                    const lastName = deal.customer.split(' ').pop() || '';
+
+                    // Format date for display - use actual deal date from form
+                    const actualDealDate = dealData.dealDate || deal.saleDate;
+                    const dealDate = new Date(actualDealDate);
+                    const formattedDate = dealDate.toLocaleDateString('en-US', {
+                      month: '2-digit',
+                      day: '2-digit',
+                      year: '2-digit',
+                    });
+
+                    // Determine if New, Used or CPO - use actual form data
+                    const vehicleType =
+                      dealData.vehicleType ||
+                      (deal.vehicle.toLowerCase().includes('new')
+                        ? 'N'
+                        : deal.vehicle.toLowerCase().includes('cpo')
+                        ? 'C'
+                        : 'U');
+
+                    // Get individual product profits - ensure we handle both number and string values
+                    const vscProfit =
+                      typeof dealData.vscProfit === 'number'
+                        ? dealData.vscProfit
+                        : parseFloat(dealData.vscProfit) ||
+                          (deal.products.includes('Extended Warranty') ||
+                          deal.products.includes('Vehicle Service Contract (VSC)')
+                            ? Math.round(deal.profit * 0.35)
+                            : 0);
+
+                    const ppmProfit =
+                      typeof dealData.ppmProfit === 'number'
+                        ? dealData.ppmProfit
+                        : parseFloat(dealData.ppmProfit) ||
+                          (deal.products.includes('Paint Protection') ||
+                          deal.products.includes('Paint and Fabric Protection') ||
+                          deal.products.includes('PPM') ||
+                          deal.products.includes('PrePaid Maintenance (PPM)')
+                            ? Math.round(deal.profit * 0.2)
+                            : 0);
+
+                    const gapProfit =
+                      typeof dealData.gapProfit === 'number'
+                        ? dealData.gapProfit
+                        : parseFloat(dealData.gapProfit) ||
+                          (deal.products.includes('GAP Insurance')
+                            ? Math.round(deal.profit * 0.25)
+                            : 0);
+
+                    const twProfit =
+                      typeof dealData.tireAndWheelProfit === 'number'
+                        ? dealData.tireAndWheelProfit
+                        : parseFloat(dealData.tireAndWheelProfit) ||
+                          (deal.products.includes('Tire & Wheel') ||
+                          deal.products.includes('Tire & Wheel Bundle')
+                            ? Math.round(deal.profit * 0.2)
+                            : 0);
+
+                    // Products per deal
+                    const ppd = deal.products.length;
+
+                    // PVR (per vehicle retailed) - using profit as estimation
+                    const pvr = Math.round(deal.profit / (ppd || 1));
+
+                    // Get status based on deal status or default to "Pending"
+                    const status =
+                      deal.status === 'Complete' || deal.status === 'Funded'
+                        ? 'Funded'
+                        : deal.status === 'Canceled' || deal.status === 'Unwound'
+                        ? 'Unwound'
+                        : deal.status === 'Dead Deal'
+                        ? 'Dead Deal'
+                        : 'Pending';
+
+                    // Status badge colors
+                    const statusColor =
+                      status === 'Funded'
+                        ? 'bg-green-100 text-green-800 border-green-200'
+                        : status === 'Unwound'
+                        ? 'bg-red-100 text-red-800 border-red-200'
+                        : status === 'Dead Deal'
+                        ? 'bg-gray-100 text-gray-800 border-gray-200'
+                        : 'bg-amber-100 text-amber-800 border-amber-200';
+
+                    return (
+                      <tr
+                        key={deal.id}
+                        className={`border-b ${
+                          index % 2 === 1 ? 'bg-gray-50' : ''
+                        } hover:bg-blue-50`}
+                      >
+                        <td className="py-2 px-2 text-center font-medium">
+                          {filteredDeals.length - index}
+                        </td>
+                        <td className="py-2 px-2 text-left font-medium">{lastName}</td>
+                        <td className="py-2 pl-4 pr-2 text-left font-medium text-blue-600">
+                          {dealData.dealNumber || deal.id}
+                        </td>
+                        <td className="py-2 px-2 text-left font-mono">
+                          {dealData.stockNumber || deal.id.replace('D', 'S')}
+                        </td>
+                        <td className="py-2 px-2 text-center text-gray-600">{formattedDate}</td>
+                        <td className="py-2 px-2 text-left font-mono text-xs">
+                          {deal.vin ? `...${deal.vin.slice(-8)}` : dealData.vinLast8 || 'N/A'}
+                        </td>
+                        <td className="py-2 px-2 text-center">
+                          <span
+                            className={`px-1.5 py-0.5 rounded text-xs font-medium ${
+                              vehicleType === 'N'
+                                ? 'bg-green-100 text-green-800'
+                                : vehicleType === 'C'
+                                ? 'bg-blue-100 text-blue-800'
+                                : 'bg-amber-100 text-amber-800'
+                            }`}
+                          >
+                            {vehicleType}
+                          </span>
+                        </td>
+                        <td className="py-2 px-2 text-left">{dealData.lender || 'N/A'}</td>
+                        <td className="py-2 px-2 text-right bg-blue-50 font-medium">
+                          $
+                          {(
+                            dealData.frontEndGross || Math.round(deal.amount * 0.7)
+                          ).toLocaleString()}
+                        </td>
+                        <td className="py-2 px-2 text-right bg-teal-50">
+                          ${vscProfit.toLocaleString()}
+                        </td>
+                        <td className="py-2 px-2 text-right bg-purple-50">
+                          ${ppmProfit.toLocaleString()}
+                        </td>
+                        <td className="py-2 px-2 text-right bg-green-50">
+                          ${gapProfit.toLocaleString()}
+                        </td>
+                        <td className="py-2 px-2 text-right bg-amber-50">
+                          ${twProfit.toLocaleString()}
+                        </td>
+                        <td className="py-2 px-2 text-center bg-pink-50 font-medium">{ppd}</td>
+                        <td className="py-2 px-2 text-right bg-purple-50">
+                          ${pvr.toLocaleString()}
+                        </td>
+                        <td className="py-2 px-2 text-right font-medium text-green-600">
+                          ${deal.profit.toLocaleString()}
+                        </td>
+                        <td className="py-2 px-2 text-center">
+                          <select
+                            value={status}
+                            onChange={e => handleStatusChange(deal.id, e.target.value)}
+                            className={`text-xs px-2 py-1 rounded border-0 focus:ring-1 focus:ring-blue-500 ${statusColor}`}
+                          >
+                            <option value="Pending">Pending</option>
+                            <option value="Funded">Funded</option>
+                            <option value="Unwound">Unwound</option>
+                            <option value="Dead Deal">Dead Deal</option>
+                          </select>
+                        </td>
+                        <td className="py-2 px-2 text-center">
+                          <input
+                            type="checkbox"
+                            onChange={e => handleDeleteDeal(deal.id, e.target.checked)}
+                            className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
-                    <td colSpan={9} className="py-10 text-center text-gray-500">
+                    <td colSpan={18} className="py-10 text-center text-gray-500">
                       No deals match your filter criteria. Try adjusting your filters.
                     </td>
                   </tr>

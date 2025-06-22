@@ -290,16 +290,18 @@ export default function LogFinanceManagerDeal() {
       if (parseFloat(formData.extWarrantyProfit) > 0) productsSold.push('Extended Warranty');
       if (parseFloat(formData.otherProfit) > 0) productsSold.push('Other');
 
-      // Prepare deal data for metrics calculation
+      // Prepare deal data for metrics calculation - FINANCE MANAGER SPECIFIC
       const dealData = {
         id: dealId,
         customer_name: formData.customerName,
+        customer: formData.customerName, // Backward compatibility
         vehicle: `${
           formData.vehicleType === 'N' ? 'New' : formData.vehicleType === 'U' ? 'Used' : 'CPO'
         } - ${formData.vehicleDescription}`,
         vin: formData.vinLast8,
         stock_number: formData.stockNumber,
         sale_date: formData.saleDate,
+        saleDate: formData.saleDate, // Backward compatibility
         deal_type: formData.dealType,
         salesperson: salespersonDisplay,
         salesperson_id: formData.salespersonId,
@@ -309,6 +311,8 @@ export default function LogFinanceManagerDeal() {
         front_end_gross: parseFloat(formData.frontEndGross) || 0,
         back_end_gross: parseFloat(formData.backEndGross) || 0,
         total_gross: parseFloat(formData.totalGross) || 0,
+        amount: parseFloat(formData.totalGross) || 0, // Backward compatibility
+        profit: parseFloat(formData.backEndGross) || 0, // Backward compatibility
         reserve_flat: parseFloat(formData.reserveFlat) || 0,
         vsc_profit: parseFloat(formData.vscProfit) || 0,
         gap_profit: parseFloat(formData.gapProfit) || 0,
@@ -327,6 +331,9 @@ export default function LogFinanceManagerDeal() {
         vsc_sold: parseFloat(formData.vscProfit) > 0,
         created_by: user?.email || 'unknown',
         created_at: new Date().toISOString(),
+        // Mark as Finance Manager deal
+        dashboard_type: 'finance_manager',
+        schema_name: schemaName,
       };
 
       // Save to localStorage for backward compatibility
@@ -348,7 +355,7 @@ export default function LogFinanceManagerDeal() {
           description: 'Deal logged successfully!',
         });
 
-        navigate('/dashboard/single-finance');
+        navigate('/dashboard/finance');
       } else {
         console.error('[LogFinanceManagerDeal] Error logging deal:', result.error);
         toast({
@@ -375,7 +382,7 @@ export default function LogFinanceManagerDeal() {
         <h1 className="text-2xl font-bold">Log New Deal</h1>
         <Button
           variant="outline"
-          onClick={() => navigate('/dashboard/single-finance')}
+          onClick={() => navigate('/dashboard/finance')}
           className="flex items-center"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
