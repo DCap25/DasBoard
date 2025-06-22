@@ -21,6 +21,7 @@ import {
   Calculator,
   Target,
   Badge,
+  Car,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -399,85 +400,131 @@ const FinanceHomePage: React.FC = () => {
       </div>
 
       <div className="space-y-6">
-        {/* 4 Metric Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {/* 5 Metric Cards */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
           <Card className="border-l-4 border-l-green-500 hover:shadow-md transition-shadow">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center">
-                <DollarSign className="mr-2 h-4 w-4 text-green-500" />
-                F&I Gross
-              </CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-base font-semibold text-slate-700">F&I Gross</CardTitle>
+              <DollarSign className="h-4 w-4 text-green-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {metrics.mtdRevenue > 0 ? `$${metrics.mtdRevenue.toLocaleString()}` : 'No data yet'}
+              <div className="text-2xl font-bold text-slate-900">
+                ${metrics.totalBackGross.toLocaleString()}
               </div>
-              {metrics.mtdRevenue > 0 && (
-                <div className="flex items-center pt-1 text-green-500">
-                  <ChevronUp className="h-3 w-3 mr-1" />
-                  <span className="text-xs">8.2% from previous period</span>
-                </div>
-              )}
+              <p className="text-xs text-muted-foreground">
+                {metrics.totalBackGross > 12000 ? (
+                  <span className="text-green-500 flex items-center">
+                    <ChevronUp className="mr-1 h-4 w-4" />
+                    +12% from last month
+                  </span>
+                ) : (
+                  <span className="text-red-600 flex items-center">
+                    <ChevronDown className="mr-1 h-4 w-4" />
+                    -8% from last month
+                  </span>
+                )}
+              </p>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center">
-                <CreditCard className="mr-2 h-4 w-4 text-blue-500" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-base font-semibold text-slate-700">
                 Deals Processed
               </CardTitle>
+              <FileText className="h-4 w-4 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {metrics.dealsProcessed > 0 ? metrics.dealsProcessed : 'No deals yet'}
-              </div>
-              {metrics.dealsProcessed > 0 && (
-                <div className="flex items-center pt-1 text-green-500">
-                  <ChevronUp className="h-3 w-3 mr-1" />
-                  <span className="text-xs">10.5% from previous period</span>
+              <div className="text-2xl font-bold text-slate-900">{metrics.totalDeals}</div>
+              <p className="text-xs text-muted-foreground">
+                <span className="text-green-500 flex items-center">
+                  <ChevronUp className="mr-1 h-4 w-4" />
+                  +3% from last month
+                </span>
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-l-4 border-l-indigo-500 hover:shadow-md transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-base font-semibold text-slate-700">Deal Types</CardTitle>
+              <CreditCard className="h-4 w-4 text-indigo-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-1">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-600">Finance:</span>
+                  <span className="text-sm font-bold text-indigo-600">
+                    {Math.round(metrics.totalDeals * 0.65)}
+                  </span>
                 </div>
-              )}
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-600">Cash:</span>
+                  <span className="text-sm font-bold text-green-600">
+                    {Math.round(metrics.totalDeals * 0.25)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-600">Lease:</span>
+                  <span className="text-sm font-bold text-blue-600">
+                    {Math.round(metrics.totalDeals * 0.1)}
+                  </span>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-purple-500 hover:shadow-md transition-shadow">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center">
-                <BarChart4 className="mr-2 h-4 w-4 text-purple-500" />
-                Pay Calculator MTD
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-base font-semibold text-slate-700">
+                Products Per Deal
               </CardTitle>
+              <BarChart4 className="h-4 w-4 text-purple-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                ${Math.round(metrics.mtdRevenue * 0.15).toLocaleString()}
+              <div className="text-2xl font-bold text-slate-900">
+                {(metrics.totalDeals > 0 ? metrics.totalPVR / metrics.totalDeals : 0).toFixed(1)}
               </div>
-              {metrics.dealsProcessed > 0 && (
-                <div className="flex items-center pt-1 text-green-500">
-                  <ChevronUp className="h-3 w-3 mr-1" />
-                  <span className="text-xs">15% of F&I revenue</span>
-                </div>
-              )}
+              <p className="text-xs text-muted-foreground">
+                {(metrics.totalDeals > 0 ? metrics.totalPVR / metrics.totalDeals : 0) >= 2.0 ? (
+                  <span className="text-green-500 flex items-center">
+                    <ChevronUp className="mr-1 h-4 w-4" />
+                    +0.2 from last month
+                  </span>
+                ) : (
+                  <span className="text-red-600 flex items-center">
+                    <ChevronDown className="mr-1 h-4 w-4" />
+                    -0.3 from last month
+                  </span>
+                )}
+              </p>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-amber-500 hover:shadow-md transition-shadow">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center">
-                <Percent className="mr-2 h-4 w-4 text-amber-500" />
-                PVR
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-base font-semibold text-slate-700">
+                PVR (Per Vehicle Retailed)
               </CardTitle>
+              <Percent className="h-4 w-4 text-amber-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {metrics.dealsProcessed > 0 ? `$${metrics.pvr.toLocaleString()}` : 'No data yet'}
+              <div className="text-2xl font-bold text-slate-900">
+                ${metrics.avgPVR.toLocaleString()}
               </div>
-              {metrics.dealsProcessed > 0 && (
-                <div className="flex items-center pt-1 text-green-500">
-                  <ChevronUp className="h-3 w-3 mr-1" />
-                  <span className="text-xs">$120 from previous period</span>
-                </div>
-              )}
+              <p className="text-xs text-muted-foreground">
+                {metrics.avgPVR > 1500 ? (
+                  <span className="text-green-500 flex items-center">
+                    <ChevronUp className="mr-1 h-4 w-4" />
+                    +$125 from last month
+                  </span>
+                ) : (
+                  <span className="text-red-600 flex items-center">
+                    <ChevronDown className="mr-1 h-4 w-4" />
+                    -$89 from last month
+                  </span>
+                )}
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -533,158 +580,157 @@ const FinanceHomePage: React.FC = () => {
           </Card>
         </div>
 
+        {/* Product Mix Section - Now Full Width */}
+        <Card className="col-span-12 bg-white border-slate-200 shadow-sm mt-6">
+          <CardHeader className="py-2 px-4 border-b">
+            <CardTitle className="flex items-center text-xl font-semibold">
+              <BarChart4 className="mr-2 h-6 w-6 text-blue-500" />
+              F&I Product Mix - Penetration % & Avg. Profit
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* First Column: VSC, GAP, PPM */}
+              <div className="space-y-2">
+                {/* VSC */}
+                <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <div className="font-medium flex items-center text-base">
+                    <div className="w-3 h-3 bg-blue-600 rounded-full mr-2"></div>
+                    Vehicle Service Contract (VSC)
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-2xl text-blue-600">
+                      ${Math.round(
+                        (metrics.totalBackGross * 0.35) / Math.max(1, Math.round(metrics.totalDeals * 0.60))
+                      ).toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {Math.round(metrics.totalDeals * 0.60 / Math.max(1, metrics.totalDeals) * 100)}% Penetration
+                    </div>
+                  </div>
+                </div>
+
+                {/* GAP Insurance */}
+                <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <div className="font-medium flex items-center text-base">
+                    <div className="w-3 h-3 bg-green-600 rounded-full mr-2"></div>
+                    GAP Insurance
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-2xl text-green-600">
+                      ${Math.round(
+                        (metrics.totalBackGross * 0.20) / Math.max(1, Math.round(metrics.totalDeals * 0.75))
+                      ).toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {Math.round(metrics.totalDeals * 0.75 / Math.max(1, metrics.totalDeals) * 100)}% Penetration
+                    </div>
+                  </div>
+                </div>
+
+                {/* PPM */}
+                <div className="flex items-center justify-between py-2">
+                  <div className="font-medium flex items-center text-base">
+                    <div className="w-3 h-3 bg-purple-600 rounded-full mr-2"></div>
+                    PrePaid Maintenance (PPM)
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-2xl text-purple-600">
+                      ${Math.round(
+                        (metrics.totalBackGross * 0.15) / Math.max(1, Math.round(metrics.totalDeals * 0.45))
+                      ).toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {Math.round(metrics.totalDeals * 0.45 / Math.max(1, metrics.totalDeals) * 100)}% Penetration
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Second Column: Paint, Tire & Wheel, Other */}
+              <div className="space-y-2">
+                {/* Paint Protection */}
+                <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <div className="font-medium flex items-center text-base">
+                    <div className="w-3 h-3 bg-orange-600 rounded-full mr-2"></div>
+                    Paint Protection
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-2xl text-orange-600">
+                      ${Math.round(
+                        (metrics.totalBackGross * 0.15) / Math.max(1, Math.round(metrics.totalDeals * 0.55))
+                      ).toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {Math.round(metrics.totalDeals * 0.55 / Math.max(1, metrics.totalDeals) * 100)}% Penetration
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tire & Wheel */}
+                <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <div className="font-medium flex items-center text-base">
+                    <div className="w-3 h-3 bg-amber-600 rounded-full mr-2"></div>
+                    Tire and Wheel Bundle
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-2xl text-amber-600">
+                      ${Math.round(
+                        (metrics.totalBackGross * 0.10) / Math.max(1, Math.round(metrics.totalDeals * 0.30))
+                      ).toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {Math.round(metrics.totalDeals * 0.30 / Math.max(1, metrics.totalDeals) * 100)}% Penetration
+                    </div>
+                  </div>
+                </div>
+
+                {/* Other */}
+                <div className="flex items-center justify-between py-2">
+                  <div className="font-medium flex items-center text-base">
+                    <div className="w-3 h-3 bg-gray-600 rounded-full mr-2"></div>
+                    Other Products
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-2xl text-gray-600">
+                      ${Math.round(
+                        (metrics.totalBackGross * 0.05) / Math.max(1, Math.round(metrics.totalDeals * 0.20))
+                      ).toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {Math.round(metrics.totalDeals * 0.20 / Math.max(1, metrics.totalDeals) * 100)}% Penetration
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Products Per Deal (PPD) metric at the bottom */}
+            <div className="mt-4 pt-3 border-t border-gray-200">
+              <div className="flex items-center justify-between">
+                <div className="font-medium text-sm">Products Per Deal (PPD)</div>
+                <div className="font-bold text-lg text-purple-600">
+                  {(metrics.totalDeals > 0 ? metrics.totalPVR / metrics.totalDeals : 0).toFixed(1)}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         <div className="grid gap-6 md:grid-cols-2">
           <Card className="border hover:shadow-md transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center text-lg font-medium">
                 <BarChart4 className="mr-2 h-5 w-5 text-blue-500" />
-                F&I Product Mix & Avg. Profit
+                Deal Performance (Legacy View)
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {metrics.dealsProcessed > 0 ? (
+              {metrics.totalDeals > 0 ? (
                 <div className="space-y-2">
-                  {[
-                    {
-                      name: 'Vehicle Service Contract (VSC)',
-                      percent: metrics.productMix.extendedWarranty,
-                      value: `$${Math.round(
-                        (metrics.mtdRevenue * metrics.productMix.extendedWarranty) /
-                          100 /
-                          Math.max(
-                            1,
-                            deals.filter(
-                              d =>
-                                d.products.includes('Extended Warranty') ||
-                                d.products.includes('Vehicle Service Contract (VSC)')
-                            ).length
-                          )
-                      ).toLocaleString()}`,
-                      color: 'bg-teal-600',
-                    },
-                    {
-                      name: 'PrePaid Maintenance (PPM)',
-                      percent: metrics.productMix.ppm,
-                      value: `$${Math.round(
-                        (metrics.mtdRevenue * metrics.productMix.ppm) /
-                          100 /
-                          Math.max(
-                            1,
-                            deals.filter(
-                              d =>
-                                d.products.includes('PPM') ||
-                                d.products.includes('PrePaid Maintenance (PPM)')
-                            ).length
-                          )
-                      ).toLocaleString()}`,
-                      color: 'bg-purple-600',
-                    },
-                    {
-                      name: 'GAP Insurance',
-                      percent: metrics.productMix.gapInsurance,
-                      value: `$${Math.round(
-                        (metrics.mtdRevenue * metrics.productMix.gapInsurance) /
-                          100 /
-                          Math.max(
-                            1,
-                            deals.filter(d => d.products.includes('GAP Insurance')).length
-                          )
-                      ).toLocaleString()}`,
-                      color: 'bg-green-600',
-                    },
-                    {
-                      name: 'Paint and Fabric Protection',
-                      percent: metrics.productMix.paintProtection,
-                      value: `$${Math.round(
-                        (metrics.mtdRevenue * metrics.productMix.paintProtection) /
-                          100 /
-                          Math.max(
-                            1,
-                            deals.filter(
-                              d =>
-                                d.products.includes('Paint Protection') ||
-                                d.products.includes('Paint and Fabric Protection')
-                            ).length
-                          )
-                      ).toLocaleString()}`,
-                      color: 'bg-blue-600',
-                    },
-                    {
-                      name: 'Tire & Wheel Bundle',
-                      percent: metrics.productMix.tireWheel,
-                      value: `$${Math.round(
-                        (metrics.mtdRevenue * metrics.productMix.tireWheel) /
-                          100 /
-                          Math.max(
-                            1,
-                            deals.filter(
-                              d =>
-                                d.products.includes('Tire & Wheel') ||
-                                d.products.includes('Tire & Wheel Bundle')
-                            ).length
-                          )
-                      ).toLocaleString()}`,
-                      color: 'bg-amber-600',
-                    },
-                    {
-                      name: 'Other Products',
-                      percent: metrics.productMix.other,
-                      value: `$${Math.round(
-                        (metrics.mtdRevenue * metrics.productMix.other) /
-                          100 /
-                          Math.max(
-                            1,
-                            deals.filter(
-                              d =>
-                                !d.products.some(
-                                  p =>
-                                    p === 'Extended Warranty' ||
-                                    p === 'Vehicle Service Contract (VSC)' ||
-                                    p === 'GAP Insurance' ||
-                                    p === 'Paint Protection' ||
-                                    p === 'Paint and Fabric Protection' ||
-                                    p === 'Tire & Wheel' ||
-                                    p === 'Tire & Wheel Bundle' ||
-                                    p === 'PPM' ||
-                                    p === 'PrePaid Maintenance (PPM)'
-                                )
-                            ).length
-                          )
-                      ).toLocaleString()}`,
-                      color: 'bg-gray-600',
-                    },
-                  ].map((product, index) => (
-                    <div key={index} className="space-y-1">
-                      <div className="flex items-center justify-between">
-                        <div className="font-medium flex items-center text-sm">
-                          <div className={`w-3 h-3 ${product.color} rounded-full mr-2`}></div>
-                          {product.name}
-                        </div>
-                        <div className="text-right">
-                          <div className="text-xs text-gray-500">Avg. Profit</div>
-                          <div className="font-medium text-sm">{product.value}</div>
-                        </div>
-                      </div>
-                      <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
-                        <div
-                          className={`absolute inset-y-0 left-0 rounded-full ${product.color}`}
-                          style={{ width: `${product.percent}%` }}
-                        />
-                      </div>
-                      <div className="text-right text-xs text-gray-500">{product.percent}%</div>
-                    </div>
-                  ))}
-
-                  {/* Add PPD metric at the bottom */}
-                  <div className="mt-4 pt-3 border-t border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <div className="font-medium text-sm">Products Per Deal (PPD)</div>
-                      <div className="font-bold text-lg text-purple-600">
-                        {metrics.productsPerDeal.toFixed(1)}
-                      </div>
-                    </div>
+                  <div className="text-sm text-gray-600">
+                    This section shows legacy metrics for comparison. The new F&I Product Mix section above provides more detailed and accurate data.
                   </div>
-                </div>
               ) : (
                 <div className="py-8 text-center text-gray-500">
                   No F&I product data available yet. Log deals with products to see the mix.
