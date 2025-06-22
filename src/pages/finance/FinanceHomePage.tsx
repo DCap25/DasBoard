@@ -8,7 +8,6 @@ import {
   ChevronUp,
   ChevronDown,
   BarChart4,
-  CreditCard,
   Percent,
   Calendar,
   Filter,
@@ -30,22 +29,7 @@ import {
   DropdownMenuTrigger,
 } from '../../components/ui/dropdown-menu';
 
-// Interface for a deal
-interface Deal {
-  id: string;
-  customer: string;
-  vehicle: string;
-  vin: string;
-  saleDate: string;
-  salesperson: string;
-  amount: number;
-  status: string;
-  products: string[];
-  profit: number;
-  created_at: string;
-}
-
-// Interface for metrics
+// Legacy interface for backward compatibility with existing components
 interface Metrics {
   mtdRevenue: number;
   dealsProcessed: number;
@@ -231,120 +215,16 @@ const FinanceHomePage: React.FC = () => {
   // Apply custom date range
   const applyCustomDateRange = () => {
     if (customDateRange.start && customDateRange.end) {
-      filterDealsByDateRange();
+      // The hook will handle the filtering based on the custom date range
+      setHookTimePeriod('custom');
     }
   };
 
   // Load deals from localStorage
+  // Update the hook when time period changes
   useEffect(() => {
-    try {
-      const storedDeals = localStorage.getItem('financeDeals');
-      if (storedDeals) {
-        const parsedDeals = JSON.parse(storedDeals);
-        setDeals(parsedDeals);
-
-        // Filter for pending deals
-        const pendingDealsFilter = parsedDeals.filter(
-          (deal: Deal) =>
-            deal.status === 'Pending' ||
-            deal.status === 'Bank Approval' ||
-            deal.status === 'Pending Documents' ||
-            deal.status === 'Contract Review' ||
-            deal.status === 'Insurance Verification'
-        );
-        setPendingDeals(pendingDealsFilter);
-      }
-    } catch (error) {
-      console.error('Error loading deals from localStorage:', error);
-    }
-  }, []);
-
-  // Filter deals by date range when time period changes
-  useEffect(() => {
-    filterDealsByDateRange();
-  }, [deals, timePeriod, customDateRange]);
-
-  // Filter deals by selected date range
-  const filterDealsByDateRange = () => {
-    if (!deals.length) return;
-
-    const { startDate, endDate } = getDateRange(timePeriod);
-
-    const filtered = deals.filter(deal => {
-      const dealDate = new Date(deal.saleDate);
-      return dealDate >= startDate && dealDate <= endDate;
-    });
-
-    setFilteredDeals(filtered);
-    calculateMetrics(filtered);
-  };
-
-  // Calculate metrics based on deals
-  const calculateMetrics = (deals: Deal[]) => {
-    // Calculate total F&I revenue for the time period
-    const totalRevenue = deals.reduce((total, deal) => total + deal.profit, 0);
-
-    // Calculate deals processed in this time period
-    const dealsProcessed = deals.length;
-
-    // Calculate average products per deal
-    const totalProducts = deals.reduce((total, deal) => total + deal.products.length, 0);
-    const productsPerDeal = dealsProcessed > 0 ? totalProducts / dealsProcessed : 0;
-
-    // Calculate PVR (Per Vehicle Retailed)
-    const pvr = dealsProcessed > 0 ? totalRevenue / dealsProcessed : 0;
-
-    // Calculate product mix percentages
-    let extendedWarrantyCount = 0;
-    let gapInsuranceCount = 0;
-    let paintProtectionCount = 0;
-    let tireWheelCount = 0;
-    let ppmCount = 0;
-    let otherCount = 0;
-
-    deals.forEach(deal => {
-      deal.products.forEach(product => {
-        if (product === 'Extended Warranty' || product === 'Vehicle Service Contract (VSC)')
-          extendedWarrantyCount++;
-        else if (product === 'GAP Insurance') gapInsuranceCount++;
-        else if (product === 'Paint Protection' || product === 'Paint and Fabric Protection')
-          paintProtectionCount++;
-        else if (product === 'Tire & Wheel' || product === 'Tire & Wheel Bundle') tireWheelCount++;
-        else if (product === 'PPM' || product === 'PrePaid Maintenance (PPM)') ppmCount++;
-        else otherCount++;
-      });
-    });
-
-    const totalProductCount =
-      extendedWarrantyCount +
-      gapInsuranceCount +
-      paintProtectionCount +
-      tireWheelCount +
-      ppmCount +
-      otherCount;
-
-    // Calculate percentages, handling the case where totalProductCount is 0
-    const calculatePercentage = (count: number) =>
-      totalProductCount > 0 ? Math.round((count / totalProductCount) * 100) : 0;
-
-    const productMix = {
-      extendedWarranty: calculatePercentage(extendedWarrantyCount),
-      gapInsurance: calculatePercentage(gapInsuranceCount),
-      paintProtection: calculatePercentage(paintProtectionCount),
-      tireWheel: calculatePercentage(tireWheelCount),
-      ppm: calculatePercentage(ppmCount),
-      other: calculatePercentage(otherCount),
-    };
-
-    // Update metrics state
-    setMetrics({
-      mtdRevenue: totalRevenue,
-      dealsProcessed,
-      productsPerDeal,
-      pvr,
-      productMix,
-    });
-  };
+    setHookTimePeriod(timePeriod);
+  }, [timePeriod, setHookTimePeriod]);
 
   // Helper to highlight today in the schedule
   const isToday = (day: string) => {
@@ -448,7 +328,7 @@ const FinanceHomePage: React.FC = () => {
           <Card className="border-l-4 border-l-indigo-500 hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-base font-semibold text-slate-700">Deal Types</CardTitle>
-              <CreditCard className="h-4 w-4 text-indigo-500" />
+              <Car className="h-4 w-4 text-indigo-500" />
             </CardHeader>
             <CardContent>
               <div className="space-y-1">
