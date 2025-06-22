@@ -13,9 +13,8 @@ export const mapVehicleType = vehicleType => {
     case 'N':
       return 'New';
     case 'U':
-      return 'Used';
     case 'C':
-      return 'CPO';
+      return 'Used';
     default:
       return 'Unknown';
   }
@@ -263,6 +262,171 @@ export const mapDealData = (rawDeal, options = {}) => {
 };
 
 /**
+ * Maps deal data specifically for Sales Manager dashboard
+ * @param {Array} deals - Array of raw deals
+ * @param {string} dealershipId - Dealership ID to filter by
+ * @param {string} timePeriod - Time period for filtering
+ * @returns {Object} Manager dashboard formatted data
+ */
+export const mapManagerDashboardData = (deals, dealershipId, timePeriod = 'this-month') => {
+  try {
+    // Map all deals first
+    const mappedDeals = deals.map(deal =>
+      mapDealData(deal, {
+        dashboardType: 'sales-manager',
+        userRole: 'sales_manager',
+      })
+    );
+
+    // Filter by dealership if specified
+    let filteredDeals = mappedDeals.filter(deal => {
+      if (dealershipId && deal.raw.dealershipId && deal.raw.dealershipId !== dealershipId) {
+        return false;
+      }
+      return deal.isActive;
+    });
+
+    // Time period filtering
+    if (timePeriod !== 'all-time') {
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth();
+
+      filteredDeals = filteredDeals.filter(deal => {
+        const dealDate = new Date(deal.dealDate);
+
+        switch (timePeriod) {
+          case 'this-month':
+            return dealDate.getFullYear() === currentYear && dealDate.getMonth() === currentMonth;
+          case 'last-month':
+            const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+            const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+            return dealDate.getFullYear() === lastMonthYear && dealDate.getMonth() === lastMonth;
+          case 'ytd':
+            return dealDate.getFullYear() === currentYear;
+          case 'last-year':
+            return dealDate.getFullYear() === currentYear - 1;
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Calculate manager-specific metrics
+    const totalDeals = filteredDeals.length;
+    const fundedDeals = filteredDeals.filter(d => d.metricFlags.countsForSold).length;
+    const pendingDeals = filteredDeals.filter(d => d.metricFlags.countsForTracking).length;
+    const newVehicleDeals = filteredDeals.filter(d => d.vehicleType === 'N').length;
+    const usedVehicleDeals = filteredDeals.filter(
+      d => d.vehicleType === 'U' || d.vehicleType === 'C'
+    ).length;
+
+    const totalFrontGross = filteredDeals.reduce((sum, d) => sum + d.frontEndGross, 0);
+    const totalBackGross = filteredDeals.reduce((sum, d) => sum + d.backEndGross, 0);
+    const totalGross = filteredDeals.reduce((sum, d) => sum + d.totalGross, 0);
+
+    // Calculate per-salesperson metrics
+    const salespersonMetrics = {};
+    filteredDeals.forEach(deal => {
+      const salespersonId = deal.primarySalespersonId || 'unknown';
+      if (!salespersonMetrics[salespersonId]) {
+        salespersonMetrics[salespersonId] = {
+          salespersonId,
+          salespersonName:
+            deal.raw.salespersonName || deal.raw.salesperson || `SP-${salespersonId}`,
+          totalDeals: 0,
+          fundedDeals: 0,
+          totalFrontGross: 0,
+          totalBackGross: 0,
+          totalGross: 0,
+          newVehicleDeals: 0,
+          usedVehicleDeals: 0,
+        };
+      }
+
+      const metrics = salespersonMetrics[salespersonId];
+      const creditPercentage = deal.splitCredit?.creditPercentage || 100;
+
+      metrics.totalDeals += creditPercentage / 100;
+      if (deal.metricFlags.countsForSold) metrics.fundedDeals += creditPercentage / 100;
+      metrics.totalFrontGross += deal.frontEndGross * (creditPercentage / 100);
+      metrics.totalBackGross += deal.backEndGross * (creditPercentage / 100);
+      metrics.totalGross += deal.totalGross * (creditPercentage / 100);
+
+      if (deal.vehicleType === 'N') metrics.newVehicleDeals += creditPercentage / 100;
+      else metrics.usedVehicleDeals += creditPercentage / 100;
+    });
+
+    // Calculate averages for each salesperson
+    Object.values(salespersonMetrics).forEach(metrics => {
+      metrics.avgFrontGross =
+        metrics.totalDeals > 0 ? metrics.totalFrontGross / metrics.totalDeals : 0;
+      metrics.avgBackGross =
+        metrics.totalDeals > 0 ? metrics.totalBackGross / metrics.totalDeals : 0;
+      metrics.avgPerDeal = metrics.totalDeals > 0 ? metrics.totalGross / metrics.totalDeals : 0;
+      metrics.goalPercentage = (metrics.totalDeals / 15) * 100; // Assuming 15 deals goal per salesperson
+    });
+
+    return {
+      deals: filteredDeals.map(deal => ({
+        ...deal,
+        // Format for manager dashboard table
+        dealNumber: deal.dealNumber,
+        stockNumber: deal.stockNumber,
+        customer: deal.lastName,
+        date: deal.dealDate,
+        vehicleType: deal.vehicleTypeDisplay,
+        salesperson: deal.raw.salespersonName || deal.raw.salesperson || 'Unknown',
+        frontGross: deal.frontEndGross,
+        financeGross: deal.backEndGross,
+        totalGross: deal.totalGross,
+        status: deal.dealStatus,
+      })),
+      metrics: {
+        totalDeals,
+        fundedDeals,
+        pendingDeals,
+        newVehicleDeals,
+        usedVehicleDeals,
+        totalFrontGross,
+        totalBackGross,
+        totalGross,
+        avgFrontGross: totalDeals > 0 ? totalFrontGross / totalDeals : 0,
+        avgBackGross: totalDeals > 0 ? totalBackGross / totalDeals : 0,
+        avgPerDeal: totalDeals > 0 ? totalGross / totalDeals : 0,
+        salesGoal: 100, // This could be configurable
+        salesPerformance: (totalDeals / 100) * 100,
+      },
+      salespersonMetrics: Object.values(salespersonMetrics),
+      lastUpdated: new Date().toISOString(),
+    };
+  } catch (error) {
+    console.error('Error mapping manager dashboard data:', error);
+    return {
+      deals: [],
+      metrics: {
+        totalDeals: 0,
+        fundedDeals: 0,
+        pendingDeals: 0,
+        newVehicleDeals: 0,
+        usedVehicleDeals: 0,
+        totalFrontGross: 0,
+        totalBackGross: 0,
+        totalGross: 0,
+        avgFrontGross: 0,
+        avgBackGross: 0,
+        avgPerDeal: 0,
+        salesGoal: 100,
+        salesPerformance: 0,
+      },
+      salespersonMetrics: [],
+      error: error.message,
+      lastUpdated: new Date().toISOString(),
+    };
+  }
+};
+
+/**
  * Filters and aggregates deals for dashboard display
  * @param {Array} deals - Array of raw deals
  * @param {Object} options - Filter and aggregation options
@@ -289,7 +453,12 @@ export const aggregateDealsForDashboard = (deals, options = {}) => {
       if (!includeInactive && !deal.isActive) return false;
 
       // Filter by salesperson if specified
-      if (salespersonId && !deal.splitCredit.hasCredit) return false;
+      if (salespersonId) {
+        const splitCredit = calculateSplitDealCredit(deal, salespersonId);
+        if (!splitCredit.hasCredit) return false;
+        // Update deal with split credit info
+        deal.splitCredit = splitCredit;
+      }
 
       return true;
     });

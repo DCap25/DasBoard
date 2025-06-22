@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useManagerDealsData } from '../../hooks/useDealsData';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import {
@@ -157,6 +158,14 @@ const SalesManagerDashboard = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [timePeriod, setTimePeriod] = useState<string>('this-month');
   const navigate = useNavigate();
+
+  // Use the manager deals hook
+  const {
+    dealData: managerDealData,
+    loading: dealDataLoading,
+    error: dealDataError,
+    refresh: refreshDealData,
+  } = useManagerDealsData(dealershipId, timePeriod);
 
   useEffect(() => {
     console.log('[SalesManagerDashboard] Rendering sales manager dashboard', {
@@ -361,6 +370,36 @@ const SalesManagerDashboard = () => {
         </div>
       </div>
 
+      {/* Error Display */}
+      {dealDataError && (
+        <div className="mb-6">
+          <div className="bg-red-50 border border-red-200 rounded-md p-4">
+            <div className="flex">
+              <AlertTriangle className="h-5 w-5 text-red-400 mr-2 mt-0.5" />
+              <div>
+                <h3 className="text-sm font-medium text-red-800">Deal Data Warning</h3>
+                <p className="text-sm text-red-700 mt-1">{dealDataError}</p>
+                <p className="text-xs text-red-600 mt-1">
+                  Showing fallback data. New deals will update automatically.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Loading Indicator */}
+      {dealDataLoading && (
+        <div className="mb-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+            <div className="flex items-center">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+              <p className="text-sm text-blue-700">Loading deal data...</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-6">
         {/* Box 1: Gross Profits */}
         <Card className="border-l-4 border-l-green-500">
@@ -371,15 +410,21 @@ const SalesManagerDashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(data.totalGross)}</div>
+            <div className="text-2xl font-bold">
+              {formatCurrency(managerDealData?.metrics?.totalGross || data.totalGross)}
+            </div>
             <div className="mt-2 space-y-1">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-500">Front End Gross:</span>
-                <span className="font-medium">{formatCurrency(data.frontEndGross)}</span>
+                <span className="font-medium">
+                  {formatCurrency(managerDealData?.metrics?.totalFrontGross || data.frontEndGross)}
+                </span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-500">Finance Gross:</span>
-                <span className="font-medium">{formatCurrency(data.financeGross)}</span>
+                <span className="font-medium">
+                  {formatCurrency(managerDealData?.metrics?.totalBackGross || data.financeGross)}
+                </span>
               </div>
             </div>
             <div className="flex items-center pt-2 text-xs">
@@ -408,15 +453,21 @@ const SalesManagerDashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{data.totalUnits}</div>
+            <div className="text-2xl font-bold">
+              {managerDealData?.metrics?.totalDeals || data.totalUnits}
+            </div>
             <div className="mt-2 space-y-1">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-500">New Cars:</span>
-                <span className="font-medium">{data.newCars}</span>
+                <span className="font-medium">
+                  {managerDealData?.metrics?.newVehicleDeals || data.newCars}
+                </span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-500">Used Cars:</span>
-                <span className="font-medium">{data.usedCars}</span>
+                <span className="font-medium">
+                  {managerDealData?.metrics?.usedVehicleDeals || data.usedCars}
+                </span>
               </div>
             </div>
             <div className="flex items-center pt-2 text-xs">
@@ -445,31 +496,46 @@ const SalesManagerDashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{data.salesPerformance}%</div>
+            <div className="text-2xl font-bold">
+              {managerDealData?.metrics?.salesPerformance || data.salesPerformance}%
+            </div>
             <div className="mt-2">
               <div className="flex justify-between items-center text-sm mb-1">
-                <span className="text-gray-500">Goal: {data.salesGoal} units</span>
+                <span className="text-gray-500">
+                  Goal: {managerDealData?.metrics?.salesGoal || data.salesGoal} units
+                </span>
                 <span className="font-medium">
-                  {data.totalUnits}/{data.salesGoal}
+                  {managerDealData?.metrics?.totalDeals || data.totalUnits}/
+                  {managerDealData?.metrics?.salesGoal || data.salesGoal}
                 </span>
               </div>
               <div className="h-2 w-full bg-gray-100 rounded-full">
                 <div
                   className={`h-full rounded-full ${
-                    data.salesPerformance >= 100
+                    (managerDealData?.metrics?.salesPerformance || data.salesPerformance) >= 100
                       ? 'bg-green-500'
-                      : data.salesPerformance >= 80
+                      : (managerDealData?.metrics?.salesPerformance || data.salesPerformance) >= 80
                       ? 'bg-yellow-500'
                       : 'bg-red-500'
                   }`}
-                  style={{ width: `${Math.min(data.salesPerformance, 100)}%` }}
+                  style={{
+                    width: `${Math.min(
+                      managerDealData?.metrics?.salesPerformance || data.salesPerformance,
+                      100
+                    )}%`,
+                  }}
                 ></div>
               </div>
             </div>
             <div className="flex items-center pt-2 text-xs">
               <span className="text-gray-500">
-                {data.salesGoal - data.totalUnits > 0
-                  ? `${data.salesGoal - data.totalUnits} more units to goal`
+                {(managerDealData?.metrics?.salesGoal || data.salesGoal) -
+                  (managerDealData?.metrics?.totalDeals || data.totalUnits) >
+                0
+                  ? `${
+                      (managerDealData?.metrics?.salesGoal || data.salesGoal) -
+                      (managerDealData?.metrics?.totalDeals || data.totalUnits)
+                    } more units to goal`
                   : 'Goal achieved!'}
               </span>
             </div>
@@ -485,7 +551,9 @@ const SalesManagerDashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(data.avgPerDeal)}</div>
+            <div className="text-2xl font-bold">
+              {formatCurrency(managerDealData?.metrics?.avgPerDeal || data.avgPerDeal)}
+            </div>
             <div className="mt-2 space-y-1">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-500">Avg Front Gross:</span>
@@ -838,298 +906,321 @@ const SalesManagerDashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {[
-                    {
-                      id: 'D12345',
-                      stockNumber: 'S9876',
-                      customer: 'Johnson',
-                      vehicleType: 'N', // N for New
-                      date: '06/12/2023',
-                      salesperson: 'Sarah Johnson',
-                      initials: 'SJ',
-                      frontGross: 1850,
-                      financeGross: 1200,
-                      totalGross: 3050,
-                      status: 'Funded',
-                      csiFollowUp: true,
-                    },
-                    {
-                      id: 'D12346',
-                      stockNumber: 'S9452',
-                      customer: 'Williams',
-                      vehicleType: 'U', // U for Used
-                      date: '06/10/2023',
-                      salesperson: 'Michael Chen',
-                      initials: 'MC',
-                      frontGross: 1300,
-                      financeGross: 950,
-                      totalGross: 2250,
-                      status: 'Pending',
-                      csiFollowUp: false,
-                    },
-                    {
-                      id: 'D12347',
-                      stockNumber: 'S8765',
-                      customer: 'Martinez',
-                      vehicleType: 'C', // C for CPO
-                      date: '06/09/2023',
-                      salesperson: 'David Rodriguez',
-                      initials: 'DR',
-                      frontGross: 2100,
-                      financeGross: 1400,
-                      totalGross: 3500,
-                      status: 'Funded',
-                      csiFollowUp: true,
-                    },
-                    {
-                      id: 'D12348',
-                      stockNumber: 'S7620',
-                      customer: 'Taylor',
-                      vehicleType: 'U',
-                      date: '06/07/2023',
-                      salesperson: 'Amanda Williams',
-                      initials: 'AW',
-                      frontGross: 1750,
-                      financeGross: 1050,
-                      totalGross: 2800,
-                      status: 'Funded',
-                      csiFollowUp: true,
-                    },
-                    {
-                      id: 'D12349',
-                      stockNumber: 'S8452',
-                      customer: 'Garcia',
-                      vehicleType: 'N',
-                      date: '06/05/2023',
-                      salesperson: 'Robert Johnson',
-                      initials: 'RJ',
-                      frontGross: 1500,
-                      financeGross: 1100,
-                      totalGross: 2600,
-                      status: 'Pending',
-                      csiFollowUp: false,
-                    },
-                    {
-                      id: 'D12350',
-                      stockNumber: 'S9123',
-                      customer: 'Miller',
-                      vehicleType: 'C',
-                      date: '06/04/2023',
-                      salesperson: 'Sarah Johnson',
-                      initials: 'SJ',
-                      frontGross: 2250,
-                      financeGross: 1320,
-                      totalGross: 3570,
-                      status: 'Funded',
-                      csiFollowUp: true,
-                    },
-                    {
-                      id: 'D12351',
-                      stockNumber: 'S7845',
-                      customer: 'Davis',
-                      vehicleType: 'U',
-                      date: '06/03/2023',
-                      salesperson: 'Michael Chen',
-                      initials: 'MC',
-                      frontGross: 1420,
-                      financeGross: 980,
-                      totalGross: 2400,
-                      status: 'Funded',
-                      csiFollowUp: false,
-                    },
-                    {
-                      id: 'D12352',
-                      stockNumber: 'S8932',
-                      customer: 'Wilson',
-                      vehicleType: 'N',
-                      date: '06/02/2023',
-                      salesperson: 'David Rodriguez',
-                      initials: 'DR',
-                      frontGross: 1950,
-                      financeGross: 1250,
-                      totalGross: 3200,
-                      status: 'Unwound',
-                      csiFollowUp: false,
-                    },
-                    {
-                      id: 'D12353',
-                      stockNumber: 'S7534',
-                      customer: 'Thompson',
-                      vehicleType: 'C',
-                      date: '06/01/2023',
-                      salesperson: 'Amanda Williams',
-                      initials: 'AW',
-                      frontGross: 1650,
-                      financeGross: 1020,
-                      totalGross: 2670,
-                      status: 'Funded',
-                      csiFollowUp: true,
-                    },
-                    {
-                      id: 'D12354',
-                      stockNumber: 'S8721',
-                      customer: 'Anderson',
-                      vehicleType: 'N',
-                      date: '05/31/2023',
-                      salesperson: 'Robert Johnson',
-                      initials: 'RJ',
-                      frontGross: 2050,
-                      financeGross: 1350,
-                      totalGross: 3400,
-                      status: 'Funded',
-                      csiFollowUp: true,
-                    },
-                  ].map((deal, index) => {
-                    // Status badge colors
-                    const statusColor =
-                      deal.status === 'Funded'
-                        ? 'bg-green-100 text-green-800 border-green-200'
-                        : deal.status === 'Unwound'
-                        ? 'bg-red-100 text-red-800 border-red-200'
-                        : 'bg-amber-100 text-amber-800 border-amber-200';
+                  {(
+                    managerDealData?.deals || [
+                      {
+                        id: 'D12345',
+                        stockNumber: 'S9876',
+                        customer: 'Johnson',
+                        vehicleType: 'N', // N for New
+                        date: '06/12/2023',
+                        salesperson: 'Sarah Johnson',
+                        initials: 'SJ',
+                        frontGross: 1850,
+                        financeGross: 1200,
+                        totalGross: 3050,
+                        status: 'Funded',
+                        csiFollowUp: true,
+                      },
+                      {
+                        id: 'D12346',
+                        stockNumber: 'S9452',
+                        customer: 'Williams',
+                        vehicleType: 'U', // U for Used
+                        date: '06/10/2023',
+                        salesperson: 'Michael Chen',
+                        initials: 'MC',
+                        frontGross: 1300,
+                        financeGross: 950,
+                        totalGross: 2250,
+                        status: 'Pending',
+                        csiFollowUp: false,
+                      },
+                      {
+                        id: 'D12347',
+                        stockNumber: 'S8765',
+                        customer: 'Martinez',
+                        vehicleType: 'C', // C for CPO
+                        date: '06/09/2023',
+                        salesperson: 'David Rodriguez',
+                        initials: 'DR',
+                        frontGross: 2100,
+                        financeGross: 1400,
+                        totalGross: 3500,
+                        status: 'Funded',
+                        csiFollowUp: true,
+                      },
+                      {
+                        id: 'D12348',
+                        stockNumber: 'S7620',
+                        customer: 'Taylor',
+                        vehicleType: 'U',
+                        date: '06/07/2023',
+                        salesperson: 'Amanda Williams',
+                        initials: 'AW',
+                        frontGross: 1750,
+                        financeGross: 1050,
+                        totalGross: 2800,
+                        status: 'Funded',
+                        csiFollowUp: true,
+                      },
+                      {
+                        id: 'D12349',
+                        stockNumber: 'S8452',
+                        customer: 'Garcia',
+                        vehicleType: 'N',
+                        date: '06/05/2023',
+                        salesperson: 'Robert Johnson',
+                        initials: 'RJ',
+                        frontGross: 1500,
+                        financeGross: 1100,
+                        totalGross: 2600,
+                        status: 'Pending',
+                        csiFollowUp: false,
+                      },
+                      {
+                        id: 'D12350',
+                        stockNumber: 'S9123',
+                        customer: 'Miller',
+                        vehicleType: 'C',
+                        date: '06/04/2023',
+                        salesperson: 'Sarah Johnson',
+                        initials: 'SJ',
+                        frontGross: 2250,
+                        financeGross: 1320,
+                        totalGross: 3570,
+                        status: 'Funded',
+                        csiFollowUp: true,
+                      },
+                      {
+                        id: 'D12351',
+                        stockNumber: 'S7845',
+                        customer: 'Davis',
+                        vehicleType: 'U',
+                        date: '06/03/2023',
+                        salesperson: 'Michael Chen',
+                        initials: 'MC',
+                        frontGross: 1420,
+                        financeGross: 980,
+                        totalGross: 2400,
+                        status: 'Funded',
+                        csiFollowUp: false,
+                      },
+                      {
+                        id: 'D12352',
+                        stockNumber: 'S8932',
+                        customer: 'Wilson',
+                        vehicleType: 'N',
+                        date: '06/02/2023',
+                        salesperson: 'David Rodriguez',
+                        initials: 'DR',
+                        frontGross: 1950,
+                        financeGross: 1250,
+                        totalGross: 3200,
+                        status: 'Unwound',
+                        csiFollowUp: false,
+                      },
+                      {
+                        id: 'D12353',
+                        stockNumber: 'S7534',
+                        customer: 'Thompson',
+                        vehicleType: 'C',
+                        date: '06/01/2023',
+                        salesperson: 'Amanda Williams',
+                        initials: 'AW',
+                        frontGross: 1650,
+                        financeGross: 1020,
+                        totalGross: 2670,
+                        status: 'Funded',
+                        csiFollowUp: true,
+                      },
+                      {
+                        id: 'D12354',
+                        stockNumber: 'S8721',
+                        customer: 'Anderson',
+                        vehicleType: 'N',
+                        date: '05/31/2023',
+                        salesperson: 'Robert Johnson',
+                        initials: 'RJ',
+                        frontGross: 2050,
+                        financeGross: 1350,
+                        totalGross: 3400,
+                        status: 'Funded',
+                        csiFollowUp: true,
+                      },
+                    ]
+                  )
+                    .slice(0, 10)
+                    .map((deal, index) => {
+                      // Status badge colors
+                      const statusColor =
+                        (deal.status || deal.dealStatus) === 'Funded'
+                          ? 'bg-green-100 text-green-800 border-green-200'
+                          : (deal.status || deal.dealStatus) === 'Unwound'
+                          ? 'bg-red-100 text-red-800 border-red-200'
+                          : 'bg-amber-100 text-amber-800 border-amber-200';
 
-                    // Calculate the reverse index (10, 9, 8, ..., 1)
-                    const reverseIndex = 10 - index;
+                      // Calculate the reverse index (10, 9, 8, ..., 1)
+                      const reverseIndex = 10 - index;
 
-                    return (
-                      <tr
-                        key={deal.id}
-                        className={`border-b ${
-                          index % 2 === 1 ? 'bg-gray-50' : ''
-                        } hover:bg-blue-50`}
-                      >
-                        <td className="py-2 px-2 text-center font-medium">{reverseIndex}</td>
-                        <td className="py-2 pl-4 pr-2 text-left font-medium text-blue-600">
-                          {deal.id}
-                        </td>
-                        <td className="py-2 px-2 text-left">{deal.stockNumber}</td>
-                        <td className="py-2 px-2 text-left font-medium">{deal.customer}</td>
-                        <td className="py-2 px-2 text-center text-gray-600">{deal.date}</td>
-                        <td className="py-2 px-2 text-center">
-                          <span
-                            className={`px-1.5 py-0.5 rounded text-xs font-medium ${
-                              deal.vehicleType === 'N'
-                                ? 'bg-green-100 text-green-800'
-                                : deal.vehicleType === 'U'
-                                ? 'bg-amber-100 text-amber-800'
-                                : 'bg-blue-100 text-blue-800'
-                            }`}
-                          >
-                            {deal.vehicleType}
-                          </span>
-                        </td>
-                        <td className="py-2 px-2 text-center font-medium">{deal.initials}</td>
-                        <td className="py-2 px-2 text-right">
-                          ${deal.frontGross.toLocaleString()}
-                        </td>
-                        <td className="py-2 px-2 text-right">
-                          ${deal.financeGross.toLocaleString()}
-                        </td>
-                        <td className="py-2 px-2 text-right font-medium text-green-600">
-                          ${deal.totalGross.toLocaleString()}
-                        </td>
-                        <td className="py-2 px-2 text-center">
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${statusColor}`}
-                          >
-                            {deal.status}
-                          </span>
-                        </td>
-                        <td className="py-2 px-2 text-center">
-                          <input
-                            type="checkbox"
-                            checked={deal.csiFollowUp}
-                            className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                          />
-                        </td>
-                        <td className="py-2 px-2 text-center">
-                          <Dialog
-                            open={isEditing && selectedDeal?.id === deal.id}
-                            onOpenChange={open => {
-                              if (!open) setIsEditing(false);
-                            }}
-                          >
-                            <DialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7"
-                                onClick={() => {
-                                  setSelectedDeal({
-                                    id: deal.id,
-                                    frontGross: deal.frontGross,
-                                    status: deal.status,
-                                  });
-                                  setIsEditing(true);
-                                }}
-                              >
-                                <Edit className="h-3.5 w-3.5" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[425px]">
-                              <DialogHeader>
-                                <DialogTitle>Edit Deal</DialogTitle>
-                                <DialogDescription>
-                                  Update deal information for {deal.customer}
-                                </DialogDescription>
-                              </DialogHeader>
-                              <form onSubmit={handleSubmit}>
-                                <div className="grid gap-4 py-4">
-                                  <div className="grid gap-2">
-                                    <Label htmlFor="frontGross">Front End Gross ($)</Label>
-                                    <Input
-                                      id="frontGross"
-                                      type="number"
-                                      value={selectedDeal?.frontGross || 0}
-                                      onChange={handleFrontGrossChange}
-                                    />
+                      return (
+                        <tr
+                          key={deal.id || deal.dealNumber}
+                          className={`border-b ${
+                            index % 2 === 1 ? 'bg-gray-50' : ''
+                          } hover:bg-blue-50`}
+                        >
+                          <td className="py-2 px-2 text-center font-medium">{reverseIndex}</td>
+                          <td className="py-2 pl-4 pr-2 text-left font-medium text-blue-600">
+                            {deal.dealNumber || deal.id}
+                          </td>
+                          <td className="py-2 px-2 text-left">{deal.stockNumber}</td>
+                          <td className="py-2 px-2 text-left font-medium">
+                            {deal.customer || deal.lastName}
+                          </td>
+                          <td className="py-2 px-2 text-center text-gray-600">
+                            {deal.date || deal.dealDate}
+                          </td>
+                          <td className="py-2 px-2 text-center">
+                            <span
+                              className={`px-1.5 py-0.5 rounded text-xs font-medium ${
+                                deal.vehicleType === 'N'
+                                  ? 'bg-green-100 text-green-800'
+                                  : deal.vehicleType === 'U' || deal.vehicleType === 'C'
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : 'bg-blue-100 text-blue-800'
+                              }`}
+                            >
+                              {deal.vehicleType || 'U'}
+                            </span>
+                          </td>
+                          <td className="py-2 px-2 text-center font-medium">
+                            {deal.initials ||
+                              deal.salesperson?.substring(0, 2)?.toUpperCase() ||
+                              'SP'}
+                          </td>
+                          <td className="py-2 px-2 text-right">
+                            ${(deal.frontGross || deal.frontEndGross || 0).toLocaleString()}
+                          </td>
+                          <td className="py-2 px-2 text-right">
+                            $
+                            {(
+                              deal.financeGross ||
+                              deal.backEndGross ||
+                              deal.profit ||
+                              0
+                            ).toLocaleString()}
+                          </td>
+                          <td className="py-2 px-2 text-right font-medium text-green-600">
+                            $
+                            {(
+                              deal.totalGross ||
+                              (deal.frontGross || deal.frontEndGross || 0) +
+                                (deal.financeGross || deal.backEndGross || deal.profit || 0)
+                            ).toLocaleString()}
+                          </td>
+                          <td className="py-2 px-2 text-center">
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-medium ${statusColor}`}
+                            >
+                              {deal.status || deal.dealStatus || 'Pending'}
+                            </span>
+                          </td>
+                          <td className="py-2 px-2 text-center">
+                            <input
+                              type="checkbox"
+                              checked={deal.csiFollowUp || false}
+                              className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                            />
+                          </td>
+                          <td className="py-2 px-2 text-center">
+                            <Dialog
+                              open={isEditing && selectedDeal?.id === (deal.id || deal.dealNumber)}
+                              onOpenChange={open => {
+                                if (!open) setIsEditing(false);
+                              }}
+                            >
+                              <DialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7"
+                                  onClick={() => {
+                                    setSelectedDeal({
+                                      id: deal.id || deal.dealNumber,
+                                      frontGross: deal.frontGross || deal.frontEndGross || 0,
+                                      status: deal.status || deal.dealStatus || 'Pending',
+                                    });
+                                    setIsEditing(true);
+                                  }}
+                                >
+                                  <Edit className="h-3.5 w-3.5" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="sm:max-w-[425px]">
+                                <DialogHeader>
+                                  <DialogTitle>Edit Deal</DialogTitle>
+                                  <DialogDescription>
+                                    Update deal information for {deal.customer || deal.lastName}
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <form onSubmit={handleSubmit}>
+                                  <div className="grid gap-4 py-4">
+                                    <div className="grid gap-2">
+                                      <Label htmlFor="frontGross">Front End Gross ($)</Label>
+                                      <Input
+                                        id="frontGross"
+                                        type="number"
+                                        value={selectedDeal?.frontGross || 0}
+                                        onChange={handleFrontGrossChange}
+                                      />
+                                    </div>
+                                    <div className="grid gap-2">
+                                      <Label htmlFor="status">Deal Status</Label>
+                                      <Select
+                                        value={selectedDeal?.status || 'Pending'}
+                                        onValueChange={handleStatusChange}
+                                      >
+                                        <SelectTrigger id="status">
+                                          <SelectValue placeholder="Select status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="Pending">Pending</SelectItem>
+                                          <SelectItem value="Funded">Funded</SelectItem>
+                                          <SelectItem value="Unwound">Unwound</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+
+                                      {selectedDeal?.status === 'Unwound' && (
+                                        <p className="text-xs text-red-500 mt-1">
+                                          Warning: Unwinding a deal may affect salesperson
+                                          commissions.
+                                        </p>
+                                      )}
+                                    </div>
                                   </div>
-                                  <div className="grid gap-2">
-                                    <Label htmlFor="status">Deal Status</Label>
-                                    <Select
-                                      value={selectedDeal?.status || 'Pending'}
-                                      onValueChange={handleStatusChange}
-                                    >
-                                      <SelectTrigger id="status">
-                                        <SelectValue placeholder="Select status" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="Pending">Pending</SelectItem>
-                                        <SelectItem value="Funded">Funded</SelectItem>
-                                        <SelectItem value="Unwound">Unwound</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-
-                                    {selectedDeal?.status === 'Unwound' && (
-                                      <p className="text-xs text-red-500 mt-1">
-                                        Warning: Unwinding a deal may affect salesperson
-                                        commissions.
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
-                                <DialogFooter>
-                                  <Button type="submit" disabled={isSaving}>
-                                    {isSaving ? (
-                                      <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Saving
-                                      </>
-                                    ) : (
-                                      <>
-                                        <Save className="mr-2 h-4 w-4" />
-                                        Save Changes
-                                      </>
-                                    )}
-                                  </Button>
-                                </DialogFooter>
-                              </form>
-                            </DialogContent>
-                          </Dialog>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                                  <DialogFooter>
+                                    <Button type="submit" disabled={isSaving}>
+                                      {isSaving ? (
+                                        <>
+                                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                          Saving
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Save className="mr-2 h-4 w-4" />
+                                          Save Changes
+                                        </>
+                                      )}
+                                    </Button>
+                                  </DialogFooter>
+                                </form>
+                              </DialogContent>
+                            </Dialog>
+                          </td>
+                        </tr>
+                      );
+                    })}
                 </tbody>
                 <tfoot>
                   <tr className="bg-gray-100 border-t border-t-gray-200 font-medium">

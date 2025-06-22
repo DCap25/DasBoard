@@ -189,20 +189,13 @@ const SalesDashboard = () => {
   const currentDeals = dealData?.deals || MOCK_DEALS;
   const metrics = dealData?.metrics || {};
 
-  // Calculate front end gross
-  const totalFrontEndGross =
-    metrics.totalFrontGross || MOCK_DEALS.reduce((sum, deal) => sum + deal.frontGross, 0);
-
-  // Calculate back end gross
-  const totalBackEndGross =
-    metrics.totalBackGross || MOCK_DEALS.reduce((sum, deal) => sum + deal.backEndGross, 0);
-
-  // Calculate total gross
+  // Calculate metrics from real data
+  const totalFrontEndGross = metrics.totalFrontGross || 0;
+  const totalBackEndGross = metrics.totalBackGross || 0;
   const totalGross = metrics.totalGross || totalFrontEndGross + totalBackEndGross;
-
-  // Calculate mini deals (deals with $0 front end gross)
+  const totalDeals = metrics.totalDeals || 0;
   const miniDeals = currentDeals.filter(
-    deal => deal.frontEndGross === 0 || deal.frontGross === 0
+    deal => (deal.frontGross || deal.frontEndGross || 0) === 0
   ).length;
 
   // Current car in progression
@@ -728,27 +721,33 @@ const SalesDashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {MOCK_DEALS.map((deal, index) => (
+                    {currentDeals.slice(0, 10).map((deal, index) => (
                       <tr
-                        key={deal.id}
-                        className={`${index !== MOCK_DEALS.length - 1 ? 'border-b' : ''} ${
-                          deal.isNew ? 'bg-blue-50' : ''
-                        }`}
+                        key={deal.id || deal.dealNumber}
+                        className={`${
+                          index !== currentDeals.slice(0, 10).length - 1 ? 'border-b' : ''
+                        } ${deal.vehicleType === 'N' || deal.isNew ? 'bg-blue-50' : ''}`}
                       >
                         <td className="py-3 text-sm">{deal.stockNumber}</td>
-                        <td className="py-3 text-sm">{deal.lastName}</td>
+                        <td className="py-3 text-sm">{deal.lastName || deal.customer}</td>
                         <td
                           className={`py-3 text-sm text-right ${
-                            deal.frontGross === 0 ? 'text-red-500 font-medium' : ''
+                            (deal.frontEndGross || deal.frontGross || 0) === 0
+                              ? 'text-red-500 font-medium'
+                              : ''
                           }`}
                         >
-                          ${deal.frontGross.toLocaleString()}
+                          ${(deal.frontEndGross || deal.frontGross || 0).toLocaleString()}
                         </td>
                         <td className="py-3 text-sm text-right">
-                          ${deal.backEndGross.toLocaleString()}
+                          ${(deal.backEndGross || deal.profit || 0).toLocaleString()}
                         </td>
                         <td className="py-3 text-sm font-medium text-right">
-                          ${(deal.frontGross + deal.backEndGross).toLocaleString()}
+                          $
+                          {(
+                            (deal.frontEndGross || deal.frontGross || 0) +
+                            (deal.backEndGross || deal.profit || 0)
+                          ).toLocaleString()}
                         </td>
                       </tr>
                     ))}

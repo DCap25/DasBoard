@@ -3,6 +3,7 @@ import {
   getDashboardData,
   loadDealsFromStorage,
   aggregateDealsForDashboard,
+  mapManagerDashboardData,
 } from '../utils/dealMapper';
 
 interface UseDealsDataOptions {
@@ -178,4 +179,99 @@ export const useSingleFinanceDealsData = (timePeriod = 'this-month') => {
     includeInactive: false,
     autoRefresh: true,
   });
+};
+
+/**
+ * Hook specifically for sales manager dashboard data
+ */
+export const useManagerDealsData = (dealershipId?: string, timePeriod = 'this-month') => {
+  const [dealData, setDealData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadManagerData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      console.log(`[useManagerDealsData] Loading deals for sales manager dashboard`, {
+        dealershipId,
+        timePeriod,
+      });
+
+      // Load deals from storage
+      const rawDeals = loadDealsFromStorage('financeDeals');
+
+      // Map data for manager dashboard
+      const data = mapManagerDashboardData(rawDeals, dealershipId, timePeriod);
+
+      setDealData(data);
+
+      if (data.error) {
+        console.warn('[useManagerDealsData] Deal data warning:', data.error);
+        setError(`Warning: ${data.error}`);
+      }
+
+      console.log(
+        `[useManagerDealsData] Loaded ${data.deals?.length || 0} deals with metrics:`,
+        data.metrics
+      );
+    } catch (err) {
+      console.error('[useManagerDealsData] Error loading manager deal data:', err);
+      setError('Failed to load manager deal data');
+
+      // Provide empty fallback data
+      setDealData({
+        deals: [],
+        metrics: {
+          totalDeals: 0,
+          fundedDeals: 0,
+          pendingDeals: 0,
+          newVehicleDeals: 0,
+          usedVehicleDeals: 0,
+          totalFrontGross: 0,
+          totalBackGross: 0,
+          totalGross: 0,
+          avgFrontGross: 0,
+          avgBackGross: 0,
+          avgPerDeal: 0,
+          salesGoal: 100,
+          salesPerformance: 0,
+        },
+        salespersonMetrics: [],
+        error: err instanceof Error ? err.message : 'Unknown error',
+        lastUpdated: new Date().toISOString(),
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [dealershipId, timePeriod]);
+
+  // Load data on mount and when dependencies change
+  useEffect(() => {
+    loadManagerData();
+  }, [loadManagerData]);
+
+  // Listen for localStorage changes
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'financeDeals') {
+        console.log('[useManagerDealsData] localStorage changed, refreshing deal data');
+        loadManagerData();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [loadManagerData]);
+
+  return {
+    dealData,
+    loading,
+    error,
+    refresh: loadManagerData,
+    setTimePeriod: (period: string) => {
+      // This will be handled by the parent component re-calling the hook
+    },
+  };
 };
