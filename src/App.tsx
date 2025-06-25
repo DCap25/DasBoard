@@ -64,6 +64,14 @@ import SignUp from './components/auth/SignUp';
 import SingleFinanceSignup from './components/auth/SingleFinanceSignup';
 import DealershipSignup from './components/auth/DealershipSignup';
 import DealerGroupSignup from './components/auth/DealerGroupSignup';
+import HomePage from './pages/HomePage';
+import PricingPage from './pages/PricingPage';
+import TermsPage from './pages/legal/TermsPage';
+import PrivacyPage from './pages/legal/PrivacyPage';
+import SubscriptionPage from './pages/legal/SubscriptionPage';
+import AboutPage from './pages/AboutPage';
+import ScreenshotsPage from './pages/ScreenshotsPage';
+import { TranslationProvider } from './contexts/TranslationContext';
 
 // Add global type declaration for app event tracking
 declare global {
@@ -728,261 +736,272 @@ function App() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ToastContextProvider>
-        <AuthProvider>
-          <DealershipProvider>
-            <Router>
-              <DirectAuthProvider>
-                <TestUserMiddleware>
-                  <RouteLogger />
-                  <Routes>
-                    {/* Public route for authentication - the main entry point */}
-                    <Route path="/" element={<AuthPage />} />
+    <TranslationProvider>
+      <QueryClientProvider client={queryClient}>
+        <ToastContextProvider>
+          <AuthProvider>
+            <DealershipProvider>
+              <Router>
+                <DirectAuthProvider>
+                  <TestUserMiddleware>
+                    <RouteLogger />
+                    <Routes>
+                      {/* Marketing Pages - Public Access */}
+                      <Route path="/" element={<HomePage />} />
+                      <Route path="/about" element={<AboutPage />} />
+                      <Route path="/screenshots" element={<ScreenshotsPage />} />
+                      <Route path="/pricing" element={<PricingPage />} />
+                      <Route path="/auth" element={<AuthPage />} />
 
-                    {/* Signup routes - public access */}
-                    <Route path="/signup" element={<SignUp />} />
-                    <Route path="/signup/single-finance" element={<SingleFinanceSignup />} />
-                    <Route path="/signup/dealership" element={<DealershipSignup />} />
-                    <Route path="/signup/dealer-group" element={<DealerGroupSignup />} />
+                      {/* Legal Pages - Public Access */}
+                      <Route path="/legal/terms" element={<TermsPage />} />
+                      <Route path="/legal/privacy" element={<PrivacyPage />} />
+                      <Route path="/legal/subscription" element={<SubscriptionPage />} />
 
-                    {/* New Logout Route - accessible to everyone */}
-                    <Route path="/logout" element={<LogoutPage />} />
+                      {/* Signup routes - public access */}
+                      <Route path="/signup" element={<SignUp />} />
+                      <Route path="/signup/single-finance" element={<SingleFinanceSignup />} />
+                      <Route path="/signup/dealership" element={<DealershipSignup />} />
+                      <Route path="/signup/dealer-group" element={<DealerGroupSignup />} />
 
-                    {/* New Direct Login route */}
-                    <Route path="/direct-login" element={<DirectLoginPage />} />
+                      {/* New Logout Route - accessible to everyone */}
+                      <Route path="/logout" element={<LogoutPage />} />
 
-                    {/* Force Login route - emergency bypass */}
-                    <Route path="/force-login" element={<ForceLoginPage />} />
+                      {/* New Direct Login route */}
+                      <Route path="/direct-login" element={<DirectLoginPage />} />
 
-                    {/* Auth Reset route - to escape redirect loops */}
-                    <Route path="/reset" element={<ResetAuth />} />
+                      {/* Force Login route - emergency bypass */}
+                      <Route path="/force-login" element={<ForceLoginPage />} />
 
-                    {/* Debug auth page - direct login bypass */}
-                    <Route path="/debug-auth" element={<DebugAuthPage />} />
+                      {/* Auth Reset route - to escape redirect loops */}
+                      <Route path="/reset" element={<ResetAuth />} />
 
-                    {/* New Auth Debugger route */}
-                    <Route path="/auth-debug" element={<AuthDebugger />} />
+                      {/* Debug auth page - direct login bypass */}
+                      <Route path="/debug-auth" element={<DebugAuthPage />} />
 
-                    {/* Role-based redirect after login */}
-                    <Route
-                      path="/dashboard"
-                      element={
-                        <ProtectedRoute>
-                          <RoleBasedRedirect />
-                        </ProtectedRoute>
-                      }
-                    />
+                      {/* New Auth Debugger route */}
+                      <Route path="/auth-debug" element={<AuthDebugger />} />
 
-                    {/* Marketing website link */}
-                    <Route path="/marketing" element={<RedirectLogger to={MARKETING_URL} />} />
+                      {/* Role-based redirect after login */}
+                      <Route
+                        path="/dashboard"
+                        element={
+                          <ProtectedRoute>
+                            <RoleBasedRedirect />
+                          </ProtectedRoute>
+                        }
+                      />
 
-                    {/* Admin routes */}
-                    <Route
-                      path="/master-admin"
-                      element={
-                        <ProtectedRoute requiredRoles={['admin']}>
-                          <DashboardLayout title="Master Admin Panel">
-                            <MasterAdminPage />
-                          </DashboardLayout>
-                        </ProtectedRoute>
-                      }
-                    />
+                      {/* Marketing website link */}
+                      <Route path="/marketing" element={<RedirectLogger to={MARKETING_URL} />} />
 
-                    {/* Group Admin Route - allow group admins by email, flag, or role */}
-                    <Route
-                      path="/group-admin"
-                      element={
-                        <GroupAdminAccessCheck>
-                          <DashboardLayout title="Group Admin Dashboard">
-                            <GroupAdminDashboard />
-                          </DashboardLayout>
-                        </GroupAdminAccessCheck>
-                      }
-                    />
+                      {/* Admin routes */}
+                      <Route
+                        path="/master-admin"
+                        element={
+                          <ProtectedRoute requiredRoles={['admin']}>
+                            <DashboardLayout title="Master Admin Panel">
+                              <MasterAdminPage />
+                            </DashboardLayout>
+                          </ProtectedRoute>
+                        }
+                      />
 
-                    {/* Area VP Full Dashboard Route */}
-                    <Route
-                      path="/avp-full-dashboard"
-                      element={
-                        <ProtectedRoute requiredRoles={['area_vice_president']}>
-                          <DashboardLayout title="Area VP Full Dashboard">
-                            <AVPFullDashboard />
-                          </DashboardLayout>
-                        </ProtectedRoute>
-                      }
-                    />
+                      {/* Group Admin Route - allow group admins by email, flag, or role */}
+                      <Route
+                        path="/group-admin"
+                        element={
+                          <GroupAdminAccessCheck>
+                            <DashboardLayout title="Group Admin Dashboard">
+                              <GroupAdminDashboard />
+                            </DashboardLayout>
+                          </GroupAdminAccessCheck>
+                        }
+                      />
 
-                    {/* Role-specific dashboards */}
-                    <Route
-                      path="/dashboard/admin"
-                      element={
-                        <ProtectedRoute
-                          requiredRoles={['admin', 'dealership_admin', 'single_dealer_admin']}
-                        >
-                          <AdminDashboardPage />
-                        </ProtectedRoute>
-                      }
-                    />
+                      {/* Area VP Full Dashboard Route */}
+                      <Route
+                        path="/avp-full-dashboard"
+                        element={
+                          <ProtectedRoute requiredRoles={['area_vice_president']}>
+                            <DashboardLayout title="Area VP Full Dashboard">
+                              <AVPFullDashboard />
+                            </DashboardLayout>
+                          </ProtectedRoute>
+                        }
+                      />
 
-                    <Route
-                      path="/dashboard/sales"
-                      element={
-                        <ProtectedRoute requiredRoles={['salesperson']}>
-                          <DashboardLayout>
-                            <SalesDashboard />
-                          </DashboardLayout>
-                        </ProtectedRoute>
-                      }
-                    />
+                      {/* Role-specific dashboards */}
+                      <Route
+                        path="/dashboard/admin"
+                        element={
+                          <ProtectedRoute
+                            requiredRoles={['admin', 'dealership_admin', 'single_dealer_admin']}
+                          >
+                            <AdminDashboardPage />
+                          </ProtectedRoute>
+                        }
+                      />
 
-                    <Route
-                      path="/dashboard/finance/*"
-                      element={
-                        <ProtectedRoute
-                          requiredRoles={['finance_manager', 'single_finance_manager']}
-                        >
-                          <DashboardLayout>
-                            <FinanceDashboard />
-                          </DashboardLayout>
-                        </ProtectedRoute>
-                      }
-                    />
+                      <Route
+                        path="/dashboard/sales"
+                        element={
+                          <ProtectedRoute requiredRoles={['salesperson']}>
+                            <DashboardLayout>
+                              <SalesDashboard />
+                            </DashboardLayout>
+                          </ProtectedRoute>
+                        }
+                      />
 
-                    {/* Single Finance Manager Dashboard */}
-                    <Route
-                      path="/dashboard/single-finance/*"
-                      element={
-                        <ProtectedRoute
-                          requiredRoles={['finance_manager', 'single_finance_manager']}
-                        >
-                          <DashboardLayout>
-                            <SingleFinanceManagerDashboard />
-                          </DashboardLayout>
-                        </ProtectedRoute>
-                      }
-                    />
+                      <Route
+                        path="/dashboard/finance/*"
+                        element={
+                          <ProtectedRoute
+                            requiredRoles={['finance_manager', 'single_finance_manager']}
+                          >
+                            <DashboardLayout>
+                              <FinanceDashboard />
+                            </DashboardLayout>
+                          </ProtectedRoute>
+                        }
+                      />
 
-                    {/* Finance Director Dashboard */}
-                    <Route
-                      path="/dashboard/finance-director/*"
-                      element={
-                        <ProtectedRoute requiredRoles={['finance_director']}>
-                          <DashboardLayout>
-                            <FinanceDirectorDashboard />
-                          </DashboardLayout>
-                        </ProtectedRoute>
-                      }
-                    />
+                      {/* Single Finance Manager Dashboard */}
+                      <Route
+                        path="/dashboard/single-finance/*"
+                        element={
+                          <ProtectedRoute
+                            requiredRoles={['finance_manager', 'single_finance_manager']}
+                          >
+                            <DashboardLayout>
+                              <SingleFinanceManagerDashboard />
+                            </DashboardLayout>
+                          </ProtectedRoute>
+                        }
+                      />
 
-                    {/* Finance Manager Deal Logging */}
-                    <Route
-                      path="/finance-manager/log-deal"
-                      element={
-                        <ProtectedRoute
-                          requiredRoles={['finance_manager', 'single_finance_manager']}
-                        >
-                          <DashboardLayout>
-                            <LogFinanceManagerDeal />
-                          </DashboardLayout>
-                        </ProtectedRoute>
-                      }
-                    />
+                      {/* Finance Director Dashboard */}
+                      <Route
+                        path="/dashboard/finance-director/*"
+                        element={
+                          <ProtectedRoute requiredRoles={['finance_director']}>
+                            <DashboardLayout>
+                              <FinanceDirectorDashboard />
+                            </DashboardLayout>
+                          </ProtectedRoute>
+                        }
+                      />
 
-                    {/* Direct deal log route */}
-                    <Route
-                      path="/deal-log"
-                      element={
-                        <ProtectedRoute
-                          requiredRoles={['finance_manager', 'single_finance_manager']}
-                        >
-                          <DashboardLayout>
-                            <DealLogPage />
-                          </DashboardLayout>
-                        </ProtectedRoute>
-                      }
-                    />
+                      {/* Finance Manager Deal Logging */}
+                      <Route
+                        path="/finance-manager/log-deal"
+                        element={
+                          <ProtectedRoute
+                            requiredRoles={['finance_manager', 'single_finance_manager']}
+                          >
+                            <DashboardLayout>
+                              <LogFinanceManagerDeal />
+                            </DashboardLayout>
+                          </ProtectedRoute>
+                        }
+                      />
 
-                    {/* Finance Dashboard specific deal log route */}
-                    <Route
-                      path="/finance-deal-log"
-                      element={
-                        <ProtectedRoute
-                          requiredRoles={['finance_manager', 'single_finance_manager']}
-                        >
-                          <DashboardLayout>
-                            <DealLogPage dashboardType="finance" />
-                          </DashboardLayout>
-                        </ProtectedRoute>
-                      }
-                    />
+                      {/* Direct deal log route */}
+                      <Route
+                        path="/deal-log"
+                        element={
+                          <ProtectedRoute
+                            requiredRoles={['finance_manager', 'single_finance_manager']}
+                          >
+                            <DashboardLayout>
+                              <DealLogPage />
+                            </DashboardLayout>
+                          </ProtectedRoute>
+                        }
+                      />
 
-                    {/* Single Finance Manager Dashboard specific deal log route */}
-                    <Route
-                      path="/single-finance-deal-log"
-                      element={
-                        <ProtectedRoute
-                          requiredRoles={['finance_manager', 'single_finance_manager']}
-                        >
-                          <DashboardLayout>
-                            <DealLogPage dashboardType="single-finance" />
-                          </DashboardLayout>
-                        </ProtectedRoute>
-                      }
-                    />
+                      {/* Finance Dashboard specific deal log route */}
+                      <Route
+                        path="/finance-deal-log"
+                        element={
+                          <ProtectedRoute
+                            requiredRoles={['finance_manager', 'single_finance_manager']}
+                          >
+                            <DashboardLayout>
+                              <DealLogPage dashboardType="finance" />
+                            </DashboardLayout>
+                          </ProtectedRoute>
+                        }
+                      />
 
-                    <Route
-                      path="/dashboard/sales-manager/*"
-                      element={
-                        <ProtectedRoute requiredRoles={['sales_manager']}>
-                          <DashboardLayout>
-                            <Routes>
-                              <Route path="/" element={<SalesManagerDashboard />} />
-                              <Route path="team" element={<TeamManagementPage />} />
-                              <Route path="goals" element={<GoalsPage />} />
-                              <Route path="schedule" element={<SchedulePage />} />
-                              <Route path="sales-report" element={<SalesReportPage />} />
-                            </Routes>
-                          </DashboardLayout>
-                        </ProtectedRoute>
-                      }
-                    />
+                      {/* Single Finance Manager Dashboard specific deal log route */}
+                      <Route
+                        path="/single-finance-deal-log"
+                        element={
+                          <ProtectedRoute
+                            requiredRoles={['finance_manager', 'single_finance_manager']}
+                          >
+                            <DashboardLayout>
+                              <DealLogPage dashboardType="single-finance" />
+                            </DashboardLayout>
+                          </ProtectedRoute>
+                        }
+                      />
 
-                    <Route
-                      path="/dashboard/gm"
-                      element={
-                        <ProtectedRoute requiredRoles={['general_manager']}>
-                          <DashboardLayout>
-                            <GMDashboard />
-                          </DashboardLayout>
-                        </ProtectedRoute>
-                      }
-                    />
+                      <Route
+                        path="/dashboard/sales-manager/*"
+                        element={
+                          <ProtectedRoute requiredRoles={['sales_manager']}>
+                            <DashboardLayout>
+                              <Routes>
+                                <Route path="/" element={<SalesManagerDashboard />} />
+                                <Route path="team" element={<TeamManagementPage />} />
+                                <Route path="goals" element={<GoalsPage />} />
+                                <Route path="schedule" element={<SchedulePage />} />
+                                <Route path="sales-report" element={<SalesReportPage />} />
+                              </Routes>
+                            </DashboardLayout>
+                          </ProtectedRoute>
+                        }
+                      />
 
-                    {/* Specific dealership routes with dealership ID parameter */}
-                    <Route path="/dealership/:dealershipId/*" element={<DealershipLayout />} />
+                      <Route
+                        path="/dashboard/gm"
+                        element={
+                          <ProtectedRoute requiredRoles={['general_manager']}>
+                            <DashboardLayout>
+                              <GMDashboard />
+                            </DashboardLayout>
+                          </ProtectedRoute>
+                        }
+                      />
 
-                    {/* Test Login Redirect */}
-                    <Route path="/test-login-redirect" element={<TestLoginRedirect />} />
+                      {/* Specific dealership routes with dealership ID parameter */}
+                      <Route path="/dealership/:dealershipId/*" element={<DealershipLayout />} />
 
-                    {/* Group Admin Bypass */}
-                    <Route path="/group-admin-bypass" element={<GroupAdminBypass />} />
+                      {/* Test Login Redirect */}
+                      <Route path="/test-login-redirect" element={<TestLoginRedirect />} />
 
-                    {/* Dashboard Selector - Direct Access */}
-                    <Route path="/dashboard-selector" element={<DashboardSelector />} />
+                      {/* Group Admin Bypass */}
+                      <Route path="/group-admin-bypass" element={<GroupAdminBypass />} />
 
-                    {/* Fallback - redirect to dashboard */}
-                    <Route path="*" element={<RedirectLogger to="/dashboard" />} />
-                  </Routes>
-                  <Toaster />
-                </TestUserMiddleware>
-              </DirectAuthProvider>
-            </Router>
-          </DealershipProvider>
-        </AuthProvider>
-        {APP_ENV !== 'production' && <ReactQueryDevtools />}
-      </ToastContextProvider>
-    </QueryClientProvider>
+                      {/* Dashboard Selector - Direct Access */}
+                      <Route path="/dashboard-selector" element={<DashboardSelector />} />
+
+                      {/* Fallback - redirect to dashboard */}
+                      <Route path="*" element={<RedirectLogger to="/dashboard" />} />
+                    </Routes>
+                    <Toaster />
+                  </TestUserMiddleware>
+                </DirectAuthProvider>
+              </Router>
+            </DealershipProvider>
+          </AuthProvider>
+          {APP_ENV !== 'production' && <ReactQueryDevtools />}
+        </ToastContextProvider>
+      </QueryClientProvider>
+    </TranslationProvider>
   );
 }
 

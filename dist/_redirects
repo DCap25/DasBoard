@@ -1,0 +1,17 @@
+# Netlify redirects for DAS Board app integration with thedasboard.com
+# This file ensures React Router works properly and integrates with the marketing site
+
+# Handle dashboard routes - send everything to the React app with 200 status
+/dashboard/* /index.html 200
+
+# Handle authentication routes
+/auth/* /index.html 200
+/login /index.html 200
+/signup /index.html 200
+
+# Handle API routes (if using Netlify Functions)
+/api/* /.netlify/functions/:splat 200
+
+# Fallback for all other dashboard-related routes
+# This ensures React Router can handle nested routes
+/* /index.html 200 
