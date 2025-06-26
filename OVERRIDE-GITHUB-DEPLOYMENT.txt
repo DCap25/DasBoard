@@ -1,0 +1,67 @@
+OVERRIDE GITHUB DEPLOYMENT ON THEDASBOARD.COM
+==========================================
+
+PROBLEM: 
+thedasboard.com (d967da04-9e37-4c8e-ab88-4fb29c3276b0) is still using GitHub deployment 
+with broken Next.js build, causing 404 errors.
+
+SOLUTION: 
+Override with manual deployment of dashboard files.
+
+STEP-BY-STEP FIX:
+================
+
+STEP 1: Go to Netlify Site
+--------------------------
+URL: https://app.netlify.com/sites/d967da04-9e37-4c8e-ab88-4fb29c3276b0
+
+STEP 2: Disable GitHub Deployment (CRITICAL)
+--------------------------------------------
+1. Click "Site settings" (top menu)
+2. Go to "Build & deploy" (left sidebar)
+3. Scroll to "Continuous deployment"
+4. Click "Edit settings" next to "Build settings"
+5. CLEAR the "Build command" field (remove "npm run build")
+6. CLEAR the "Publish directory" field (remove "out")
+7. Click "Save"
+
+OR disconnect GitHub entirely:
+1. In "Build & deploy" section
+2. Find "Repository" section
+3. Click "Disconnect" or "Unlink repository"
+
+STEP 3: Manual Upload Dashboard
+------------------------------
+1. Go to "Deploys" tab
+2. Look for manual deployment options:
+   - "Deploy manually" button
+   - "Drag and drop" area
+   - "Browse to choose folder" link
+
+3. Upload from: E:\WebProjects\dasboard\dist\
+   - Upload ALL files in the dist folder
+   - Including index.html and assets/ folder
+
+STEP 4: Verify Success
+---------------------
+1. Wait for deployment to complete (1-2 minutes)
+2. Go to https://thedasboard.com
+3. Should now show dashboard login page (NOT 404)
+
+ALTERNATIVE IF MANUAL DEPLOY NOT VISIBLE:
+=========================================
+1. Create new deployment by visiting: https://app.netlify.com/drop
+2. Drag your dist folder there
+3. After upload completes:
+   - Go to Site Settings
+   - Domain management
+   - Change primary domain to thedasboard.com
+   - Remove domain from old site (d967da04...)
+
+VERIFICATION:
+============
+✅ thedasboard.com shows dashboard login
+✅ No more GitHub builds happening
+✅ Manual deployment successful in Netlify dashboard
+
+KEY POINT: You MUST disable the GitHub build first, or it will keep overriding your manual uploads! 

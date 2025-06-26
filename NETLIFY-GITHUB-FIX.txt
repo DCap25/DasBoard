@@ -1,0 +1,86 @@
+NETLIFY GITHUB REPOSITORY FIX
+=============================
+
+PROBLEM:
+--------
+thedasboard.com (d967da04-9e37-4c8e-ab88-4fb29c3276b0) is deploying from:
+❌ das-board-marketing repository (broken Next.js)
+Instead of:
+✅ DasBoard repository (working Vite build)
+
+SOLUTION:
+---------
+Update Netlify to point to the DasBoard repository instead of das-board-marketing.
+
+STEP 1: Ensure Dashboard is on GitHub
+-------------------------------------
+From E:\WebProjects\dasboard directory:
+1. Run: git remote -v (check current repository)
+2. If no repository, create one on GitHub
+3. Push dashboard code: git push origin master
+
+STEP 2: Update Netlify Repository Link
+--------------------------------------
+Go to: https://app.netlify.com/sites/d967da04-9e37-4c8e-ab88-4fb29c3276b0/settings/deploys
+
+Option A - Link Different Repository:
+1. Scroll to "Repository" section
+2. Click "Link to a different repository"
+3. Choose your DasBoard repository (NOT das-board-marketing)
+4. Authorize GitHub access if needed
+
+Option B - Update Build Settings:
+1. Scroll to "Build settings"
+2. Click "Edit settings"
+3. Update these fields:
+   ✅ Build command: npm run build
+   ✅ Publish directory: dist
+   ✅ Branch: master (or main)
+
+STEP 3: Trigger New Deployment
+------------------------------
+1. Go to "Deploys" tab
+2. Click "Trigger deploy" → "Deploy site"
+3. Wait for build to complete (2-5 minutes)
+
+STEP 4: Verify Success
+---------------------
+1. Check deployment logs for success
+2. Visit https://thedasboard.com
+3. Should now show dashboard login (not 404)
+
+CURRENT REPOSITORY STRUCTURE:
+============================
+das-board-marketing (broken):
+- GitHub: das-board-marketing repository
+- Location: E:\WebProjects\das-board-marketing
+- Build: Next.js (failing)
+- Purpose: Landing page
+
+DasBoard (working):
+- GitHub: DasBoard repository  
+- Location: E:\WebProjects\dasboard
+- Build: Vite (successful)
+- Purpose: Main application
+
+WHAT NETLIFY SHOULD BUILD:
+=========================
+Repository: DasBoard repository
+Build command: npm run build
+Publish directory: dist
+Branch: master/main
+Result: Working dashboard at thedasboard.com
+
+TROUBLESHOOTING:
+===============
+If build still fails:
+1. Check build logs in Netlify
+2. Ensure package.json has correct build script
+3. Verify dist/ folder is created during build
+4. Check Node.js version compatibility
+
+If deployment succeeds but 404 persists:
+1. Check if dist/index.html exists
+2. Verify routing configuration
+3. Clear browser cache
+4. Check Netlify redirects 

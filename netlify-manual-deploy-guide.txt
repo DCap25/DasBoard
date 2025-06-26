@@ -1,0 +1,53 @@
+NETLIFY MANUAL DEPLOYMENT GUIDE
+================================
+
+If you can't find "Deploy manually" button, try these locations:
+
+METHOD 1: Direct Site URL
+------------------------
+1. Go to: https://app.netlify.com/sites/d967da04-9e37-4c8e-ab88-4fb29c3276b0
+2. This takes you directly to your site dashboard
+
+METHOD 2: From Site Overview
+---------------------------
+1. Go to: https://app.netlify.com
+2. Find your site (thedasboard.com)
+3. Click on the site name
+
+LOOK FOR THESE OPTIONS:
+=====================
+- "Deploys" tab (main deployment area)
+- "Deploy site" button (usually green/blue)
+- "Drag and drop your site output folder here" (big dashed box)
+- "Browse to choose folder" link
+- "Manual deploy" section
+- "Upload folder" option
+
+IF STILL NOT FOUND:
+==================
+1. Look for a "+" button or "New deploy" button
+2. Check if there's a "Site settings" → "Build & deploy" section
+3. Look for "Deploy settings" → "Manual deploy"
+
+WHAT TO UPLOAD:
+==============
+Upload ALL files from: E:\WebProjects\dasboard\dist\
+Including:
+- index.html
+- assets/ folder (with all CSS/JS files)
+- Any other files in the dist directory
+
+ALTERNATIVE APPROACH:
+====================
+If manual deploy is not available:
+1. Create a new site on Netlify
+2. Upload the dist folder to the new site
+3. Change the domain from the new site to thedasboard.com
+4. Delete the old site
+
+TROUBLESHOOTING:
+===============
+- Make sure you're logged into the correct Netlify account
+- Refresh the page if options don't appear
+- Try a different browser
+- Clear browser cache 
