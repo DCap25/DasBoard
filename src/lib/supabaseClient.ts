@@ -1,13 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 import { Database } from './database.types';
 
-// Default Supabase config (Das Board Master)
+// Main Supabase config (Das Board Master)
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-
-// Dealership1 Supabase config
-const dealership1Url = import.meta.env.VITE_DEALERSHIP1_SUPABASE_URL || '';
-const dealership1AnonKey = import.meta.env.VITE_DEALERSHIP1_SUPABASE_ANON_KEY || '';
 
 // Validate main configuration
 if (!supabaseUrl || !supabaseAnonKey) {
@@ -52,44 +48,11 @@ export const supabase = createSupabaseClient();
 const clientInstances = new Map<string, ReturnType<typeof createClient<Database>>>();
 
 // Get Supabase client for a specific dealership
+// Note: All dealerships now use the main project database with RLS policies
 export const getDealershipSupabase = (dealershipId?: string | number) => {
-  // If no dealershipId or it's 'master', return the master project
-  if (!dealershipId || dealershipId === 'master') {
-    return supabase;
-  }
-
-  // For now, we only have Dealership1 as a separate project
-  if (dealershipId === 1 || dealershipId === '1' || dealershipId === 'dealership1') {
-    if (!dealership1Url || !dealership1AnonKey) {
-      console.warn('Dealership1 Supabase configuration missing, falling back to master project');
-      return supabase;
-    }
-
-    // Check if we already have an instance
-    const cacheKey = `dealership-${dealershipId}`;
-    if (clientInstances.has(cacheKey)) {
-      return clientInstances.get(cacheKey)!;
-    }
-
-    // Create a new instance
-    console.log(`Creating new Supabase client for dealership ${dealershipId}`);
-    const instance = createClient<Database>(dealership1Url, dealership1AnonKey, {
-      auth: {
-        persistSession: true,
-        storageKey: `dealership-${dealershipId}-auth`,
-        storage: window.localStorage,
-        detectSessionInUrl: true,
-        autoRefreshToken: true,
-      },
-    });
-
-    // Cache the instance
-    clientInstances.set(cacheKey, instance);
-    return instance;
-  }
-
-  // Default to master project if dealership ID doesn't match
-  console.warn(`No specific Supabase project for dealership ${dealershipId}, using master project`);
+  // All dealerships use the same main Supabase project
+  // RLS (Row Level Security) policies handle data isolation by dealership_id
+  console.log(`Using main Supabase project for dealership ${dealershipId || 'unknown'}`);
   return supabase;
 };
 

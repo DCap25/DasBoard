@@ -1,0 +1,65 @@
+# Production Environment Variables for thedasboard.com Netlify Deployment
+# Copy these EXACT values to your Netlify site settings under "Environment variables"
+
+# ===========================================
+# BUILD CONFIGURATION (REQUIRED)
+# ===========================================
+NODE_VERSION=18
+NPM_FLAGS=--legacy-peer-deps
+
+# ===========================================
+# APP CONFIGURATION (REQUIRED)
+# ===========================================
+VITE_APP_URL=https://thedasboard.com
+VITE_MARKETING_URL=https://thedasboard.com
+VITE_BASE_PATH=/
+VITE_DEPLOYMENT_VERSION=1.0.0
+
+# ===========================================
+# SUPABASE MAIN PROJECT - "das board master"
+# ===========================================
+VITE_SUPABASE_URL=https://iugjtokydvbcvmrpeziv.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1Z2p0b2t5ZHZiY3ZtcnBlemloIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5MzI4MzMsImV4cCI6MjA0OTUwODgzM30.z6cOOlGZ4FgppJHWHoggKfxKCQSPTArlYS5SgaKMIKw
+
+# ===========================================
+# AUTHENTICATION & SECURITY (REQUIRED)
+# ===========================================
+VITE_AUTH_ENABLED=true
+VITE_ENABLE_SIGNUP=true
+VITE_ENABLE_GUEST_MODE=false
+
+# ===========================================
+# FEATURE FLAGS (OPTIONAL)
+# ===========================================
+VITE_ENABLE_ANALYTICS=true
+VITE_ENABLE_ERROR_REPORTING=true
+VITE_ENABLE_PERFORMANCE_MONITORING=true
+VITE_DEBUG_MODE=false
+
+# ===========================================
+# DEPLOYMENT & CDN (OPTIONAL)
+# ===========================================
+VITE_CDN_URL=https://thedasboard.com
+VITE_ASSET_BASE_URL=https://thedasboard.com
+
+# ===========================================
+# SOCIAL AUTH (OPTIONAL - Configure if needed)
+# ===========================================
+# VITE_GOOGLE_CLIENT_ID=your_google_client_id
+# VITE_GITHUB_CLIENT_ID=your_github_client_id
+
+# ===========================================
+# INTEGRATION KEYS (OPTIONAL - Add if needed)
+# ===========================================
+# VITE_STRIPE_PUBLISHABLE_KEY=pk_live_...
+# VITE_ANALYTICS_ID=your_analytics_id
+# VITE_SENTRY_DSN=your_sentry_dsn
+
+# ===========================================
+# INSTRUCTIONS FOR NETLIFY
+# ===========================================
+# 1. Go to Netlify Site Settings > Environment Variables
+# 2. Copy each line above (without # comments)
+# 3. Create new environment variable for each line
+# 4. Format: Key=Value (e.g., NODE_VERSION=18)
+# 5. Save and redeploy your site 
