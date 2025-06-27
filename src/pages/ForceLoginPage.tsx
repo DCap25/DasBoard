@@ -5,10 +5,9 @@ import { Alert, AlertDescription } from '../components/ui/alert';
 import { AlertCircle, Info } from 'lucide-react';
 import { TEST_USERS, loginWithTestAccount, getRedirectPath } from '../lib/directAuth';
 
-// Hard-coded auth tokens for testing - these won't be real tokens but will trick the app
-const ACCESS_TOKEN =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhbXBsZSIsInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiaWF0IjoxNjE2NDI4ODAwLCJleHAiOjE2MTY0NzIwMDB9.EXAMPLE';
-const REFRESH_TOKEN = 'refresh-token-example';
+// Mock auth tokens for testing - these are example tokens that won't work in production
+const ACCESS_TOKEN = 'example-access-token-placeholder';
+const REFRESH_TOKEN = 'example-refresh-token-placeholder';
 
 /**
  * This page forces authentication by directly manipulating localStorage

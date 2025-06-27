@@ -157,7 +157,7 @@ Deployment is currently paused until authentication issues are resolved. To re-e
 2. Update the Supabase configuration in `.env.production`
 3. Set up a new Vercel project with the repository
 4. Configure the following environment variables:
-   - `VITE_API_URL=https://dijulexxrgfmaiewtavb.supabase.co`
+   - `VITE_API_URL=https://your-project-id.supabase.co`
    - `VITE_SUPABASE_ANON_KEY=[your-anon-key]`
    - `USE_MOCK_SUPABASE=false`
 
