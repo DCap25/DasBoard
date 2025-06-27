@@ -55,3 +55,6 @@ fix-*.js
 # Scripts with credentials
 supabase-config.js
 test-helpers.js
+
+# Excluded files with hardcoded secrets
+.excluded-from-build/
