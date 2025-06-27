@@ -7,10 +7,6 @@
   NPM_FLAGS = "--legacy-peer-deps"
   # Disable secrets scanning for test files and development files
   SECRETS_SCAN_OMIT_PATHS = ".excluded-from-build/**/*,test-*.js,test-*.cjs,test-*.ts,fix-*.js,setup-*.js,setup-*.cjs,update-*.js,SignupForm.tsx,src/test-*.js,src/test-*.cjs,src/test-*.ts,src/scripts/supabase-config.js,src/test-helpers.js,src/pages/*test*.html,src/pages/*emergency*.html,src/pages/DirectLogin.html,public/*test*.html,public/*emergency*.html,public/*standalone*.html,public/*direct*.html,public/*bypass*.js,*-test-guide.md,auth-fix-documentation.md,supabase-integration-log.md,DEALERSHIP*.md"
-  
-# Exclude directories from deployment
-[build.ignore]
-  .excluded-from-build = true
 
 # Functions disabled - no functions directory
 
