@@ -342,7 +342,7 @@ const SingleFinanceManagerDashboard = () => {
       } catch (error) {
         console.error('[SingleFinanceManagerDashboard] Error deleting deal:', error);
         setError('Failed to delete deal');
-      }
+  }
     }
   };
 
@@ -509,9 +509,9 @@ const SingleFinanceManagerDashboard = () => {
                     const vehicleType =
                       dealData.vehicleType ||
                       (deal.vehicle.toLowerCase().includes('new')
-                        ? 'N'
-                        : deal.vehicle.toLowerCase().includes('cpo')
-                        ? 'C'
+                      ? 'N'
+                      : deal.vehicle.toLowerCase().includes('cpo')
+                      ? 'C'
                         : 'U');
 
                     console.log(`[Dashboard] Processing deal ${deal.id}:`, {

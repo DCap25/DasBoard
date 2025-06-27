@@ -24,10 +24,12 @@ The deployment is failing due to Windows permissions issues with the `.netlify` 
 ### Option 2: GitHub Actions (Automated - Recommended)
 
 1. **Add Secrets** to your GitHub repository:
+
    - `NETLIFY_AUTH_TOKEN`: Get from https://app.netlify.com/user/applications#personal-access-tokens
    - `NETLIFY_SITE_ID`: `d967da04-9e37-4c8e-ab88-4fb29c3276b0`
 
 2. **Commit & Push** the code:
+
    ```bash
    git add .
    git commit -m "Add internationalization and legal pages"
@@ -39,6 +41,7 @@ The deployment is failing due to Windows permissions issues with the `.netlify` 
 ### Option 3: Fix Local CLI (Advanced)
 
 Run PowerShell as Administrator and try:
+
 ```powershell
 # Clear Netlify cache
 Remove-Item -Recurse -Force $env:APPDATA\.netlify -ErrorAction SilentlyContinue
@@ -54,16 +57,19 @@ netlify deploy --prod --dir=dist --site=d967da04-9e37-4c8e-ab88-4fb29c3276b0
 ## 🎯 New Features After Deployment:
 
 ### **Language Switcher**
+
 - **Location**: Top-right corner of navigation
 - **Features**: 9 languages with country flags
 - **Persistence**: Remembers user's language choice
 
 ### **Legal Pages**
+
 - **Terms**: `/legal/terms` - Comprehensive dealership terms
-- **Privacy**: `/legal/privacy` - GDPR-compliant privacy policy  
+- **Privacy**: `/legal/privacy` - GDPR-compliant privacy policy
 - **Subscription**: `/legal/subscription` - Detailed billing terms
 
 ### **Enhanced Navigation**
+
 - **Translated Menu**: All navigation items now support multiple languages
 - **Professional Footer**: Links to legal pages with translations
 - **Consistent Design**: Same beautiful blue accent theme throughout
@@ -80,6 +86,7 @@ Once deployed, your site will have:
 ## 📋 Files Created/Modified:
 
 ### New Files:
+
 - `src/contexts/TranslationContext.tsx` - Translation system
 - `src/components/LanguageSwitcher.tsx` - Language dropdown
 - `src/pages/legal/TermsPage.tsx` - Terms of Service
@@ -88,6 +95,7 @@ Once deployed, your site will have:
 - `.github/workflows/deploy.yml` - Automated deployment
 
 ### Modified Files:
+
 - `src/App.tsx` - Added translation provider and legal routes
 - `src/pages/HomePage.tsx` - Added language switcher and translations
 - `netlify.toml` - Updated for legal page routing
@@ -95,8 +103,9 @@ Once deployed, your site will have:
 ## 🚀 Priority Action:
 
 **Use Option 1 (Manual Upload)** for immediate deployment:
+
 1. Go to Netlify dashboard
 2. Drag `dist` folder to deploy area
 3. Your international features will be live in minutes!
 
-The application is **100% ready** - just needs to bypass the Windows CLI permissions issue. 
+The application is **100% ready** - just needs to bypass the Windows CLI permissions issue.

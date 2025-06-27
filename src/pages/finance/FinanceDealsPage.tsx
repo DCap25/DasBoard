@@ -421,14 +421,14 @@ const FinanceDealsPage: React.FC = () => {
                         </td>
                         <td className="py-2 px-2 text-right bg-amber-50">
                           ${twProfit.toLocaleString()}
-                        </td>
+                      </td>
                         <td className="py-2 px-2 text-center bg-pink-50 font-medium">{ppd}</td>
                         <td className="py-2 px-2 text-right bg-purple-50">
                           ${pvr.toLocaleString()}
-                        </td>
+                      </td>
                         <td className="py-2 px-2 text-right font-medium text-green-600">
-                          ${deal.profit.toLocaleString()}
-                        </td>
+                        ${deal.profit.toLocaleString()}
+                      </td>
                         <td className="py-2 px-2 text-center">
                           <select
                             value={status}
@@ -447,8 +447,8 @@ const FinanceDealsPage: React.FC = () => {
                             onChange={e => handleDeleteDeal(deal.id, e.target.checked)}
                             className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
                           />
-                        </td>
-                      </tr>
+                      </td>
+                    </tr>
                     );
                   })
                 ) : (
