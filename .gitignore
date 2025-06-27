@@ -1,2 +1,57 @@
 # Local Netlify folder
 .netlify
+
+# Environment files with secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env.txt
+*-env.txt
+netlify-*-env.txt
+
+# Build outputs
+dist/
+build/
+.next/
+
+# Dependencies
+node_modules/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+.tmp/
+temp/
+*.tmp
+
+# Test files with hardcoded credentials
+*test*.js
+*test*.cjs
+*test*.ts
+setup-*.js
+setup-*.cjs
+fix-*.js
+*-test-guide.md
+*emergency*.html
+*standalone*.html
+*direct*.html
+*bypass*.js
+*patch-and-inject*.html
+
+# Scripts with credentials
+supabase-config.js
+test-helpers.js

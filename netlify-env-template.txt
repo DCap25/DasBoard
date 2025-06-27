@@ -1,26 +1,47 @@
-# Production Environment Variables Template for Netlify Deployment
-# Copy these variables to your Netlify site settings under "Environment variables"
+# Netlify Environment Variables Template
+# Copy these variable names to your Netlify dashboard and set the actual values there
 
-# Supabase Configuration (REQUIRED)
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key-here
-VITE_SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
-VITE_SUPABASE_PROJECT_ID=your-project-id
+# Required Build Variables
+NODE_VERSION=18
+NPM_FLAGS=--legacy-peer-deps
+
+# Required App Configuration
+VITE_APP_URL=https://thedasboard.com
+VITE_MARKETING_URL=https://thedasboard.com
+VITE_BASE_PATH=/
+VITE_DEPLOYMENT_VERSION=1.0.0
+
+# Required Supabase Configuration (GET ACTUAL VALUES FROM SUPABASE DASHBOARD)
+VITE_SUPABASE_URL=https://YOUR_PROJECT_ID.supabase.co
+VITE_SUPABASE_ANON_KEY=YOUR_ANON_KEY_HERE
+
+# Authentication Settings
+VITE_AUTH_ENABLED=true
+VITE_ENABLE_SIGNUP=true
+VITE_ENABLE_GUEST_MODE=false
+
+# Feature Flags
+VITE_ENABLE_ANALYTICS=true
+VITE_ENABLE_ERROR_REPORTING=true
+VITE_ENABLE_PERFORMANCE_MONITORING=true
+VITE_DEBUG_MODE=false
+
+# CDN Configuration
+VITE_CDN_URL=https://thedasboard.com
+VITE_ASSET_BASE_URL=https://thedasboard.com
+
+# INSTRUCTIONS:
+# 1. Go to Netlify Site Settings > Environment Variables
+# 2. Add each variable above with the proper values
+# 3. For Supabase values, get them from your Supabase project dashboard
+# 4. Never commit actual secret values to git
 
 # Secondary Dealership Configuration (if needed)
 VITE_DEALERSHIP1_SUPABASE_URL=https://dealership1-project.supabase.co
 VITE_DEALERSHIP1_SUPABASE_ANON_KEY=dealership1-anon-key
 
 # App Configuration
-VITE_APP_URL=https://thedasboard.com
-VITE_MARKETING_URL=https://thedasboard.com
 VITE_API_URL=https://thedasboard.com/api
-VITE_BASE_PATH=/
-VITE_DEPLOYMENT_VERSION=1.0.0
-
-# Build Configuration
-NODE_VERSION=18
-NPM_FLAGS=--legacy-peer-deps
 
 # Mock Configuration (set to false for production)
 USE_MOCK_SUPABASE=false
