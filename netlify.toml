@@ -7,6 +7,8 @@
   NPM_FLAGS = "--legacy-peer-deps"
   # Disable secrets scanning for test files and development files
   SECRETS_SCAN_OMIT_PATHS = ".excluded-from-build/**/*,.env*,test-*.js,test-*.cjs,test-*.ts,fix-*.js,setup-*.js,setup-*.cjs,update-*.js,check-*.js,execute-*.js,create-*.js,create-*.cjs,deploy-*.ps1,schema-*.cjs,scripts/**/*,public/*.html,src/pages/*.html,*RESOLUTION*.md,*SETUP*.md,*DEALERSHIP*.md,*TEST*.md,auth-*.md,supabase-*.md"
+  # Disable secrets scanning for Supabase environment variables
+  SECRETS_SCAN_OMIT_KEYS = "VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY,SUPABASE_URL,SUPABASE_ANON_KEY"
 
 # Functions disabled - no functions directory
 
