@@ -220,46 +220,68 @@ const FinanceDealsPage: React.FC = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-xs">
-                  <th className="font-medium text-white py-2 pl-3 text-center bg-gray-600 w-12">
+                  <th className="font-medium text-gray-700 py-2 pl-3 text-center bg-white w-12 border-r border-gray-200">
                     #
                   </th>
-                  <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
+                  <th className="font-medium text-gray-700 py-2 px-2 text-left bg-gray-50 border-r border-gray-200">
                     Last Name
                   </th>
-                  <th className="font-medium text-white py-2 pl-4 pr-2 text-left bg-blue-600">
-                    <button className="flex items-center" onClick={() => toggleSort('id')}>
+                  <th className="font-medium text-white py-2 pl-4 pr-2 text-left bg-blue-100 border-r border-blue-200">
+                    <button
+                      className="flex items-center text-blue-700"
+                      onClick={() => toggleSort('id')}
+                    >
                       Deal #
-                      {sortField === 'id' && <ArrowUpDown size={14} className="ml-1 text-white" />}
-                    </button>
-                  </th>
-                  <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
-                    Stock #
-                  </th>
-                  <th className="font-medium text-white py-2 px-2 text-center bg-gray-600">
-                    <button className="flex items-center" onClick={() => toggleSort('saleDate')}>
-                      Date
-                      {sortField === 'saleDate' && (
-                        <ArrowUpDown size={14} className="ml-1 text-white" />
+                      {sortField === 'id' && (
+                        <ArrowUpDown size={14} className="ml-1 text-blue-700" />
                       )}
                     </button>
                   </th>
-                  <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">VIN</th>
-                  <th className="font-medium text-white py-2 px-2 text-center bg-indigo-600">
+                  <th className="font-medium text-white py-2 px-2 text-left bg-blue-200 border-r border-blue-300">
+                    <span className="text-blue-800">Stock #</span>
+                  </th>
+                  <th className="font-medium text-white py-2 px-2 text-center bg-blue-300 border-r border-blue-400">
+                    <button
+                      className="flex items-center text-blue-900"
+                      onClick={() => toggleSort('saleDate')}
+                    >
+                      Date
+                      {sortField === 'saleDate' && (
+                        <ArrowUpDown size={14} className="ml-1 text-blue-900" />
+                      )}
+                    </button>
+                  </th>
+                  <th className="font-medium text-white py-2 px-2 text-left bg-blue-400 border-r border-blue-500">
+                    <span className="text-blue-900">VIN</span>
+                  </th>
+                  <th className="font-medium text-white py-2 px-2 text-center bg-blue-500 border-r border-blue-600">
                     N/U/CPO
                   </th>
-                  <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">Lender</th>
-                  <th className="font-medium text-white py-2 px-2 text-right bg-blue-600">
+                  <th className="font-medium text-white py-2 px-2 text-left bg-blue-600 border-r border-blue-700">
+                    Lender
+                  </th>
+                  <th className="font-medium text-white py-2 px-2 text-right bg-blue-700 border-r border-blue-800">
                     Front End
                   </th>
-                  <th className="font-medium text-white py-2 px-2 text-right bg-teal-600">VSC</th>
-                  <th className="font-medium text-white py-2 px-2 text-right bg-purple-600">PPM</th>
-                  <th className="font-medium text-white py-2 px-2 text-right bg-green-600">GAP</th>
-                  <th className="font-medium text-white py-2 px-2 text-right bg-amber-600">
+                  <th className="font-medium text-white py-2 px-2 text-right bg-blue-800 border-r border-blue-900">
+                    VSC
+                  </th>
+                  <th className="font-medium text-white py-2 px-2 text-right bg-blue-900 border-r border-slate-100">
+                    PPM
+                  </th>
+                  <th className="font-medium text-white py-2 px-2 text-right bg-slate-600 border-r border-slate-700">
+                    GAP
+                  </th>
+                  <th className="font-medium text-white py-2 px-2 text-right bg-slate-700 border-r border-slate-800">
                     T&W/Bundle
                   </th>
-                  <th className="font-medium text-white py-2 px-2 text-center bg-pink-600">PPD</th>
-                  <th className="font-medium text-white py-2 px-2 text-right bg-purple-600">PVR</th>
-                  <th className="font-medium text-white py-2 px-2 text-right bg-green-600">
+                  <th className="font-medium text-white py-2 px-2 text-center bg-slate-800 border-r border-slate-900">
+                    PPD
+                  </th>
+                  <th className="font-medium text-white py-2 px-2 text-right bg-slate-900 border-r border-gray-700">
+                    PVR
+                  </th>
+                  <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-gray-800">
                     <button
                       className="flex items-center justify-end ml-auto"
                       onClick={() => toggleSort('profit')}
@@ -270,7 +292,7 @@ const FinanceDealsPage: React.FC = () => {
                       )}
                     </button>
                   </th>
-                  <th className="font-medium text-white py-2 px-2 text-center bg-gray-600 w-20">
+                  <th className="font-medium text-white py-2 px-2 text-center bg-gray-800 w-20 border-r border-gray-900">
                     Status
                   </th>
                   <th className="font-medium text-white py-2 px-2 text-center bg-red-600 rounded-tr-md w-16">
@@ -376,60 +398,68 @@ const FinanceDealsPage: React.FC = () => {
                           index % 2 === 1 ? 'bg-gray-50' : ''
                         } hover:bg-blue-50`}
                       >
-                        <td className="py-2 px-2 text-center font-medium">
+                        <td className="py-2 px-2 text-center font-medium bg-white border-r border-gray-200">
                           {filteredDeals.length - index}
                         </td>
-                        <td className="py-2 px-2 text-left font-medium">{lastName}</td>
-                        <td className="py-2 pl-4 pr-2 text-left font-medium text-blue-600">
+                        <td className="py-2 px-2 text-left font-medium bg-white border-r border-gray-200">
+                          {lastName}
+                        </td>
+                        <td className="py-2 pl-4 pr-2 text-left font-medium text-blue-700 bg-white border-r border-gray-200">
                           {dealData.dealNumber || deal.id}
                         </td>
-                        <td className="py-2 px-2 text-left font-mono">
+                        <td className="py-2 px-2 text-left font-mono bg-white border-r border-gray-200">
                           {dealData.stockNumber || deal.id.replace('D', 'S')}
                         </td>
-                        <td className="py-2 px-2 text-center text-gray-600">{formattedDate}</td>
-                        <td className="py-2 px-2 text-left font-mono text-xs">
+                        <td className="py-2 px-2 text-center text-gray-700 bg-white border-r border-gray-200">
+                          {formattedDate}
+                        </td>
+                        <td className="py-2 px-2 text-left font-mono text-xs bg-white border-r border-gray-200">
                           {deal.vin ? `...${deal.vin.slice(-8)}` : dealData.vinLast8 || 'N/A'}
                         </td>
-                        <td className="py-2 px-2 text-center">
+                        <td className="py-2 px-2 text-center bg-white border-r border-gray-200">
                           <span
                             className={`px-1.5 py-0.5 rounded text-xs font-medium ${
                               vehicleType === 'N'
-                                ? 'bg-green-100 text-green-800'
-                                : vehicleType === 'C'
                                 ? 'bg-blue-100 text-blue-800'
-                                : 'bg-amber-100 text-amber-800'
+                                : vehicleType === 'C'
+                                ? 'bg-slate-100 text-slate-800'
+                                : 'bg-slate-100 text-slate-600'
                             }`}
                           >
                             {vehicleType}
                           </span>
                         </td>
-                        <td className="py-2 px-2 text-left">{dealData.lender || 'N/A'}</td>
-                        <td className="py-2 px-2 text-right bg-blue-50 font-medium">
+                        <td className="py-2 px-2 text-left bg-white border-r border-gray-200">
+                          {dealData.lender || 'N/A'}
+                        </td>
+                        <td className="py-2 px-2 text-right bg-white font-medium border-r border-gray-200">
                           $
                           {(
                             dealData.frontEndGross || Math.round(deal.amount * 0.7)
                           ).toLocaleString()}
                         </td>
-                        <td className="py-2 px-2 text-right bg-teal-50">
+                        <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
                           ${vscProfit.toLocaleString()}
                         </td>
-                        <td className="py-2 px-2 text-right bg-purple-50">
+                        <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
                           ${ppmProfit.toLocaleString()}
                         </td>
-                        <td className="py-2 px-2 text-right bg-green-50">
+                        <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
                           ${gapProfit.toLocaleString()}
                         </td>
-                        <td className="py-2 px-2 text-right bg-amber-50">
+                        <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
                           ${twProfit.toLocaleString()}
-                      </td>
-                        <td className="py-2 px-2 text-center bg-pink-50 font-medium">{ppd}</td>
-                        <td className="py-2 px-2 text-right bg-purple-50">
+                        </td>
+                        <td className="py-2 px-2 text-center bg-white font-medium border-r border-gray-200">
+                          {ppd}
+                        </td>
+                        <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
                           ${pvr.toLocaleString()}
-                      </td>
-                        <td className="py-2 px-2 text-right font-medium text-green-600">
-                        ${deal.profit.toLocaleString()}
-                      </td>
-                        <td className="py-2 px-2 text-center">
+                        </td>
+                        <td className="py-2 px-2 text-right font-medium text-blue-600 bg-white border-r border-gray-200">
+                          ${deal.profit.toLocaleString()}
+                        </td>
+                        <td className="py-2 px-2 text-center bg-white border-r border-gray-200">
                           <select
                             value={status}
                             onChange={e => handleStatusChange(deal.id, e.target.value)}
@@ -441,14 +471,14 @@ const FinanceDealsPage: React.FC = () => {
                             <option value="Dead Deal">Dead Deal</option>
                           </select>
                         </td>
-                        <td className="py-2 px-2 text-center">
+                        <td className="py-2 px-2 text-center bg-white">
                           <input
                             type="checkbox"
                             onChange={e => handleDeleteDeal(deal.id, e.target.checked)}
                             className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
                           />
-                      </td>
-                    </tr>
+                        </td>
+                      </tr>
                     );
                   })
                 ) : (

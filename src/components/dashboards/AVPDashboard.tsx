@@ -325,7 +325,7 @@ const AVPDashboard = () => {
       <div className="w-full bg-gray-200 rounded-full h-2">
         <div
           className={`h-2 rounded-full ${
-            percentage >= 90 ? 'bg-green-500' : percentage >= 70 ? 'bg-yellow-500' : 'bg-red-500'
+            percentage >= 90 ? 'bg-blue-500' : percentage >= 70 ? 'bg-blue-500' : 'bg-blue-500'
           }`}
           style={{ width: `${percentage}%` }}
         ></div>
@@ -410,8 +410,8 @@ const AVPDashboard = () => {
           {/* District Metrics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Gross Profit</CardTitle>
+              <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-white">Total Gross Profit</CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -428,8 +428,8 @@ const AVPDashboard = () => {
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Units</CardTitle>
+              <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-white">Total Units</CardTitle>
                 <BarChart4 className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -441,8 +441,8 @@ const AVPDashboard = () => {
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">District Front PVR</CardTitle>
+              <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-white">District Front PVR</CardTitle>
                 <Calculator className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -452,8 +452,8 @@ const AVPDashboard = () => {
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">District Back PVR</CardTitle>
+              <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-white">District Back PVR</CardTitle>
                 <CreditCard className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -466,8 +466,8 @@ const AVPDashboard = () => {
           {/* Goal Achievement and Top Performer */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
+              <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600">
+                <CardTitle className="flex items-center text-white">
                   <Target className="w-5 h-5 mr-2" />
                   District Goal Achievement
                 </CardTitle>
@@ -487,7 +487,7 @@ const AVPDashboard = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
+                <CardTitle className="flex items-center text-white">
                   <Trophy className="w-5 h-5 mr-2 text-yellow-500" />
                   Top Performing Store
                 </CardTitle>
@@ -507,7 +507,7 @@ const AVPDashboard = () => {
           {/* Dealership Performance Overview */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center">
+              <CardTitle className="flex items-center text-white">
                 <Building className="w-5 h-5 mr-2" />
                 Dealership Performance Overview
               </CardTitle>
@@ -653,7 +653,7 @@ const AVPDashboard = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center">
+              <CardTitle className="flex items-center text-white">
                 <Trophy className="w-5 h-5 mr-2 text-yellow-500" />
                 {showSalesBoard ? 'Sales Team' : 'F&I Team'} Leaderboard
               </CardTitle>
@@ -721,7 +721,7 @@ const AVPDashboard = () => {
         <TabsContent value="schedules" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center">
+              <CardTitle className="flex items-center text-white">
                 <Calendar className="w-5 h-5 mr-2" />
                 District Team Schedules
               </CardTitle>
@@ -752,7 +752,7 @@ const AVPDashboard = () => {
         <TabsContent value="deals" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center">
+              <CardTitle className="flex items-center text-white">
                 <FileText className="w-5 h-5 mr-2" />
                 District Deal Log
               </CardTitle>
@@ -770,7 +770,7 @@ const AVPDashboard = () => {
         <TabsContent value="metrics" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center">
+              <CardTitle className="flex items-center text-white">
                 <BarChart3 className="w-5 h-5 mr-2" />
                 Team Sales Metrics
               </CardTitle>
@@ -813,7 +813,7 @@ const AVPDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
+                <CardTitle className="flex items-center text-white">
                   <UserPlus className="w-5 h-5 mr-2" />
                   Team Management
                 </CardTitle>
@@ -836,7 +836,7 @@ const AVPDashboard = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
+                <CardTitle className="flex items-center text-white">
                   <Goal className="w-5 h-5 mr-2" />
                   Goal Setting
                 </CardTitle>
@@ -859,7 +859,7 @@ const AVPDashboard = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
+                <CardTitle className="flex items-center text-white">
                   <ClipboardList className="w-5 h-5 mr-2" />
                   Reports & Analytics
                 </CardTitle>

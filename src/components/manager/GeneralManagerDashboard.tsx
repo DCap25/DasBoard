@@ -745,11 +745,11 @@ export function GeneralManagerDashboard() {
                         <TableHead>Customer</TableHead>
                         <TableHead>Vehicle</TableHead>
                         <TableHead>Salesperson</TableHead>
-                        <TableHead className="text-right">Front End</TableHead>
-                        <TableHead className="text-right">Back End</TableHead>
-                        <TableHead className="text-right">F&I Gross</TableHead>
+                        <TableHead className=" bg-gray-700 text-white">Front End</TableHead>
+                        <TableHead className=" bg-gray-700 text-white">Back End</TableHead>
+                        <TableHead className=" bg-gray-700 text-white">F&I Gross</TableHead>
                         <TableHead>Status</TableHead>
-                        <TableHead className="w-[80px]">Action</TableHead>
+                        <TableHead className="w-[80px] bg-gray-700 text-white">Action</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>

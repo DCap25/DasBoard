@@ -653,128 +653,217 @@ export const SingleFinanceHomePage: React.FC = () => {
         </Card>
       </div>
 
-      {/* Product Mix Section - Now Full Width */}
-      <Card className="col-span-12 bg-white border-slate-200 shadow-sm mt-6">
-        <CardHeader className="py-2 px-4 border-b">
-          <CardTitle className="flex items-center text-xl font-semibold">
-            <BarChart4 className="mr-2 h-6 w-6 text-blue-500" />
-            F&I Product Mix - Penetration % & Avg. Profit
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* First Column: VSC, GAP, PPM */}
-            <div className="space-y-2">
-              {/* VSC */}
-              <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                <div className="font-medium flex items-center text-base">
-                  <div className="w-3 h-3 bg-blue-600 rounded-full mr-2"></div>
-                  Vehicle Service Contract (VSC)
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-2xl text-blue-600">
-                    ${metrics.avgProfits.extendedWarranty.toLocaleString()}
+      {/* F&I Product Mix and Finance Das Board Row */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card className="border hover:shadow-md transition-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center text-lg font-medium">
+              <BarChart4 className="mr-2 h-5 w-5 text-blue-500" />
+              F&I Product Mix & Avg. Profit
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {metrics.dealsProcessed > 0 ? (
+              <div className="space-y-2">
+                {[
+                  {
+                    name: 'Vehicle Service Contract (VSC)',
+                    percent: metrics.productMix.extendedWarranty,
+                    value: `${metrics.avgProfits.extendedWarranty.toLocaleString()}`,
+                    color: 'bg-blue-600',
+                  },
+                  {
+                    name: 'PrePaid Maintenance (PPM)',
+                    percent: metrics.productMix.ppm,
+                    value: `${metrics.avgProfits.ppm.toLocaleString()}`,
+                    color: 'bg-blue-600',
+                  },
+                  {
+                    name: 'GAP Insurance',
+                    percent: metrics.productMix.gapInsurance,
+                    value: `${metrics.avgProfits.gapInsurance.toLocaleString()}`,
+                    color: 'bg-blue-600',
+                  },
+                  {
+                    name: 'Paint and Fabric Protection',
+                    percent: metrics.productMix.paintProtection,
+                    value: `${metrics.avgProfits.paintProtection.toLocaleString()}`,
+                    color: 'bg-blue-600',
+                  },
+                  {
+                    name: 'Tire & Wheel Bundle',
+                    percent: metrics.productMix.tireWheel,
+                    value: `${metrics.avgProfits.tireWheel.toLocaleString()}`,
+                    color: 'bg-blue-600',
+                  },
+                  {
+                    name: 'Other Products',
+                    percent: metrics.productMix.other,
+                    value: `${metrics.avgProfits.other.toLocaleString()}`,
+                    color: 'bg-blue-600',
+                  },
+                ].map((product, index) => (
+                  <div key={index} className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <div className="font-medium flex items-center text-sm">
+                        <div className={`w-3 h-3 ${product.color} rounded-full mr-2`}></div>
+                        {product.name}
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xs text-gray-500">Avg. Profit</div>
+                        <div className="font-medium text-sm">{product.value}</div>
+                      </div>
+                    </div>
+                    <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                      <div
+                        className={`absolute inset-y-0 left-0 rounded-full ${product.color}`}
+                        style={{ width: `${product.percent}%` }}
+                      />
+                    </div>
+                    <div className="text-right text-xs text-gray-500">{product.percent}%</div>
                   </div>
-                  <div className="text-sm text-gray-600">
-                    {metrics.productMix.extendedWarranty}% Penetration
+                ))}
+
+                {/* Add PPD metric at the bottom */}
+                <div className="mt-4 pt-3 border-t border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <div className="font-medium text-sm">Products Per Deal (PPD)</div>
+                    <div className="font-bold text-lg text-blue-700">
+                      {metrics.productsPerDeal.toFixed(1)}
+                    </div>
                   </div>
                 </div>
               </div>
-
-              {/* GAP Insurance */}
-              <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                <div className="font-medium flex items-center text-base">
-                  <div className="w-3 h-3 bg-green-600 rounded-full mr-2"></div>
-                  GAP Insurance
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-2xl text-green-600">
-                    ${metrics.avgProfits.gapInsurance.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    {metrics.productMix.gapInsurance}% Penetration
-                  </div>
-                </div>
+            ) : (
+              <div className="py-8 text-center text-gray-500">
+                No F&I product data available yet. Log deals with products to see the mix.
               </div>
+            )}
+          </CardContent>
+        </Card>
 
-              {/* PPM */}
-              <div className="flex items-center justify-between py-2">
-                <div className="font-medium flex items-center text-base">
-                  <div className="w-3 h-3 bg-purple-600 rounded-full mr-2"></div>
-                  PrePaid Maintenance (PPM)
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-2xl text-purple-600">
-                    ${metrics.avgProfits.ppm.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-gray-600">{metrics.productMix.ppm}% Penetration</div>
-                </div>
+        <Card className="border hover:shadow-md transition-shadow">
+          <CardHeader className="py-2 px-4 border-b">
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-sm font-medium flex items-center">
+                <Trophy className="mr-2 h-4 w-4 text-blue-600" />
+                Finance Das Board
+              </CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="py-1">
+            {/* Sortable Header */}
+            <div className="flex items-center text-xs font-medium text-white border-b py-2 px-1">
+              <div className="w-10 text-center bg-gray-600 py-2 rounded-l-md">#</div>
+              <div className="w-36 flex-shrink-0 bg-gray-600 py-2 px-2">F&I Manager</div>
+              <div className="w-28 text-center bg-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
+                PVR <ChevronDown className="ml-1 h-3 w-3" />
+              </div>
+              <div className="w-28 text-center bg-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
+                VSC % <ChevronDown className="ml-1 h-3 w-3" />
+              </div>
+              <div className="w-28 text-center bg-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
+                GAP % <ChevronDown className="ml-1 h-3 w-3" />
+              </div>
+              <div className="w-28 text-center bg-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
+                PPM % <ChevronDown className="ml-1 h-3 w-3" />
+              </div>
+              <div className="w-24 text-center bg-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
+                PPD <ChevronDown className="ml-1 h-3 w-3" />
+              </div>
+              <div className="w-36 text-right bg-blue-600 py-2 pr-3 flex items-center justify-end cursor-pointer hover:bg-blue-700 font-semibold rounded-r-md">
+                Profit <ChevronDown className="ml-1 h-3 w-3" />
               </div>
             </div>
 
-            {/* Second Column: Paint, Tire & Wheel, Other */}
-            <div className="space-y-2">
-              {/* Paint Protection */}
-              <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                <div className="font-medium flex items-center text-base">
-                  <div className="w-3 h-3 bg-orange-600 rounded-full mr-2"></div>
-                  Paint Protection
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-2xl text-orange-600">
-                    ${metrics.avgProfits.paintProtection.toLocaleString()}
+            {/* Leaderboard Entries */}
+            <div>
+              {[
+                {
+                  name: 'Ashley Rodriguez',
+                  pvr: 2650,
+                  vscPen: 68,
+                  gapPen: 72,
+                  ppmPen: 54,
+                  ppd: 3.2,
+                  profit: 143200,
+                },
+                {
+                  name: 'Michael Parker',
+                  pvr: 2450,
+                  vscPen: 65,
+                  gapPen: 70,
+                  ppmPen: 48,
+                  ppd: 2.9,
+                  profit: 127500,
+                },
+                {
+                  name: 'Sophia Martinez',
+                  pvr: 2320,
+                  vscPen: 61,
+                  gapPen: 68,
+                  ppmPen: 45,
+                  ppd: 2.7,
+                  profit: 115300,
+                },
+                {
+                  name: 'James Wilson',
+                  pvr: 2200,
+                  vscPen: 58,
+                  gapPen: 65,
+                  ppmPen: 42,
+                  ppd: 2.5,
+                  profit: 96500,
+                },
+                {
+                  name: 'Emma Johnson',
+                  pvr: 2100,
+                  vscPen: 55,
+                  gapPen: 62,
+                  ppmPen: 38,
+                  ppd: 2.4,
+                  profit: 89200,
+                },
+              ].map((person, index) => (
+                <div
+                  key={index}
+                  className={`flex items-center py-2 px-1 ${
+                    index !== 4 ? 'border-b' : ''
+                  } border-gray-100 text-sm hover:bg-gray-50`}
+                >
+                  <div className="w-10 flex justify-center">
+                    <div
+                      className={`w-5 h-5 rounded-full flex items-center justify-center
+                        ${
+                          index === 0
+                            ? 'bg-yellow-100 text-yellow-600'
+                            : index === 1
+                            ? 'bg-gray-100 text-gray-600'
+                            : index === 2
+                            ? 'bg-amber-100 text-amber-600'
+                            : 'bg-blue-50 text-blue-500'
+                        }`}
+                    >
+                      <span className="text-xs font-bold">{index + 1}</span>
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-600">
-                    {metrics.productMix.paintProtection}% Penetration
+                  <div className="w-36 flex-shrink-0 font-medium truncate px-2">{person.name}</div>
+                  <div className="w-28 text-center bg-blue-50">${person.pvr.toLocaleString()}</div>
+                  <div className="w-28 text-center bg-blue-50">{person.vscPen}%</div>
+                  <div className="w-28 text-center bg-blue-50">{person.gapPen}%</div>
+                  <div className="w-28 text-center bg-blue-50">{person.ppmPen}%</div>
+                  <div className="w-24 text-center bg-blue-50">{person.ppd}</div>
+                  <div className="w-36 text-right pr-3">
+                    <span className="text-lg font-bold text-green-600">
+                      ${person.profit.toLocaleString()}
+                    </span>
                   </div>
                 </div>
-              </div>
-
-              {/* Tire & Wheel */}
-              <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                <div className="font-medium flex items-center text-base">
-                  <div className="w-3 h-3 bg-amber-600 rounded-full mr-2"></div>
-                  Tire and Wheel Bundle
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-2xl text-amber-600">
-                    ${metrics.avgProfits.tireWheel.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    {metrics.productMix.tireWheel}% Penetration
-                  </div>
-                </div>
-              </div>
-
-              {/* Other */}
-              <div className="flex items-center justify-between py-2">
-                <div className="font-medium flex items-center text-base">
-                  <div className="w-3 h-3 bg-gray-600 rounded-full mr-2"></div>
-                  Other Products
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-2xl text-gray-600">
-                    ${metrics.avgProfits.other.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    {metrics.productMix.other}% Penetration
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
-          </div>
-
-          {/* Products Per Deal (PPD) metric at the bottom */}
-          <div className="mt-4 pt-3 border-t border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="font-medium text-sm">Products Per Deal (PPD)</div>
-              <div className="font-bold text-lg text-purple-600">
-                {metrics.productsPerDeal.toFixed(1)}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Schedule Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">

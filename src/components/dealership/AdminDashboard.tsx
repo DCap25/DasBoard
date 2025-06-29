@@ -209,9 +209,9 @@ const AdminDashboard: React.FC = () => {
               <table className="min-w-full bg-white">
                 <thead>
                   <tr>
-                    <th className="px-6 py-3 border-b-2 border-gray-200 text-left">Name</th>
-                    <th className="px-6 py-3 border-b-2 border-gray-200 text-left">Email</th>
-                    <th className="px-6 py-3 border-b-2 border-gray-200 text-left">Role</th>
+                    <th className="bg-gray-700 text-white" className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white">Name</th>
+                    <th className="bg-gray-700 text-white" className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white">Email</th>
+                    <th className="bg-gray-700 text-white" className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white">Role</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -238,11 +238,11 @@ const AdminDashboard: React.FC = () => {
                 <table className="min-w-full bg-white">
                   <thead>
                     <tr>
-                      <th className="px-6 py-3 border-b-2 border-gray-200 text-left">Role</th>
-                      <th className="px-6 py-3 border-b-2 border-gray-200 text-left">Base Salary</th>
-                      <th className="px-6 py-3 border-b-2 border-gray-200 text-left">Commission Rate</th>
-                      <th className="px-6 py-3 border-b-2 border-gray-200 text-left">Bonus %</th>
-                      <th className="px-6 py-3 border-b-2 border-gray-200 text-left">Profit Sharing</th>
+                      <th className="bg-gray-700 text-white" className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white">Role</th>
+                      <th className="bg-gray-700 text-white" className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white">Base Salary</th>
+                      <th className="bg-gray-700 text-white" className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white">Commission Rate</th>
+                      <th className="bg-gray-700 text-white" className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white">Bonus %</th>
+                      <th className="bg-gray-700 text-white" className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white">Profit Sharing</th>
                     </tr>
                   </thead>
                   <tbody>

@@ -164,8 +164,8 @@ const GMDashboard = () => {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-6">
         {/* Box 1: Gross Profits */}
         <Card className="border-l-4 border-l-green-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 pb-2">
+            <CardTitle className="text-sm font-medium flex items-center text-white">
               <DollarSign className="mr-2 h-4 w-4 text-green-500" />
               Gross Profit
             </CardTitle>
@@ -201,8 +201,8 @@ const GMDashboard = () => {
 
         {/* Box 2: Units Sold with New/Used Breakdown */}
         <Card className="border-l-4 border-l-blue-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 pb-2">
+            <CardTitle className="text-sm font-medium flex items-center text-white">
               <Car className="mr-2 h-4 w-4 text-blue-500" />
               Total Units
             </CardTitle>
@@ -238,8 +238,8 @@ const GMDashboard = () => {
 
         {/* Box 3: Sales Performance */}
         <Card className="border-l-4 border-l-purple-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 pb-2">
+            <CardTitle className="text-sm font-medium flex items-center text-white">
               <Target className="mr-2 h-4 w-4 text-purple-500" />
               Sales Performance
             </CardTitle>
@@ -253,14 +253,14 @@ const GMDashboard = () => {
                   {data.totalUnits}/{data.salesGoal}
                 </span>
               </div>
-              <div className="h-2 w-full bg-gray-100 rounded-full">
+              <div className="h-2 w-full bg-white rounded-full">
                 <div
                   className={`h-full rounded-full ${
                     data.salesPerformance >= 100
-                      ? 'bg-green-500'
+                      ? 'bg-white border-r border-blue-500'
                       : data.salesPerformance >= 80
-                      ? 'bg-yellow-500'
-                      : 'bg-red-500'
+                      ? 'bg-blue-500'
+                      : 'bg-blue-500'
                   }`}
                   style={{ width: `${Math.min(data.salesPerformance, 100)}%` }}
                 ></div>
@@ -278,8 +278,8 @@ const GMDashboard = () => {
 
         {/* Box 4: Average Per Deal */}
         <Card className="border-l-4 border-l-amber-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 pb-2">
+            <CardTitle className="text-sm font-medium flex items-center text-white">
               <Calculator className="mr-2 h-4 w-4 text-amber-500" />
               Average Per Deal
             </CardTitle>
@@ -318,8 +318,8 @@ const GMDashboard = () => {
       <div className="grid grid-cols-12 gap-6 mb-6">
         {/* Finance Das Board (Left) */}
         <Card className="col-span-12 md:col-span-6">
-          <CardHeader className="bg-green-50 border-b border-green-100">
-            <CardTitle className="text-lg font-semibold text-green-700 flex items-center">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300">
+            <CardTitle className="text-white text-lg font-semibold flex items-center">
               <Trophy className="mr-2 h-5 w-5 text-yellow-500" />
               Finance Das Board
             </CardTitle>
@@ -329,21 +329,21 @@ const GMDashboard = () => {
               <div className="min-w-full">
                 {/* Sortable Header */}
                 <div className="flex items-center text-xs font-medium text-white border-b py-2 px-1">
-                  <div className="w-10 text-center bg-gray-600 py-2 rounded-l-md">#</div>
-                  <div className="w-36 flex-shrink-0 bg-gray-600 py-2 px-2">F&I Manager</div>
-                  <div className="w-28 text-center bg-purple-600 py-2 flex items-center justify-center cursor-pointer hover:bg-purple-700">
+                  <div className="w-10 text-center bg-gray-50 border-r border-gray-200 py-2 rounded-l-md">#</div>
+                  <div className="w-36 flex-shrink-0 bg-blue-100 border-r border-blue-200 py-2 px-2">F&I Manager</div>
+                  <div className="w-28 text-center bg-blue-200 border-r border-blue-300 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                     PVR <ChevronDown className="ml-1 h-3 w-3" />
                   </div>
-                  <div className="w-28 text-center bg-teal-600 py-2 flex items-center justify-center cursor-pointer hover:bg-teal-700">
+                  <div className="w-28 text-center bg-blue-300 border-r border-blue-400 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                     VSC % <ChevronDown className="ml-1 h-3 w-3" />
                   </div>
-                  <div className="w-28 text-center bg-purple-600 py-2 flex items-center justify-center cursor-pointer hover:bg-purple-700">
+                  <div className="w-28 text-center bg-blue-400 border-r border-blue-500 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                     PPM % <ChevronDown className="ml-1 h-3 w-3" />
                   </div>
-                  <div className="w-24 text-center bg-pink-600 py-2 flex items-center justify-center cursor-pointer hover:bg-pink-700">
+                  <div className="w-24 text-center bg-white border-r border-blue-500 border-r border-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                     PPD <ChevronDown className="ml-1 h-3 w-3" />
                   </div>
-                  <div className="w-36 text-right bg-indigo-600 py-2 pr-3 flex items-center justify-end cursor-pointer hover:bg-indigo-700 font-semibold rounded-r-md">
+                  <div className="w-36 text-right bg-blue-600 border-r border-blue-700 py-2 pr-3 flex items-center justify-end cursor-pointer hover:bg-blue-700 font-semibold rounded-r-md">
                     Profit <ChevronDown className="ml-1 h-3 w-3" />
                   </div>
                 </div>
@@ -408,7 +408,7 @@ const GMDashboard = () => {
                               ? 'bg-gray-100 text-gray-600'
                               : index === 2
                               ? 'bg-amber-100 text-amber-600'
-                              : 'bg-blue-50 text-blue-500'
+                              : 'bg-white border-r border-gray-200 text-blue-500'
                           }`}
                         >
                           <span className="text-xs font-bold">{index + 1}</span>
@@ -432,8 +432,8 @@ const GMDashboard = () => {
 
         {/* Sales Manager Das Board */}
         <Card className="col-span-12 md:col-span-6">
-          <CardHeader className="bg-purple-50 border-b border-purple-100">
-            <CardTitle className="text-lg font-semibold text-purple-700 flex items-center">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300">
+            <CardTitle className="text-white text-lg font-semibold flex items-center">
               <Users className="h-5 w-5 text-purple-600 mr-2" />
               Sales Manager Das Board
             </CardTitle>
@@ -442,12 +442,12 @@ const GMDashboard = () => {
             <div className="overflow-x-auto">
               <div className="min-w-full">
                 <div className="flex items-center text-xs font-medium text-white border-b py-2 px-1">
-                  <div className="w-10 text-center bg-gray-600 py-2 rounded-l-md">#</div>
-                  <div className="w-40 flex-shrink-0 bg-gray-600 py-2 px-2">Manager</div>
-                  <div className="w-28 text-center bg-blue-600 py-2">Team Units</div>
-                  <div className="w-28 text-center bg-green-600 py-2">Total Gross</div>
-                  <div className="w-28 text-center bg-purple-600 py-2">Avg Front</div>
-                  <div className="w-28 text-center bg-indigo-600 py-2 rounded-r-md">Avg Back</div>
+                  <div className="w-10 text-center bg-blue-700 border-r border-blue-800 py-2 rounded-l-md">#</div>
+                  <div className="w-40 flex-shrink-0 bg-blue-800 border-r border-blue-900 py-2 px-2">Manager</div>
+                  <div className="w-28 text-center bg-blue-900 border-r border-slate-100 py-2">Team Units</div>
+                  <div className="w-28 text-center bg-slate-600 border-r border-slate-700 py-2">Total Gross</div>
+                  <div className="w-28 text-center bg-slate-700 border-r border-slate-800 py-2">Avg Front</div>
+                  <div className="w-28 text-center bg-slate-800 border-r border-slate-900 py-2 rounded-r-md">Avg Back</div>
                 </div>
 
                 {/* Sample data rows */}
@@ -488,8 +488,8 @@ const GMDashboard = () => {
 
         {/* Sales Person Das Board */}
         <Card className="col-span-12">
-          <CardHeader className="bg-blue-50 border-b border-blue-100">
-            <CardTitle className="text-lg font-semibold text-blue-700 flex items-center">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300">
+            <CardTitle className="text-white text-lg font-semibold flex items-center">
               <Trophy className="h-5 w-5 text-yellow-500 mr-2" />
               The Das Board
             </CardTitle>
@@ -499,33 +499,33 @@ const GMDashboard = () => {
               <div className="min-w-full">
                 {/* Sortable Header - Performance View */}
                 <div className="flex items-center text-xs font-medium text-white border-b py-2 px-1">
-                  <div className="w-10 text-center bg-gray-600 py-2 rounded-l-md">#</div>
-                  <div className="w-40 flex-shrink-0 bg-gray-600 py-2 px-2">Salesperson</div>
-                  <div className="w-28 text-center bg-purple-600 py-2 flex items-center justify-center cursor-pointer hover:bg-purple-700">
+                  <div className="w-10 text-center bg-slate-900 border-r border-gray-700 py-2 rounded-l-md">#</div>
+                  <div className="w-40 flex-shrink-0 bg-gray-700 border-r border-gray-800 py-2 px-2">Salesperson</div>
+                  <div className="w-28 text-center bg-gray-800 border-r border-gray-900 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                     PVR <ChevronDown className="ml-1 h-3 w-3" />
                   </div>
-                  <div className="w-36 text-center bg-green-600 py-2 flex items-center justify-center cursor-pointer hover:bg-green-700">
+                  <div className="w-36 text-center bg-gray-900 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                     Total Gross <ChevronDown className="ml-1 h-3 w-3" />
                   </div>
                   <div className="w-28 text-center bg-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                     Avg/Mo <ChevronDown className="ml-1 h-3 w-3" />
                   </div>
-                  <div className="w-28 text-center bg-blue-500 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-600">
+                  <div className="w-28 text-center bg-gray-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-600">
                     Last Mo <ChevronDown className="ml-1 h-3 w-3" />
                   </div>
-                  <div className="w-28 text-center bg-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
+                  <div className="w-28 text-center bg-gray-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                     YTD <ChevronDown className="ml-1 h-3 w-3" />
                   </div>
-                  <div className="w-28 text-center bg-blue-500 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-600">
+                  <div className="w-28 text-center bg-gray-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-600">
                     Annual <ChevronDown className="ml-1 h-3 w-3" />
                   </div>
-                  <div className="w-24 text-center bg-green-600 py-2 flex items-center justify-center cursor-pointer hover:bg-green-700">
+                  <div className="w-24 text-center bg-gray-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                     New <ChevronDown className="ml-1 h-3 w-3" />
                   </div>
-                  <div className="w-24 text-center bg-amber-600 py-2 flex items-center justify-center cursor-pointer hover:bg-amber-700">
+                  <div className="w-24 text-center bg-gray-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                     Used <ChevronDown className="ml-1 h-3 w-3" />
                   </div>
-                  <div className="w-36 text-right bg-indigo-600 py-2 pr-3 flex items-center justify-end cursor-pointer hover:bg-indigo-700 font-semibold rounded-r-md">
+                  <div className="w-36 text-right bg-gray-600 py-2 pr-3 flex items-center justify-end cursor-pointer hover:bg-blue-700 font-semibold rounded-r-md">
                     Current Month <ChevronDown className="ml-1 h-3 w-3" />
                   </div>
                 </div>
@@ -620,7 +620,7 @@ const GMDashboard = () => {
                               ? 'bg-gray-100 text-gray-600'
                               : index === 2
                               ? 'bg-amber-100 text-amber-600'
-                              : 'bg-blue-50 text-blue-500'
+                              : 'bg-white border-r border-gray-200 text-blue-500'
                           }`}
                         >
                           <span className="text-xs font-bold">{index + 1}</span>
@@ -629,16 +629,16 @@ const GMDashboard = () => {
                       <div className="w-40 flex-shrink-0 font-medium truncate px-2">
                         {person.name}
                       </div>
-                      <div className="w-28 text-center bg-purple-50">${person.pvr}</div>
-                      <div className="w-36 text-center bg-green-50">
+                      <div className="w-28 text-center bg-gray-600">${person.pvr}</div>
+                      <div className="w-36 text-center bg-gray-600">
                         ${person.totalGross.toLocaleString()}
                       </div>
-                      <div className="w-28 text-center bg-blue-50">{person.avgMonth}</div>
+                      <div className="w-28 text-center bg-gray-600">{person.avgMonth}</div>
                       <div className="w-28 text-center">{person.lastMonth}</div>
-                      <div className="w-28 text-center bg-blue-50">{person.ytd}</div>
+                      <div className="w-28 text-center bg-gray-600">{person.ytd}</div>
                       <div className="w-28 text-center">{person.annualPace}</div>
-                      <div className="w-24 text-center bg-green-50">{person.newUnits}</div>
-                      <div className="w-24 text-center bg-amber-50">{person.usedUnits}</div>
+                      <div className="w-24 text-center bg-gray-600">{person.newUnits}</div>
+                      <div className="w-24 text-center bg-gray-600">{person.usedUnits}</div>
                       <div className="w-36 text-right pr-3">
                         <span className="text-lg font-bold text-indigo-700">{person.units}</span>
                       </div>
@@ -654,8 +654,8 @@ const GMDashboard = () => {
       {/* Department Performance (moved down) */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7 mb-6">
         <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Department Performance</CardTitle>
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600">
+            <CardTitle className="text-white">Department Performance</CardTitle>
             <CardDescription>Overall business metrics for the current month</CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
@@ -663,28 +663,28 @@ const GMDashboard = () => {
               <div className="flex items-center">
                 <div className="w-[100px] text-sm">Sales</div>
                 <div className="flex-1">
-                  <div className="bg-blue-500 h-2 w-[85%] rounded-full"></div>
+                  <div className="bg-gray-600 h-2 w-[85%] rounded-full"></div>
                 </div>
                 <div className="w-[50px] text-right text-sm">85%</div>
               </div>
               <div className="flex items-center">
                 <div className="w-[100px] text-sm">Finance</div>
                 <div className="flex-1">
-                  <div className="bg-green-500 h-2 w-[92%] rounded-full"></div>
+                  <div className="bg-gray-600 h-2 w-[92%] rounded-full"></div>
                 </div>
                 <div className="w-[50px] text-right text-sm">92%</div>
               </div>
               <div className="flex items-center">
                 <div className="w-[100px] text-sm">Service</div>
                 <div className="flex-1">
-                  <div className="bg-amber-500 h-2 w-[78%] rounded-full"></div>
+                  <div className="bg-gray-600 h-2 w-[78%] rounded-full"></div>
                 </div>
                 <div className="w-[50px] text-right text-sm">78%</div>
               </div>
               <div className="flex items-center">
                 <div className="w-[100px] text-sm">Parts</div>
                 <div className="flex-1">
-                  <div className="bg-purple-500 h-2 w-[68%] rounded-full"></div>
+                  <div className="bg-gray-600 h-2 w-[68%] rounded-full"></div>
                 </div>
                 <div className="w-[50px] text-right text-sm">68%</div>
               </div>
@@ -694,7 +694,7 @@ const GMDashboard = () => {
 
         <Card className="col-span-3">
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+            <CardTitle className="text-white">Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4">
             <Button className="w-full justify-start">

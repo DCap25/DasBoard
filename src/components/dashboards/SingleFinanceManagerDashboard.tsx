@@ -374,7 +374,7 @@ const SingleFinanceManagerDashboard = () => {
             </div>
 
             {/* Daily Finance Tip - Best Practices */}
-            <div className="bg-orange-50 p-2 rounded-md mt-2 md:mt-0 border border-orange-100 max-w-2xl">
+            <div className="bg-white p-2 rounded-md mt-2 md:mt-0 border border-orange-100 max-w-2xl">
               <p className="text-xs italic text-orange-800">
                 <Lightbulb className="h-3 w-3 inline-block mr-1" />
                 <strong>F&I Best Practice:</strong>{' '}
@@ -404,7 +404,7 @@ const SingleFinanceManagerDashboard = () => {
 
         <Button
           size="lg"
-          className="bg-orange-600 hover:bg-orange-700"
+          className="bg-blue-600 hover:bg-blue-700"
           onClick={handleLogNewDealClick}
         >
           <span className="flex items-center">
@@ -421,8 +421,8 @@ const SingleFinanceManagerDashboard = () => {
 
       {/* Deals Log Section */}
       <Card className="col-span-12 bg-white border-slate-200 shadow-sm">
-        <CardHeader className="py-2 px-4 border-b flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-lg font-medium flex items-center">
+        <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 py-2 px-4 flex flex-row items-center justify-between space-y-0">
+          <CardTitle className="text-lg font-medium flex items-center text-white">
             <FileText className="mr-2 h-5 w-5 text-orange-500" />
             Deals Log
           </CardTitle>
@@ -436,51 +436,51 @@ const SingleFinanceManagerDashboard = () => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-xs">
-                    <th className="font-medium text-white py-2 pl-3 text-center bg-gray-600 w-12">
+                    <th className="font-medium text-white py-2 pl-3 text-center bg-white w-12 border-r border-gray-200">
                       #
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
+                    <th className="font-medium text-white py-2 px-2 text-left bg-gray-700 border-r border-gray-200">
                       Last Name
                     </th>
-                    <th className="font-medium text-white py-2 pl-4 pr-2 text-left bg-orange-600">
+                    <th className="font-medium text-white py-2 pl-4 pr-2 text-left bg-gray-700 border-r border-blue-200">
                       Deal #
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
+                    <th className="font-medium text-white py-2 px-2 text-left bg-gray-700 border-r border-blue-300">
                       Stock #
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-center bg-gray-600">
+                    <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 border-r border-blue-400">
                       Date
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">VIN</th>
-                    <th className="font-medium text-white py-2 px-2 text-center bg-indigo-600">
+                    <th className="font-medium text-white py-2 px-2 text-left bg-gray-700 border-r border-blue-500">VIN</th>
+                    <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 border-r border-blue-600">
                       N/U/CPO
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
+                    <th className="font-medium text-white py-2 px-2 text-left bg-gray-700 border-r border-blue-700">
                       Lender
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-right bg-orange-600">
+                    <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-blue-800">
                       Front End
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-right bg-teal-600">VSC</th>
-                    <th className="font-medium text-white py-2 px-2 text-right bg-purple-600">
+                    <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-blue-900">VSC</th>
+                    <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-slate-100">
                       PPM
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-right bg-green-600">
+                    <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-slate-700">
                       GAP
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-right bg-amber-600">
+                    <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-slate-800">
                       T&W/Bundle
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-center bg-pink-600">
+                    <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 border-r border-slate-900">
                       PPD
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-right bg-purple-600">
+                    <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-gray-700">
                       PVR
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-right bg-green-600">
+                    <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-gray-800">
                       Total
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-center bg-gray-600 w-20">
+                    <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 border-r border-gray-900 w-20">
                       Status
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-center bg-red-600 rounded-tr-md w-16">
@@ -616,23 +616,23 @@ const SingleFinanceManagerDashboard = () => {
                         <td className="py-2 px-2 text-left text-gray-600 text-xs">
                           {dealData.lender || 'N/A'}
                         </td>
-                        <td className="py-2 px-2 text-right bg-blue-50 font-medium">
+                        <td className="py-2 px-2 text-right bg-white border-r border-gray-200 font-medium">
                           ${(dealData.frontEndGross || 0).toLocaleString()}
                         </td>
-                        <td className="py-2 px-2 text-right bg-teal-50">
+                        <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
                           ${vscProfit.toLocaleString()}
                         </td>
-                        <td className="py-2 px-2 text-right bg-purple-50">
+                        <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
                           ${ppmProfit.toLocaleString()}
                         </td>
-                        <td className="py-2 px-2 text-right bg-green-50">
+                        <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
                           ${gapProfit.toLocaleString()}
                         </td>
-                        <td className="py-2 px-2 text-right bg-amber-50">
+                        <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
                           ${twProfit.toLocaleString()}
                         </td>
-                        <td className="py-2 px-2 text-center bg-pink-50 font-medium">{ppd}</td>
-                        <td className="py-2 px-2 text-right bg-purple-50">
+                        <td className="py-2 px-2 text-center bg-white border-r border-gray-200 font-medium">{ppd}</td>
+                        <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
                           ${pvr.toLocaleString()}
                         </td>
                         <td className="py-2 px-2 text-right font-medium text-green-600">
@@ -665,7 +665,7 @@ const SingleFinanceManagerDashboard = () => {
                     <td colSpan={8} className="py-2 pl-4 text-left">
                       TOTALS
                     </td>
-                    <td className="py-2 px-2 text-right bg-orange-50">
+                    <td className="py-2 px-2 text-right bg-blue-50">
                       $
                       {deals
                         .slice(0, 10)
@@ -679,7 +679,7 @@ const SingleFinanceManagerDashboard = () => {
                         }, 0)
                         .toLocaleString()}
                     </td>
-                    <td className="py-2 px-2 text-right bg-teal-50">
+                    <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
                       $
                       {deals
                         .slice(0, 10)
@@ -693,7 +693,7 @@ const SingleFinanceManagerDashboard = () => {
                         }, 0)
                         .toLocaleString()}
                     </td>
-                    <td className="py-2 px-2 text-right bg-purple-50">
+                    <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
                       $
                       {deals
                         .slice(0, 10)
@@ -707,7 +707,7 @@ const SingleFinanceManagerDashboard = () => {
                         }, 0)
                         .toLocaleString()}
                     </td>
-                    <td className="py-2 px-2 text-right bg-green-50">
+                    <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
                       $
                       {deals
                         .slice(0, 10)
@@ -721,7 +721,7 @@ const SingleFinanceManagerDashboard = () => {
                         }, 0)
                         .toLocaleString()}
                     </td>
-                    <td className="py-2 px-2 text-right bg-amber-50">
+                    <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
                       $
                       {deals
                         .slice(0, 10)
@@ -735,13 +735,13 @@ const SingleFinanceManagerDashboard = () => {
                         }, 0)
                         .toLocaleString()}
                     </td>
-                    <td className="py-2 px-2 text-center bg-pink-50">
+                    <td className="py-2 px-2 text-center bg-white border-r border-gray-200">
                       {(
                         deals.slice(0, 10).reduce((sum, deal) => sum + deal.products.length, 0) /
                         Math.max(1, deals.slice(0, 10).length)
                       ).toFixed(1)}
                     </td>
-                    <td className="py-2 px-2 text-right bg-purple-50">
+                    <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
                       $
                       {Math.round(
                         deals.slice(0, 10).reduce((sum, deal) => sum + deal.profit, 0) /
@@ -786,8 +786,8 @@ const SingleFinanceManagerDashboard = () => {
 function DealProfitTracker() {
   return (
     <Card className="p-6">
-      <CardHeader>
-        <CardTitle>Deal Profit Tracker</CardTitle>
+      <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600">
+        <CardTitle className="text-white">Deal Profit Tracker</CardTitle>
       </CardHeader>
       <CardContent>
         <p>The deal profit tracker feature is coming soon.</p>
@@ -799,8 +799,8 @@ function DealProfitTracker() {
 function PayCalculator() {
   return (
     <Card className="p-6">
-      <CardHeader>
-        <CardTitle>Pay Calculator</CardTitle>
+      <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300">
+        <CardTitle className="text-white">Pay Calculator</CardTitle>
       </CardHeader>
       <CardContent>
         <p>The pay calculator feature is coming soon.</p>
@@ -812,8 +812,8 @@ function PayCalculator() {
 function ProductsPerformance() {
   return (
     <Card className="p-6">
-      <CardHeader>
-        <CardTitle>Products Performance</CardTitle>
+      <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300">
+        <CardTitle className="text-white">Products Performance</CardTitle>
       </CardHeader>
       <CardContent>
         <p>The products performance feature is coming soon.</p>
@@ -825,8 +825,8 @@ function ProductsPerformance() {
 function DealDocuments() {
   return (
     <Card className="p-6">
-      <CardHeader>
-        <CardTitle>Deal Documents</CardTitle>
+      <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300">
+        <CardTitle className="text-white">Deal Documents</CardTitle>
       </CardHeader>
       <CardContent>
         <p>The deal documents feature is coming soon.</p>
@@ -838,8 +838,8 @@ function DealDocuments() {
 function PerformanceMetrics() {
   return (
     <Card className="p-6">
-      <CardHeader>
-        <CardTitle>Performance Metrics</CardTitle>
+      <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300">
+        <CardTitle className="text-white">Performance Metrics</CardTitle>
       </CardHeader>
       <CardContent>
         <p>Performance metrics are coming soon.</p>

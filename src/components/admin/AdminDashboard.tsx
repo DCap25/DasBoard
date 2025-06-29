@@ -713,7 +713,7 @@ export function AdminDashboard() {
                       <TableHead>Email</TableHead>
                       <TableHead>Start Date</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead className="w-[100px]">Actions</TableHead>
+                      <TableHead className="w-[100px] bg-red-600 text-white">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -778,7 +778,7 @@ export function AdminDashboard() {
                       <TableHead>Email</TableHead>
                       <TableHead>Start Date</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead className="w-[100px]">Actions</TableHead>
+                      <TableHead className="w-[100px] bg-red-600 text-white">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -843,7 +843,7 @@ export function AdminDashboard() {
                       <TableHead>Email</TableHead>
                       <TableHead>Start Date</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead className="w-[100px]">Actions</TableHead>
+                      <TableHead className="w-[100px] bg-red-600 text-white">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

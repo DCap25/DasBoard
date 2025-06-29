@@ -29,11 +29,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Th
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <div className="w-64 bg-black shadow-md text-white">
-        <div className="p-4 border-b border-gray-700">
-          <h1 className="text-2xl font-bold text-orange-500">{title}</h1>
+      <div className="w-64 bg-blue-900 shadow-md text-white">
+        <div className="p-4 border-b border-gray-200 bg-white">
+          <h1 className="text-2xl font-bold text-blue-900">{title}</h1>
           {currentDealershipName && (
-            <div className="flex items-center mt-2 text-sm text-orange-300">
+            <div className="flex items-center mt-2 text-sm text-blue-600">
               <Building2 size={14} className="mr-1" />
               <span>{currentDealershipName}</span>
             </div>
@@ -42,12 +42,12 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Th
 
         <div className="p-4">
           <div className="flex items-center space-x-2 mb-6">
-            <div className="bg-blue-900 p-2 rounded-full">
-              <User size={20} className="text-blue-300" />
+            <div className="bg-blue-700 p-2 rounded-full">
+              <User size={20} className="text-blue-100" />
             </div>
             <div>
               <p className="text-sm font-medium text-white">{user?.email}</p>
-              <p className="text-xs text-gray-300">{userRole || 'User'}</p>
+              <p className="text-xs text-blue-100">{userRole || 'User'}</p>
             </div>
           </div>
 
@@ -62,8 +62,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Th
                   (isDealershipPath &&
                     !location.pathname.includes('/deals') &&
                     !location.pathname.includes('/schedule'))
-                    ? 'bg-gray-800 text-white'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                    ? 'bg-blue-700 text-white'
+                    : 'text-blue-100 hover:bg-blue-800 hover:text-white'
                 }`}
               >
                 <Home size={18} className="mr-2" />
@@ -80,8 +80,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Th
                 className={`flex items-center w-full px-4 py-2 text-left text-sm rounded-md ${
                   isActive('/dashboard/deals') ||
                   (isDealershipPath && location.pathname.includes('/deals'))
-                    ? 'bg-gray-800 text-white'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                    ? 'bg-blue-700 text-white'
+                    : 'text-blue-100 hover:bg-blue-800 hover:text-white'
                 }`}
               >
                 <BarChart2 size={18} className="mr-2" />
@@ -100,8 +100,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Th
                 className={`flex items-center w-full px-4 py-2 text-left text-sm rounded-md ${
                   isActive('/dashboard/schedule') ||
                   (isDealershipPath && location.pathname.includes('/schedule'))
-                    ? 'bg-gray-800 text-white'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                    ? 'bg-blue-700 text-white'
+                    : 'text-blue-100 hover:bg-blue-800 hover:text-white'
                 }`}
               >
                 <Calendar size={18} className="mr-2" />
@@ -115,8 +115,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Th
                 <button
                   className={`flex items-center w-full px-4 py-2 text-left text-sm rounded-md ${
                     isActive('/master-admin')
-                      ? 'bg-gray-800 text-white'
-                      : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                      ? 'bg-blue-700 text-white'
+                      : 'text-blue-100 hover:bg-blue-800 hover:text-white'
                   }`}
                 >
                   <Building2 size={18} className="mr-2" />
@@ -127,10 +127,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Th
           </nav>
         </div>
 
-        <div className="absolute bottom-0 w-64 p-4 border-t border-gray-700">
+        <div className="absolute bottom-0 w-64 p-4 border-t border-blue-800">
           <Button
             variant="outline"
-            className="w-full flex items-center justify-center bg-gray-800 text-white border-gray-600 hover:bg-gray-700"
+            className="w-full flex items-center justify-center bg-blue-700 text-white border-blue-600 hover:bg-blue-800"
             onClick={handleSignOut}
           >
             <LogOut size={18} className="mr-2" />

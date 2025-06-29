@@ -135,8 +135,8 @@ export default function GeneralManagerDashboard() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-6">
         {/* Box 1: Gross Profits */}
         <Card className="border-l-4 border-l-green-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 pb-2">
+            <CardTitle className="text-sm font-medium flex items-center text-white">
               <DollarSign className="mr-2 h-4 w-4 text-green-500" />
               Gross Profit
             </CardTitle>
@@ -172,8 +172,8 @@ export default function GeneralManagerDashboard() {
 
         {/* Box 2: Units Sold with New/Used Breakdown */}
         <Card className="border-l-4 border-l-blue-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 pb-2">
+            <CardTitle className="text-sm font-medium flex items-center text-white">
               <Car className="mr-2 h-4 w-4 text-blue-500" />
               Total Units
             </CardTitle>
@@ -209,8 +209,8 @@ export default function GeneralManagerDashboard() {
 
         {/* Box 3: Sales Performance */}
         <Card className="border-l-4 border-l-purple-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 pb-2">
+            <CardTitle className="text-sm font-medium flex items-center text-white">
               <Target className="mr-2 h-4 w-4 text-purple-500" />
               Sales Performance
             </CardTitle>
@@ -224,14 +224,14 @@ export default function GeneralManagerDashboard() {
                   {data.totalUnits}/{data.salesGoal}
                 </span>
               </div>
-              <div className="h-2 w-full bg-gray-100 rounded-full">
+              <div className="h-2 w-full bg-white rounded-full">
                 <div
                   className={`h-full rounded-full ${
                     data.salesPerformance >= 100
-                      ? 'bg-green-500'
+                      ? 'bg-white border-r border-blue-500'
                       : data.salesPerformance >= 80
-                      ? 'bg-yellow-500'
-                      : 'bg-red-500'
+                      ? 'bg-blue-500'
+                      : 'bg-blue-500'
                   }`}
                   style={{ width: `${Math.min(data.salesPerformance, 100)}%` }}
                 ></div>
@@ -249,8 +249,8 @@ export default function GeneralManagerDashboard() {
 
         {/* Box 4: Average Per Deal */}
         <Card className="border-l-4 border-l-amber-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 pb-2">
+            <CardTitle className="text-sm font-medium flex items-center text-white">
               <Calculator className="mr-2 h-4 w-4 text-amber-500" />
               Average Per Deal
             </CardTitle>
@@ -289,8 +289,8 @@ export default function GeneralManagerDashboard() {
       <div className="grid grid-cols-12 gap-6 mb-6">
         {/* Sales Person Das Board (Left) */}
         <Card className="col-span-12 md:col-span-6">
-          <CardHeader className="bg-blue-50 border-b border-blue-100">
-            <CardTitle className="text-lg font-semibold text-blue-700 flex items-center">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300">
+            <CardTitle className="text-white text-lg font-semibold flex items-center">
               <User className="h-5 w-5 text-blue-600 mr-2" />
               Sales Person Das Board
             </CardTitle>
@@ -299,15 +299,15 @@ export default function GeneralManagerDashboard() {
             <div className="overflow-x-auto">
               <div className="min-w-full">
                 <div className="flex items-center text-xs font-medium text-white border-b py-2 px-1">
-                  <div className="w-10 text-center bg-gray-600 py-2 rounded-l-md">#</div>
-                  <div className="w-40 flex-shrink-0 bg-gray-600 py-2 px-2">Salesperson</div>
-                  <div className="w-28 text-center bg-blue-600 py-2 flex items-center justify-center">
+                  <div className="w-10 text-center bg-gray-50 border-r border-gray-200 py-2 rounded-l-md">#</div>
+                  <div className="w-40 flex-shrink-0 bg-blue-100 border-r border-blue-200 py-2 px-2">Salesperson</div>
+                  <div className="w-28 text-center bg-blue-200 border-r border-blue-300 py-2 flex items-center justify-center">
                     MTD <ArrowUpDown className="ml-1 h-3 w-3" />
                   </div>
-                  <div className="w-28 text-center bg-green-600 py-2 flex items-center justify-center">
+                  <div className="w-28 text-center bg-blue-300 border-r border-blue-400 py-2 flex items-center justify-center">
                     Gross <ArrowUpDown className="ml-1 h-3 w-3" />
                   </div>
-                  <div className="w-24 text-center bg-amber-600 py-2 flex items-center justify-center rounded-r-md">
+                  <div className="w-24 text-center bg-blue-400 border-r border-blue-500 py-2 flex items-center justify-center rounded-r-md">
                     CSI <ArrowUpDown className="ml-1 h-3 w-3" />
                   </div>
                 </div>
@@ -338,8 +338,8 @@ export default function GeneralManagerDashboard() {
 
         {/* Finance Das Board (Right) */}
         <Card className="col-span-12 md:col-span-6">
-          <CardHeader className="bg-green-50 border-b border-green-100">
-            <CardTitle className="text-lg font-semibold text-green-700 flex items-center">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300">
+            <CardTitle className="text-white text-lg font-semibold flex items-center">
               <DollarSign className="h-5 w-5 text-green-600 mr-2" />
               Finance Das Board
             </CardTitle>
@@ -348,15 +348,15 @@ export default function GeneralManagerDashboard() {
             <div className="overflow-x-auto">
               <div className="min-w-full">
                 <div className="flex items-center text-xs font-medium text-white border-b py-2 px-1">
-                  <div className="w-10 text-center bg-gray-600 py-2 rounded-l-md">#</div>
-                  <div className="w-40 flex-shrink-0 bg-gray-600 py-2 px-2">Product</div>
-                  <div className="w-28 text-center bg-blue-600 py-2 flex items-center justify-center">
+                  <div className="w-10 text-center bg-white border-r border-blue-500 border-r border-blue-600 py-2 rounded-l-md">#</div>
+                  <div className="w-40 flex-shrink-0 bg-blue-600 border-r border-blue-700 py-2 px-2">Product</div>
+                  <div className="w-28 text-center bg-blue-700 border-r border-blue-800 py-2 flex items-center justify-center">
                     Penetration <ArrowUpDown className="ml-1 h-3 w-3" />
                   </div>
-                  <div className="w-28 text-center bg-green-600 py-2 flex items-center justify-center">
+                  <div className="w-28 text-center bg-blue-800 border-r border-blue-900 py-2 flex items-center justify-center">
                     Profit <ArrowUpDown className="ml-1 h-3 w-3" />
                   </div>
-                  <div className="w-24 text-center bg-purple-600 py-2 flex items-center justify-center rounded-r-md">
+                  <div className="w-24 text-center bg-blue-900 border-r border-slate-100 py-2 flex items-center justify-center rounded-r-md">
                     Avg <ArrowUpDown className="ml-1 h-3 w-3" />
                   </div>
                 </div>
@@ -390,8 +390,8 @@ export default function GeneralManagerDashboard() {
 
         {/* Sales Manager Das Board (Full width) */}
         <Card className="col-span-12">
-          <CardHeader className="bg-purple-50 border-b border-purple-100">
-            <CardTitle className="text-lg font-semibold text-purple-700 flex items-center">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300">
+            <CardTitle className="text-white text-lg font-semibold flex items-center">
               <Users className="h-5 w-5 text-purple-600 mr-2" />
               Sales Manager Das Board
             </CardTitle>
@@ -400,13 +400,13 @@ export default function GeneralManagerDashboard() {
             <div className="overflow-x-auto">
               <div className="min-w-full">
                 <div className="flex items-center text-xs font-medium text-white border-b py-2 px-1">
-                  <div className="w-10 text-center bg-gray-600 py-2 rounded-l-md">#</div>
-                  <div className="w-40 flex-shrink-0 bg-gray-600 py-2 px-2">Manager</div>
-                  <div className="w-28 text-center bg-blue-600 py-2">Team Units</div>
-                  <div className="w-28 text-center bg-green-600 py-2">Total Gross</div>
-                  <div className="w-28 text-center bg-amber-600 py-2">Closing %</div>
-                  <div className="w-28 text-center bg-purple-600 py-2">Avg Front</div>
-                  <div className="w-28 text-center bg-indigo-600 py-2 rounded-r-md">Avg Back</div>
+                  <div className="w-10 text-center bg-slate-600 border-r border-slate-700 py-2 rounded-l-md">#</div>
+                  <div className="w-40 flex-shrink-0 bg-slate-700 border-r border-slate-800 py-2 px-2">Manager</div>
+                  <div className="w-28 text-center bg-slate-800 border-r border-slate-900 py-2">Team Units</div>
+                  <div className="w-28 text-center bg-slate-900 border-r border-gray-700 py-2">Total Gross</div>
+                  <div className="w-28 text-center bg-gray-700 border-r border-gray-800 py-2">Closing %</div>
+                  <div className="w-28 text-center bg-gray-800 border-r border-gray-900 py-2">Avg Front</div>
+                  <div className="w-28 text-center bg-gray-900 py-2 rounded-r-md">Avg Back</div>
                 </div>
 
                 {/* Sample data rows */}
@@ -452,8 +452,8 @@ export default function GeneralManagerDashboard() {
       {/* Department Performance (moved down) */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7 mb-6">
         <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Department Performance</CardTitle>
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600">
+            <CardTitle className="text-white">Department Performance</CardTitle>
             <CardDescription>Overall business metrics for the current month</CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
@@ -461,28 +461,28 @@ export default function GeneralManagerDashboard() {
               <div className="flex items-center">
                 <div className="w-[100px] text-sm">Sales</div>
                 <div className="flex-1">
-                  <div className="bg-blue-500 h-2 w-[85%] rounded-full"></div>
+                  <div className="bg-blue-600 h-2 w-[85%] rounded-full"></div>
                 </div>
                 <div className="w-[50px] text-right text-sm">85%</div>
               </div>
               <div className="flex items-center">
                 <div className="w-[100px] text-sm">Finance</div>
                 <div className="flex-1">
-                  <div className="bg-green-500 h-2 w-[92%] rounded-full"></div>
+                  <div className="bg-gray-600 h-2 w-[92%] rounded-full"></div>
                 </div>
                 <div className="w-[50px] text-right text-sm">92%</div>
               </div>
               <div className="flex items-center">
                 <div className="w-[100px] text-sm">Service</div>
                 <div className="flex-1">
-                  <div className="bg-amber-500 h-2 w-[78%] rounded-full"></div>
+                  <div className="bg-gray-600 h-2 w-[78%] rounded-full"></div>
                 </div>
                 <div className="w-[50px] text-right text-sm">78%</div>
               </div>
               <div className="flex items-center">
                 <div className="w-[100px] text-sm">Parts</div>
                 <div className="flex-1">
-                  <div className="bg-purple-500 h-2 w-[68%] rounded-full"></div>
+                  <div className="bg-gray-600 h-2 w-[68%] rounded-full"></div>
                 </div>
                 <div className="w-[50px] text-right text-sm">68%</div>
               </div>
@@ -492,7 +492,7 @@ export default function GeneralManagerDashboard() {
 
         <Card className="col-span-3">
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+            <CardTitle className="text-white">Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4">
             <Button className="w-full justify-start">

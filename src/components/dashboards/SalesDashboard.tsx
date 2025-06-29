@@ -298,7 +298,7 @@ const SalesDashboard = () => {
         <h1 className="text-3xl font-bold">Sales Dashboard</h1>
 
         {/* Daily Sales Tip - Centered */}
-        <div className="bg-blue-50 px-3 py-1 rounded-md text-center flex-1 mx-8 border border-blue-100">
+        <div className="bg-white px-3 py-1 rounded-md text-center flex-1 mx-8 border border-blue-100">
           <p className="text-xs italic text-blue-800 truncate">
             <Lightbulb className="h-3 w-3 inline-block mr-1" />
             <strong>Daily Tip:</strong>{' '}
@@ -340,7 +340,7 @@ const SalesDashboard = () => {
           </div>
 
           <div className="flex items-center">
-            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2">
+            <div className="w-8 h-8 bg-gray-50 border-r border-gray-200 rounded-full flex items-center justify-center mr-2">
               <User className="h-4 w-4 text-blue-600" />
             </div>
             <div>
@@ -354,7 +354,7 @@ const SalesDashboard = () => {
       {/* Error Display */}
       {error && (
         <div className="mb-6">
-          <div className="bg-red-50 border border-red-200 rounded-md p-4">
+          <div className="bg-blue-100 border-r border-blue-200 border border-red-200 rounded-md p-4">
             <div className="flex">
               <AlertTriangle className="h-5 w-5 text-red-400 mr-2 mt-0.5" />
               <div>
@@ -372,7 +372,7 @@ const SalesDashboard = () => {
       {/* Loading Indicator */}
       {loading && (
         <div className="mb-6">
-          <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+          <div className="bg-blue-200 border-r border-blue-300 border border-blue-200 rounded-md p-4">
             <div className="flex items-center">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
               <p className="text-sm text-blue-700">Loading deal data...</p>
@@ -383,8 +383,8 @@ const SalesDashboard = () => {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-6">
         <Card className="border-l-4 border-l-blue-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 pb-2">
+            <CardTitle className="text-sm font-medium flex items-center text-white">
               <ShoppingBag className="mr-2 h-4 w-4 text-blue-500" />
               Total Deals This Month
             </CardTitle>
@@ -401,8 +401,8 @@ const SalesDashboard = () => {
         </Card>
 
         <Card className="border-l-4 border-l-green-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 pb-2">
+            <CardTitle className="text-sm font-medium flex items-center text-white">
               <DollarSign className="mr-2 h-4 w-4 text-green-500" />
               Gross
             </CardTitle>
@@ -423,8 +423,8 @@ const SalesDashboard = () => {
         </Card>
 
         <Card className="border-l-4 border-l-amber-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 pb-2">
+            <CardTitle className="text-sm font-medium flex items-center text-white">
               <AlertTriangle className="mr-2 h-4 w-4 text-amber-500" />
               Minis
             </CardTitle>
@@ -448,15 +448,15 @@ const SalesDashboard = () => {
         </Card>
 
         <Card className="border-l-4 border-l-purple-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 pb-2">
+            <CardTitle className="text-sm font-medium flex items-center text-white">
               <Target className="mr-2 h-4 w-4 text-purple-500" />
               Monthly Goal Progress
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{goalProgress}%</div>
-            <div className="w-full h-2 bg-gray-200 mt-2 rounded-full overflow-hidden">
+            <div className="w-full h-2 bg-blue-300 border-r border-blue-400 mt-2 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full"
                 style={{
@@ -472,8 +472,8 @@ const SalesDashboard = () => {
       {/* Compact Weekly Schedule with left/right navigation */}
       <div className="mb-6">
         <Card className="border hover:shadow-md transition-shadow">
-          <CardHeader className="py-2 px-4 border-b">
-            <CardTitle className="text-sm font-medium flex items-center">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 py-2 px-4">
+            <CardTitle className="text-sm font-medium flex items-center text-white">
               <CalendarClock className="mr-2 h-4 w-4 text-indigo-500" />
               Schedule
             </CardTitle>
@@ -491,7 +491,7 @@ const SalesDashboard = () => {
                 <div
                   key={index}
                   className={`p-1 ${
-                    isToday(day.day) ? 'bg-blue-50 border-b-2 border-blue-500' : ''
+                    isToday(day.day) ? 'bg-white border-r border-gray-200 border-b-2 border-blue-500' : ''
                   }`}
                 >
                   <div className="font-medium text-xs text-gray-800">
@@ -523,9 +523,9 @@ const SalesDashboard = () => {
       {/* Leader Board - The Das Board */}
       <div className="mb-6">
         <Card className="border hover:shadow-md transition-shadow">
-          <CardHeader className="py-2 px-4 border-b">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 py-2 px-4">
             <div className="flex justify-between items-center">
-              <CardTitle className="text-sm font-medium flex items-center">
+              <CardTitle className="text-sm font-medium flex items-center text-white">
                 <Trophy className="mr-2 h-4 w-4 text-yellow-500" />
                 The Das Board
               </CardTitle>
@@ -534,33 +534,33 @@ const SalesDashboard = () => {
           <CardContent className="py-1">
             {/* Sortable Header - Performance View */}
             <div className="flex items-center text-xs font-medium text-white border-b py-2 px-1">
-              <div className="w-10 text-center bg-gray-600 py-2 rounded-l-md">#</div>
-              <div className="w-40 flex-shrink-0 bg-gray-600 py-2 px-2">Salesperson</div>
-              <div className="w-28 text-center bg-purple-600 py-2 flex items-center justify-center cursor-pointer hover:bg-purple-700">
+              <div className="w-10 text-center bg-blue-400 border-r border-blue-500 py-2 rounded-l-md">#</div>
+              <div className="w-40 flex-shrink-0 bg-white border-r border-blue-500 border-r border-blue-600 py-2 px-2">Salesperson</div>
+              <div className="w-28 text-center bg-blue-600 border-r border-blue-700 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                 PVR <ChevronDown className="ml-1 h-3 w-3" />
               </div>
-              <div className="w-36 text-center bg-green-600 py-2 flex items-center justify-center cursor-pointer hover:bg-green-700">
+              <div className="w-36 text-center bg-blue-700 border-r border-blue-800 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                 Total Gross <ChevronDown className="ml-1 h-3 w-3" />
               </div>
-              <div className="w-28 text-center bg-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
+              <div className="w-28 text-center bg-blue-800 border-r border-blue-900 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                 Avg/Mo <ChevronDown className="ml-1 h-3 w-3" />
               </div>
-              <div className="w-28 text-center bg-blue-500 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-600">
+              <div className="w-28 text-center bg-blue-900 border-r border-slate-100 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-600">
                 Last Mo <ChevronDown className="ml-1 h-3 w-3" />
               </div>
-              <div className="w-28 text-center bg-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
+              <div className="w-28 text-center bg-slate-600 border-r border-slate-700 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                 YTD <ChevronDown className="ml-1 h-3 w-3" />
               </div>
-              <div className="w-28 text-center bg-blue-500 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-600">
+              <div className="w-28 text-center bg-slate-700 border-r border-slate-800 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-600">
                 Annual <ChevronDown className="ml-1 h-3 w-3" />
               </div>
-              <div className="w-24 text-center bg-green-600 py-2 flex items-center justify-center cursor-pointer hover:bg-green-700">
+              <div className="w-24 text-center bg-slate-800 border-r border-slate-900 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                 New <ChevronDown className="ml-1 h-3 w-3" />
               </div>
-              <div className="w-24 text-center bg-amber-600 py-2 flex items-center justify-center cursor-pointer hover:bg-amber-700">
+              <div className="w-24 text-center bg-slate-900 border-r border-gray-700 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                 Used <ChevronDown className="ml-1 h-3 w-3" />
               </div>
-              <div className="w-36 text-right bg-indigo-600 py-2 pr-3 flex items-center justify-end cursor-pointer hover:bg-indigo-700 font-semibold rounded-r-md">
+              <div className="w-36 text-right bg-gray-700 border-r border-gray-800 py-2 pr-3 flex items-center justify-end cursor-pointer hover:bg-blue-700 font-semibold rounded-r-md">
                 Current Month <ChevronDown className="ml-1 h-3 w-3" />
               </div>
             </div>
@@ -655,23 +655,23 @@ const SalesDashboard = () => {
                           ? 'bg-gray-100 text-gray-600'
                           : index === 2
                           ? 'bg-amber-100 text-amber-600'
-                          : 'bg-blue-50 text-blue-500'
+                          : 'bg-white border-r border-gray-200 text-blue-500'
                       }`}
                     >
                       <span className="text-xs font-bold">{index + 1}</span>
                     </div>
                   </div>
                   <div className="w-40 flex-shrink-0 font-medium truncate px-2">{person.name}</div>
-                  <div className="w-28 text-center bg-purple-50">${person.pvr}</div>
-                  <div className="w-36 text-center bg-green-50">
+                  <div className="w-28 text-center bg-gray-800 border-r border-gray-900">${person.pvr}</div>
+                  <div className="w-36 text-center bg-gray-900">
                     ${person.totalGross.toLocaleString()}
                   </div>
-                  <div className="w-28 text-center bg-blue-50">{person.avgMonth}</div>
+                  <div className="w-28 text-center bg-blue-600">{person.avgMonth}</div>
                   <div className="w-28 text-center">{person.lastMonth}</div>
-                  <div className="w-28 text-center bg-blue-50">{person.ytd}</div>
+                  <div className="w-28 text-center bg-gray-600">{person.ytd}</div>
                   <div className="w-28 text-center">{person.annualPace}</div>
-                  <div className="w-24 text-center bg-green-50">{person.newUnits}</div>
-                  <div className="w-24 text-center bg-amber-50">{person.usedUnits}</div>
+                  <div className="w-24 text-center bg-gray-600">{person.newUnits}</div>
+                  <div className="w-24 text-center bg-gray-600">{person.usedUnits}</div>
                   <div className="w-36 text-right pr-3">
                     <span className="text-lg font-bold text-indigo-700">{person.units}</span>
                   </div>
@@ -690,19 +690,19 @@ const SalesDashboard = () => {
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card className="flex-grow border hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2 border-b">
+          <CardHeader className="pb-2 border-b bg-gradient-to-r from-blue-500 to-gray-600">
             <div className="flex justify-between items-center">
-              <CardTitle className="text-lg font-medium flex items-center">
+              <CardTitle className="text-lg font-medium flex items-center text-white">
                 <FileText className="mr-2 h-5 w-5 text-blue-500" />
                 My Deals
               </CardTitle>
               <div
                 className={`h-3 w-3 rounded-full ${
                   performanceColor === 'green'
-                    ? 'bg-green-500'
+                    ? 'bg-white border-r border-blue-500'
                     : performanceColor === 'yellow'
-                    ? 'bg-yellow-500'
-                    : 'bg-red-500'
+                    ? 'bg-blue-500'
+                    : 'bg-blue-500'
                 }`}
               ></div>
             </div>
@@ -713,11 +713,11 @@ const SalesDashboard = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="text-left border-b">
-                      <th className="pb-2 font-medium text-xs text-gray-500">STOCK #</th>
-                      <th className="pb-2 font-medium text-xs text-gray-500">CUSTOMER</th>
-                      <th className="pb-2 font-medium text-xs text-gray-500 text-right">FRONT</th>
-                      <th className="pb-2 font-medium text-xs text-gray-500 text-right">BACK</th>
-                      <th className="pb-2 font-medium text-xs text-gray-500 text-right">TOTAL</th>
+                      <th className="pb-2 font-medium text-xs text-white">STOCK #</th>
+                      <th className="pb-2 font-medium text-xs text-white">CUSTOMER</th>
+                      <th className="pb-2 font-medium text-xs text-white text-right">FRONT</th>
+                      <th className="pb-2 font-medium text-xs text-white text-right">BACK</th>
+                      <th className="pb-2 font-medium text-xs text-white text-right">TOTAL</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -726,7 +726,7 @@ const SalesDashboard = () => {
                         key={deal.id || deal.dealNumber}
                         className={`${
                           index !== currentDeals.slice(0, 10).length - 1 ? 'border-b' : ''
-                        } ${deal.vehicleType === 'N' || deal.isNew ? 'bg-blue-50' : ''}`}
+                        } ${deal.vehicleType === 'N' || deal.isNew ? 'bg-white border-r border-gray-200' : ''}`}
                       >
                         <td className="py-3 text-sm">{deal.stockNumber}</td>
                         <td className="py-3 text-sm">{deal.lastName || deal.customer}</td>
@@ -757,7 +757,7 @@ const SalesDashboard = () => {
             </div>
 
             <div className="mt-8">
-              <div className="bg-blue-50 rounded-lg border border-blue-100 p-4">
+              <div className="bg-gray-600 rounded-lg border border-blue-100 p-4">
                 <h3 className="font-semibold text-blue-700 mb-2">Deal Performance</h3>
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
@@ -801,7 +801,7 @@ const SalesDashboard = () => {
 
           {/* Pay Calculator with Disclaimer */}
           <Card className="border hover:shadow-md transition-shadow overflow-hidden bg-white z-10 relative">
-            <CardHeader className="pb-2 border-b bg-gradient-to-r from-green-400 to-teal-500">
+            <CardHeader className="pb-2 border-b bg-gradient-to-r from-blue-500 to-gray-600">
               <CardTitle className="text-lg font-medium flex items-center text-white">
                 <Calculator className="mr-2 h-5 w-5 text-white" />
                 Pay Calculator
@@ -884,8 +884,8 @@ const SalesDashboard = () => {
 function PayCalculator() {
   return (
     <Card className="p-6">
-      <CardHeader>
-        <CardTitle>Pay Calculator</CardTitle>
+      <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600">
+        <CardTitle className="text-white">Pay Calculator</CardTitle>
       </CardHeader>
       <CardContent>
         <p>The pay calculator feature is coming soon.</p>
@@ -898,7 +898,7 @@ function GoalTracker() {
   return (
     <Card className="p-6">
       <CardHeader>
-        <CardTitle>Goal Tracker</CardTitle>
+        <CardTitle className="text-white">Goal Tracker</CardTitle>
       </CardHeader>
       <CardContent>
         <p>The goal tracker feature is coming soon.</p>
@@ -911,7 +911,7 @@ function PerformanceMetrics() {
   return (
     <Card className="p-6">
       <CardHeader>
-        <CardTitle>Performance Metrics</CardTitle>
+        <CardTitle className="text-white">Performance Metrics</CardTitle>
       </CardHeader>
       <CardContent>
         <p>Performance metrics are coming soon.</p>

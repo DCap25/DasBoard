@@ -322,7 +322,7 @@ const SalesManagerDashboard = () => {
         <div className="flex-grow">
           <h1 className="text-3xl font-bold">Sales Manager Dashboard</h1>
           {/* Best Practices Quote */}
-          <div className="bg-blue-50 p-2 rounded-md mt-2 border border-blue-100">
+          <div className="bg-white p-2 rounded-md mt-2 border border-blue-100">
             <p className="text-xs italic text-blue-800">
               <Lightbulb className="h-3 w-3 inline-block mr-1" />
               <strong>Management Tip:</strong>{' '}
@@ -373,7 +373,7 @@ const SalesManagerDashboard = () => {
       {/* Error Display */}
       {dealDataError && (
         <div className="mb-6">
-          <div className="bg-red-50 border border-red-200 rounded-md p-4">
+          <div className="bg-gray-50 border-r border-gray-600 border border-red-200 rounded-md p-4">
             <div className="flex">
               <AlertTriangle className="h-5 w-5 text-red-400 mr-2 mt-0.5" />
               <div>
@@ -391,7 +391,7 @@ const SalesManagerDashboard = () => {
       {/* Loading Indicator */}
       {dealDataLoading && (
         <div className="mb-6">
-          <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+          <div className="bg-blue-100 border-r border-gray-600 border border-blue-200 rounded-md p-4">
             <div className="flex items-center">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
               <p className="text-sm text-blue-700">Loading deal data...</p>
@@ -403,8 +403,8 @@ const SalesManagerDashboard = () => {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-6">
         {/* Box 1: Gross Profits */}
         <Card className="border-l-4 border-l-green-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
+          <CardHeader className="bg-gray-50 border-b border-gray-300 pb-2">
+            <CardTitle className="text-sm font-medium flex items-center text-black">
               <DollarSign className="mr-2 h-4 w-4 text-green-500" />
               Gross Profit
             </CardTitle>
@@ -446,8 +446,8 @@ const SalesManagerDashboard = () => {
 
         {/* Box 2: Units Sold with New/Used Breakdown */}
         <Card className="border-l-4 border-l-blue-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
+          <CardHeader className="bg-gray-50 border-b border-gray-300 pb-2">
+            <CardTitle className="text-sm font-medium flex items-center text-black">
               <Car className="mr-2 h-4 w-4 text-blue-500" />
               Total Units
             </CardTitle>
@@ -489,8 +489,8 @@ const SalesManagerDashboard = () => {
 
         {/* Box 3: Sales Performance */}
         <Card className="border-l-4 border-l-purple-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
+          <CardHeader className="bg-gray-50 border-b border-gray-300 pb-2">
+            <CardTitle className="text-sm font-medium flex items-center text-black">
               <Target className="mr-2 h-4 w-4 text-purple-500" />
               Sales Performance
             </CardTitle>
@@ -509,14 +509,14 @@ const SalesManagerDashboard = () => {
                   {managerDealData?.metrics?.salesGoal || data.salesGoal}
                 </span>
               </div>
-              <div className="h-2 w-full bg-gray-100 rounded-full">
+              <div className="h-2 w-full bg-blue-200 border-r border-gray-600 rounded-full">
                 <div
                   className={`h-full rounded-full ${
                     (managerDealData?.metrics?.salesPerformance || data.salesPerformance) >= 100
-                      ? 'bg-green-500'
+                      ? 'bg-white border-r border-gray-600'
                       : (managerDealData?.metrics?.salesPerformance || data.salesPerformance) >= 80
-                      ? 'bg-yellow-500'
-                      : 'bg-red-500'
+                      ? 'bg-blue-500'
+                      : 'bg-blue-500'
                   }`}
                   style={{
                     width: `${Math.min(
@@ -544,8 +544,8 @@ const SalesManagerDashboard = () => {
 
         {/* Box 4: Average Per Deal */}
         <Card className="border-l-4 border-l-amber-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
+          <CardHeader className="bg-gray-50 border-b border-gray-300 pb-2">
+            <CardTitle className="text-sm font-medium flex items-center text-black">
               <Calculator className="mr-2 h-4 w-4 text-amber-500" />
               Average Per Deal
             </CardTitle>
@@ -585,9 +585,9 @@ const SalesManagerDashboard = () => {
       {/* Add schedule box before the leaderboard */}
       <div className="mb-6">
         <Card className="border hover:shadow-md transition-shadow">
-          <CardHeader className="py-2 px-4 border-b">
+          <CardHeader className="bg-gray-50 border-b border-gray-300 py-2 px-4">
             <div className="flex justify-between items-center">
-              <CardTitle className="text-sm font-medium flex items-center">
+              <CardTitle className="text-sm font-medium flex items-center text-black">
                 <CalendarClock className="mr-2 h-4 w-4 text-indigo-500" />
                 Team Schedule
               </CardTitle>
@@ -609,7 +609,7 @@ const SalesManagerDashboard = () => {
                   <div
                     key={index}
                     className={`p-2 ${
-                      dayData.isToday ? 'bg-blue-50 border-b-2 border-blue-500' : ''
+                      dayData.isToday ? 'bg-white border-r border-gray-600 border-b-2 border-blue-500' : ''
                     }`}
                   >
                     <div className="font-medium text-xs text-gray-800">
@@ -644,39 +644,39 @@ const SalesManagerDashboard = () => {
 
       <div className="grid gap-6 md:grid-cols-3 mb-6">
         <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>The Das Board</CardTitle>
+          <CardHeader className="bg-gray-50">
+            <CardTitle className="text-black">The Das Board</CardTitle>
           </CardHeader>
           <CardContent>
             {/* Sortable Header - Performance View */}
             <div className="flex items-center text-xs font-medium text-white border-b py-2 px-1 overflow-x-auto">
-              <div className="w-10 text-center bg-gray-600 py-2 rounded-l-md">#</div>
-              <div className="w-40 flex-shrink-0 bg-gray-600 py-2 px-2">Salesperson</div>
-              <div className="w-28 text-center bg-purple-600 py-2 flex items-center justify-center cursor-pointer hover:bg-purple-700">
+              <div className="w-10 text-center bg-blue-300 border-r border-gray-600 py-2 rounded-l-md">#</div>
+              <div className="w-40 flex-shrink-0 bg-blue-400 border-r border-gray-600 py-2 px-2">Salesperson</div>
+              <div className="w-28 text-center bg-blue-500 border-r border-gray-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                 PVR <ArrowUpDown className="ml-1 h-3 w-3" />
               </div>
-              <div className="w-36 text-center bg-green-600 py-2 flex items-center justify-center cursor-pointer hover:bg-green-700">
+              <div className="w-36 text-center bg-blue-600 border-r border-gray-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                 Total Gross <ArrowUpDown className="ml-1 h-3 w-3" />
               </div>
-              <div className="w-28 text-center bg-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
+              <div className="w-28 text-center bg-blue-700 border-r border-gray-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                 Avg/Mo <ArrowUpDown className="ml-1 h-3 w-3" />
               </div>
-              <div className="w-28 text-center bg-blue-500 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-600">
+              <div className="w-28 text-center bg-blue-800 border-r border-gray-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-600">
                 Last Mo <ArrowUpDown className="ml-1 h-3 w-3" />
               </div>
-              <div className="w-28 text-center bg-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
+              <div className="w-28 text-center bg-blue-900 border-r border-gray-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                 YTD <ArrowUpDown className="ml-1 h-3 w-3" />
               </div>
-              <div className="w-28 text-center bg-blue-500 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-600">
+              <div className="w-28 text-center bg-slate-600 border-r border-gray-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-600">
                 Annual <ArrowUpDown className="ml-1 h-3 w-3" />
               </div>
-              <div className="w-24 text-center bg-green-600 py-2 flex items-center justify-center cursor-pointer hover:bg-green-700">
+              <div className="w-24 text-center bg-slate-700 border-r border-gray-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                 New <ArrowUpDown className="ml-1 h-3 w-3" />
               </div>
-              <div className="w-24 text-center bg-amber-600 py-2 flex items-center justify-center cursor-pointer hover:bg-amber-700">
+              <div className="w-24 text-center bg-slate-800 border-r border-slate-900 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                 Used <ArrowUpDown className="ml-1 h-3 w-3" />
               </div>
-              <div className="w-36 text-right bg-indigo-600 py-2 pr-3 flex items-center justify-end cursor-pointer hover:bg-indigo-700 font-semibold rounded-r-md">
+              <div className="w-36 text-right bg-slate-900 border-r border-gray-700 py-2 pr-3 flex items-center justify-end cursor-pointer hover:bg-blue-700 font-semibold rounded-r-md">
                 Current Month <ArrowUpDown className="ml-1 h-3 w-3" />
               </div>
             </div>
@@ -771,23 +771,23 @@ const SalesManagerDashboard = () => {
                           ? 'bg-gray-100 text-gray-600'
                           : index === 2
                           ? 'bg-amber-100 text-amber-600'
-                          : 'bg-blue-50 text-blue-500'
+                          : 'bg-white border-r border-gray-600 text-blue-500'
                       }`}
                     >
                       <span className="text-xs font-bold">{index + 1}</span>
                     </div>
                   </div>
                   <div className="w-40 flex-shrink-0 font-medium truncate px-2">{person.name}</div>
-                  <div className="w-28 text-center bg-purple-50">${person.pvr}</div>
-                  <div className="w-36 text-center bg-green-50">
+                  <div className="w-28 text-center bg-gray-700 border-r border-gray-600">${person.pvr}</div>
+                  <div className="w-36 text-center bg-gray-800 border-r border-gray-900">
                     ${person.totalGross.toLocaleString()}
                   </div>
-                  <div className="w-28 text-center bg-blue-50">{person.avgMonth}</div>
+                  <div className="w-28 text-center bg-gray-900">{person.avgMonth}</div>
                   <div className="w-28 text-center">{person.lastMonth}</div>
-                  <div className="w-28 text-center bg-blue-50">{person.ytd}</div>
+                  <div className="w-28 text-center bg-blue-600">{person.ytd}</div>
                   <div className="w-28 text-center">{person.annualPace}</div>
-                  <div className="w-24 text-center bg-green-50">{person.newUnits}</div>
-                  <div className="w-24 text-center bg-amber-50">{person.usedUnits}</div>
+                  <div className="w-24 text-center bg-gray-600">{person.newUnits}</div>
+                  <div className="w-24 text-center bg-gray-600">{person.usedUnits}</div>
                   <div className="w-36 text-right pr-3">
                     <span className="text-lg font-bold text-indigo-700">{person.units}</span>
                   </div>
@@ -805,7 +805,7 @@ const SalesManagerDashboard = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+            <CardTitle className="text-black">Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4">
             <Button
@@ -848,8 +848,8 @@ const SalesManagerDashboard = () => {
 
       {/* Deals Log - Full Width */}
       <Card className="mb-6 border hover:shadow-md transition-shadow">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 border-b">
-          <CardTitle className="text-lg font-medium flex items-center">
+        <CardHeader className="bg-gray-50 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-lg font-medium flex items-center text-black">
             <FileText className="mr-2 h-5 w-5 text-blue-500" />
             Deals Log
           </CardTitle>
@@ -864,43 +864,43 @@ const SalesManagerDashboard = () => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-xs">
-                    <th className="font-medium text-white py-2 pl-3 text-center bg-gray-600 w-12">
+                    <th className="font-medium text-white py-2 pl-3 text-center bg-white w-12 border-r border-gray-600">
                       #
                     </th>
-                    <th className="font-medium text-white py-2 pl-4 pr-2 text-left bg-blue-600">
+                    <th className="font-medium text-white py-2 pl-4 pr-2 text-left bg-gray-700 border-r border-gray-600">
                       Deal #
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
+                    <th className="font-medium text-white py-2 px-2 text-left bg-gray-700 border-r border-gray-600">
                       Stock #
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-left bg-gray-600">
+                    <th className="font-medium text-white py-2 px-2 text-left bg-gray-700 border-r border-gray-600">
                       Customer
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-center bg-gray-600">
+                    <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 border-r border-gray-600">
                       Date
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-center bg-indigo-600">
+                    <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 border-r border-gray-600">
                       N/U/CPO
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-center bg-blue-600">
+                    <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 border-r border-gray-600">
                       Salesperson
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-right bg-green-600">
+                    <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-gray-600">
                       Front Gross
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-right bg-purple-600">
+                    <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-gray-600">
                       Finance Gross
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-right bg-amber-600">
+                    <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-gray-600">
                       Total Gross
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-center bg-gray-600 w-20">
+                    <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 border-r border-gray-600 w-20">
                       Status
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-center bg-blue-600 w-20">
+                    <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 border-r border-gray-600 w-20">
                       CSI Follow Up
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-center bg-gray-600 rounded-tr-md">
+                    <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 border-r border-gray-600 rounded-tr-md">
                       Action
                     </th>
                   </tr>
@@ -1263,7 +1263,7 @@ const SalesManagerDashboard = () => {
               </div>
             </div>
             {/* Scroll navigation buttons on the right */}
-            <div className="w-12 border-l bg-gray-50 flex flex-col items-center justify-between py-4">
+            <div className="w-12 border-l bg-gray-600 flex flex-col items-center justify-between py-4">
               <div className="flex flex-col space-y-2">
                 <Button variant="outline" size="sm" className="w-8 h-8 p-0">
                   <ChevronUp className="h-4 w-4" />
@@ -1288,7 +1288,7 @@ const SalesManagerDashboard = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Team Performance Metrics</CardTitle>
+          <CardTitle className="text-black">Team Performance Metrics</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
@@ -1398,16 +1398,16 @@ const SalesManagerDashboard = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end">
-                      <div className="w-16 h-2 bg-gray-100 rounded-full mr-2 overflow-hidden">
+                      <div className="w-16 h-2 bg-gray-600 rounded-full mr-2 overflow-hidden">
                         <div
                           className={`h-full rounded-full ${
                             person.percentGoal >= 90
-                              ? 'bg-green-500'
+                              ? 'bg-white border-r border-gray-600'
                               : person.percentGoal >= 70
-                              ? 'bg-blue-500'
+                              ? 'bg-white border-r border-gray-600'
                               : person.percentGoal >= 50
-                              ? 'bg-amber-500'
-                              : 'bg-red-500'
+                              ? 'bg-white border-r border-gray-600'
+                              : 'bg-blue-500'
                           }`}
                           style={{ width: `${Math.min(person.percentGoal, 100)}%` }}
                         ></div>
@@ -1430,7 +1430,7 @@ function TeamLeaderboard() {
   return (
     <Card className="p-6">
       <CardHeader>
-        <CardTitle>Team Leaderboard</CardTitle>
+        <CardTitle className="text-black">Team Leaderboard</CardTitle>
       </CardHeader>
       <CardContent>
         <p>The team leaderboard feature is coming soon.</p>
@@ -1443,7 +1443,7 @@ function PayCalculator() {
   return (
     <Card className="p-6">
       <CardHeader>
-        <CardTitle>Pay Calculator</CardTitle>
+        <CardTitle className="text-black">Pay Calculator</CardTitle>
       </CardHeader>
       <CardContent>
         <p>The pay calculator feature is coming soon.</p>
@@ -1456,7 +1456,7 @@ function TeamAnalytics() {
   return (
     <Card className="p-6">
       <CardHeader>
-        <CardTitle>Team Analytics</CardTitle>
+        <CardTitle className="text-black">Team Analytics</CardTitle>
       </CardHeader>
       <CardContent>
         <p>The team analytics feature is coming soon.</p>
@@ -1469,7 +1469,7 @@ function GoalTracking() {
   return (
     <Card className="p-6">
       <CardHeader>
-        <CardTitle>Goal Tracking</CardTitle>
+        <CardTitle className="text-black">Goal Tracking</CardTitle>
       </CardHeader>
       <CardContent>
         <p>The goal tracking feature is coming soon.</p>

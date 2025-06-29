@@ -143,11 +143,7 @@ const FinanceDashboard = () => {
           </select>
         </div>
 
-        <Button
-          size="lg"
-          className="bg-orange-600 hover:bg-orange-700"
-          onClick={handleLogNewDealClick}
-        >
+        <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={handleLogNewDealClick}>
           <span className="flex items-center">
             <PlusCircle className="mr-2 h-5 w-5" />
             Log New Deal
@@ -169,7 +165,7 @@ const FinanceDashboard = () => {
 function DealProfitTracker() {
   return (
     <Card className="p-6">
-      <CardHeader>
+      <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600">
         <CardTitle>Deal Profit Tracker</CardTitle>
       </CardHeader>
       <CardContent>
