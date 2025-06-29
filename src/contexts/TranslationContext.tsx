@@ -92,40 +92,40 @@ const translations = {
     'about.title': 'Who We Are',
     'about.subtitle':
       'Passionate professionals dedicated to revolutionizing dealership management through innovative technology and data-driven insights.',
-    'about.founderVision.title': "Founder's Vision",
+    'about.founderVision.title': 'Why I Created The DAS Board – Tyler Durden, CEO and Founder',
     'about.founderVision.paragraph1':
-      'The DAS Board was born from a real need in the automotive industry. Having worked directly in dealerships, I witnessed firsthand the challenges that finance managers, sales teams, and dealership management face every day.',
+      "With over 27 years of experience in the automotive dealership industry, I've seen firsthand the challenges managers face in balancing their roles as leaders and performers. As a seasoned professional, I founded The DAS Board to address a critical gap I observed: while Sales Managers excel at selling cars, they often struggle to effectively manage their sales teams.",
     'about.founderVision.paragraph2':
-      "Traditional systems were outdated, inefficient, and didn't provide the real-time insights that modern dealerships need to stay competitive. I envisioned a platform that would empower every role in the dealership with the data and tools they need to succeed.",
+      'I believe that informed, motivated, and well-supported salespeople are the key to driving exceptional results—far surpassing the outcomes of disengaged or uninformed teams. The DAS Board empowers Sales Managers with intuitive tools to lead their teams more effectively, ensuring they can focus on both team development and sales excellence.',
     'about.founderVision.paragraph3':
-      'Today, The DAS Board serves hundreds of dealerships across the country, helping them increase profitability, improve team performance, and make data-driven decisions that drive success.',
+      'Beyond sales, the app supports Finance Managers by providing real-time insights into deal profitability and key metrics, while offering GMs actionable reports to guide strategic decisions. My vision with The DAS Board is to revolutionize dealership management, fostering a culture of efficiency, transparency, and success across all levels of the organization.',
     'about.team.title': 'Our Team',
     'about.team.members.tyler.name': 'Tyler Durden',
-    'about.team.members.tyler.role': 'Founder & CEO',
+    'about.team.members.tyler.role': 'CEO & Founder',
     'about.team.members.tyler.bio':
-      'Former dealership finance manager with over 10 years of automotive industry experience. Passionate about using technology to solve real-world problems.',
-    'about.team.members.sarah.name': 'Sarah Johnson',
-    'about.team.members.sarah.role': 'Head of Product',
+      'Drawing on extensive experience in dealership management, Tyler Durden founded The DAS Board to foster a culture where informed and motivated employees thrive, driving productivity through transparent, data-driven tools that empower automotive teams.',
+    'about.team.members.sarah.name': 'Sarah Conner',
+    'about.team.members.sarah.role': 'Chief Product Officer',
     'about.team.members.sarah.bio':
-      'Product management expert with a background in automotive software. Ensures our platform meets the evolving needs of modern dealerships.',
-    'about.team.members.claude.name': 'Claude Mitchell',
-    'about.team.members.claude.role': 'Lead Developer',
+      'With over 25 years of dealership and retail experience, Sarah Conner brings deep insights into achieving sales success. She understands the power of effective tools and skilled management to inspire teams, ensuring The DAS Board drives exceptional results for dealerships.',
+    'about.team.members.claude.name': 'Claude Sonnet',
+    'about.team.members.claude.role': 'Chief Technology Officer',
     'about.team.members.claude.bio':
-      'Full-stack developer specializing in real-time applications and data visualization. Builds the technical backbone that powers The DAS Board.',
-    'about.team.members.annie.name': 'Annie Rodriguez',
-    'about.team.members.annie.role': 'Customer Success Manager',
+      'Claude Sonnet brings deep expertise in crafting software that excels, with a focus on scalable, secure platforms. His ability to deliver insights without complexity ensures The DAS Board provides seamless, reliable technology for dealerships.',
+    'about.team.members.annie.name': 'Annie Porter',
+    'about.team.members.annie.role': 'Customer Success Director',
     'about.team.members.annie.bio':
-      'Dedicated to ensuring our customers get maximum value from The DAS Board. Former automotive operations manager with deep industry knowledge.',
+      'Dedicated to ensuring every DAS Board customer gets the most from our platform through personalized onboarding and support',
     'about.values.title': 'Our Values',
     'about.values.customerFocused.title': 'Customer-Focused',
     'about.values.customerFocused.description':
-      'Every feature we build is driven by real feedback from dealerships. We listen to our customers and continuously improve based on their needs.',
+      'We empower automotive dealerships with intuitive dashboards that prioritize their unique needs, ensuring seamless management and enhanced customer experiences.',
     'about.values.dataDriven.title': 'Data-Driven',
     'about.values.dataDriven.description':
-      'We believe in the power of data to transform decision-making. Our platform provides actionable insights that drive real business results.',
+      'Our platform delivers real-time, actionable insights from dealership data, enabling precise decision-making to boost sales and operational efficiency.',
     'about.values.continuousImprovement.title': 'Continuous Improvement',
     'about.values.continuousImprovement.description':
-      'The automotive industry evolves rapidly, and so do we. We are constantly innovating and improving to stay ahead of industry trends.',
+      'We relentlessly refine our tools to help dealerships optimize performance, adapt to industry trends, and achieve sustained growth.',
     'about.contact.title': 'Get in Touch',
     'about.contact.subtitle':
       "Ready to see how The DAS Board can transform your dealership operations? We'd love to hear from you.",

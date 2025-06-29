@@ -188,7 +188,7 @@ export default function HomePage() {
               Everything you need to manage your dealership operations effectively
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {features.map((feature, index) => {
               const IconComponent = feature.icon;
               return (
@@ -296,7 +296,7 @@ export default function HomePage() {
       <footer className="border-t border-gray-700 bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="col-span-1 md:col-span-2">
+            <div>
               <h3 className="text-2xl font-bold text-white mb-4">The DAS Board</h3>
               <p className="text-gray-400 mb-4">
                 Modern dealership management software with real-time insights.
@@ -336,6 +336,35 @@ export default function HomePage() {
                     className="text-gray-400 hover:text-white transition-colors"
                   >
                     About Us
+                  </button>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold text-white mb-4">Legal</h4>
+              <ul className="space-y-2">
+                <li>
+                  <button
+                    onClick={() => navigate('/legal/terms')}
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    Terms of Service
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => navigate('/legal/privacy')}
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    Privacy Policy
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => navigate('/legal/subscription')}
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    Subscription Agreement
                   </button>
                 </li>
               </ul>

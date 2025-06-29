@@ -12,65 +12,80 @@ export default function PricingPage() {
       originalPrice: '$5/Month',
       description: 'Perfect for individual finance managers',
       popular: true,
-      features: [
-        'Personal deal tracking',
-        'Performance analytics',
-        'Goal management',
-        'Commission tracking',
-        'PVR & VSC metrics',
-        'Real-time earnings calculator',
-        '30-day free trial',
-        'Email support',
-      ],
+      features: ['Personal deal tracking', 'Performance analytics', 'PVR & VSC metrics'],
     },
     {
-      name: 'Single Dealership',
-      price: '$250/month',
-      description: 'For individual dealership locations',
+      name: 'Small Dealer Groups',
+      price: '$250/mo per Dealership',
+      description: '1-5 Dealerships',
       popular: false,
       features: [
-        'Up to 15 users',
+        'Role Specific Dashboards for up to 10 Sales People',
+        '3 F&I Managers',
+        '3 Sales Managers',
+        '1 GM',
         'Team management',
         'Sales tracking',
         'Finance oversight',
         'Performance reporting',
         'Dynamic scheduler',
-        'Role-based dashboards',
         'Priority support',
-        'Custom pay plans',
-        'Advanced analytics',
       ],
     },
     {
-      name: 'Dealer Groups',
-      price: '$500/month',
-      description: 'For multi-location dealership groups',
+      name: 'Dealer Groups 6+',
+      price: '$200/Mo per Dealer*',
+      description: 'Everything Single Dealership offers plus Area VP Dashboard',
       popular: false,
       features: [
-        'Unlimited users',
+        'Level 1: 6 - 12 Locations',
+        'Level 2: 13-25 Locations',
+        'Level 3: Contact for larger groups',
         'Multi-location management',
         'Centralized reporting',
         'Group-wide analytics',
-        'Scalable team structure',
+        'Area VP Dashboard',
         'Advanced admin controls',
-        'Custom integrations',
         'Dedicated account manager',
         'Priority phone support',
-        'Custom training sessions',
       ],
     },
   ];
 
   const comparisonFeatures = [
-    { name: 'Deal Tracking', finance: true, dealership: true, group: true },
-    { name: 'Performance Analytics', finance: true, dealership: true, group: true },
-    { name: 'Team Management', finance: false, dealership: true, group: true },
-    { name: 'Multi-location Support', finance: false, dealership: false, group: true },
-    { name: 'Custom Pay Plans', finance: false, dealership: true, group: true },
-    { name: 'Advanced Reporting', finance: false, dealership: true, group: true },
-    { name: 'Priority Support', finance: false, dealership: true, group: true },
-    { name: 'Custom Integrations', finance: false, dealership: false, group: true },
-    { name: 'Dedicated Account Manager', finance: false, dealership: false, group: true },
+    { name: 'Deal Log', finance: true, dealership: true, group: true },
+    { name: 'Track Deals', finance: true, dealership: true, group: true },
+    { name: 'Track PVR', finance: true, dealership: true, group: true },
+    { name: 'Track Gross', finance: true, dealership: true, group: true },
+    { name: 'View Schedule', finance: true, dealership: true, group: true },
+    { name: 'Pay Calculator', finance: true, dealership: true, group: true },
+    { name: 'Daily DAS Board (Leaderboard)', finance: false, dealership: true, group: true },
+    { name: 'Team Schedule', finance: false, dealership: true, group: true },
+    { name: 'Set Team Goals', finance: false, dealership: true, group: true },
+    { name: 'Sales Reports', finance: false, dealership: true, group: true },
+    { name: 'General Manager Dashboard', finance: false, dealership: true, group: true },
+    { name: 'Finance Director Dashboard', finance: false, dealership: true, group: true },
+    { name: 'Sales Director Dashboard', finance: false, dealership: true, group: true },
+    { name: 'Dealer Group Overview', finance: false, dealership: false, group: true },
+    { name: 'Multi-Location Analytics', finance: false, dealership: false, group: true },
+    {
+      name: 'Level 1 (6-12 dealerships, $200/mo per dealership): Adds Area Vice President (AVP)',
+      finance: false,
+      dealership: false,
+      group: true,
+    },
+    {
+      name: 'Level 2 (13-25 dealerships, $250/mo per dealership): 2 AVPs',
+      finance: false,
+      dealership: false,
+      group: true,
+    },
+    {
+      name: 'Level 3 (larger dealer groups): Contact for pricing',
+      finance: false,
+      dealership: false,
+      group: true,
+    },
   ];
 
   return (
@@ -217,15 +232,36 @@ export default function PricingPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-700">
-                    <th className="text-left py-4 px-6 text-white font-semibold">Features</th>
-                    <th className="text-center py-4 px-6 text-blue-400 font-semibold">
-                      Finance Manager
+                    <th className="text-left py-6 px-6 text-white font-semibold">Features</th>
+                    <th className="text-center py-6 px-6 text-blue-400 font-semibold">
+                      <div className="space-y-2">
+                        <div className="text-lg">Finance Manager Only</div>
+                        <div className="text-sm text-blue-300">$5/mo FREE for a limited time</div>
+                        <div className="text-xs text-gray-400 max-w-48">
+                          Log your Deals, Track your PVR, Product Profit, Product Spread, View
+                          Schedule, and Pay Calculator.
+                        </div>
+                      </div>
                     </th>
-                    <th className="text-center py-4 px-6 text-white font-semibold">
-                      Single Dealership
+                    <th className="text-center py-6 px-6 text-white font-semibold">
+                      <div className="space-y-2">
+                        <div className="text-lg">Small Dealer Groups</div>
+                        <div className="text-sm text-green-400">Just $250/mo per Dealership</div>
+                        <div className="text-xs text-gray-400 max-w-48">
+                          1-5 Dealerships. Role Specific Dashboards for up to 10 Sales People, 3 F&I
+                          Managers, 3 Sales Managers and 1 GM.
+                        </div>
+                      </div>
                     </th>
-                    <th className="text-center py-4 px-6 text-white font-semibold">
-                      Dealer Groups
+                    <th className="text-center py-6 px-6 text-white font-semibold">
+                      <div className="space-y-2">
+                        <div className="text-lg">Dealer Groups 6+</div>
+                        <div className="text-sm text-green-400">$200/Mo per Dealer*</div>
+                        <div className="text-xs text-gray-400 max-w-48">
+                          Everything Single Dealership offers plus Area VP Dashboard. Level 1: 6-12
+                          Locations, Level 2: 13-25 Locations, Level 3: Contact for larger groups.
+                        </div>
+                      </div>
                     </th>
                   </tr>
                 </thead>
@@ -257,7 +293,276 @@ export default function PricingPage() {
                     </tr>
                   ))}
                 </tbody>
+                <tfoot>
+                  <tr className="border-t border-gray-600 bg-gray-750">
+                    <td className="py-6 px-6 text-white font-semibold">Select Plan</td>
+                    <td className="py-6 px-6 text-center">
+                      <button
+                        onClick={() => navigate('/signup')}
+                        className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
+                      >
+                        Select Plan
+                      </button>
+                    </td>
+                    <td className="py-6 px-6 text-center">
+                      <button
+                        onClick={() => navigate('/signup')}
+                        className="bg-green-600 hover:bg-green-500 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
+                      >
+                        Select Plan
+                      </button>
+                    </td>
+                    <td className="py-6 px-6 text-center">
+                      <button
+                        onClick={() => navigate('/signup')}
+                        className="bg-green-600 hover:bg-green-500 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
+                      >
+                        Select Plan
+                      </button>
+                    </td>
+                  </tr>
+                </tfoot>
               </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Subscription Upgrade Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-white mb-4">Subscription Upgrades</h2>
+            <p className="text-xl text-gray-300">
+              Enhance your plan with additional capacity and features
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Premium + */}
+            <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 hover:border-blue-500 transition-all duration-300">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-white mb-2">Premium +</h3>
+                <div className="text-3xl font-bold text-blue-400 mb-4">+$100/month</div>
+                <p className="text-gray-400">
+                  Expand your team capacity and unlock additional management features for growing
+                  dealerships.
+                </p>
+              </div>
+
+              <div className="space-y-4 mb-8">
+                <h4 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">
+                  Features:
+                </h4>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">Adds 10 more Sales People (up to 20 total)</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">Adds up to 5 F&I Managers</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">Adds Finance Director role</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">Adds up to 5 Sales Managers</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">1 GSM and GM</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">Dynamic Scheduling</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">More Sales Reports</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => navigate('/signup')}
+                className="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 px-6 rounded-lg font-semibold transition-colors"
+              >
+                Upgrade Plan
+              </button>
+            </div>
+
+            {/* Premium ++ */}
+            <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 hover:border-purple-500 transition-all duration-300">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-white mb-2">Premium ++</h3>
+                <div className="text-3xl font-bold text-purple-400 mb-4">Contact Us</div>
+                <p className="text-gray-400">
+                  Maximum capacity for large dealerships with extensive teams and comprehensive
+                  management needs.
+                </p>
+              </div>
+
+              <div className="space-y-4 mb-8">
+                <h4 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">
+                  Features:
+                </h4>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-purple-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">Up to 50 Sales People</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-purple-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">Up to 10 Finance People</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-purple-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">Up to 3 Finance Assistants</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-purple-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">Up to 8 Sales Managers</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-purple-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">1 GSM and GM</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-purple-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">Dynamic Scheduling</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-purple-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">More Sales Reports</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => navigate('/signup')}
+                className="w-full bg-purple-600 hover:bg-purple-500 text-white py-3 px-6 rounded-lg font-semibold transition-colors"
+              >
+                Contact Sales
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Subscription Upgrade Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-white mb-4">Subscription Upgrades</h2>
+            <p className="text-xl text-gray-300">
+              Enhance your plan with additional capacity and features
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Premium + */}
+            <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 hover:border-blue-500 transition-all duration-300">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-white mb-2">Premium +</h3>
+                <div className="text-3xl font-bold text-blue-400 mb-4">+$100/month</div>
+                <p className="text-gray-400">
+                  Expand your team capacity and unlock additional management features for growing
+                  dealerships.
+                </p>
+              </div>
+
+              <div className="space-y-4 mb-8">
+                <h4 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">
+                  Features:
+                </h4>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">Adds 10 more Sales People (up to 20 total)</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">Adds up to 5 F&I Managers</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">Adds Finance Director role</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">Adds up to 5 Sales Managers</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">1 GSM and GM</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">Dynamic Scheduling</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">More Sales Reports</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => navigate('/signup')}
+                className="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 px-6 rounded-lg font-semibold transition-colors"
+              >
+                Upgrade Plan
+              </button>
+            </div>
+
+            {/* Premium ++ */}
+            <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 hover:border-purple-500 transition-all duration-300">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-white mb-2">Premium ++</h3>
+                <div className="text-3xl font-bold text-purple-400 mb-4">Contact Us</div>
+                <p className="text-gray-400">
+                  Maximum capacity for large dealerships with extensive teams and comprehensive
+                  management needs.
+                </p>
+              </div>
+
+              <div className="space-y-4 mb-8">
+                <h4 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">
+                  Features:
+                </h4>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-purple-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">Up to 50 Sales People</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-purple-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">Up to 10 Finance People</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-purple-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">Up to 3 Finance Assistants</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-purple-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">Up to 8 Sales Managers</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-purple-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">1 GSM and GM</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-purple-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">Dynamic Scheduling</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 text-purple-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-300">More Sales Reports</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => navigate('/signup')}
+                className="w-full bg-purple-600 hover:bg-purple-500 text-white py-3 px-6 rounded-lg font-semibold transition-colors"
+              >
+                Contact Sales
+              </button>
             </div>
           </div>
         </div>
@@ -335,7 +640,7 @@ export default function PricingPage() {
       <footer className="border-t border-gray-700 bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="col-span-1 md:col-span-2">
+            <div>
               <h3 className="text-2xl font-bold text-white mb-4">The DAS Board</h3>
               <p className="text-gray-400 mb-4">
                 Modern dealership management software with real-time insights.
@@ -363,10 +668,46 @@ export default function PricingPage() {
                 </li>
                 <li>
                   <button
+                    onClick={() => navigate('/pricing')}
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    Pricing
+                  </button>
+                </li>
+                <li>
+                  <button
                     onClick={() => navigate('/about')}
                     className="text-gray-400 hover:text-white transition-colors"
                   >
                     About Us
+                  </button>
+                </li>
+              </ul>
+
+              <h4 className="text-lg font-semibold text-white mb-4 mt-6">Legal</h4>
+              <ul className="space-y-2">
+                <li>
+                  <button
+                    onClick={() => navigate('/legal/terms')}
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    Terms of Service
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => navigate('/legal/privacy')}
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    Privacy Policy
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => navigate('/legal/subscription')}
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    Subscription Agreement
                   </button>
                 </li>
               </ul>

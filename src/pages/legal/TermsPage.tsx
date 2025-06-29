@@ -34,131 +34,240 @@ export default function TermsPage() {
         <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-8">
           <div className="flex items-center space-x-3 mb-8">
             <FileText className="w-8 h-8 text-blue-400" />
-            <h1 className="text-3xl font-bold text-white">{t('legal.terms.title')}</h1>
+            <h1 className="text-3xl font-bold text-white">Terms of Service</h1>
           </div>
 
           <div className="prose prose-invert max-w-none">
             <p className="text-gray-300 text-sm mb-8">
-              <strong>Effective Date:</strong> January 1, 2025
-              <br />
-              <strong>Last Updated:</strong> January 1, 2025
+              <strong>Last Updated:</strong> 6/28/2025
             </p>
 
             <div className="space-y-8 text-gray-300">
               <section>
+                <p>
+                  Welcome to The DAS Board. These Terms of Service ("Terms") govern your access to
+                  and use of our dealership management software platform. By accessing or using our
+                  services, you agree to be bound by these Terms.
+                </p>
+              </section>
+
+              <section>
                 <h2 className="text-xl font-semibold text-white mb-4">1. Acceptance of Terms</h2>
                 <p>
-                  By accessing and using The DAS Board service, you accept and agree to be bound by
-                  the terms and provision of this agreement. If you do not agree to abide by the
-                  above, please do not use this service.
+                  By creating an account, accessing, or using The DAS Board, you acknowledge that
+                  you have read, understood, and agree to be bound by these Terms and our Privacy
+                  Policy. If you do not agree to these Terms, you may not use our services. You must
+                  be at least 18 years old and have the authority to enter into these Terms on
+                  behalf of your organization.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">2. Service Description</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">2. Description of Service</h2>
                 <p>
-                  The DAS Board provides dealership management software with real-time dashboards
-                  for finance managers, sales teams, and dealership management. Our service includes
-                  performance tracking, deal logging, scheduling, and analytics tools designed
-                  specifically for automotive dealerships.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-xl font-semibold text-white mb-4">3. User Accounts</h2>
-                <p>
-                  You are responsible for maintaining the confidentiality of your account
-                  credentials and for all activities that occur under your account. You agree to
-                  notify us immediately of any unauthorized use of your account.
+                  The DAS Board is a cloud-based dealership management software platform that
+                  provides tools for inventory management, sales tracking, customer relationship
+                  management, financial reporting, and related automotive industry services. We
+                  reserve the right to modify, suspend, or discontinue any aspect of our service
+                  with reasonable notice.
                 </p>
               </section>
 
               <section>
                 <h2 className="text-xl font-semibold text-white mb-4">
-                  4. Subscription and Payment
+                  3. Account Registration and Security
                 </h2>
+                <p className="mb-4">
+                  To use our services, you must create an account with accurate and complete
+                  information. You are responsible for:
+                </p>
                 <ul className="list-disc list-inside space-y-2">
-                  <li>Subscriptions are billed monthly or annually as selected</li>
-                  <li>Free trials are available for eligible plans</li>
-                  <li>Payment is due at the beginning of each billing cycle</li>
-                  <li>Cancellations take effect at the end of the current billing period</li>
-                  <li>Refunds are provided according to our refund policy</li>
+                  <li>Maintaining the confidentiality of your account credentials</li>
+                  <li>All activities that occur under your account</li>
+                  <li>Notifying us immediately of any unauthorized use</li>
+                  <li>Ensuring your account information remains current and accurate</li>
+                  <li>Complying with our security requirements and best practices</li>
                 </ul>
               </section>
 
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">5. Data and Privacy</h2>
-                <p>
-                  Your privacy is important to us. Please review our Privacy Policy, which governs
-                  how we collect, use, and protect your information. By using our service, you
-                  consent to the collection and use of information in accordance with our Privacy
-                  Policy.
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  4. Subscription and Payment Terms
+                </h2>
+                <p className="mb-4">
+                  The DAS Board operates on a subscription basis. By subscribing, you agree to:
                 </p>
-              </section>
-
-              <section>
-                <h2 className="text-xl font-semibold text-white mb-4">6. Acceptable Use</h2>
-                <p>
-                  You agree not to use the service for any unlawful purpose or in any way that could
-                  damage, disable, overburden, or impair our service. Prohibited activities include
-                  but are not limited to:
-                </p>
-                <ul className="list-disc list-inside space-y-2 mt-2">
-                  <li>Violating any applicable laws or regulations</li>
-                  <li>Attempting to gain unauthorized access to our systems</li>
-                  <li>Interfering with other users' ability to use the service</li>
-                  <li>Transmitting viruses or malicious code</li>
+                <ul className="list-disc list-inside space-y-2">
+                  <li>Pay all fees associated with your subscription plan</li>
+                  <li>Automatic renewal unless cancelled before the renewal date</li>
+                  <li>Fee changes with 30 days' advance notice</li>
+                  <li>No refunds for partial subscription periods</li>
+                  <li>Suspension of service for non-payment after reasonable notice</li>
                 </ul>
               </section>
 
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">7. Intellectual Property</h2>
-                <p>
-                  The service and its original content, features, and functionality are owned by The
-                  DAS Board and are protected by international copyright, trademark, patent, trade
-                  secret, and other intellectual property laws.
+                <h2 className="text-xl font-semibold text-white mb-4">5. Acceptable Use Policy</h2>
+                <p className="mb-4">
+                  You agree to use The DAS Board only for lawful purposes and in accordance with
+                  these Terms. You may not:
+                </p>
+                <ul className="list-disc list-inside space-y-2">
+                  <li>Violate any applicable laws, regulations, or third-party rights</li>
+                  <li>Upload harmful, offensive, or inappropriate content</li>
+                  <li>
+                    Attempt to gain unauthorized access to our systems or other users' accounts
+                  </li>
+                  <li>Use the service to send spam, malware, or other malicious content</li>
+                  <li>Reverse engineer, decompile, or attempt to extract source code</li>
+                  <li>Interfere with or disrupt the integrity or performance of our services</li>
+                  <li>Use the platform for any fraudulent or illegal activities</li>
+                </ul>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  6. Intellectual Property Rights
+                </h2>
+                <p className="mb-4">
+                  The DAS Board and all related technology, content, and materials are owned by us
+                  or our licensors. This includes:
+                </p>
+                <ul className="list-disc list-inside space-y-2">
+                  <li>Software, algorithms, and user interfaces</li>
+                  <li>Trademarks, logos, and branding materials</li>
+                  <li>Documentation, tutorials, and support materials</li>
+                  <li>Analytics, reports, and aggregated data insights</li>
+                </ul>
+                <p className="mt-4">
+                  You retain ownership of your data but grant us a license to use it to provide our
+                  services. We may use anonymized, aggregated data for industry research and
+                  platform improvement.
                 </p>
               </section>
 
               <section>
                 <h2 className="text-xl font-semibold text-white mb-4">
-                  8. Limitation of Liability
+                  7. Data Protection and Privacy
                 </h2>
                 <p>
-                  In no event shall The DAS Board be liable for any indirect, incidental, special,
-                  consequential, or punitive damages, including without limitation, loss of profits,
-                  data, use, goodwill, or other intangible losses, resulting from your use of the
-                  service.
+                  You are responsible for ensuring that any personal data you process through our
+                  platform complies with applicable privacy laws. We will process data in accordance
+                  with our Privacy Policy and applicable data protection regulations, including GDPR
+                  and CCPA where applicable.
                 </p>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  8. Service Availability and Support
+                </h2>
+                <p className="mb-4">
+                  While we strive for high availability, we do not guarantee uninterrupted service.
+                  We provide:
+                </p>
+                <ul className="list-disc list-inside space-y-2">
+                  <li>99.9% uptime SLA for paid subscriptions</li>
+                  <li>Regular maintenance windows with advance notice</li>
+                  <li>Technical support based on your subscription level</li>
+                  <li>Security monitoring and incident response</li>
+                </ul>
               </section>
 
               <section>
                 <h2 className="text-xl font-semibold text-white mb-4">9. Termination</h2>
+                <p className="mb-4">Either party may terminate these Terms:</p>
+                <ul className="list-disc list-inside space-y-2">
+                  <li>
+                    You may cancel your subscription at any time through your account settings
+                  </li>
+                  <li>We may terminate for breach of these Terms with reasonable notice</li>
+                  <li>
+                    We may suspend service immediately for serious violations or security threats
+                  </li>
+                  <li>Upon termination, you will lose access to the platform and your data</li>
+                  <li>
+                    We will provide a reasonable opportunity to export your data before deletion
+                  </li>
+                </ul>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  10. Disclaimers and Limitations of Liability
+                </h2>
+                <p className="mb-4">
+                  THE DAS BOARD IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND. TO THE MAXIMUM
+                  EXTENT PERMITTED BY LAW:
+                </p>
+                <ul className="list-disc list-inside space-y-2">
+                  <li>
+                    We disclaim all warranties, express or implied, including merchantability and
+                    fitness for a particular purpose
+                  </li>
+                  <li>
+                    We are not liable for indirect, incidental, special, or consequential damages
+                  </li>
+                  <li>
+                    Our total liability shall not exceed the fees paid by you in the 12 months
+                    preceding the claim
+                  </li>
+                  <li>
+                    You acknowledge that software may contain bugs and agree to report them promptly
+                  </li>
+                </ul>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-semibold text-white mb-4">11. Indemnification</h2>
                 <p>
-                  We may terminate or suspend your account immediately, without prior notice or
-                  liability, for any reason whatsoever, including without limitation if you breach
-                  the Terms.
+                  You agree to indemnify and hold us harmless from any claims, losses, or damages
+                  arising from your use of our services, violation of these Terms, or infringement
+                  of any third-party rights.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">10. Changes to Terms</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  12. Governing Law and Dispute Resolution
+                </h2>
                 <p>
-                  We reserve the right to modify or replace these Terms at any time. If a revision
-                  is material, we will try to provide at least 30 days' notice prior to any new
-                  terms taking effect.
+                  These Terms are governed by the laws of [Jurisdiction] without regard to conflict
+                  of law principles. Any disputes will be resolved through binding arbitration,
+                  except for injunctive relief claims which may be brought in appropriate courts.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">11. Contact Information</h2>
-                <p>If you have any questions about these Terms, please contact us at:</p>
+                <h2 className="text-xl font-semibold text-white mb-4">13. Changes to Terms</h2>
+                <p>
+                  We may modify these Terms from time to time. We will provide notice of material
+                  changes at least 30 days in advance. Continued use of our services after changes
+                  take effect constitutes acceptance of the revised Terms.
+                </p>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-semibold text-white mb-4">14. Entire Agreement</h2>
+                <p>
+                  These Terms, together with our Privacy Policy and any additional agreements,
+                  constitute the entire agreement between you and The DAS Board regarding your use
+                  of our services.
+                </p>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-semibold text-white mb-4">15. Contact Information</h2>
+                <p>If you have questions about these Terms, please contact us:</p>
                 <div className="mt-2 bg-gray-700/50 p-4 rounded-lg">
                   <p>
                     <strong>Email:</strong> legal@thedasboard.com
                   </p>
                   <p>
-                    <strong>Address:</strong> The DAS Board Legal Department
+                    <strong>Address:</strong> [Company Address]
+                  </p>
+                  <p>
+                    <strong>Phone:</strong> [Support Phone Number]
                   </p>
                 </div>
               </section>
