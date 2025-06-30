@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, User, Building, Users } from 'lucide-react';
+import { ArrowRight, User, Building, Users, Home } from 'lucide-react';
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -44,12 +44,21 @@ export default function SignUp() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
-      <div className="max-w-6xl w-full">
+      <div className="max-w-4xl w-full">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-4">Join The Das Board</h1>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Choose the option that best describes your business to get started with the right
-            dashboard for your needs.
+          <div className="flex items-center justify-between mb-6">
+            <div></div> {/* Empty div for spacing */}
+            <h1 className="text-4xl font-bold text-white">Choose Your Account Type</h1>
+            <button
+              onClick={() => navigate('/')}
+              className="text-gray-400 hover:text-white transition-colors"
+              title="Back to home"
+            >
+              <Home className="w-6 h-6" />
+            </button>
+          </div>
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            Select the option that best describes your role or organization
           </p>
         </div>
 

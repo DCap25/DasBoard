@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, CheckCircle2, Loader2, ArrowLeft, Info } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Loader2, ArrowLeft, Info, Home } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 
 export default function DealerGroupSignup() {
@@ -209,12 +209,21 @@ export default function DealerGroupSignup() {
               <span className="text-blue-400 font-mono">/group-admin</span>
             </p>
           )}
-          <button
-            onClick={() => navigate(formState.level === 'level_3' ? '/signup' : '/auth')}
-            className="bg-blue-600 hover:bg-blue-500 text-white py-3 px-8 rounded-lg font-semibold transition-colors"
-          >
-            {formState.level === 'level_3' ? 'Back to Signup' : 'Go to Login'}
-          </button>
+          <div className="space-y-4">
+            <button
+              onClick={() => navigate(formState.level === 'level_3' ? '/signup' : '/auth')}
+              className="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 px-8 rounded-lg font-semibold transition-colors"
+            >
+              {formState.level === 'level_3' ? 'Back to Signup' : 'Go to Login'}
+            </button>
+            <button
+              onClick={() => navigate('/')}
+              className="w-full bg-gray-600 hover:bg-gray-500 text-white py-3 px-8 rounded-lg font-semibold transition-colors flex items-center justify-center"
+            >
+              <Home className="w-5 h-5 mr-2" />
+              Back to Home
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -224,14 +233,24 @@ export default function DealerGroupSignup() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <div className="bg-gray-800 rounded-xl p-8 border border-gray-700">
-          <div className="flex items-center mb-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center">
+              <button
+                onClick={() => navigate('/signup')}
+                className="text-gray-400 hover:text-white mr-4 transition-colors"
+                title="Back to signup options"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <h2 className="text-2xl font-bold text-white">Dealer Groups</h2>
+            </div>
             <button
-              onClick={() => navigate('/signup')}
-              className="text-gray-400 hover:text-white mr-4 transition-colors"
+              onClick={() => navigate('/')}
+              className="text-gray-400 hover:text-white transition-colors"
+              title="Back to home"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <Home className="w-5 h-5" />
             </button>
-            <h2 className="text-2xl font-bold text-white">Dealer Group</h2>
           </div>
 
           {error && (

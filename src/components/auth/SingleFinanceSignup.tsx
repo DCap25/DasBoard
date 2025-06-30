@@ -9,6 +9,7 @@ import {
   Lock,
   Eye,
   EyeOff,
+  Home,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 
@@ -393,62 +394,42 @@ export default function SingleFinanceSignup() {
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
         <div className="max-w-lg w-full text-center">
           <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-6" />
-          <h2 className="text-3xl font-bold mb-4 text-white">Finance Manager Account Created!</h2>
-          <p className="text-gray-300 mb-6">
-            Your finance manager account has been created successfully!
-          </p>
+          <h2 className="text-3xl font-bold mb-4 text-white">Welcome to The DAS Board!</h2>
 
-          {/* Login Credentials */}
-          <div className="bg-gray-800 border border-gray-600 rounded-lg p-6 mb-6 text-left">
-            <h3 className="text-lg font-semibold text-white mb-4">🔑 Your Login Information</h3>
+          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-6">
+            <h3 className="text-xl font-semibold text-white mb-4">Your Login Credentials</h3>
             <div className="space-y-3">
-              <div>
-                <label className="text-gray-400 text-sm">Email:</label>
-                <div className="bg-gray-700 p-2 rounded font-mono text-blue-300 break-all">
-                  {formState.email}
-                </div>
+              <div className="bg-gray-700 p-3 rounded-lg">
+                <p className="text-gray-300 text-sm">Email:</p>
+                <p className="text-blue-400 font-mono break-all">{formState.email}</p>
               </div>
-              {formState.tempPassword && (
-                <div>
-                  <label className="text-gray-400 text-sm">Temporary Password:</label>
-                  <div className="bg-gray-700 p-2 rounded font-mono text-green-300 break-all">
-                    {formState.tempPassword}
-                  </div>
-                </div>
-              )}
+              <div className="bg-gray-700 p-3 rounded-lg">
+                <p className="text-gray-300 text-sm">Temporary Password:</p>
+                <p className="text-green-400 font-mono text-lg">{formState.tempPassword}</p>
+              </div>
             </div>
-            <div className="mt-4 p-3 bg-blue-900/50 border border-blue-500 rounded">
-              <p className="text-blue-300 text-sm">
-                💡 <strong>Next Steps:</strong>
+            <div className="mt-4 p-3 bg-yellow-900/30 border border-yellow-600 rounded-lg">
+              <p className="text-yellow-200 text-sm">
+                <strong>Important:</strong> Save these credentials! You'll need them to log in. We
+                recommend changing your password after your first login.
               </p>
-              <ul className="text-blue-300 text-sm mt-2 space-y-1">
-                <li>1. Check your email for a confirmation link (if required)</li>
-                <li>2. Use the login credentials above to access your dashboard</li>
-                <li>3. Change your password after first login for security</li>
-              </ul>
             </div>
           </div>
 
           <div className="space-y-4">
-            <p className="text-gray-400">
-              Access your dashboard at: <br />
-              <span className="text-blue-400 font-mono">/dashboard/single-finance</span>
-            </p>
-
-            <div className="flex space-x-4">
-              <button
-                onClick={() => navigate('/auth')}
-                className="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-3 px-6 rounded-lg font-semibold transition-colors"
-              >
-                Go to Login
-              </button>
-              <button
-                onClick={() => navigate('/dashboard/single-finance')}
-                className="flex-1 bg-green-600 hover:bg-green-500 text-white py-3 px-6 rounded-lg font-semibold transition-colors"
-              >
-                Go to Dashboard
-              </button>
-            </div>
+            <button
+              onClick={() => navigate('/auth')}
+              className="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 px-8 rounded-lg font-semibold transition-colors"
+            >
+              Go to Login
+            </button>
+            <button
+              onClick={() => navigate('/')}
+              className="w-full bg-gray-600 hover:bg-gray-500 text-white py-3 px-8 rounded-lg font-semibold transition-colors flex items-center justify-center"
+            >
+              <Home className="w-5 h-5 mr-2" />
+              Back to Home
+            </button>
           </div>
         </div>
       </div>
@@ -459,14 +440,24 @@ export default function SingleFinanceSignup() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <div className="bg-gray-800 rounded-xl p-8 border border-gray-700">
-          <div className="flex items-center mb-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center">
+              <button
+                onClick={() => navigate('/signup')}
+                className="text-gray-400 hover:text-white mr-4 transition-colors"
+                title="Back to signup options"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <h2 className="text-2xl font-bold text-white">Finance Manager</h2>
+            </div>
             <button
-              onClick={() => navigate('/signup')}
-              className="text-gray-400 hover:text-white mr-4 transition-colors"
+              onClick={() => navigate('/')}
+              className="text-gray-400 hover:text-white transition-colors"
+              title="Back to home"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <Home className="w-5 h-5" />
             </button>
-            <h2 className="text-2xl font-bold text-white">Single Finance Manager</h2>
           </div>
 
           {/* Promotional Pricing Banner */}
