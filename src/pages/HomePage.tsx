@@ -127,16 +127,13 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
-              <h1 className="text-5xl lg:text-7xl font-bold text-white leading-tight">
-                The{' '}
+              <h1 className="text-5xl lg:text-7xl font-bold leading-tight">
+                <span className="text-white">The </span>
                 <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
                   DAS Board
                 </span>
               </h1>
-              <p className="text-xl text-gray-300 leading-relaxed">
-                Real-time dashboards providing critical insights for finance managers, dealerships,
-                and dealer groups.
-              </p>
+              <p className="text-xl text-gray-300 leading-relaxed">{t('home.subtitle')}</p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={() => navigate('/signup')}

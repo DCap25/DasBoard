@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, CheckCircle2, Loader2, ArrowLeft } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
+import LanguageSelector from './LanguageSelector';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 export default function DealershipSignup() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [formState, setFormState] = useState({
     firstName: '',
     lastName: '',
@@ -218,10 +221,13 @@ export default function DealershipSignup() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Language Selector */}
+            <LanguageSelector className="mb-4" />
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label htmlFor="firstName" className="block text-gray-300 text-sm font-bold mb-2">
-                  First Name
+                  {t('signup.form.firstName')}
                 </label>
                 <input
                   id="firstName"
@@ -237,7 +243,7 @@ export default function DealershipSignup() {
 
               <div>
                 <label htmlFor="lastName" className="block text-gray-300 text-sm font-bold mb-2">
-                  Last Name
+                  {t('signup.form.lastName')}
                 </label>
                 <input
                   id="lastName"
@@ -254,7 +260,7 @@ export default function DealershipSignup() {
 
             <div>
               <label htmlFor="email" className="block text-gray-300 text-sm font-bold mb-2">
-                Email
+                {t('signup.form.email')}
               </label>
               <input
                 id="email"

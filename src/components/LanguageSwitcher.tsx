@@ -11,7 +11,6 @@ const languages = [
   { code: 'cs', name: 'Čeština', flag: '🇨🇿' },
   { code: 'it', name: 'Italiano', flag: '🇮🇹' },
   { code: 'pl', name: 'Polski', flag: '🇵🇱' },
-  { code: 'el', name: 'Ελληνικά', flag: '🇬🇷' },
   { code: 'pt', name: 'Português', flag: '🇵🇹' },
 ];
 
