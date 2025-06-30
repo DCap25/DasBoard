@@ -19,59 +19,54 @@ export default function HomePage() {
   const features = [
     {
       icon: BarChart3,
-      title: 'Finance Dashboards',
-      description:
-        'Real-time insights for finance managers to track daily performance, log deals, view metrics including PVR, VSC, and other Products.',
+      title: t('features.finance.title'),
+      description: t('features.finance.desc'),
     },
     {
       icon: TrendingUp,
-      title: 'Sales Team Dashboards',
-      description:
-        'The Das Board is your new Leaderboard! Keep track of your deals know exactly where you are throughout the month.',
+      title: t('features.sales.title'),
+      description: t('features.sales.desc'),
     },
     {
       icon: Users,
-      title: 'Sales Manager Dashboards',
-      description: 'View Deals Logs, Sales People statistics, manage your Teams more effectively.',
+      title: t('features.manager.title'),
+      description: t('features.manager.desc'),
     },
     {
       icon: Target,
-      title: 'Informative Dashboards',
-      description:
-        'Role-specific dashboards for Sales Teams, Finance Managers, Sales Managers and General Managers.',
+      title: t('features.info.title'),
+      description: t('features.info.desc'),
     },
     {
       icon: Calendar,
-      title: 'Dynamic Scheduler',
-      description:
-        'Dynamic Sales person scheduler for efficient team coordination. Manage schedules to maximize daily production.',
+      title: t('features.scheduler.title'),
+      description: t('features.scheduler.desc'),
     },
     {
       icon: Calculator,
-      title: 'Pay Calculator',
-      description:
-        'Your Sales Team and Finance Managers will be able to see month to date real time earnings with pre-configured pay plans.',
+      title: t('features.calculator.title'),
+      description: t('features.calculator.desc'),
     },
   ];
 
   const pricingTiers = [
     {
-      name: 'Finance Managers',
-      price: 'Free for Limited Time!',
-      originalPrice: '$5/Month',
-      description: 'Keep track of your Deals, Products, PVR and Pay!',
+      name: t('pricing.tiers.finance.name'),
+      price: t('pricing.tiers.finance.price'),
+      originalPrice: t('pricing.tiers.finance.originalPrice'),
+      description: t('pricing.tiers.finance.description'),
       popular: true,
     },
     {
-      name: 'Dealerships',
-      price: '$250/month',
-      description: 'For up to 15 users with full dealership access.',
+      name: t('pricing.tiers.dealership.name'),
+      price: t('pricing.tiers.dealership.price'),
+      description: t('pricing.tiers.dealership.description'),
       popular: false,
     },
     {
-      name: 'Dealer Groups',
-      price: '$500/month',
-      description: 'Multi-dealership support for dealer groups.',
+      name: t('pricing.tiers.group.name'),
+      price: t('pricing.tiers.group.price'),
+      description: t('pricing.tiers.group.description'),
       popular: false,
     },
   ];
@@ -139,14 +134,14 @@ export default function HomePage() {
                   onClick={() => navigate('/signup')}
                   className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/25 flex items-center justify-center"
                 >
-                  Start Your Free Trial
+                  {t('home.startTrial')}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </button>
                 <button
                   onClick={() => navigate('/screenshots')}
                   className="border border-gray-600 hover:bg-gray-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
                 >
-                  View Screenshots
+                  {t('home.viewScreenshots')}
                 </button>
               </div>
             </div>
@@ -168,9 +163,7 @@ export default function HomePage() {
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-800/30">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-lg font-medium text-gray-200 leading-relaxed italic">
-            "The DAS Board redefines dealership success, empowering Sales Managers to optimize teams
-            and Finance Managers to maximize profits with key sales insights, and Sales People to
-            stay on top of their deals." - Tyler Durden
+            {t('home.mission')}
           </p>
           <div className="h-1 w-32 bg-gradient-to-r from-blue-400 to-blue-600 mx-auto mt-6 rounded-full"></div>
         </div>
@@ -180,10 +173,8 @@ export default function HomePage() {
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">Key Features</h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Everything you need to manage your dealership operations effectively
-            </p>
+            <h2 className="text-4xl font-bold text-white mb-4">{t('home.features.title')}</h2>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">{t('home.features.subtitle')}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {features.map((feature, index) => {
@@ -211,11 +202,8 @@ export default function HomePage() {
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-800/30">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">Try it Now</h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Start your free trial and see the difference real-time insights can make for your
-              dealership.
-            </p>
+            <h2 className="text-4xl font-bold text-white mb-4">{t('home.pricing.title')}</h2>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">{t('home.pricing.subtitle')}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {pricingTiers.map((tier, index) => (
@@ -283,7 +271,7 @@ export default function HomePage() {
             onClick={() => navigate('/signup')}
             className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/25 inline-flex items-center"
           >
-            Start Your Free Trial
+            {t('home.startTrial')}
             <ArrowRight className="ml-2 w-5 h-5" />
           </button>
         </div>
@@ -292,7 +280,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="border-t border-gray-700 bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <h3 className="text-2xl font-bold text-white mb-4">The DAS Board</h3>
               <p className="text-gray-400 mb-4">
