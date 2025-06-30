@@ -12,6 +12,7 @@ const languages = [
   { code: 'it', name: 'Italiano', flag: '🇮🇹' },
   { code: 'pl', name: 'Polski', flag: '🇵🇱' },
   { code: 'pt', name: 'Português', flag: '🇵🇹' },
+  { code: 'gr', name: 'Ελληνικά', flag: '🇬🇷' },
 ];
 
 export default function LanguageSwitcher() {

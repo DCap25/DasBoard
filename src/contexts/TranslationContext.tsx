@@ -16,7 +16,7 @@ interface TranslationProviderProps {
 }
 
 // Available languages with metadata for better UX
-const AVAILABLE_LANGUAGES: Language[] = ['en', 'es', 'fr', 'de', 'cs', 'it', 'pl', 'pt'];
+const AVAILABLE_LANGUAGES: Language[] = ['en', 'es', 'fr', 'de', 'cs', 'it', 'pl', 'pt', 'gr'];
 
 export function TranslationProvider({ children }: TranslationProviderProps) {
   const [language, setLanguageState] = useState<Language>('en');
@@ -34,8 +34,8 @@ export function TranslationProvider({ children }: TranslationProviderProps) {
         setLanguageState(savedLanguage);
       } else {
         // Try to detect browser language
-        if (typeof navigator !== 'undefined') {
-          const browserLang = navigator.language.split('-')[0] as Language;
+        if (typeof window !== 'undefined' && window.navigator) {
+          const browserLang = window.navigator.language.split('-')[0] as Language;
           if (AVAILABLE_LANGUAGES.includes(browserLang)) {
             setLanguageState(browserLang);
             localStorage.setItem('app-language', browserLang);

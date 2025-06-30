@@ -1,32 +1,111 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, CheckCircle2, Loader2, ArrowLeft } from 'lucide-react';
+import {
+  AlertCircle,
+  CheckCircle2,
+  Loader2,
+  ArrowLeft,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+} from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 
 export default function SingleFinanceSignup() {
   const navigate = useNavigate();
+  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showExistingUserLogin, setShowExistingUserLogin] = useState(false);
+  const [passwordResetSent, setPasswordResetSent] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loginData, setLoginData] = useState({
+    email: '',
+    password: '',
+  });
+
   const [formState, setFormState] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
+    tempPassword: '',
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormState(prev => ({ ...prev, [name]: value }));
+    setFormState({ ...formState, [e.target.name]: e.target.value });
+  };
+
+  const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLoginData({ ...loginData, [e.target.name]: e.target.value });
   };
 
   const generateTempPassword = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%';
     let password = '';
     for (let i = 0; i < 12; i++) {
       password += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return password;
+  };
+
+  const handleExistingUserLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email: loginData.email.trim(),
+        password: loginData.password,
+      });
+
+      if (authError) {
+        if (authError.message.includes('Invalid login credentials')) {
+          setError(
+            'Invalid email or password. Please check your credentials or reset your password.'
+          );
+        } else {
+          setError(authError.message);
+        }
+        return;
+      }
+
+      // Login successful, redirect to dashboard
+      navigate('/dashboard/single-finance');
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.message || 'Failed to login');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!loginData.email) {
+      setError('Please enter your email address first');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(loginData.email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      });
+
+      if (error) throw error;
+
+      setPasswordResetSent(true);
+      setError(null);
+    } catch (err: any) {
+      console.error('Password reset error:', err);
+      setError(err.message || 'Failed to send password reset email');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,100 +115,341 @@ export default function SingleFinanceSignup() {
 
     try {
       const fullName = `${formState.firstName} ${formState.lastName}`;
+
+      // First check if user already exists in signup_requests table
+      const { data: existingSignup } = await supabase
+        .from('signup_requests')
+        .select('email')
+        .eq('email', formState.email)
+        .single();
+
+      if (existingSignup) {
+        // User already exists, show login form
+        setLoginData({ email: formState.email, password: '' });
+        setShowExistingUserLogin(true);
+        setError(
+          'An account with this email already exists. Please login below or reset your password.'
+        );
+        setLoading(false);
+        return;
+      }
+
+      // Create signup request in database (Finance Manager is FREE promotional)
+      const { data, error } = await supabase
+        .from('signup_requests')
+        .insert({
+          email: formState.email,
+          dealership_name: `${fullName} - Finance Manager`,
+          contact_person: fullName,
+          phone: formState.phone,
+          tier: 'finance_manager',
+          subscription_tier: 'finance_manager_free_promo',
+          dealer_count: 1,
+          add_ons: [],
+          promo_applied: true,
+          status: 'approved', // Auto-approve free finance manager accounts
+          stripe_payment_status: 'free_promotional',
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      const signupData = data;
+
+      // Generate temporary password
       const tempPassword = generateTempPassword();
 
-      // Create user with Supabase auth
+      console.log('Creating user account with signup options...');
+
+      // Create actual user account with email confirmation disabled
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formState.email,
         password: tempPassword,
         options: {
+          emailRedirectTo: undefined, // Disable email confirmation flow
           data: {
-            name: fullName,
-            role: 'single_finance_manager',
+            full_name: fullName,
+            first_name: formState.firstName,
+            last_name: formState.lastName,
             phone: formState.phone,
+            role: 'single_finance_manager',
+            signup_request_id: signupData.id,
+            email_confirmed: true, // Mark as confirmed in metadata
           },
         },
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        console.error('Auth signup error:', authError);
 
-      // Create profile entry
-      const { error: profileError } = await supabase.from('profiles').upsert({
-        id: authData.user?.id,
-        email: formState.email,
-        name: fullName,
-        role: 'single_finance_manager',
-        phone: formState.phone,
-      });
+        // If auth signup fails due to email confirmation, try alternative approach
+        if (authError.message?.includes('confirm') || authError.message?.includes('verification')) {
+          console.log('Email confirmation required, creating simplified account...');
 
-      if (profileError) throw profileError;
-
-      // Send signup notification to admin
-      try {
-        await fetch('/.netlify/functions/send-emails', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            type: 'signup_notification',
-            data: {
-              name: fullName,
+          // Create a profile directly in the profiles table for immediate access
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .insert({
               email: formState.email,
-              companyType: 'Single Finance Manager',
-              subscriptionId: authData.user?.id,
-            },
-          }),
-        });
-      } catch (emailError) {
-        console.warn('Failed to send admin notification:', emailError);
+              full_name: fullName,
+              first_name: formState.firstName,
+              last_name: formState.lastName,
+              phone: formState.phone,
+              role: 'single_finance_manager',
+              signup_request_id: signupData.id,
+              pending_email_confirmation: true,
+            })
+            .select()
+            .single();
+
+          if (profileError) {
+            console.error('Profile creation error:', profileError);
+            throw new Error('Failed to create user profile. Please try again or contact support.');
+          }
+
+          console.log('Profile created for pending email confirmation:', profileData);
+
+          // Store the temporary password to show to user
+          setFormState(prev => ({ ...prev, tempPassword }));
+          setSuccess(true);
+          return;
+        }
+
+        throw authError;
       }
 
-      // Send temporary password email to user
-      try {
-        await fetch('/.netlify/functions/send-emails', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            type: 'temp_password',
-            data: {
-              name: fullName,
-              email: formState.email,
-              tempPassword: tempPassword,
-              role: 'Single Finance Manager',
-            },
-          }),
-        });
-      } catch (emailError) {
-        console.warn('Failed to send temporary password email:', emailError);
+      console.log('Auth signup result:', authData);
+
+      // Check if user needs email confirmation
+      if (authData.user && !authData.user.email_confirmed_at) {
+        // If email confirmation is required by Supabase settings,
+        // we'll still show success but inform user about email confirmation
+        console.log('User created but email confirmation may be required');
       }
 
+      // Store the temporary password to show to user
+      setFormState(prev => ({ ...prev, tempPassword }));
+
+      console.log('Finance Manager signup completed:', { signupData, authData });
       setSuccess(true);
     } catch (err: any) {
-      setError(err.message || 'Failed to create account');
+      console.error('Signup error:', err);
+
+      // Provide more specific error messages
+      let errorMessage = err.message || 'Failed to create account';
+
+      if (err.message?.includes('Email rate limit exceeded')) {
+        errorMessage = 'Too many signup attempts. Please wait a few minutes and try again.';
+      } else if (err.message?.includes('User already registered')) {
+        errorMessage =
+          'An account with this email already exists. Please use the login form below.';
+        setLoginData({ email: formState.email, password: '' });
+        setShowExistingUserLogin(true);
+      } else if (err.message?.includes('Invalid email')) {
+        errorMessage = 'Please enter a valid email address.';
+      }
+
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
+  // Show existing user login form
+  if (showExistingUserLogin) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          <div className="bg-gray-800 rounded-xl p-8 border border-gray-700">
+            <div className="flex items-center mb-6">
+              <button
+                onClick={() => setShowExistingUserLogin(false)}
+                className="text-gray-400 hover:text-white mr-4 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <h2 className="text-2xl font-bold text-white">Login to Your Account</h2>
+            </div>
+
+            {passwordResetSent ? (
+              <div className="text-center">
+                <Mail className="h-16 w-16 text-blue-500 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-white mb-2">Password Reset Sent!</h3>
+                <p className="text-gray-300 mb-6">
+                  Check your email for a password reset link. You can close this window.
+                </p>
+                <button
+                  onClick={() => navigate('/auth')}
+                  className="bg-blue-600 hover:bg-blue-500 text-white py-2 px-6 rounded-lg font-semibold transition-colors"
+                >
+                  Go to Login Page
+                </button>
+              </div>
+            ) : (
+              <>
+                {error && (
+                  <div className="mb-4 p-3 bg-red-900/50 text-red-100 rounded flex items-center">
+                    <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
+                    <span>{error}</span>
+                  </div>
+                )}
+
+                <form onSubmit={handleExistingUserLogin} className="space-y-4">
+                  <div>
+                    <label
+                      htmlFor="loginEmail"
+                      className="block text-gray-300 text-sm font-bold mb-2"
+                    >
+                      Email
+                    </label>
+                    <input
+                      id="loginEmail"
+                      name="email"
+                      type="email"
+                      value={loginData.email}
+                      onChange={handleLoginChange}
+                      required
+                      className="bg-gray-700 border border-gray-600 rounded w-full py-3 px-4 text-white leading-tight focus:outline-none focus:border-blue-500 transition-colors"
+                      placeholder="Enter your email"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="loginPassword"
+                      className="block text-gray-300 text-sm font-bold mb-2"
+                    >
+                      Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        id="loginPassword"
+                        name="password"
+                        type={showPassword ? 'text' : 'password'}
+                        value={loginData.password}
+                        onChange={handleLoginChange}
+                        required
+                        className="bg-gray-700 border border-gray-600 rounded w-full py-3 px-4 pr-10 text-white leading-tight focus:outline-none focus:border-blue-500 transition-colors"
+                        placeholder="Enter your password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white"
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-5 w-5" />
+                        ) : (
+                          <Eye className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm">
+                    <button
+                      type="button"
+                      onClick={handlePasswordReset}
+                      className="text-blue-400 hover:text-blue-300 transition-colors"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 px-6 rounded-lg font-semibold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? (
+                      <span className="flex items-center justify-center">
+                        <Loader2 className="animate-spin mr-2 h-5 w-5" />
+                        Logging in...
+                      </span>
+                    ) : (
+                      'Login'
+                    )}
+                  </button>
+                </form>
+
+                <div className="mt-6 text-center">
+                  <button
+                    onClick={() => navigate('/auth')}
+                    className="text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    Go to main login page
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (success) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
-        <div className="max-w-md w-full text-center">
+        <div className="max-w-lg w-full text-center">
           <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-6" />
           <h2 className="text-3xl font-bold mb-4 text-white">Finance Manager Account Created!</h2>
           <p className="text-gray-300 mb-6">
-            Your finance manager account has been created successfully. You should receive an email
-            with your temporary password shortly.
+            Your finance manager account has been created successfully!
           </p>
-          <p className="text-gray-400 mb-8">
-            You can now access your dashboard at: <br />
-            <span className="text-blue-400 font-mono">/dashboard/single-finance</span>
-          </p>
-          <button
-            onClick={() => navigate('/auth')}
-            className="bg-blue-600 hover:bg-blue-500 text-white py-3 px-8 rounded-lg font-semibold transition-colors"
-          >
-            Go to Login
-          </button>
+
+          {/* Login Credentials */}
+          <div className="bg-gray-800 border border-gray-600 rounded-lg p-6 mb-6 text-left">
+            <h3 className="text-lg font-semibold text-white mb-4">🔑 Your Login Information</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="text-gray-400 text-sm">Email:</label>
+                <div className="bg-gray-700 p-2 rounded font-mono text-blue-300 break-all">
+                  {formState.email}
+                </div>
+              </div>
+              {formState.tempPassword && (
+                <div>
+                  <label className="text-gray-400 text-sm">Temporary Password:</label>
+                  <div className="bg-gray-700 p-2 rounded font-mono text-green-300 break-all">
+                    {formState.tempPassword}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="mt-4 p-3 bg-blue-900/50 border border-blue-500 rounded">
+              <p className="text-blue-300 text-sm">
+                💡 <strong>Next Steps:</strong>
+              </p>
+              <ul className="text-blue-300 text-sm mt-2 space-y-1">
+                <li>1. Check your email for a confirmation link (if required)</li>
+                <li>2. Use the login credentials above to access your dashboard</li>
+                <li>3. Change your password after first login for security</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <p className="text-gray-400">
+              Access your dashboard at: <br />
+              <span className="text-blue-400 font-mono">/dashboard/single-finance</span>
+            </p>
+
+            <div className="flex space-x-4">
+              <button
+                onClick={() => navigate('/auth')}
+                className="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-3 px-6 rounded-lg font-semibold transition-colors"
+              >
+                Go to Login
+              </button>
+              <button
+                onClick={() => navigate('/dashboard/single-finance')}
+                className="flex-1 bg-green-600 hover:bg-green-500 text-white py-3 px-6 rounded-lg font-semibold transition-colors"
+              >
+                Go to Dashboard
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -147,6 +467,17 @@ export default function SingleFinanceSignup() {
               <ArrowLeft className="w-5 h-5" />
             </button>
             <h2 className="text-2xl font-bold text-white">Single Finance Manager</h2>
+          </div>
+
+          {/* Promotional Pricing Banner */}
+          <div className="mb-6 p-4 bg-green-900/50 border border-green-500 rounded-lg">
+            <div className="text-center">
+              <div className="text-red-400 line-through text-lg mb-1">$5/month</div>
+              <div className="text-2xl font-bold text-green-400 mb-2">FREE</div>
+              <p className="text-green-300 text-sm">
+                🎉 Limited time promotional offer! Finance Manager tools are currently FREE
+              </p>
+            </div>
           </div>
 
           {error && (

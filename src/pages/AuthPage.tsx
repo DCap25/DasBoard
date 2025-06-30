@@ -100,12 +100,19 @@ const AuthPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-orange-500">
-        <div className="flex flex-col items-center gap-3">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+      <div className="min-h-screen bg-white flex items-center justify-center relative overflow-hidden">
+        {/* Ghosted background text */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="text-gray-300 text-[12rem] font-bold transform -rotate-12 select-none whitespace-nowrap opacity-60">
+            The DAS Board
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center gap-3 relative z-10">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           {loadingTimeout && (
-            <div className="text-sm text-white max-w-md text-center mt-4 flex items-center gap-2 bg-orange-600 p-2 rounded border border-orange-400">
-              <AlertCircle className="h-4 w-4 text-orange-200" />
+            <div className="text-sm text-blue-800 max-w-md text-center mt-4 flex items-center gap-2 bg-blue-100 p-2 rounded border border-blue-300 shadow-lg">
+              <AlertCircle className="h-4 w-4 text-blue-600" />
               <span>
                 Taking longer than expected. Please try refreshing the page if this continues.
               </span>
@@ -138,37 +145,56 @@ const AuthPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-orange-500">
-      {/* Black border top section with 1/2" height (approximately 48px) */}
-      <div className="h-12 bg-black flex items-center">
-        <h1 className="text-white text-3xl font-bold ml-6">The DAS Board</h1>
+    <div className="min-h-screen bg-white relative overflow-hidden">
+      {/* Ghosted background text */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="text-gray-300 text-[12rem] font-bold transform -rotate-12 select-none whitespace-nowrap opacity-60">
+          The DAS Board
+        </div>
+      </div>
+
+      {/* Professional header with subtle gradient */}
+      <div className="h-16 bg-gradient-to-r from-blue-600 to-blue-700 shadow-lg flex items-center relative z-10">
+        <div className="flex items-center ml-6">
+          <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-3">
+            <div className="w-4 h-4 bg-blue-600 rounded"></div>
+          </div>
+          <h1 className="text-white text-2xl font-bold tracking-wide">The DAS Board</h1>
+        </div>
       </div>
 
       {/* Main content area */}
-      <div className="flex items-center justify-center py-12">
+      <div className="flex items-center justify-center py-16 px-4 relative z-10">
         <div className="w-full max-w-md">
-          <Card className="bg-white">
-            <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl font-bold text-center text-gray-800">
-                The DAS Board Login
+          <Card className="bg-white shadow-2xl border border-gray-200 rounded-xl">
+            <CardHeader className="space-y-1 pb-6">
+              <CardTitle className="text-3xl font-bold text-center text-gray-800 mb-2">
+                Welcome Back
               </CardTitle>
+              <p className="text-gray-600 text-center text-sm">Sign in to your DAS Board account</p>
               {(forceLogin || noRedirect) && (
-                <p className="text-sm text-center text-green-600">
+                <p className="text-sm text-center text-blue-600 bg-blue-50 p-2 rounded-lg">
                   Force login mode active - you can log in again
                 </p>
               )}
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-6">
               <LoginForm />
             </CardContent>
-            <CardFooter className="flex flex-col gap-2">
+            <CardFooter className="flex flex-col gap-2 pt-6">
               <p className="text-sm text-gray-500 text-center">
-                Don't have an account? Contact your administrator.
+                Don't have an account?{' '}
+                <span className="text-blue-600 font-medium">Contact your administrator</span>
               </p>
             </CardFooter>
           </Card>
         </div>
       </div>
+
+      {/* Subtle decorative elements */}
+      <div className="absolute top-20 left-10 w-20 h-20 bg-blue-100/50 rounded-full blur-xl"></div>
+      <div className="absolute bottom-20 right-10 w-32 h-32 bg-blue-50/50 rounded-full blur-xl"></div>
+      <div className="absolute top-1/2 right-20 w-16 h-16 bg-gray-100/50 rounded-full blur-lg"></div>
     </div>
   );
 };

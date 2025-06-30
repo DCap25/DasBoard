@@ -218,7 +218,7 @@ export default function HomePage() {
                 {tier.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                     <span className="bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                      Popular
+                      {t('pricing.popular')}
                     </span>
                   </div>
                 )}
@@ -227,10 +227,26 @@ export default function HomePage() {
                   <div className="mb-4">
                     {tier.originalPrice && (
                       <span className="text-red-400 line-through text-lg mr-2">
-                        {tier.originalPrice}
+                        {(() => {
+                          const currency = t('currency.symbol') as string;
+                          const price = tier.originalPrice;
+                          if (price.includes('$') && currency !== '$') {
+                            return price.replace('$', currency);
+                          }
+                          return price;
+                        })()}
                       </span>
                     )}
-                    <span className="text-3xl font-bold text-blue-400">{tier.price}</span>
+                    <span className="text-3xl font-bold text-blue-400">
+                      {(() => {
+                        const currency = t('currency.symbol') as string;
+                        const price = tier.price;
+                        if (price.includes('$') && currency !== '$') {
+                          return price.replace('$', currency);
+                        }
+                        return price;
+                      })()}
+                    </span>
                   </div>
                   <p className="text-gray-300 mb-8">{tier.description}</p>
                   <button
@@ -241,7 +257,7 @@ export default function HomePage() {
                         : 'bg-gray-700 hover:bg-gray-600 text-white'
                     }`}
                   >
-                    Select Plan
+                    {t('pricing.getStarted')}
                   </button>
                 </div>
               </div>
@@ -261,12 +277,8 @@ export default function HomePage() {
       {/* CTA Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">
-            Ready to transform your dealership operations?
-          </h2>
-          <p className="text-xl text-gray-300 mb-8">
-            Join hundreds of dealerships already using The DAS Board to optimize their operations.
-          </p>
+          <h2 className="text-4xl font-bold text-white mb-6">{t('home.cta.title')}</h2>
+          <p className="text-xl text-gray-300 mb-8">{t('home.cta.subtitle')}</p>
           <button
             onClick={() => navigate('/signup')}
             className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/25 inline-flex items-center"
@@ -283,20 +295,18 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <h3 className="text-2xl font-bold text-white mb-4">The DAS Board</h3>
-              <p className="text-gray-400 mb-4">
-                Modern dealership management software with real-time insights.
-              </p>
-              <p className="text-gray-400">Dealership Automotive Sales</p>
+              <p className="text-gray-400 mb-4">{t('footer.tagline')}</p>
+              <p className="text-gray-400">{t('footer.industry')}</p>
             </div>
             <div>
-              <h4 className="text-lg font-semibold text-white mb-4">Product</h4>
+              <h4 className="text-lg font-semibold text-white mb-4">{t('footer.product')}</h4>
               <ul className="space-y-2">
                 <li>
                   <button
                     onClick={() => navigate('/')}
                     className="text-gray-400 hover:text-white transition-colors"
                   >
-                    Home
+                    {t('footer.home')}
                   </button>
                 </li>
                 <li>
@@ -304,7 +314,7 @@ export default function HomePage() {
                     onClick={() => navigate('/screenshots')}
                     className="text-gray-400 hover:text-white transition-colors"
                   >
-                    Screenshots
+                    {t('footer.screenshots')}
                   </button>
                 </li>
                 <li>
@@ -312,7 +322,7 @@ export default function HomePage() {
                     onClick={() => navigate('/pricing')}
                     className="text-gray-400 hover:text-white transition-colors"
                   >
-                    Pricing
+                    {t('footer.pricing')}
                   </button>
                 </li>
                 <li>
@@ -320,20 +330,20 @@ export default function HomePage() {
                     onClick={() => navigate('/about')}
                     className="text-gray-400 hover:text-white transition-colors"
                   >
-                    About Us
+                    {t('footer.aboutUs')}
                   </button>
                 </li>
               </ul>
             </div>
             <div>
-              <h4 className="text-lg font-semibold text-white mb-4">Legal</h4>
+              <h4 className="text-lg font-semibold text-white mb-4">{t('footer.legal')}</h4>
               <ul className="space-y-2">
                 <li>
                   <button
                     onClick={() => navigate('/legal/terms')}
                     className="text-gray-400 hover:text-white transition-colors"
                   >
-                    Terms of Service
+                    {t('footer.terms')}
                   </button>
                 </li>
                 <li>
@@ -341,7 +351,7 @@ export default function HomePage() {
                     onClick={() => navigate('/legal/privacy')}
                     className="text-gray-400 hover:text-white transition-colors"
                   >
-                    Privacy Policy
+                    {t('footer.privacy')}
                   </button>
                 </li>
                 <li>
@@ -349,21 +359,19 @@ export default function HomePage() {
                     onClick={() => navigate('/legal/subscription')}
                     className="text-gray-400 hover:text-white transition-colors"
                   >
-                    Subscription Agreement
+                    {t('footer.subscription')}
                   </button>
                 </li>
               </ul>
             </div>
             <div>
-              <h4 className="text-lg font-semibold text-white mb-4">Contact</h4>
-              <p className="text-gray-400 mb-2">For support or inquiries, please contact us at:</p>
+              <h4 className="text-lg font-semibold text-white mb-4">{t('footer.contact')}</h4>
+              <p className="text-gray-400 mb-2">{t('footer.support')}</p>
               <p className="text-blue-400">support@thedasboard.com</p>
             </div>
           </div>
           <div className="border-t border-gray-700 mt-8 pt-8 text-center">
-            <p className="text-gray-400">
-              © 2025 The DAS Board. All rights reserved. Designed with 🖤
-            </p>
+            <p className="text-gray-400">{t('footer.copyright')}</p>
           </div>
         </div>
       </footer>

@@ -47,6 +47,7 @@ import { isAuthenticated, getCurrentUser, getRedirectPath } from './lib/directAu
 import ForceLoginPage from './pages/ForceLoginPage';
 import ResetPage from './pages/ResetPage';
 import LogoutPage from './pages/LogoutPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import TestLoginRedirect from './pages/TestLoginRedirect';
 import GroupAdminBypass from './pages/GroupAdminBypass';
 import DashboardSelector from './pages/DashboardSelector';
@@ -766,6 +767,9 @@ function App() {
 
                       {/* New Logout Route - accessible to everyone */}
                       <Route path="/logout" element={<LogoutPage />} />
+
+                      {/* Password Reset Route - accessible to everyone */}
+                      <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
                       {/* New Direct Login route */}
                       <Route path="/direct-login" element={<DirectLoginPage />} />

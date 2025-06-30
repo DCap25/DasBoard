@@ -1,4 +1,4 @@
-export type Language = 'en' | 'es' | 'fr' | 'de' | 'cs' | 'it' | 'pl' | 'pt';
+export type Language = 'en' | 'es' | 'fr' | 'de' | 'cs' | 'it' | 'pl' | 'pt' | 'gr';
 
 interface Translations {
   nav: {
@@ -207,6 +207,14 @@ interface Translations {
     terms: string;
     privacy: string;
     subscription: string;
+    home: string;
+    screenshots: string;
+    pricing: string;
+    aboutUs: string;
+  };
+  currency: {
+    symbol: string;
+    name: string;
   };
   legal: {
     terms: {
@@ -442,6 +450,14 @@ export const translations: Record<Language, Translations | Partial<Translations>
       terms: 'Terms of Service',
       privacy: 'Privacy Policy',
       subscription: 'Subscription Agreement',
+      home: 'Home',
+      screenshots: 'Screenshots',
+      pricing: 'Pricing',
+      aboutUs: 'About Us',
+    },
+    currency: {
+      symbol: '$',
+      name: 'USD',
     },
     legal: {
       terms: {
@@ -610,7 +626,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
         customerFocused: {
           title: 'Enfocados en el Cliente',
           description:
-            'Empoderamos a los concesionarios automotrices con tableros intuitivos que priorizan sus necesidades únicas, asegurando una gestión sin problemas y experiencias mejoradas para el cliente.',
+            'Empoderamos a los concesionarios automotrices con tableros intuitivos que priorizan sus necesidades únicas, asegurando una gestión perfecta y experiencias mejoradas para el cliente.',
         },
         dataDriven: {
           title: 'Basados en Datos',
@@ -620,15 +636,15 @@ export const translations: Record<Language, Translations | Partial<Translations>
         continuousImprovement: {
           title: 'Mejora Continua',
           description:
-            'Refinamos implacablemente nuestras herramientas para ayudar a los concesionarios a optimizar el rendimiento, adaptarse a las tendencias de la industria y lograr un crecimiento sostenido.',
+            'Refinamos incansablemente nuestras herramientas para ayudar a los concesionarios a optimizar el rendimiento, adaptarse a las tendencias de la industria y lograr un crecimiento sostenido.',
         },
       },
       contact: {
-        title: 'Ponte en Contacto',
+        title: 'Contactános',
         subtitle:
-          '¿Listo para ver cómo The DAS Board puede transformar las operaciones de tu concesionario? Nos encantaría escucharte.',
-        email: 'Email:',
-        phone: 'Teléfono:',
+          '¿Listo para ver cómo The DAS Board puede transformar las operaciones de su concesionario? Nos encantaría saber de usted.',
+        email: 'Email',
+        phone: 'Teléfono',
       },
     },
     signup: {
@@ -661,7 +677,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
       save: 'Guardar',
       cancel: 'Cancelar',
       continue: 'Continuar',
-      back: 'Atrás',
+      back: 'Volver',
       next: 'Siguiente',
       submit: 'Enviar',
       close: 'Cerrar',
@@ -672,11 +688,19 @@ export const translations: Record<Language, Translations | Partial<Translations>
       product: 'Producto',
       legal: 'Legal',
       contact: 'Contacto',
-      support: 'Para soporte o consultas, contáctenos en:',
+      support: 'Para soporte o consultas, por favor contáctenos en:',
       copyright: '© 2025 The DAS Board. Todos los derechos reservados. Diseñado con 🖤',
       terms: 'Términos de Servicio',
       privacy: 'Política de Privacidad',
       subscription: 'Acuerdo de Suscripción',
+      home: 'Inicio',
+      screenshots: 'Capturas',
+      pricing: 'Precios',
+      aboutUs: 'Nosotros',
+    },
+    currency: {
+      symbol: '$',
+      name: 'USD',
     },
     legal: {
       terms: {
@@ -912,6 +936,14 @@ export const translations: Record<Language, Translations | Partial<Translations>
       terms: 'Conditions de service',
       privacy: 'Politique de confidentialité',
       subscription: "Accord d'abonnement",
+      home: 'Accueil',
+      screenshots: "Captures d'écran",
+      pricing: 'Tarifs',
+      aboutUs: 'À propos',
+    },
+    currency: {
+      symbol: '€',
+      name: 'EUR',
     },
     legal: {
       terms: {
@@ -1100,64 +1132,72 @@ export const translations: Record<Language, Translations | Partial<Translations>
       },
     },
     signup: {
-      title: 'Treten Sie Das DAS Board bei',
-      subtitle: 'Beginnen Sie heute mit Ihrer Autohaus-Management-Lösung.',
-      selectLanguage: 'Wählen Sie Ihre Sprache',
-      dealerGroup: 'Händlergruppen-Registrierung',
-      dealership: 'Autohaus-Registrierung',
-      financeManager: 'Finanzmanager-Registrierung',
+      title: 'Vytvořit účet',
+      subtitle: 'Začněte dnes s vaším řešením pro řízení dealerství.',
+      selectLanguage: 'Vyberte svůj jazyk',
+      dealerGroup: 'Registrace skupiny dealerů',
+      dealership: 'Registrace dealerství',
+      financeManager: 'Registrace finančního manažera',
       form: {
-        firstName: 'Vorname',
-        lastName: 'Nachname',
-        email: 'E-Mail-Adresse',
-        password: 'Passwort',
-        confirmPassword: 'Passwort bestätigen',
-        dealershipName: 'Name des Autohauses',
-        role: 'Ihre Rolle',
-        phone: 'Telefonnummer',
-        submit: 'Konto erstellen',
-        alreadyHave: 'Haben Sie bereits ein Konto?',
-        signIn: 'Anmelden',
-        terms: 'Ich stimme den Nutzungsbedingungen und der Datenschutzrichtlinie zu',
+        firstName: 'Jméno',
+        lastName: 'Příjmení',
+        email: 'E-mailová adresa',
+        password: 'Heslo',
+        confirmPassword: 'Potvrdit heslo',
+        dealershipName: 'Název dealerství',
+        role: 'Vaše role',
+        phone: 'Telefonní číslo',
+        submit: 'Vytvořit účet',
+        alreadyHave: 'Již máte účet?',
+        signIn: 'Přihlásit se',
+        terms: 'Souhlasím s podmínkami služby a zásadami ochrany osobních údajů',
       },
     },
     common: {
-      language: 'Sprache',
-      login: 'Anmelden',
-      signUp: 'Registrieren',
-      loading: 'Laden...',
-      save: 'Speichern',
-      cancel: 'Abbrechen',
-      continue: 'Weiter',
-      back: 'Zurück',
-      next: 'Weiter',
-      submit: 'Absenden',
-      close: 'Schließen',
+      language: 'Jazyk',
+      login: 'Přihlášení',
+      signUp: 'Registrace',
+      loading: 'Načítání...',
+      save: 'Uložit',
+      cancel: 'Zrušit',
+      continue: 'Pokračovat',
+      back: 'Zpět',
+      next: 'Další',
+      submit: 'Odeslat',
+      close: 'Zavřít',
     },
     footer: {
-      tagline: 'Moderne Autohaus-Management-Software mit Echtzeit-Einblicken.',
-      industry: 'Automobil-Verkauf für Autohäuser',
+      tagline: 'Zmocněte své dealerství poznatky v reálném čase',
+      industry: 'Navrženo pro automobilový průmysl',
       product: 'Produkt',
-      legal: 'Rechtliches',
+      legal: 'Právní',
       contact: 'Kontakt',
-      support: 'Für Support oder Anfragen kontaktieren Sie uns unter:',
-      copyright: '© 2025 Das DAS Board. Alle Rechte vorbehalten. Entworfen mit 🖤',
-      terms: 'Nutzungsbedingungen',
-      privacy: 'Datenschutzrichtlinie',
-      subscription: 'Abonnement-Vereinbarung',
+      support: 'Pro podporu nebo dotazy nás kontaktujte na:',
+      copyright: '© 2025 The DAS Board. Všechna práva vyhrazena. Navrženo s 🖤',
+      terms: 'Podmínky služby',
+      privacy: 'Zásady ochrany osobních údajů',
+      subscription: 'Dohoda o předplatném',
+      home: 'Domů',
+      screenshots: 'Snímky obrazovky',
+      pricing: 'Ceny',
+      aboutUs: 'O nás',
+    },
+    currency: {
+      symbol: 'Kč',
+      name: 'CZK',
     },
     legal: {
       terms: {
-        title: 'Nutzungsbedingungen',
+        title: 'Podmínky služby',
       },
       privacy: {
-        title: 'Datenschutzrichtlinie',
+        title: 'Zásady ochrany osobních údajů',
       },
       subscription: {
-        title: 'Abonnement-Vereinbarung',
+        title: 'Dohoda o předplatném',
       },
     },
-  } as Translations,
+  } as Partial<Translations>,
   cs: {
     nav: {
       home: 'Domů',
@@ -1371,11 +1411,19 @@ export const translations: Record<Language, Translations | Partial<Translations>
       product: 'Produkt',
       legal: 'Právní',
       contact: 'Kontakt',
-      support: 'Pro podporu nebo dotazy nás kontaktujte na:',
-      copyright: '© 2025 The DAS Board. Všechna práva vyhrazena. Navrženo s 🖤',
-      terms: 'Podmínky služby',
-      privacy: 'Zásady ochrany osobních údajů',
-      subscription: 'Dohoda o předplatném',
+      support: 'W przypadku wsparcia lub zapytań skontaktuj się z nami pod adresem:',
+      copyright: '© 2025 The DAS Board. Wszystkie prawa zastrzeżone. Zaprojektowane z 🖤',
+      terms: 'Warunki świadczenia usług',
+      privacy: 'Polityka prywatności',
+      subscription: 'Umowa subskrypcji',
+      home: 'Domů',
+      screenshots: 'Snímky obrazovky',
+      pricing: 'Ceny',
+      aboutUs: 'O nás',
+    },
+    currency: {
+      symbol: 'Kč',
+      name: 'CZK',
     },
     legal: {
       terms: {
@@ -1548,7 +1596,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
         dataDriven: {
           title: 'Guidati dai dati',
           description:
-            "La nostra piattaforma fornisce insights azionabili in tempo reale dai dati delle concessionarie, consentendo decisioni precise per aumentare le vendite e l'efficienza operativa.",
+            "La nostra piattaforma fornisce insights azionabili in tempo reale dai dati delle concessionarie, consentendo decisioni precise per aumentare le vendite e l'efficacità operativa.",
         },
         continuousImprovement: {
           title: 'Miglioramento continuo',
@@ -1609,6 +1657,14 @@ export const translations: Record<Language, Translations | Partial<Translations>
       terms: 'Termini di servizio',
       privacy: 'Politica sulla privacy',
       subscription: 'Accordo di abbonamento',
+      home: 'Home',
+      screenshots: 'Screenshot',
+      pricing: 'Prezzi',
+      aboutUs: 'Chi siamo',
+    },
+    currency: {
+      symbol: '€',
+      name: 'EUR',
     },
     legal: {
       terms: {
@@ -1839,6 +1895,14 @@ export const translations: Record<Language, Translations | Partial<Translations>
       terms: 'Warunki świadczenia usług',
       privacy: 'Polityka prywatności',
       subscription: 'Umowa subskrypcji',
+      home: 'Strona główna',
+      screenshots: 'Zrzuty ekranu',
+      pricing: 'Cennik',
+      aboutUs: 'O nas',
+    },
+    currency: {
+      symbol: 'PLN',
+      name: 'PLN',
     },
     legal: {
       terms: {
@@ -1862,6 +1926,194 @@ export const translations: Record<Language, Translations | Partial<Translations>
       signup: 'Cadastrar',
       legal: 'Legal',
     },
+    home: {
+      title: 'O DAS Board',
+      subtitle:
+        'Dashboards em tempo real fornecendo insights críticos para gerentes financeiros, concessionárias e grupos de concessionários.',
+      startTrial: 'Comece Sua Avaliação Gratuita',
+      viewScreenshots: 'Ver Capturas de Tela',
+      mission:
+        '"O DAS Board redefine o sucesso da concessionária, capacitando Gerentes de Vendas para otimizar equipes e Gerentes Financeiros para maximizar lucros com insights-chave de vendas, e Vendedores para ficarem por dentro de seus negócios." - Tyler Durden',
+      features: {
+        title: 'Principais Recursos',
+        subtitle:
+          'Tudo que você precisa para gerenciar as operações da sua concessionária de forma eficaz',
+      },
+      pricing: {
+        title: 'Experimente Agora',
+        subtitle:
+          'Comece sua avaliação gratuita e veja a diferença que insights em tempo real podem fazer para sua concessionária.',
+      },
+      cta: {
+        title: 'Pronto para transformar as operações da sua concessionária?',
+        subtitle:
+          'Junte-se a centenas de concessionárias que já usam O DAS Board para otimizar suas operações.',
+      },
+    },
+    features: {
+      finance: {
+        title: 'Dashboards Financeiros',
+        desc: 'Insights em tempo real para gerentes financeiros acompanharem performance diária, registrarem negócios, visualizarem métricas incluindo PVR, VSC e outros Produtos.',
+      },
+      sales: {
+        title: 'Dashboards da Equipe de Vendas',
+        desc: 'O DAS Board é sua nova Tabela de Classificação! Acompanhe seus negócios e saiba exatamente onde você está durante o mês.',
+      },
+      manager: {
+        title: 'Dashboards de Gerente de Vendas',
+        desc: 'Visualize Logs de Negócios, estatísticas de Vendedores, gerencie suas Equipes de forma mais eficaz.',
+      },
+      info: {
+        title: 'Dashboards Informativos',
+        desc: 'Dashboards específicos por função para Equipes de Vendas, Gerentes Financeiros, Gerentes de Vendas e Gerentes Gerais.',
+      },
+      scheduler: {
+        title: 'Agendador Dinâmico',
+        desc: 'Agendador dinâmico de vendedores para coordenação eficiente da equipe. Gerencie horários para maximizar a produção diária.',
+      },
+      calculator: {
+        title: 'Calculadora de Pagamento',
+        desc: 'Sua Equipe de Vendas e Gerentes Financeiros poderão ver ganhos em tempo real do mês até a data com planos de pagamento pré-configurados.',
+      },
+    },
+    screenshots: {
+      title: 'Veja O DAS Board em Ação',
+      subtitle:
+        'Dê uma olhada em nossos dashboards intuitivos projetados para profissionais automotivos.',
+      finance: {
+        title: 'Dashboard do Gerente Financeiro',
+        desc: 'Acompanhe negócios, métricas PVR, VSC e performance diária em tempo real.',
+      },
+      sales: {
+        title: 'Dashboard de Vendas',
+        desc: 'Sua tabela de classificação pessoal mostrando negócios, rankings e progresso mensal.',
+      },
+      manager: {
+        title: 'Dashboard do Gerente de Vendas',
+        desc: 'Visão abrangente da equipe com logs de negócios e análises de performance.',
+      },
+      gm: {
+        title: 'Dashboard do Gerente Geral',
+        desc: 'Insights de alto nível sobre performance da concessionária e produtividade da equipe.',
+      },
+    },
+    pricing: {
+      title: 'Escolha o Plano Perfeito',
+      subtitle:
+        'Comece com nossa avaliação gratuita para gerentes financeiros, ou escolha o plano que escala com sua concessionária.',
+      finance: 'Gerente Financeiro',
+      dealership: 'Concessionária Individual',
+      group: 'Grupos de Concessionários',
+      freeTime: 'Grátis por Tempo Limitado!',
+      getStarted: 'Começar',
+      startTrial: 'Iniciar Avaliação Gratuita',
+      popular: 'Mais Popular',
+      viewDetails: 'Ver Detalhes Completos de Preços →',
+      tiers: {
+        finance: {
+          name: 'Gerentes Financeiros',
+          price: 'Grátis por Tempo Limitado!',
+          originalPrice: 'R$25/Mês',
+          description: 'Acompanhe seus Negócios, Produtos, PVR e Pagamento!',
+        },
+        dealership: {
+          name: 'Concessionárias',
+          price: 'R$1.250/mês',
+          description: 'Para até 15 usuários com acesso completo à concessionária.',
+        },
+        group: {
+          name: 'Grupos de Concessionários',
+          price: 'R$2.500/mês',
+          description: 'Suporte multi-concessionária para grupos de concessionários.',
+        },
+      },
+    },
+    about: {
+      title: 'Quem Somos',
+      subtitle:
+        'Profissionais apaixonados dedicados a revolucionar o gerenciamento de concessionárias através de tecnologia inovadora e insights baseados em dados.',
+      founderVision: {
+        title: 'Por que Criei O DAS Board – Tyler Durden, CEO e Fundador',
+        paragraph1:
+          'Com mais de 27 anos de experiência na indústria de concessionárias automotivas, testemunhei em primeira mão os desafios que os gerentes enfrentam ao equilibrar seus papéis como líderes e executores. Como profissional experiente, fundei O DAS Board para abordar uma lacuna crítica que observei: enquanto os Gerentes de Vendas se destacam em vender carros, frequentemente lutam para gerenciar efetivamente suas equipes de vendas.',
+        paragraph2:
+          'Acredito que vendedores informados, motivados e bem apoiados são a chave para resultados excepcionais — superando de longe os resultados de equipes desengajadas ou desinformadas. O DAS Board capacita Gerentes de Vendas com ferramentas intuitivas para liderar suas equipes de forma mais eficaz, garantindo que possam focar tanto no desenvolvimento da equipe quanto na excelência em vendas.',
+        paragraph3:
+          'Além das vendas, o aplicativo apoia Gerentes Financeiros fornecendo insights em tempo real sobre lucratividade de negócios e métricas-chave, enquanto oferece aos GMs relatórios acionáveis para orientar decisões estratégicas. Minha visão com O DAS Board é revolucionar o gerenciamento de concessionárias, fomentando uma cultura de eficiência, transparência e sucesso em todos os níveis da organização.',
+      },
+      team: {
+        title: 'Nossa Equipe',
+        members: {
+          tyler: {
+            name: 'Tyler Durden',
+            role: 'CEO e Fundador',
+            bio: 'Baseando-se em ampla experiência em gerenciamento de concessionárias, Tyler Durden fundou O DAS Board para fomentar uma cultura onde funcionários informados e motivados prosperam, impulsionando produtividade através de ferramentas transparentes baseadas em dados que capacitam equipes automotivas.',
+          },
+          sarah: {
+            name: 'Sarah Conner',
+            role: 'Diretora de Produto',
+            bio: 'Com mais de 25 anos de experiência em concessionárias e varejo, Sarah Conner traz insights profundos para alcançar sucesso em vendas. Ela entende o poder de ferramentas eficazes e gerenciamento habilidoso para inspirar equipes, garantindo que O DAS Board gere resultados excepcionais para concessionárias.',
+          },
+          claude: {
+            name: 'Claude Sonnet',
+            role: 'Diretor de Tecnologia',
+            bio: 'Claude Sonnet traz profunda expertise em criar software que se destaca, com foco em plataformas escaláveis e seguras. Sua capacidade de entregar insights sem complexidade garante que O DAS Board forneça tecnologia confiável e perfeita para concessionárias.',
+          },
+          annie: {
+            name: 'Annie Porter',
+            role: 'Diretora de Sucesso do Cliente',
+            bio: 'Dedicada a garantir que cada cliente do DAS Board obtenha o máximo de nossa plataforma através de integração personalizada e suporte',
+          },
+        },
+      },
+      values: {
+        title: 'Nossos Valores',
+        customerFocused: {
+          title: 'Focados no Cliente',
+          description:
+            'Capacitamos concessionárias automotivas com dashboards intuitivos que priorizam suas necessidades únicas, garantindo gerenciamento perfeito e experiências aprimoradas para o cliente.',
+        },
+        dataDriven: {
+          title: 'Baseados em Dados',
+          description:
+            'Nossa plataforma entrega insights acionáveis em tempo real de dados de concessionárias, permitindo tomada de decisão precisa para impulsionar vendas e eficiência operacional.',
+        },
+        continuousImprovement: {
+          title: 'Melhoria Contínua',
+          description:
+            'Refinamos incansavelmente nossas ferramentas para ajudar concessionárias a otimizar performance, adaptar-se a tendências da indústria e alcançar crescimento sustentado.',
+        },
+      },
+      contact: {
+        title: 'Entre em Contato',
+        subtitle:
+          'Pronto para ver como O DAS Board pode transformar as operações da sua concessionária? Adoraríamos ouvir de você.',
+        email: 'Email',
+        phone: 'Telefone',
+      },
+    },
+    signup: {
+      title: 'Junte-se ao DAS Board',
+      subtitle: 'Comece hoje com sua solução de gerenciamento de concessionária.',
+      selectLanguage: 'Selecione seu idioma',
+      dealerGroup: 'Cadastro de Grupo de Concessionários',
+      dealership: 'Cadastro de Concessionária',
+      financeManager: 'Cadastro de Gerente Financeiro',
+      form: {
+        firstName: 'Nome',
+        lastName: 'Sobrenome',
+        email: 'Endereço de Email',
+        password: 'Senha',
+        confirmPassword: 'Confirmar Senha',
+        dealershipName: 'Nome da Concessionária',
+        role: 'Sua Função',
+        phone: 'Número de Telefone',
+        submit: 'Criar Conta',
+        alreadyHave: 'Já tem uma conta?',
+        signIn: 'Entrar',
+        terms: 'Concordo com os termos de serviço e política de privacidade',
+      },
+    },
     common: {
       language: 'Idioma',
       login: 'Entrar',
@@ -1875,7 +2127,281 @@ export const translations: Record<Language, Translations | Partial<Translations>
       submit: 'Enviar',
       close: 'Fechar',
     },
-  } as Partial<Translations>,
+    footer: {
+      tagline: 'Software moderno de gerenciamento de concessionárias com insights em tempo real.',
+      industry: 'Vendas Automotivas de Concessionárias',
+      product: 'Produto',
+      legal: 'Legal',
+      contact: 'Contato',
+      support: 'Para suporte ou consultas, entre em contato conosco em:',
+      copyright: '© 2025 O DAS Board. Todos os direitos reservados. Projetado com 🖤',
+      terms: 'Termos de Serviço',
+      privacy: 'Política de Privacidade',
+      subscription: 'Acordo de Assinatura',
+      home: 'Início',
+      screenshots: 'Capturas de tela',
+      pricing: 'Preços',
+      aboutUs: 'Sobre nós',
+    },
+    currency: {
+      symbol: 'R$',
+      name: 'BRL',
+    },
+    legal: {
+      terms: {
+        title: 'Termos de Serviço',
+      },
+      privacy: {
+        title: 'Política de Privacidade',
+      },
+      subscription: {
+        title: 'Acordo de Assinatura',
+      },
+    },
+  } as Translations,
+  gr: {
+    nav: {
+      home: 'Αρχική',
+      screenshots: 'Στιγμιότυπα',
+      pricing: 'Τιμολόγηση',
+      about: 'Σχετικά με εμάς',
+      login: 'Σύνδεση',
+      signup: 'Εγγραφή',
+      legal: 'Νομικά',
+    },
+    home: {
+      title: 'Το DAS Board',
+      subtitle:
+        'Πίνακες ελέγχου πραγματικού χρόνου που παρέχουν κρίσιμες πληροφορίες για χρηματοοικονομικούς διευθυντές, αντιπροσωπείες και ομάδες αντιπροσώπων.',
+      startTrial: 'Ξεκινήστε τη Δωρεάν Δοκιμή σας',
+      viewScreenshots: 'Δείτε Στιγμιότυπα',
+      mission:
+        '"Το DAS Board επαναπροσδιορίζει την επιτυχία των αντιπροσωπειών, ενδυναμώνοντας τους Διευθυντές Πωλήσεων να βελτιστοποιούν τις ομάδες και τους Χρηματοοικονομικούς Διευθυντές να μεγιστοποιούν τα κέρδη με βασικές πληροφορίες πωλήσεων, και τους Πωλητές να παραμένουν στην κορυφή των συμφωνιών τους." - Tyler Durden',
+      features: {
+        title: 'Βασικά Χαρακτηριστικά',
+        subtitle:
+          'Όλα όσα χρειάζεστε για να διαχειριστείτε αποτελεσματικά τις λειτουργίες της αντιπροσωπείας σας',
+      },
+      pricing: {
+        title: 'Δοκιμάστε το Τώρα',
+        subtitle:
+          'Ξεκινήστε τη δωρεάν δοκιμή σας και δείτε τη διαφορά που μπορούν να κάνουν οι πληροφορίες πραγματικού χρόνου για την αντιπροσωπεία σας.',
+      },
+      cta: {
+        title: 'Έτοιμοι να μεταμορφώσετε τις λειτουργίες της αντιπροσωπείας σας;',
+        subtitle:
+          'Ενταχθείτε σε εκατοντάδες αντιπροσωπείες που ήδη χρησιμοποιούν το DAS Board για να βελτιστοποιήσουν τις λειτουργίες τους.',
+      },
+    },
+    features: {
+      finance: {
+        title: 'Πίνακες Ελέγχου Χρηματοδότησης',
+        desc: 'Πληροφορίες πραγματικού χρόνου για χρηματοοικονομικούς διευθυντές για παρακολούθηση καθημερινής απόδοσης, καταγραφή συμφωνιών, προβολή μετρήσεων συμπεριλαμβανομένων PVR, VSC και άλλων Προϊόντων.',
+      },
+      sales: {
+        title: 'Πίνακες Ελέγχου Ομάδας Πωλήσεων',
+        desc: "Το Das Board είναι ο νέος σας Πίνακας Κατάταξης! Παρακολουθήστε τις συμφωνίες σας και να ξέρετε ακριβώς που βρίσκεστε καθ' όλη τη διάρκεια του μήνα.",
+      },
+      manager: {
+        title: 'Πίνακες Ελέγχου Διευθυντή Πωλήσεων',
+        desc: 'Προβολή Αρχείων Συμφωνιών, στατιστικών Πωλητών, διαχείριση των Ομάδων σας πιο αποτελεσματικά.',
+      },
+      info: {
+        title: 'Ενημερωτικοί Πίνακες Ελέγχου',
+        desc: 'Πίνακες ελέγχου ειδικά για ρόλους για Ομάδες Πωλήσεων, Χρηματοοικονομικούς Διευθυντές, Διευθυντές Πωλήσεων και Γενικούς Διευθυντές.',
+      },
+      scheduler: {
+        title: 'Δυναμικός Προγραμματιστής',
+        desc: 'Δυναμικός προγραμματιστής πωλητών για αποτελεσματικό συντονισμό ομάδας. Διαχειριστείτε προγράμματα για μεγιστοποίηση της καθημερινής παραγωγής.',
+      },
+      calculator: {
+        title: 'Υπολογιστής Αμοιβών',
+        desc: 'Η Ομάδα Πωλήσεων και οι Χρηματοοικονομικοί Διευθυντές σας θα μπορούν να βλέπουν τα κέρδη του μήνα μέχρι σήμερα σε πραγματικό χρόνο με προ-διαμορφωμένα σχέδια αμοιβών.',
+      },
+    },
+    screenshots: {
+      title: 'Δείτε το DAS Board σε Δράση',
+      subtitle:
+        'Ρίξτε μια ματιά στους διαισθητικούς πίνακες ελέγχου μας που σχεδιάστηκαν για επαγγελματίες του αυτοκινήτου.',
+      finance: {
+        title: 'Πίνακας Ελέγχου Χρηματοοικονομικού Διευθυντή',
+        desc: 'Παρακολουθήστε συμφωνίες, PVR, VSC μετρήσεις και καθημερινή απόδοση σε πραγματικό χρόνο.',
+      },
+      sales: {
+        title: 'Πίνακας Ελέγχου Πωλήσεων',
+        desc: 'Ο προσωπικός σας πίνακας κατάταξης που δείχνει συμφωνίες, κατατάξεις και μηνιαία πρόοδο.',
+      },
+      manager: {
+        title: 'Πίνακας Ελέγχου Διευθυντή Πωλήσεων',
+        desc: 'Περιεκτική επισκόπηση ομάδας με αρχεία συμφωνιών και αναλυτικά στοιχεία απόδοσης.',
+      },
+      gm: {
+        title: 'Πίνακας Ελέγχου Γενικού Διευθυντή',
+        desc: 'Υψηλού επιπέδου πληροφορίες για την απόδοση της αντιπροσωπείας και την παραγωγικότητα της ομάδας.',
+      },
+    },
+    pricing: {
+      title: 'Επιλέξτε το Τέλειο Σχέδιο',
+      subtitle:
+        'Ξεκινήστε με τη δωρεάν δοκιμή μας για χρηματοοικονομικούς διευθυντές, ή επιλέξτε το σχέδιο που κλιμακώνεται με την αντιπροσωπεία σας.',
+      finance: 'Χρηματοοικονομικός Διευθυντής',
+      dealership: 'Μεμονωμένη Αντιπροσωπεία',
+      group: 'Ομάδες Αντιπροσώπων',
+      freeTime: 'Δωρεάν για Περιορισμένο Χρόνο!',
+      getStarted: 'Ξεκινήστε',
+      startTrial: 'Ξεκινήστε Δωρεάν Δοκιμή',
+      popular: 'Πιο Δημοφιλές',
+      viewDetails: 'Δείτε Πλήρεις Λεπτομέρειες Τιμολόγησης →',
+      tiers: {
+        finance: {
+          name: 'Χρηματοοικονομικοί Διευθυντές',
+          price: 'Δωρεάν για Περιορισμένο Χρόνο!',
+          originalPrice: '5€/Μήνα',
+          description: 'Παρακολουθήστε τις Συμφωνίες, Προϊόντα, PVR και Αμοιβές σας!',
+        },
+        dealership: {
+          name: 'Αντιπροσωπείες',
+          price: '250€/μήνα',
+          description: 'Για έως 15 χρήστες με πλήρη πρόσβαση αντιπροσωπείας.',
+        },
+        group: {
+          name: 'Ομάδες Αντιπροσώπων',
+          price: '500€/μήνα',
+          description: 'Υποστήριξη πολλαπλών αντιπροσωπειών για ομάδες αντιπροσώπων.',
+        },
+      },
+    },
+    about: {
+      title: 'Ποιοι Είμαστε',
+      subtitle:
+        'Παθιασμένοι επαγγελματίες αφοσιωμένοι στην επανάσταση της διαχείρισης αντιπροσωπειών μέσω καινοτόμου τεχνολογίας και πληροφοριών βασισμένων σε δεδομένα.',
+      founderVision: {
+        title: 'Γιατί Δημιούργησα το DAS Board – Tyler Durden, CEO και Ιδρυτής',
+        paragraph1:
+          'Με πάνω από 27 χρόνια εμπειρίας στη βιομηχανία αντιπροσωπειών αυτοκινήτων, έχω δει από πρώτο χέρι τις προκλήσεις που αντιμετωπίζουν οι διευθυντές στην εξισορρόπηση των ρόλων τους ως ηγέτες και εκτελεστές. Ως έμπειρος επαγγελματίας, ίδρυσα το DAS Board για να αντιμετωπίσω ένα κρίσιμο κενό που παρατήρησα: ενώ οι Διευθυντές Πωλήσεων διαπρέπουν στην πώληση αυτοκινήτων, συχνά δυσκολεύονται να διαχειριστούν αποτελεσματικά τις ομάδες πωλήσεων τους.',
+        paragraph2:
+          'Πιστεύω ότι οι ενημερωμένοι, παρακινημένοι και καλά υποστηριζόμενοι πωλητές είναι το κλειδί για εξαιρετικά αποτελέσματα—υπερβαίνοντας κατά πολύ τα αποτελέσματα των απομακρυσμένων ή μη ενημερωμένων ομάδων. Το DAS Board ενδυναμώνει τους Διευθυντές Πωλήσεων με διαισθητικά εργαλεία για να ηγούνται των ομάδων τους πιο αποτελεσματικά, διασφαλίζοντας ότι μπορούν να εστιάσουν τόσο στην ανάπτυξη της ομάδας όσο και στην αριστεία πωλήσεων.',
+        paragraph3:
+          'Πέρα από τις πωλήσεις, η εφαρμογή υποστηρίζει τους Χρηματοοικονομικούς Διευθυντές παρέχοντας πληροφορίες πραγματικού χρόνου για την κερδοφορία συμφωνιών και βασικές μετρήσεις, ενώ προσφέρει στους GMs εφαρμόσιμες αναφορές για την καθοδήγηση στρατηγικών αποφάσεων. Το όραμά μου με το DAS Board είναι να επαναστατήσω τη διαχείριση αντιπροσωπειών, προωθώντας μια κουλτούρα αποδοτικότητας, διαφάνειας και επιτυχίας σε όλα τα επίπεδα του οργανισμού.',
+      },
+      team: {
+        title: 'Η Ομάδα μας',
+        members: {
+          tyler: {
+            name: 'Tyler Durden',
+            role: 'CEO & Ιδρυτής',
+            bio: 'Βασιζόμενος σε εκτεταμένη εμπειρία στη διαχείριση αντιπροσωπειών, ο Tyler Durden ίδρυσε το DAS Board για να προωθήσει μια κουλτούρα όπου οι ενημερωμένοι και παρακινημένοι εργαζόμενοι ευδοκιμούν, οδηγώντας την παραγωγικότητα μέσω διαφανών, βασισμένων σε δεδομένα εργαλείων που ενδυναμώνουν τις αυτοκινητιστικές ομάδες.',
+          },
+          sarah: {
+            name: 'Sarah Conner',
+            role: 'Διευθύντρια Προϊόντος',
+            bio: 'Με πάνω από 25 χρόνια εμπειρίας σε αντιπροσωπείες και λιανικό εμπόριο, η Sarah Conner φέρνει βαθιές γνώσεις για την επίτευξη επιτυχίας πωλήσεων. Κατανοεί τη δύναμη των αποτελεσματικών εργαλείων και της ειδικευμένης διαχείρισης για να εμπνεύσει ομάδες, διασφαλίζοντας ότι το DAS Board οδηγεί σε εξαιρετικά αποτελέσματα για τις αντιπροσωπείες.',
+          },
+          claude: {
+            name: 'Claude Sonnet',
+            role: 'Διευθυντής Τεχνολογίας',
+            bio: 'Ο Claude Sonnet φέρνει βαθιά εμπειρογνωμοσύνη στη δημιουργία λογισμικού που διαπρέπει, με εστίαση σε κλιμακώσιμες, ασφαλείς πλατφόρμες. Η ικανότητά του να παρέχει πληροφορίες χωρίς πολυπλοκότητα διασφαλίζει ότι το DAS Board παρέχει απρόσκοπτη, αξιόπιστη τεχνολογία για αντιπροσωπείες.',
+          },
+          annie: {
+            name: 'Annie Porter',
+            role: 'Διευθύντρια Επιτυχίας Πελατών',
+            bio: 'Αφοσιωμένη στο να διασφαλίσει ότι κάθε πελάτης του DAS Board αποκομίζει τα μέγιστα από την πλατφόρμα μας μέσω εξατομικευμένης εισαγωγής και υποστήριξης',
+          },
+        },
+      },
+      values: {
+        title: 'Οι Αξίες μας',
+        customerFocused: {
+          title: 'Εστιασμένοι στον Πελάτη',
+          description:
+            'Ενδυναμώνουμε τις αυτοκινητιστικές αντιπροσωπείες με διαισθητικούς πίνακες ελέγχου που δίνουν προτεραιότητα στις μοναδικές τους ανάγκες, διασφαλίζοντας απρόσκοπτη διαχείριση και βελτιωμένες εμπειρίες πελατών.',
+        },
+        dataDriven: {
+          title: 'Βασισμένοι σε Δεδομένα',
+          description:
+            'Η πλατφόρμα μας παρέχει εφαρμόσιμες πληροφορίες πραγματικού χρόνου από δεδομένα αντιπροσωπειών, επιτρέποντας ακριβή λήψη αποφάσεων για την ενίσχυση των πωλήσεων και της λειτουργικής αποδοτικότητας.',
+        },
+        continuousImprovement: {
+          title: 'Συνεχής Βελτίωση',
+          description:
+            'Βελτιώνουμε αδιάκοπα τα εργαλεία μας για να βοηθήσουμε τις αντιπροσωπείες να βελτιστοποιήσουν την απόδοση, να προσαρμοστούν στις τάσεις της βιομηχανίας και να επιτύχουν βιώσιμη ανάπτυξη.',
+        },
+      },
+      contact: {
+        title: 'Επικοινωνήστε μαζί μας',
+        subtitle:
+          'Έτοιμοι να δείτε πώς το DAS Board μπορεί να μεταμορφώσει τις λειτουργίες της αντιπροσωπείας σας; Θα θέλαμε να ακούσουμε από εσάς.',
+        email: 'Email',
+        phone: 'Τηλέφωνο',
+      },
+    },
+    signup: {
+      title: 'Εγγραφείτε στο DAS Board',
+      subtitle: 'Ξεκινήστε σήμερα με τη λύση διαχείρισης αντιπροσωπείας σας.',
+      selectLanguage: 'Επιλέξτε τη γλώσσα σας',
+      dealerGroup: 'Εγγραφή Ομάδας Αντιπροσώπων',
+      dealership: 'Εγγραφή Αντιπροσωπείας',
+      financeManager: 'Εγγραφή Χρηματοοικονομικού Διευθυντή',
+      form: {
+        firstName: 'Όνομα',
+        lastName: 'Επώνυμο',
+        email: 'Διεύθυνση Email',
+        password: 'Κωδικός Πρόσβασης',
+        confirmPassword: 'Επιβεβαίωση Κωδικού Πρόσβασης',
+        dealershipName: 'Όνομα Αντιπροσωπείας',
+        role: 'Ο Ρόλος σας',
+        phone: 'Αριθμός Τηλεφώνου',
+        submit: 'Δημιουργία Λογαριασμού',
+        alreadyHave: 'Έχετε ήδη λογαριασμό;',
+        signIn: 'Σύνδεση',
+        terms: 'Συμφωνώ με τους όρους χρήσης και την πολιτική απορρήτου',
+      },
+    },
+    common: {
+      language: 'Γλώσσα',
+      login: 'Σύνδεση',
+      signUp: 'Εγγραφή',
+      loading: 'Φόρτωση...',
+      save: 'Αποθήκευση',
+      cancel: 'Ακύρωση',
+      continue: 'Συνέχεια',
+      back: 'Πίσω',
+      next: 'Επόμενο',
+      submit: 'Υποβολή',
+      close: 'Κλείσιμο',
+    },
+    footer: {
+      tagline: 'Σύγχρονο λογισμικό διαχείρισης αντιπροσωπειών με πληροφορίες πραγματικού χρόνου.',
+      industry: 'Πωλήσεις Αυτοκινήτων Αντιπροσωπειών',
+      product: 'Προϊόν',
+      legal: 'Νομικά',
+      contact: 'Επικοινωνία',
+      support: 'Για υποστήριξη ή ερωτήσεις, παρακαλώ επικοινωνήστε μαζί μας στο:',
+      copyright: '© 2025 Το DAS Board. Όλα τα δικαιώματα διατηρούνται. Σχεδιάστηκε με 🖤',
+      terms: 'Όροι Χρήσης',
+      privacy: 'Πολιτική Απορρήτου',
+      subscription: 'Συμφωνία Συνδρομής',
+      home: 'Αρχική',
+      screenshots: 'Στιγμιότυπα',
+      pricing: 'Τιμολόγηση',
+      aboutUs: 'Σχετικά με εμάς',
+    },
+    currency: {
+      symbol: '€',
+      name: 'EUR',
+    },
+    legal: {
+      terms: {
+        title: 'Όροι Χρήσης',
+      },
+      privacy: {
+        title: 'Πολιτική Απορρήτου',
+      },
+      subscription: {
+        title: 'Συμφωνία Συνδρομής',
+      },
+    },
+  } as Translations,
 };
 
 // Translation getter function with fallback
