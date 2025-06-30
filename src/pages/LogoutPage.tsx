@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { logout } from '../lib/directAuth';
+import { logoutDirectAuth } from '../lib/directAuth';
 
 export default function LogoutPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
     // Clear all authentication data
-    logout();
+    logoutDirectAuth();
 
     // Also clear any other potential auth keys
     localStorage.clear();

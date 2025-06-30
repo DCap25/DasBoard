@@ -5,10 +5,10 @@ import { Button } from '../components/ui/button';
 import {
   TEST_USERS,
   loginWithTestAccount,
-  isAuthenticated,
-  getCurrentUser,
+  isDirectAuthAuthenticated,
+  getCurrentDirectAuthUser,
   getRedirectPath,
-  logout,
+  logoutDirectAuth,
 } from '../lib/directAuth';
 
 const DirectLoginPage: React.FC = () => {
@@ -20,8 +20,8 @@ const DirectLoginPage: React.FC = () => {
 
   // Check if already logged in
   useEffect(() => {
-    if (isAuthenticated()) {
-      const user = getCurrentUser();
+    if (isDirectAuthAuthenticated()) {
+      const user = getCurrentDirectAuthUser();
       if (user) {
         setMessage(`Already logged in as ${user.email}. Redirecting...`);
         setStatus('success');
@@ -49,7 +49,7 @@ const DirectLoginPage: React.FC = () => {
       setStatus('success');
 
       // Get the user and find the correct redirect path
-      const user = getCurrentUser();
+      const user = getCurrentDirectAuthUser();
       if (user) {
         setTimeout(() => {
           navigate(getRedirectPath(user));
@@ -64,7 +64,7 @@ const DirectLoginPage: React.FC = () => {
   };
 
   const handleLogout = () => {
-    logout();
+    logoutDirectAuth();
     setMessage('Logged out successfully');
     setStatus('success');
     window.location.reload(); // Reload to clear any cached state
@@ -130,7 +130,7 @@ const DirectLoginPage: React.FC = () => {
               {loading ? 'Logging in...' : 'Login as Selected User'}
             </Button>
 
-            {isAuthenticated() && (
+            {isDirectAuthAuthenticated() && (
               <Button onClick={handleLogout} variant="outline" className="w-1/3">
                 Log Out
               </Button>

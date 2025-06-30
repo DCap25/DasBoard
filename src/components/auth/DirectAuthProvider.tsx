@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { isAuthenticated, getCurrentUser, getRedirectPath, logout } from '../../lib/directAuth';
+import {
+  isDirectAuthAuthenticated,
+  getCurrentDirectAuthUser,
+  getRedirectPath,
+  logoutDirectAuth,
+} from '../../lib/directAuth';
 
 /**
  * DirectAuthProvider detects if the user is authenticated using the direct auth system
@@ -72,8 +77,8 @@ const DirectAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
 
     // Check if we have a direct auth user
-    if (isAuthenticated()) {
-      const user = getCurrentUser();
+    if (isDirectAuthAuthenticated()) {
+      const user = getCurrentDirectAuthUser();
       if (user) {
         console.log('[DirectAuthProvider] Direct auth user detected:', user.email);
 

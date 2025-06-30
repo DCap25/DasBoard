@@ -38,17 +38,17 @@ import AVPFullDashboard from './components/dashboards/AVPDashboard';
 import { GroupAdminDashboard } from './components/admin/GroupAdminDashboard';
 import { supabase } from './lib/supabaseClient';
 import { Loader2 } from 'lucide-react';
-import DebugAuthPage from './pages/DebugAuthPage';
 import AuthDebugger from './components/debug/AuthDebugger';
-import TestUserMiddleware from './components/auth/TestUserMiddleware';
 import DirectLoginPage from './pages/DirectLoginPage';
 import DirectAuthProvider from './components/auth/DirectAuthProvider';
-import { isAuthenticated, getCurrentUser, getRedirectPath } from './lib/directAuth';
-import ForceLoginPage from './pages/ForceLoginPage';
+import {
+  isDirectAuthAuthenticated,
+  getCurrentDirectAuthUser,
+  getRedirectPath,
+} from './lib/directAuth';
 import ResetPage from './pages/ResetPage';
 import LogoutPage from './pages/LogoutPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
-import TestLoginRedirect from './pages/TestLoginRedirect';
 import GroupAdminBypass from './pages/GroupAdminBypass';
 import DashboardSelector from './pages/DashboardSelector';
 import { DealsProvider } from './contexts/DealsContext';
@@ -73,6 +73,9 @@ import SubscriptionPage from './pages/legal/SubscriptionPage';
 import AboutPage from './pages/AboutPage';
 import ScreenshotsPage from './pages/ScreenshotsPage';
 import { TranslationProvider } from './contexts/TranslationContext';
+import LoginForm from './components/auth/LoginForm';
+import AdminDashboard from './pages/AdminDashboard';
+import ResetAuth from './pages/ResetPage';
 
 // Add global type declaration for app event tracking
 declare global {
@@ -774,14 +777,8 @@ function App() {
                       {/* New Direct Login route */}
                       <Route path="/direct-login" element={<DirectLoginPage />} />
 
-                      {/* Force Login route - emergency bypass */}
-                      <Route path="/force-login" element={<ForceLoginPage />} />
-
                       {/* Auth Reset route - to escape redirect loops */}
                       <Route path="/reset" element={<ResetAuth />} />
-
-                      {/* Debug auth page - direct login bypass */}
-                      <Route path="/debug-auth" element={<DebugAuthPage />} />
 
                       {/* New Auth Debugger route */}
                       <Route path="/auth-debug" element={<AuthDebugger />} />

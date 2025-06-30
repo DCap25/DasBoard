@@ -4,7 +4,11 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { isTestEmail } from '../../lib/supabaseClient';
-import { isAuthenticated, getCurrentUser, getRedirectPath } from '../../lib/directAuth';
+import {
+  isDirectAuthAuthenticated,
+  getCurrentDirectAuthUser,
+  getRedirectPath,
+} from '../../lib/directAuth';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -76,8 +80,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   // Check for direct authentication first - but only if not overridden by recent login
-  const directAuthUser = getCurrentUser();
-  const isDirectlyAuthenticated = isAuthenticated();
+  const directAuthUser = getCurrentDirectAuthUser();
+  const isDirectlyAuthenticated = isDirectAuthAuthenticated();
   const recentLoginCleared = localStorage.getItem('recent_login_cleared') === 'true';
   const recentSupabaseLogin = localStorage.getItem('recent_supabase_login') === 'true';
 

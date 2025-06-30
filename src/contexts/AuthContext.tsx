@@ -13,8 +13,8 @@ import { toast } from '../lib/use-toast';
 import { logSchemaOperation, testDealershipConnection } from '../lib/apiService';
 import {
   logout as directAuthLogout,
-  isAuthenticated,
-  getCurrentUser as getDirectAuthUser,
+  isDirectAuthAuthenticated,
+  getCurrentDirectAuthUser as getDirectAuthUser,
 } from '../lib/directAuth';
 
 // Use lowercase role names to match database
@@ -746,7 +746,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
 
         // Check for direct auth first - if active, skip normal Supabase initialization
-        if (isAuthenticated && isAuthenticated()) {
+        if (isDirectAuthAuthenticated && isDirectAuthAuthenticated()) {
           const directUser = getDirectAuthUser();
           if (directUser) {
             console.log(
@@ -908,7 +908,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const safetyTimer = setTimeout(() => {
       if (mounted && loading) {
         // Check if direct auth is active before forcing timeout
-        const isDirectAuth = isAuthenticated && isAuthenticated();
+        const isDirectAuth = isDirectAuthAuthenticated && isDirectAuthAuthenticated();
         if (isDirectAuth) {
           console.log(
             '[AuthContext] Safety timeout reached but direct auth is active - completing auth state'
