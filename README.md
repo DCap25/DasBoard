@@ -1,107 +1,46 @@
-# Dealership Sales Dashboard
+# Das Board
 
-A React-based dashboard application for automobile dealerships, providing role-based access to sales data, metrics, and F&I details.
+A comprehensive dashboard application for automotive dealerships built with React, TypeScript, and Vite.
 
 ## Features
 
-- **Authentication**: Secure login with role-based access control
-- **Multi-tenant**: Data isolation by dealership
-- **Dashboard**: Visual overview of key metrics and recent sales
-- **Sales Management**: Track and manage vehicle sales
-- **F&I Details**: Monitor finance and insurance products and revenue
-- **Metrics**: Performance analytics by salesperson, team, and dealership
-- **Dark/Light Mode**: Customizable theme settings
+- **Role-based Authentication**: Secure login system with multiple user roles
+- **Multi-language Support**: Complete internationalization with support for English, Spanish, French, German, Portuguese, Italian, Dutch, Swedish, Chinese, and Greek
+- **Professional UI**: Modern, responsive design with dark/light mode support
+- **Dealership Management**: Comprehensive tools for managing sales, finance, and administration
+- **Real-time Data**: Live updates and real-time synchronization
+- **Mobile Responsive**: Fully optimized for mobile and tablet devices
 
 ## Technology Stack
 
-- **Frontend**: React, TypeScript, Tailwind CSS
-- **Routing**: React Router
-- **API Communication**: Fetch API with custom service layer
-- **Authentication**: JWT-based auth with localStorage token management
-- **Testing**: Custom test utilities with end-to-end verification
-- **Build**: Vite with TypeScript
+- **Frontend**: React 18, TypeScript, Vite
+- **UI Framework**: Tailwind CSS, Radix UI Components
+- **Authentication**: Supabase Auth
+- **Database**: PostgreSQL via Supabase
+- **State Management**: React Context API
+- **Build Tool**: Vite
+- **Package Manager**: npm
 
-## Getting Started
+## Quick Start
 
-### Prerequisites
+```bash
+# Clone the repository
+git clone <repository-url>
+cd dasboard
 
-- Node.js 16.x or higher
-- npm 7.x or higher
+# Install dependencies
+npm install
 
-### Installation
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your configuration
 
-1. Clone the repository:
+# Start development server
+npm run dev
 
-   ```
-   git clone https://github.com/yourusername/dasboard.git
-   cd dasboard
-   ```
-
-2. Install dependencies:
-
-   ```
-   npm install
-   ```
-
-3. Start the mock API server:
-
-   ```
-   cd sales-api-new
-   npm install
-   npm run dev
-   ```
-
-4. In a separate terminal, start the dashboard application:
-
-   ```
-   cd .. (if you're in the sales-api-new directory)
-   npm run dev
-   ```
-
-5. Access the application at http://localhost:5173/
-
-### Environment Configuration
-
-Create a `.env.development` file in the root directory with the following variables:
-
-```
-VITE_SUPABASE_URL=https://your-supabase-url.supabase.co
-VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
-VITE_API_URL=http://localhost:3001
-USE_MOCK_SUPABASE=true
-```
-
-Set `USE_MOCK_SUPABASE=false` if you want to use a real Supabase instance.
-
-## Testing
-
-### Run Tests
-
-```
-npm run test
-```
-
-### Verify Build
-
-```
-npm run test:build
-```
-
-### Build for Production
-
-```
+# Build for production
 npm run build
 ```
-
-## Test User Credentials
-
-| Email                   | Password | Role            |
-| ----------------------- | -------- | --------------- |
-| testsales@example.com   | password | Salesperson     |
-| testfinance@example.com | password | Finance Manager |
-| testmanager@example.com | password | Sales Manager   |
-| testgm@example.com      | password | General Manager |
-| testadmin@example.com   | password | Admin           |
 
 ## Project Structure
 
@@ -156,12 +95,6 @@ Deployment is currently paused until authentication issues are resolved. To re-e
 1. Fix the authentication issues in `src/lib/apiService.ts` and `src/contexts/AuthContext.tsx`
 2. Update the Supabase configuration in `.env.production`
 3. Set up a new Vercel project with the repository
-4. Configure the following environment variables:
-   - `VITE_API_URL=https://your-project-id.supabase.co`
-   - `VITE_SUPABASE_ANON_KEY=[your-anon-key]`
-   - `USE_MOCK_SUPABASE=false`
-
-Please do not re-deploy until the authentication issues are fully resolved.
 
 ## Finance Manager Promotion Implementation
 

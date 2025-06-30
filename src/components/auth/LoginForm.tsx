@@ -1,182 +1,57 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Key, Mail, AlertTriangle } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AlertTriangle, Loader2, Mail, Eye, EyeOff, Bookmark } from 'lucide-react';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
 import { supabase } from '../../lib/supabaseClient';
 
 export default function LoginForm() {
-  const { signIn, magicLinkLogin, hasSession, user, role, userRole } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [loginAttempt, setLoginAttempt] = useState(0);
+  const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isMagicLinkSent, setIsMagicLinkSent] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  // Add login debug mode flag
-  const DEBUG_LOGIN = true;
-
-  useEffect(() => {
-    if (DEBUG_LOGIN) {
-      console.log('[LoginForm] Component mounted/updated:', {
-        hasSession,
-        userEmail: user?.email,
-        role,
-        userRole,
-        timestamp: new Date().toISOString(),
-      });
-    }
-  }, [hasSession, user, role, userRole]);
-
-  const validateInput = () => {
-    if (!email) return 'Email is required';
-    if (!email.includes('@')) return 'Invalid email format';
-    if (!password) return 'Password is required';
-    if (password.length < 6) return 'Password must be at least 6 characters';
-    return null;
-  };
-
-  // Special check for group admin emails to ensure redirection
-  const isGroupAdminEmail = (emailAddress: string) => {
-    return (
-      emailAddress.toLowerCase().includes('group') &&
-      emailAddress.toLowerCase().includes('@exampletest.com')
-    );
-  };
-
-  // Special check for test emails
-  const isTestEmail = (emailAddress: string) => {
-    return (
-      emailAddress.toLowerCase().includes('@exampletest.com') ||
-      emailAddress.toLowerCase().includes('@example.com')
-    );
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!email || !password) {
+      setError('Please enter both email and password');
+      return;
+    }
+
     setLoading(true);
-    setError('');
-    setLoginAttempt(prev => prev + 1);
+    setError(null);
 
     try {
-      // Validate input
-      const validationError = validateInput();
-      if (validationError) {
-        setError(validationError);
-        return;
-      }
-
-      if (DEBUG_LOGIN) {
-        console.log('[LoginForm] Starting login attempt:', {
-          email,
-          attempt: loginAttempt + 1,
-          timestamp: new Date().toISOString(),
-        });
-      }
-
-      // Use Supabase auth directly for better error handling
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
       });
 
-      if (authError) {
-        console.error('[LoginForm] Authentication error:', authError);
-
-        // Handle specific error types
-        if (authError.message.includes('Invalid login credentials')) {
-          setError('Invalid email or password. Please check your credentials and try again.');
-        } else if (authError.message.includes('Email not confirmed')) {
-          setError('Please check your email and click the confirmation link before logging in.');
-        } else if (authError.message.includes('Too many requests')) {
-          setError('Too many login attempts. Please wait a few minutes before trying again.');
-        } else {
-          setError(`Login failed: ${authError.message}`);
-        }
-        return;
+      if (error) {
+        throw error;
       }
 
-      if (!data.user) {
-        setError('Login failed: No user data received');
-        return;
+      if (data?.user) {
+        // Let the AuthContext handle the redirect
+        console.log('[LoginForm] Login successful, letting AuthContext handle redirect');
       }
-
-      console.log('[LoginForm] Login successful:', {
-        userId: data.user.id,
-        email: data.user.email,
-        timestamp: new Date().toISOString(),
-      });
-
-      // Fetch user profile to get actual role from database
-      console.log('[LoginForm] Fetching user profile to determine role-based redirect');
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('role, is_group_admin')
-        .eq('id', data.user.id)
-        .single();
-
-      if (profileError) {
-        console.error('[LoginForm] Error fetching user profile:', profileError);
-        // Fall back to basic dashboard if we can't get the role
-        navigate('/dashboard', { replace: true });
-        return;
+    } catch (error: any) {
+      console.error('[LoginForm] Login error:', error);
+      if (error.message?.includes('Invalid login credentials')) {
+        setError('Invalid email or password. Please check your credentials and try again.');
+      } else if (error.message?.includes('Email not confirmed')) {
+        setError('Please check your email and confirm your account before signing in.');
+      } else if (error.message?.includes('Too many requests')) {
+        setError('Too many login attempts. Please wait a few minutes and try again.');
+      } else {
+        setError(error.message || 'Login failed. Please try again.');
       }
-
-      const userRole = profileData?.role;
-      const isGroupAdmin = profileData?.is_group_admin;
-
-      console.log('[LoginForm] User role from database:', { userRole, isGroupAdmin, email });
-
-      // Set coordination flag for ProtectedRoute
-      localStorage.setItem('recent_supabase_login', 'true');
-      console.log('[LoginForm] Set recent_supabase_login flag for ProtectedRoute coordination');
-      localStorage.setItem('last_login_email', email); // Track email for bypass
-
-      // Determine redirect path based on user role/email
-      let redirectPath = '/dashboard';
-
-      // Special case for testfinance@example.com - redirect to single finance dashboard
-      if (email.toLowerCase() === 'testfinance@example.com') {
-        redirectPath = '/dashboard/single-finance';
-        console.log(
-          '[LoginForm] Test finance user detected, redirecting to single finance dashboard'
-        );
-      }
-      // Check for admin roles - more comprehensive admin detection
-      else if (
-        email.toLowerCase() === 'testadmin@example.com' ||
-        email.toLowerCase() === 'admin@thedasboard.com' ||
-        email.toLowerCase() === 'admin@example.com' ||
-        email.toLowerCase().includes('admin@example.com')
-      ) {
-        redirectPath = '/master-admin';
-        console.log('[LoginForm] Admin user detected, redirecting to master admin');
-      } else if (isGroupAdminEmail(email)) {
-        redirectPath = '/group-admin';
-        console.log('[LoginForm] Group admin detected, redirecting to group admin');
-      } else if (email.toLowerCase().includes('admin@exampletest.com')) {
-        redirectPath = '/dashboard/admin';
-        console.log('[LoginForm] Dealership admin detected, redirecting to dealership admin');
-      } else if (email.toLowerCase().includes('finance')) {
-        redirectPath = '/dashboard/finance';
-      } else if (email.toLowerCase().includes('sales')) {
-        redirectPath = '/dashboard/sales';
-      }
-
-      // Use navigate for consistent routing
-      console.log('[LoginForm] Redirecting to:', redirectPath);
-      navigate(redirectPath, { replace: true });
-    } catch (err) {
-      console.error('[LoginForm] Login error:', err);
-      const errorMsg = err instanceof Error ? err.message : 'An unexpected error occurred';
-      setError(`Login failed: ${errorMsg}`);
     } finally {
       setLoading(false);
     }
@@ -214,117 +89,6 @@ export default function LoginForm() {
     }
   };
 
-  // Quick test login buttons
-  const testUsers = [
-    { email: 'testadmin@example.com', password: 'Password123!', label: 'Test Admin' },
-    { email: 'group1.admin@exampletest.com', password: 'Password123!', label: 'Group Admin' },
-    { email: 'dealer1.admin@exampletest.com', password: 'Password123!', label: 'Dealer Admin' },
-    { email: 'finance1@exampletest.com', password: 'Password123!', label: 'Finance Manager' },
-    { email: 'sales@exampletest.com', password: 'Password123!', label: 'Sales Person' },
-  ];
-
-  const quickLogin = (testUser: { email: string; password: string }) => {
-    setEmail(testUser.email);
-    setPassword(testUser.password);
-  };
-
-  const createTestUser = async (email: string, password: string, role: string, name: string) => {
-    try {
-      console.log(`[LoginForm] Creating test user: ${email}`);
-
-      // First try to sign up the user
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name: name,
-          },
-        },
-      });
-
-      if (signUpError && !signUpError.message.includes('already registered')) {
-        console.error('[LoginForm] Signup error:', signUpError);
-        return { success: false, error: signUpError.message };
-      }
-
-      // If signup succeeded or user already exists, try to create/update profile
-      if (signUpData.user || signUpError?.message.includes('already registered')) {
-        const userId =
-          signUpData.user?.id || signUpError?.message.includes('already registered')
-            ? 'existing'
-            : null;
-
-        if (userId !== 'existing') {
-          // Create profile for new user
-          const { error: profileError } = await supabase.from('profiles').upsert({
-            id: userId,
-            email,
-            role,
-            name,
-            dealership_id: role.includes('group') ? null : 1,
-            is_group_admin: role.includes('group') || email.includes('group'),
-          });
-
-          if (profileError) {
-            console.error('[LoginForm] Profile creation error:', profileError);
-          }
-        }
-      }
-
-      return { success: true };
-    } catch (error) {
-      console.error('[LoginForm] Create test user error:', error);
-      return { success: false, error: (error as Error)?.message || 'Unknown error' };
-    }
-  };
-
-  const setupTestUsers = async () => {
-    setLoading(true);
-    setError('Setting up test users...');
-
-    const testUsersToCreate = [
-      {
-        email: 'testfinance@example.com',
-        password: 'Password123!',
-        role: 'single_finance_manager',
-        name: 'Test Finance Manager',
-      },
-      {
-        email: 'testadmin@example.com',
-        password: 'Password123!',
-        role: 'admin',
-        name: 'Master Admin',
-      },
-      {
-        email: 'group1.admin@exampletest.com',
-        password: 'Password123!',
-        role: 'admin',
-        name: 'Group Admin',
-      },
-      {
-        email: 'dealer1.admin@exampletest.com',
-        password: 'Password123!',
-        role: 'dealership_admin',
-        name: 'Dealer Admin',
-      },
-      {
-        email: 'sales@exampletest.com',
-        password: 'Password123!',
-        role: 'salesperson',
-        name: 'Sales Person',
-      },
-    ];
-
-    for (const user of testUsersToCreate) {
-      await createTestUser(user.email, user.password, user.role, user.name);
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait between requests
-    }
-
-    setError('Test users setup complete! Try logging in now.');
-    setLoading(false);
-  };
-
   if (isMagicLinkSent) {
     return (
       <div className="text-center space-y-4">
@@ -340,59 +104,82 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="w-full max-w-md">
+      {/* Bookmark Reminder */}
+      <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="flex items-start gap-3">
+          <Bookmark className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+          <div>
+            <h3 className="text-sm font-medium text-blue-900 mb-1">Bookmark This Page</h3>
+            <p className="text-xs text-blue-700">
+              For easy access, bookmark this login page or add it to your home screen. Press Ctrl+D
+              (Windows) or Cmd+D (Mac) to bookmark now.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
+        <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <Input
             id="email"
             type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value.trim())}
             placeholder="Enter your email"
-            required
+            value={email}
+            onChange={e => setEmail(e.target.value)}
             disabled={loading}
-            className="mt-1"
+            required
           />
         </div>
 
-        <div>
+        <div className="space-y-2">
           <Label htmlFor="password">Password</Label>
           <div className="relative">
             <Input
               id="password"
               type={showPassword ? 'text' : 'password'}
+              placeholder="Enter your password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              required
               disabled={loading}
-              className="mt-1 pr-10"
+              required
+              className="pr-10"
             />
             <button
               type="button"
-              className="absolute right-2 top-[calc(50%-6px)] text-gray-500 hover:text-gray-700"
               onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              disabled={loading}
             >
-              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
         </div>
 
-        <div className="flex items-center justify-between mt-2">
-          <div className="flex items-center">
-            <input
-              id="remember-me"
-              name="remember-me"
-              type="checkbox"
-              className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-              checked={rememberMe}
-              onChange={e => setRememberMe(e.target.checked)}
-            />
-            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-              Remember me
-            </label>
-          </div>
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="rememberMe"
+            checked={rememberMe}
+            onChange={e => setRememberMe(e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300"
+            disabled={loading}
+          />
+          <Label htmlFor="rememberMe" className="text-sm">
+            Remember me
+          </Label>
+        </div>
+
+        <div className="text-right">
+          <button
+            type="button"
+            onClick={() => navigate('/auth/reset-password')}
+            className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+            disabled={loading}
+          >
+            Forgot your password?
+          </button>
         </div>
 
         {error && (
@@ -404,7 +191,14 @@ export default function LoginForm() {
 
         <div className="flex gap-2">
           <Button type="submit" disabled={loading} className="flex-1">
-            {loading ? 'Signing in...' : 'Sign in'}
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Signing in...
+              </>
+            ) : (
+              'Sign in'
+            )}
           </Button>
 
           <Button
@@ -419,32 +213,18 @@ export default function LoginForm() {
           </Button>
         </div>
 
-        {/* Quick Login Buttons for Testing */}
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <h4 className="text-sm font-medium text-gray-700 mb-3">Quick Test Login:</h4>
-          <div className="grid grid-cols-2 gap-2">
-            {testUsers.map(testUser => (
-              <Button
-                key={testUser.email}
-                variant="outline"
-                size="sm"
-                onClick={() => quickLogin(testUser)}
-                className="text-xs"
-              >
-                {testUser.label}
-              </Button>
-            ))}
-          </div>
-
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={setupTestUsers}
-            className="w-full mt-2"
-            disabled={loading}
-          >
-            Setup Test Users (First Time)
-          </Button>
+        <div className="text-center pt-4 border-t border-gray-200">
+          <p className="text-sm text-gray-600">
+            Don't have an account?{' '}
+            <button
+              type="button"
+              onClick={() => navigate('/signup')}
+              className="text-blue-600 hover:text-blue-800 hover:underline"
+              disabled={loading}
+            >
+              Sign up here
+            </button>
+          </p>
         </div>
       </form>
     </div>
