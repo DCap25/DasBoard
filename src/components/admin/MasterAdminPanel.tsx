@@ -717,6 +717,10 @@ export function MasterAdminPanel() {
     setCreatingGroup(true);
     setIsConfirmGroupDialogOpen(false); // Close dialog immediately
 
+    // Declare variables at function scope
+    let newDealerships = [];
+    let selectedBrands = [];
+
     try {
       console.log('[MasterAdminPanel] Creating dealership group with name only');
 
@@ -747,9 +751,9 @@ export function MasterAdminPanel() {
         console.log('[MasterAdminPanel] Creating dealerships for each brand in the group');
 
         // Get the brands to create dealerships for
-        const selectedBrands = groupForm.brands.length > 0 ? groupForm.brands : ['Default']; // If no brands selected, create at least one default dealership
+        selectedBrands = groupForm.brands.length > 0 ? groupForm.brands : ['Default']; // If no brands selected, create at least one default dealership
 
-        const newDealerships = [];
+        newDealerships = [];
 
         for (const brand of selectedBrands) {
           // Generate schema name based on group name and brand
@@ -2136,7 +2140,7 @@ export function MasterAdminPanel() {
         variant: 'destructive',
       });
     } finally {
-      setLoadingAction(false);
+      setProcessingRequest(false);
     }
   };
 

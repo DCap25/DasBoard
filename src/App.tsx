@@ -76,6 +76,7 @@ import { TranslationProvider } from './contexts/TranslationContext';
 import LoginForm from './components/auth/LoginForm';
 import AdminDashboard from './pages/AdminDashboard';
 import ResetAuth from './pages/ResetPage';
+import TestUserMiddleware from './components/auth/TestUserMiddleware';
 
 // Add global type declaration for app event tracking
 declare global {
@@ -306,8 +307,8 @@ function RoleBasedRedirect() {
   ]);
 
   // First check for direct auth
-  if (isAuthenticated()) {
-    const directUser = getCurrentUser();
+  if (isDirectAuthAuthenticated()) {
+    const directUser = getCurrentDirectAuthUser();
     if (directUser) {
       console.log('[ROLE REDIRECT] Direct auth user detected, redirecting to appropriate route', {
         email: directUser.email,
@@ -489,8 +490,8 @@ function GroupAdminAccessCheck({ children }: { children: React.ReactNode }) {
   const location = useLocation();
 
   // First check for direct auth
-  if (isAuthenticated()) {
-    const directUser = getCurrentUser();
+  if (isDirectAuthAuthenticated()) {
+    const directUser = getCurrentDirectAuthUser();
     if (directUser && directUser.isGroupAdmin) {
       console.log('[GROUP ADMIN ACCESS] Direct auth user granted access to group admin', {
         email: directUser.email,
@@ -545,23 +546,23 @@ function GroupAdminAccessCheck({ children }: { children: React.ReactNode }) {
 }
 
 // Add this function before the App component
-function ResetAuth() {
+function AuthStateReset() {
   useEffect(() => {
-    console.log('[ResetAuth] Clearing all auth state...');
+    console.log('[AuthStateReset] Clearing all auth state...');
 
     // Sign out from Supabase
     supabase.auth
       .signOut()
       .then(() => {
-        console.log('[ResetAuth] Signed out from Supabase');
+        console.log('[AuthStateReset] Signed out from Supabase');
       })
       .catch(error => {
-        console.error('[ResetAuth] Error signing out from Supabase:', error);
+        console.error('[AuthStateReset] Error signing out from Supabase:', error);
       });
 
     // Clear all storage
     try {
-      console.log('[ResetAuth] Clearing localStorage and sessionStorage');
+      console.log('[AuthStateReset] Clearing localStorage and sessionStorage');
 
       // Clear localStorage
       if (typeof window !== 'undefined' && window.localStorage) {
@@ -581,21 +582,21 @@ function ResetAuth() {
         });
       }
 
-      console.log('[ResetAuth] All storage cleared');
+      console.log('[AuthStateReset] All storage cleared');
     } catch (error) {
-      console.error('[ResetAuth] Error clearing storage:', error);
+      console.error('[AuthStateReset] Error clearing storage:', error);
     }
 
     // Redirect to login page after a short delay
     setTimeout(() => {
-      console.log('[ResetAuth] Redirecting to login page');
+      console.log('[AuthStateReset] Redirecting to login page');
       if (typeof window !== 'undefined') {
         window.location.href = '/';
       }
     }, 1000);
 
     return () => {
-      console.log('[ResetAuth] Reset component unmounted');
+      console.log('[AuthStateReset] Reset component unmounted');
     };
   }, []);
 
@@ -981,8 +982,7 @@ function App() {
                       {/* Specific dealership routes with dealership ID parameter */}
                       <Route path="/dealership/:dealershipId/*" element={<DealershipLayout />} />
 
-                      {/* Test Login Redirect */}
-                      <Route path="/test-login-redirect" element={<TestLoginRedirect />} />
+                      {/* Test Login Redirect - Route removed as component was undefined */}
 
                       {/* Group Admin Bypass */}
                       <Route path="/group-admin-bypass" element={<GroupAdminBypass />} />
