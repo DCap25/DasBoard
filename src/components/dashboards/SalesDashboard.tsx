@@ -231,7 +231,7 @@ const SalesDashboard = () => {
     switch (period) {
       case 'this-month':
         return `${month} ${year}`;
-      case 'last-month':
+      case 'last-month': {
         const lastMonth =
           today.getMonth() === 0
             ? 'December'
@@ -241,11 +241,13 @@ const SalesDashboard = () => {
         const lastMonthYear =
           today.getMonth() === 0 ? today.getFullYear() - 1 : today.getFullYear();
         return `${lastMonth} ${lastMonthYear}`;
-      case 'last-quarter':
+      }
+      case 'last-quarter': {
         const currentQuarter = Math.floor(today.getMonth() / 3);
         return `Q${currentQuarter === 0 ? 4 : currentQuarter} ${
           currentQuarter === 0 ? year - 1 : year
         }`;
+      }
       case 'ytd':
         return `Year to Date ${year}`;
       case 'last-year':
@@ -491,7 +493,9 @@ const SalesDashboard = () => {
                 <div
                   key={index}
                   className={`p-1 ${
-                    isToday(day.day) ? 'bg-white border-r border-gray-200 border-b-2 border-blue-500' : ''
+                    isToday(day.day)
+                      ? 'bg-white border-r border-gray-200 border-b-2 border-blue-500'
+                      : ''
                   }`}
                 >
                   <div className="font-medium text-xs text-gray-800">
@@ -534,8 +538,12 @@ const SalesDashboard = () => {
           <CardContent className="py-1">
             {/* Sortable Header - Performance View */}
             <div className="flex items-center text-xs font-medium text-white border-b py-2 px-1">
-              <div className="w-10 text-center bg-blue-400 border-r border-blue-500 py-2 rounded-l-md">#</div>
-              <div className="w-40 flex-shrink-0 bg-white border-r border-blue-500 border-r border-blue-600 py-2 px-2">Salesperson</div>
+              <div className="w-10 text-center bg-blue-400 border-r border-blue-500 py-2 rounded-l-md">
+                #
+              </div>
+              <div className="w-40 flex-shrink-0 bg-white border-r border-blue-500 border-r border-blue-600 py-2 px-2">
+                Salesperson
+              </div>
               <div className="w-28 text-center bg-blue-600 border-r border-blue-700 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                 PVR <ChevronDown className="ml-1 h-3 w-3" />
               </div>
@@ -662,7 +670,9 @@ const SalesDashboard = () => {
                     </div>
                   </div>
                   <div className="w-40 flex-shrink-0 font-medium truncate px-2">{person.name}</div>
-                  <div className="w-28 text-center bg-gray-800 border-r border-gray-900">${person.pvr}</div>
+                  <div className="w-28 text-center bg-gray-800 border-r border-gray-900">
+                    ${person.pvr}
+                  </div>
                   <div className="w-36 text-center bg-gray-900">
                     ${person.totalGross.toLocaleString()}
                   </div>
@@ -726,7 +736,11 @@ const SalesDashboard = () => {
                         key={deal.id || deal.dealNumber}
                         className={`${
                           index !== currentDeals.slice(0, 10).length - 1 ? 'border-b' : ''
-                        } ${deal.vehicleType === 'N' || deal.isNew ? 'bg-white border-r border-gray-200' : ''}`}
+                        } ${
+                          deal.vehicleType === 'N' || deal.isNew
+                            ? 'bg-white border-r border-gray-200'
+                            : ''
+                        }`}
                       >
                         <td className="py-3 text-sm">{deal.stockNumber}</td>
                         <td className="py-3 text-sm">{deal.lastName || deal.customer}</td>

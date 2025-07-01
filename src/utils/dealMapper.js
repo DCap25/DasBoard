@@ -296,18 +296,23 @@ export const mapManagerDashboardData = (deals, dealershipId, timePeriod = 'this-
         const dealDate = new Date(deal.dealDate);
 
         switch (timePeriod) {
-          case 'this-month':
+          case 'this-month': {
             return dealDate.getFullYear() === currentYear && dealDate.getMonth() === currentMonth;
-          case 'last-month':
+          }
+          case 'last-month': {
             const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
             const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
             return dealDate.getFullYear() === lastMonthYear && dealDate.getMonth() === lastMonth;
-          case 'ytd':
+          }
+          case 'ytd': {
             return dealDate.getFullYear() === currentYear;
-          case 'last-year':
+          }
+          case 'last-year': {
             return dealDate.getFullYear() === currentYear - 1;
-          default:
+          }
+          default: {
             return true;
+          }
         }
       });
     }
@@ -473,18 +478,23 @@ export const aggregateDealsForDashboard = (deals, options = {}) => {
         const dealDate = new Date(deal.dealDate);
 
         switch (timePeriod) {
-          case 'this-month':
+          case 'this-month': {
             return dealDate.getFullYear() === currentYear && dealDate.getMonth() === currentMonth;
-          case 'last-month':
+          }
+          case 'last-month': {
             const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
             const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
             return dealDate.getFullYear() === lastMonthYear && dealDate.getMonth() === lastMonth;
-          case 'ytd':
+          }
+          case 'ytd': {
             return dealDate.getFullYear() === currentYear;
-          case 'last-year':
+          }
+          case 'last-year': {
             return dealDate.getFullYear() === currentYear - 1;
-          default:
+          }
+          default: {
             return true;
+          }
         }
       });
     }
@@ -575,17 +585,20 @@ export const getDashboardData = (dashboardType, options = {}) => {
   let rawDeals = [];
 
   switch (dashboardType) {
-    case 'single-finance':
+    case 'single-finance': {
       // Load from singleFinanceDeals storage key
       rawDeals = loadDealsFromStorage('singleFinanceDeals');
       break;
-    case 'sales':
+    }
+    case 'sales': {
       rawDeals = loadDealsFromStorage('financeDeals'); // Sales people see deals from financeDeals
       break;
+    }
     case 'finance':
-    default:
+    default: {
       rawDeals = loadDealsFromStorage('financeDeals');
       break;
+    }
   }
 
   return aggregateDealsForDashboard(rawDeals, {
@@ -593,4 +606,3 @@ export const getDashboardData = (dashboardType, options = {}) => {
     ...options,
   });
 };
- 

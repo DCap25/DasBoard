@@ -1,4 +1,4 @@
-import React from 'react';
+// React import removed as it's not needed in modern React
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowRight,

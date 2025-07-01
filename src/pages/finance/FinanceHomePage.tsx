@@ -218,26 +218,32 @@ const FinanceHomePage: React.FC = () => {
         endDate = today;
         break;
 
-      case 'last-month':
-        startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-        endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+      case 'last-month': {
+        const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
+        startDate = lastMonthStart;
+        endDate = lastMonthEnd;
         break;
+      }
 
-      case 'last-quarter':
+      case 'last-quarter': {
         const currentQuarter = Math.floor(today.getMonth() / 3);
         startDate = new Date(today.getFullYear(), currentQuarter * 3 - 3, 1);
         endDate = new Date(today.getFullYear(), currentQuarter * 3, 0);
         break;
+      }
 
       case 'ytd':
         startDate = new Date(today.getFullYear(), 0, 1);
         endDate = today;
         break;
 
-      case 'last-year':
-        startDate = new Date(today.getFullYear() - 1, 0, 1);
-        endDate = new Date(today.getFullYear() - 1, 11, 31);
+      case 'last-year': {
+        const lastYear = today.getFullYear() - 1;
+        startDate = new Date(lastYear, 0, 1);
+        endDate = new Date(lastYear, 11, 31);
         break;
+      }
 
       case 'custom':
         if (customDateRange.start && customDateRange.end) {
@@ -245,6 +251,9 @@ const FinanceHomePage: React.FC = () => {
           endDate = new Date(customDateRange.end);
         }
         break;
+
+      default:
+        return { startDate: new Date(), endDate: new Date() };
     }
 
     return { startDate, endDate };
@@ -255,17 +264,19 @@ const FinanceHomePage: React.FC = () => {
     switch (period) {
       case 'this-month':
         return getCurrentMonthYear();
-      case 'last-month':
+      case 'last-month': {
         const lastMonth = new Date();
         lastMonth.setMonth(lastMonth.getMonth() - 1);
         return lastMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-      case 'last-quarter':
+      }
+      case 'last-quarter': {
         const today = new Date();
         const currentQuarter = Math.floor(today.getMonth() / 3);
         const lastQuarterEndMonth = new Date(today.getFullYear(), currentQuarter * 3 - 1, 1);
         return `Q${
           Math.floor(lastQuarterEndMonth.getMonth() / 3) + 1
         } ${lastQuarterEndMonth.getFullYear()}`;
+      }
       case 'ytd':
         return `YTD ${new Date().getFullYear()}`;
       case 'last-year':

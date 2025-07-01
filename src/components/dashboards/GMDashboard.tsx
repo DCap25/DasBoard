@@ -99,7 +99,7 @@ const GMDashboard = () => {
     switch (period) {
       case 'this-month':
         return `${month} ${year}`;
-      case 'last-month':
+      case 'last-month': {
         const lastMonth =
           today.getMonth() === 0
             ? 'December'
@@ -109,11 +109,13 @@ const GMDashboard = () => {
         const lastMonthYear =
           today.getMonth() === 0 ? today.getFullYear() - 1 : today.getFullYear();
         return `${lastMonth} ${lastMonthYear}`;
-      case 'last-quarter':
+      }
+      case 'last-quarter': {
         const currentQuarter = Math.floor(today.getMonth() / 3);
         return `Q${currentQuarter === 0 ? 4 : currentQuarter} ${
           currentQuarter === 0 ? year - 1 : year
         }`;
+      }
       case 'ytd':
         return `Year to Date ${year}`;
       case 'last-year':
@@ -329,8 +331,12 @@ const GMDashboard = () => {
               <div className="min-w-full">
                 {/* Sortable Header */}
                 <div className="flex items-center text-xs font-medium text-white border-b py-2 px-1">
-                  <div className="w-10 text-center bg-gray-50 border-r border-gray-200 py-2 rounded-l-md">#</div>
-                  <div className="w-36 flex-shrink-0 bg-blue-100 border-r border-blue-200 py-2 px-2">F&I Manager</div>
+                  <div className="w-10 text-center bg-gray-50 border-r border-gray-200 py-2 rounded-l-md">
+                    #
+                  </div>
+                  <div className="w-36 flex-shrink-0 bg-blue-100 border-r border-blue-200 py-2 px-2">
+                    F&I Manager
+                  </div>
                   <div className="w-28 text-center bg-blue-200 border-r border-blue-300 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                     PVR <ChevronDown className="ml-1 h-3 w-3" />
                   </div>
@@ -442,12 +448,24 @@ const GMDashboard = () => {
             <div className="overflow-x-auto">
               <div className="min-w-full">
                 <div className="flex items-center text-xs font-medium text-white border-b py-2 px-1">
-                  <div className="w-10 text-center bg-blue-700 border-r border-blue-800 py-2 rounded-l-md">#</div>
-                  <div className="w-40 flex-shrink-0 bg-blue-800 border-r border-blue-900 py-2 px-2">Manager</div>
-                  <div className="w-28 text-center bg-blue-900 border-r border-slate-100 py-2">Team Units</div>
-                  <div className="w-28 text-center bg-slate-600 border-r border-slate-700 py-2">Total Gross</div>
-                  <div className="w-28 text-center bg-slate-700 border-r border-slate-800 py-2">Avg Front</div>
-                  <div className="w-28 text-center bg-slate-800 border-r border-slate-900 py-2 rounded-r-md">Avg Back</div>
+                  <div className="w-10 text-center bg-blue-700 border-r border-blue-800 py-2 rounded-l-md">
+                    #
+                  </div>
+                  <div className="w-40 flex-shrink-0 bg-blue-800 border-r border-blue-900 py-2 px-2">
+                    Manager
+                  </div>
+                  <div className="w-28 text-center bg-blue-900 border-r border-slate-100 py-2">
+                    Team Units
+                  </div>
+                  <div className="w-28 text-center bg-slate-600 border-r border-slate-700 py-2">
+                    Total Gross
+                  </div>
+                  <div className="w-28 text-center bg-slate-700 border-r border-slate-800 py-2">
+                    Avg Front
+                  </div>
+                  <div className="w-28 text-center bg-slate-800 border-r border-slate-900 py-2 rounded-r-md">
+                    Avg Back
+                  </div>
                 </div>
 
                 {/* Sample data rows */}
@@ -499,8 +517,12 @@ const GMDashboard = () => {
               <div className="min-w-full">
                 {/* Sortable Header - Performance View */}
                 <div className="flex items-center text-xs font-medium text-white border-b py-2 px-1">
-                  <div className="w-10 text-center bg-slate-900 border-r border-gray-700 py-2 rounded-l-md">#</div>
-                  <div className="w-40 flex-shrink-0 bg-gray-700 border-r border-gray-800 py-2 px-2">Salesperson</div>
+                  <div className="w-10 text-center bg-slate-900 border-r border-gray-700 py-2 rounded-l-md">
+                    #
+                  </div>
+                  <div className="w-40 flex-shrink-0 bg-gray-700 border-r border-gray-800 py-2 px-2">
+                    Salesperson
+                  </div>
                   <div className="w-28 text-center bg-gray-800 border-r border-gray-900 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                     PVR <ChevronDown className="ml-1 h-3 w-3" />
                   </div>

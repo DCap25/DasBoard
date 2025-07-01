@@ -64,7 +64,7 @@ const FinanceDashboard = () => {
     switch (period) {
       case 'this-month':
         return `${month} ${year}`;
-      case 'last-month':
+      case 'last-month': {
         const lastMonth =
           today.getMonth() === 0
             ? 'December'
@@ -74,11 +74,13 @@ const FinanceDashboard = () => {
         const lastMonthYear =
           today.getMonth() === 0 ? today.getFullYear() - 1 : today.getFullYear();
         return `${lastMonth} ${lastMonthYear}`;
-      case 'last-quarter':
+      }
+      case 'last-quarter': {
         const currentQuarter = Math.floor(today.getMonth() / 3);
         return `Q${currentQuarter === 0 ? 4 : currentQuarter} ${
           currentQuarter === 0 ? year - 1 : year
         }`;
+      }
       case 'ytd':
         return `Year to Date ${year}`;
       case 'last-year':

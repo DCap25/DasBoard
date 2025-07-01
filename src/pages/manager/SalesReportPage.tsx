@@ -26,7 +26,7 @@ import {
   Calendar,
   LineChart,
   BarChart,
-  PieChart,
+  // PieChart,
   TrendingUp,
   TrendingDown,
   DollarSign,
@@ -613,24 +613,24 @@ const SalesPerformanceSummary = ({ data }) => {
 
   // Cards view (original view)
   const CardsView = () => (
-        <div className="space-y-3">
-          {/* Render Central Motors - New Cars first */}
-          {data.find(group => group.id === 1) && (
-            <DealerGroupSummary key={1} dealerGroup={data.find(group => group.id === 1)} />
-          )}
+    <div className="space-y-3">
+      {/* Render Central Motors - New Cars first */}
+      {data.find(group => group.id === 1) && (
+        <DealerGroupSummary key={1} dealerGroup={data.find(group => group.id === 1)} />
+      )}
 
-          {/* Render Central Motors - Used Cars second */}
-          {data.find(group => group.id === 2) && (
-            <DealerGroupSummary key={2} dealerGroup={data.find(group => group.id === 2)} />
-          )}
+      {/* Render Central Motors - Used Cars second */}
+      {data.find(group => group.id === 2) && (
+        <DealerGroupSummary key={2} dealerGroup={data.find(group => group.id === 2)} />
+      )}
 
-          {/* Render all other dealerships */}
-          {data
-            .filter(group => group.id !== 1 && group.id !== 2)
-            .map(dealerGroup => (
-              <DealerGroupSummary key={dealerGroup.id} dealerGroup={dealerGroup} />
-            ))}
-        </div>
+      {/* Render all other dealerships */}
+      {data
+        .filter(group => group.id !== 1 && group.id !== 2)
+        .map(dealerGroup => (
+          <DealerGroupSummary key={dealerGroup.id} dealerGroup={dealerGroup} />
+        ))}
+    </div>
   );
 
   // Comparison table view (new side-by-side view with metrics as rows, dealerships as columns)

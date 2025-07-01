@@ -243,66 +243,6 @@ export interface SimpleFinanceManagerPayPlan extends PayPlanBase {
   pto_structure: PTOStructure;
 }
 
-// Unit-based flat rate structure
-export interface UnitFlatStructure {
-  enabled: boolean;
-  tiers: {
-    min_units: number;
-    max_units?: number;
-    flat_amount: number;
-    label: string;
-    retroactive: boolean; // If true, applies to all units when tier is reached
-  }[];
-}
-
-// Used vehicle pack structure
-export interface UsedVehiclePack {
-  enabled: boolean;
-  high_value_pack: {
-    threshold: number; // e.g., $10,000
-    pack_amount: number; // e.g., $10,000
-  };
-  low_value_pack: {
-    min_threshold: number; // e.g., $2,000
-    max_threshold: number; // e.g., $10,000
-    pack_amount: number; // e.g., $450
-  };
-}
-
-// Minimum unit guarantee structure
-export interface MinimumUnitGuarantee {
-  enabled: boolean;
-  tiers: {
-    min_units: number;
-    max_units?: number;
-    guarantee_amount: number;
-    label: string;
-  }[];
-}
-
-// Enhanced CSI bonus for salespeople
-export interface SalespersonCSIBonus {
-  enabled: boolean;
-  benchmark_bonus: {
-    enabled: boolean;
-    bonus_percentage: number; // e.g., 5% additional on back-end
-    description: string;
-  };
-}
-
-// Volume-based back-end percentage structure
-export interface VolumeBasedBackEndStructure {
-  enabled: boolean;
-  base_percentage: number;
-  tiers: {
-    min_units: number;
-    max_units?: number;
-    percentage: number;
-    label: string;
-    retroactive: boolean; // If true, applies to all deals when tier is reached
-  }[];
-}
-
 // Enhanced Salesperson Pay Plan
 export interface AdvancedSalespersonPayPlan extends PayPlanBase {
   role: 'salesperson';

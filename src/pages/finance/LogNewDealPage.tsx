@@ -20,17 +20,13 @@ import {
 } from 'lucide-react';
 
 // Simple local storage functions - completely self-contained
-const saveToLocalStorage = deal => {
+const saveToLocalStorage = (deal: any) => {
   try {
-    const existingDeals = localStorage.getItem('financeDeals');
-    const deals = existingDeals ? JSON.parse(existingDeals) : [];
+    const deals = JSON.parse(localStorage.getItem('deals') || '[]');
     deals.push(deal);
-    localStorage.setItem('financeDeals', JSON.stringify(deals));
-    console.log('Deal saved to localStorage:', deal);
-    return true;
+    localStorage.setItem('deals', JSON.stringify(deals));
   } catch (error) {
-    console.error('Error saving deal to localStorage:', error);
-    return false;
+    console.error('Error saving to localStorage:', error);
   }
 };
 
@@ -45,9 +41,9 @@ interface StepConfig {
 
 const LogNewDealPage: React.FC = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { toast, dismissToast } = useToast();
   const [currentStep, setCurrentStep] = useState<StepKey>('customer');
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [userSchema, setUserSchema] = useState<string | null>(null);
 
   // Form data state

@@ -242,7 +242,7 @@ const FinanceDirectorDashboard = () => {
     switch (period) {
       case 'this-month':
         return `${month} ${year}`;
-      case 'last-month':
+      case 'last-month': {
         const lastMonth =
           today.getMonth() === 0
             ? 'December'
@@ -252,11 +252,13 @@ const FinanceDirectorDashboard = () => {
         const lastMonthYear =
           today.getMonth() === 0 ? today.getFullYear() - 1 : today.getFullYear();
         return `${lastMonth} ${lastMonthYear}`;
-      case 'last-quarter':
+      }
+      case 'last-quarter': {
         const currentQuarter = Math.floor(today.getMonth() / 3);
         return `Q${currentQuarter === 0 ? 4 : currentQuarter} ${
           currentQuarter === 0 ? year - 1 : year
         }`;
+      }
       case 'ytd':
         return `Year to Date ${year}`;
       case 'last-year':
@@ -379,11 +381,7 @@ const FinanceDirectorDashboard = () => {
           </select>
         </div>
 
-        <Button
-          size="lg"
-          className="bg-blue-600 hover:bg-blue-700"
-          onClick={handleLogNewDealClick}
-        >
+        <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={handleLogNewDealClick}>
           <span className="flex items-center">
             <PlusCircle className="mr-2 h-5 w-5" />
             Log New Deal
@@ -407,7 +405,9 @@ const FinanceDirectorDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card>
               <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-white">Department F&I Gross</CardTitle>
+                <CardTitle className="text-sm font-medium text-white">
+                  Department F&I Gross
+                </CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -439,7 +439,9 @@ const FinanceDirectorDashboard = () => {
 
             <Card>
               <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-white">Products Per Deal (PPD)</CardTitle>
+                <CardTitle className="text-sm font-medium text-white">
+                  Products Per Deal (PPD)
+                </CardTitle>
                 <BarChart4 className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -450,7 +452,9 @@ const FinanceDirectorDashboard = () => {
 
             <Card>
               <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-white">Per Vehicle Retail (PVR)</CardTitle>
+                <CardTitle className="text-sm font-medium text-white">
+                  Per Vehicle Retail (PVR)
+                </CardTitle>
                 <Calculator className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -464,7 +468,9 @@ const FinanceDirectorDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card>
               <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-white">Total VSC Penetration</CardTitle>
+                <CardTitle className="text-sm font-medium text-white">
+                  Total VSC Penetration
+                </CardTitle>
                 <Star className="h-4 w-4 text-yellow-500" />
               </CardHeader>
               <CardContent>
@@ -475,7 +481,9 @@ const FinanceDirectorDashboard = () => {
 
             <Card>
               <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-white">Finance Penetration Rate</CardTitle>
+                <CardTitle className="text-sm font-medium text-white">
+                  Finance Penetration Rate
+                </CardTitle>
                 <Percent className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>

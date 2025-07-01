@@ -287,7 +287,7 @@ const SalesManagerDashboard = () => {
     switch (period) {
       case 'this-month':
         return `${month} ${year}`;
-      case 'last-month':
+      case 'last-month': {
         const lastMonth =
           today.getMonth() === 0
             ? 'December'
@@ -297,11 +297,13 @@ const SalesManagerDashboard = () => {
         const lastMonthYear =
           today.getMonth() === 0 ? today.getFullYear() - 1 : today.getFullYear();
         return `${lastMonth} ${lastMonthYear}`;
-      case 'last-quarter':
+      }
+      case 'last-quarter': {
         const currentQuarter = Math.floor(today.getMonth() / 3);
         return `Q${currentQuarter === 0 ? 4 : currentQuarter} ${
           currentQuarter === 0 ? year - 1 : year
         }`;
+      }
       case 'ytd':
         return `Year to Date ${year}`;
       case 'last-year':
@@ -609,7 +611,9 @@ const SalesManagerDashboard = () => {
                   <div
                     key={index}
                     className={`p-2 ${
-                      dayData.isToday ? 'bg-white border-r border-gray-600 border-b-2 border-blue-500' : ''
+                      dayData.isToday
+                        ? 'bg-white border-r border-gray-600 border-b-2 border-blue-500'
+                        : ''
                     }`}
                   >
                     <div className="font-medium text-xs text-gray-800">
@@ -650,8 +654,12 @@ const SalesManagerDashboard = () => {
           <CardContent>
             {/* Sortable Header - Performance View */}
             <div className="flex items-center text-xs font-medium text-white border-b py-2 px-1 overflow-x-auto">
-              <div className="w-10 text-center bg-blue-300 border-r border-gray-600 py-2 rounded-l-md">#</div>
-              <div className="w-40 flex-shrink-0 bg-blue-400 border-r border-gray-600 py-2 px-2">Salesperson</div>
+              <div className="w-10 text-center bg-blue-300 border-r border-gray-600 py-2 rounded-l-md">
+                #
+              </div>
+              <div className="w-40 flex-shrink-0 bg-blue-400 border-r border-gray-600 py-2 px-2">
+                Salesperson
+              </div>
               <div className="w-28 text-center bg-blue-500 border-r border-gray-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
                 PVR <ArrowUpDown className="ml-1 h-3 w-3" />
               </div>
@@ -778,7 +786,9 @@ const SalesManagerDashboard = () => {
                     </div>
                   </div>
                   <div className="w-40 flex-shrink-0 font-medium truncate px-2">{person.name}</div>
-                  <div className="w-28 text-center bg-gray-700 border-r border-gray-600">${person.pvr}</div>
+                  <div className="w-28 text-center bg-gray-700 border-r border-gray-600">
+                    ${person.pvr}
+                  </div>
                   <div className="w-36 text-center bg-gray-800 border-r border-gray-900">
                     ${person.totalGross.toLocaleString()}
                   </div>

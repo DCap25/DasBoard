@@ -70,7 +70,7 @@ export default function GeneralManagerDashboard() {
     switch (period) {
       case 'this-month':
         return `${month} ${year}`;
-      case 'last-month':
+      case 'last-month': {
         const lastMonth =
           today.getMonth() === 0
             ? 'December'
@@ -80,11 +80,13 @@ export default function GeneralManagerDashboard() {
         const lastMonthYear =
           today.getMonth() === 0 ? today.getFullYear() - 1 : today.getFullYear();
         return `${lastMonth} ${lastMonthYear}`;
-      case 'last-quarter':
+      }
+      case 'last-quarter': {
         const currentQuarter = Math.floor(today.getMonth() / 3);
         return `Q${currentQuarter === 0 ? 4 : currentQuarter} ${
           currentQuarter === 0 ? year - 1 : year
         }`;
+      }
       case 'ytd':
         return `Year to Date ${year}`;
       case 'last-year':
@@ -299,8 +301,12 @@ export default function GeneralManagerDashboard() {
             <div className="overflow-x-auto">
               <div className="min-w-full">
                 <div className="flex items-center text-xs font-medium text-white border-b py-2 px-1">
-                  <div className="w-10 text-center bg-gray-50 border-r border-gray-200 py-2 rounded-l-md">#</div>
-                  <div className="w-40 flex-shrink-0 bg-blue-100 border-r border-blue-200 py-2 px-2">Salesperson</div>
+                  <div className="w-10 text-center bg-gray-50 border-r border-gray-200 py-2 rounded-l-md">
+                    #
+                  </div>
+                  <div className="w-40 flex-shrink-0 bg-blue-100 border-r border-blue-200 py-2 px-2">
+                    Salesperson
+                  </div>
                   <div className="w-28 text-center bg-blue-200 border-r border-blue-300 py-2 flex items-center justify-center">
                     MTD <ArrowUpDown className="ml-1 h-3 w-3" />
                   </div>
@@ -348,8 +354,12 @@ export default function GeneralManagerDashboard() {
             <div className="overflow-x-auto">
               <div className="min-w-full">
                 <div className="flex items-center text-xs font-medium text-white border-b py-2 px-1">
-                  <div className="w-10 text-center bg-white border-r border-blue-500 border-r border-blue-600 py-2 rounded-l-md">#</div>
-                  <div className="w-40 flex-shrink-0 bg-blue-600 border-r border-blue-700 py-2 px-2">Product</div>
+                  <div className="w-10 text-center bg-white border-r border-blue-500 border-r border-blue-600 py-2 rounded-l-md">
+                    #
+                  </div>
+                  <div className="w-40 flex-shrink-0 bg-blue-600 border-r border-blue-700 py-2 px-2">
+                    Product
+                  </div>
                   <div className="w-28 text-center bg-blue-700 border-r border-blue-800 py-2 flex items-center justify-center">
                     Penetration <ArrowUpDown className="ml-1 h-3 w-3" />
                   </div>
@@ -400,12 +410,24 @@ export default function GeneralManagerDashboard() {
             <div className="overflow-x-auto">
               <div className="min-w-full">
                 <div className="flex items-center text-xs font-medium text-white border-b py-2 px-1">
-                  <div className="w-10 text-center bg-slate-600 border-r border-slate-700 py-2 rounded-l-md">#</div>
-                  <div className="w-40 flex-shrink-0 bg-slate-700 border-r border-slate-800 py-2 px-2">Manager</div>
-                  <div className="w-28 text-center bg-slate-800 border-r border-slate-900 py-2">Team Units</div>
-                  <div className="w-28 text-center bg-slate-900 border-r border-gray-700 py-2">Total Gross</div>
-                  <div className="w-28 text-center bg-gray-700 border-r border-gray-800 py-2">Closing %</div>
-                  <div className="w-28 text-center bg-gray-800 border-r border-gray-900 py-2">Avg Front</div>
+                  <div className="w-10 text-center bg-slate-600 border-r border-slate-700 py-2 rounded-l-md">
+                    #
+                  </div>
+                  <div className="w-40 flex-shrink-0 bg-slate-700 border-r border-slate-800 py-2 px-2">
+                    Manager
+                  </div>
+                  <div className="w-28 text-center bg-slate-800 border-r border-slate-900 py-2">
+                    Team Units
+                  </div>
+                  <div className="w-28 text-center bg-slate-900 border-r border-gray-700 py-2">
+                    Total Gross
+                  </div>
+                  <div className="w-28 text-center bg-gray-700 border-r border-gray-800 py-2">
+                    Closing %
+                  </div>
+                  <div className="w-28 text-center bg-gray-800 border-r border-gray-900 py-2">
+                    Avg Front
+                  </div>
                   <div className="w-28 text-center bg-gray-900 py-2 rounded-r-md">Avg Back</div>
                 </div>
 

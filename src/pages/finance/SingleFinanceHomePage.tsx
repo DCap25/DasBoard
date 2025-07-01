@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { Link } from 'react-router-dom';
+// Removed unused imports
 import {
   DollarSign,
   ChevronUp,
@@ -20,12 +19,7 @@ import {
   PlusCircle,
   Car,
 } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../../components/ui/dropdown-menu';
+import { DropdownMenu } from '../../components/ui/dropdown-menu';
 
 // Interface for a deal
 interface Deal {
@@ -88,6 +82,8 @@ type TimePeriod = 'this-month' | 'last-month' | 'last-quarter' | 'ytd' | 'last-y
 
 // Add schedule data
 // Mock schedule data
+// Commented out unused data
+/* 
 const SCHEDULE_DATA = [
   { day: 'Monday', date: '12', shift: 'Off', team: '' },
   { day: 'Tuesday', date: '13', shift: '9am - 6pm', team: 'Team A' },
@@ -97,19 +93,20 @@ const SCHEDULE_DATA = [
   { day: 'Saturday', date: '17', shift: '9am - 5pm', team: 'Team B' },
   { day: 'Sunday', date: '18', shift: 'Off', team: '' },
 ];
+*/
 
 // Mock deals - cleared for testing
 const MOCK_DEALS: Deal[] = [];
 
 export const SingleFinanceHomePage: React.FC = () => {
   const [deals, setDeals] = useState<Deal[]>([]);
-  const [pendingDeals, setPendingDeals] = useState<Deal[]>([]);
-  const [timePeriod, setTimePeriod] = useState<TimePeriod>('this-month');
-  const [customDateRange, setCustomDateRange] = useState({
+  const [, setPendingDeals] = useState<Deal[]>([]);
+  const [timePeriod] = useState<TimePeriod>('this-month');
+  const [customDateRange] = useState({
     start: '',
     end: '',
   });
-  const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
+  const [showCustomDatePicker] = useState(false);
   const [filteredDeals, setFilteredDeals] = useState<Deal[]>([]);
   const [metrics, setMetrics] = useState<Metrics>({
     mtdRevenue: 0,

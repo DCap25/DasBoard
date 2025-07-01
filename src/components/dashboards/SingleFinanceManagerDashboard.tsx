@@ -264,7 +264,7 @@ const SingleFinanceManagerDashboard = () => {
     switch (period) {
       case 'this-month':
         return `${month} ${year}`;
-      case 'last-month':
+      case 'last-month': {
         const lastMonth =
           today.getMonth() === 0
             ? 'December'
@@ -274,11 +274,13 @@ const SingleFinanceManagerDashboard = () => {
         const lastMonthYear =
           today.getMonth() === 0 ? today.getFullYear() - 1 : today.getFullYear();
         return `${lastMonth} ${lastMonthYear}`;
-      case 'last-quarter':
+      }
+      case 'last-quarter': {
         const currentQuarter = Math.floor(today.getMonth() / 3);
         return `Q${currentQuarter === 0 ? 4 : currentQuarter} ${
           currentQuarter === 0 ? year - 1 : year
         }`;
+      }
       case 'ytd':
         return `Year to Date ${year}`;
       case 'last-year':
@@ -342,7 +344,7 @@ const SingleFinanceManagerDashboard = () => {
       } catch (error) {
         console.error('[SingleFinanceManagerDashboard] Error deleting deal:', error);
         setError('Failed to delete deal');
-  }
+      }
     }
   };
 
@@ -402,11 +404,7 @@ const SingleFinanceManagerDashboard = () => {
           </select>
         </div>
 
-        <Button
-          size="lg"
-          className="bg-blue-600 hover:bg-blue-700"
-          onClick={handleLogNewDealClick}
-        >
+        <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={handleLogNewDealClick}>
           <span className="flex items-center">
             <PlusCircle className="mr-2 h-5 w-5" />
             Log New Deal
@@ -451,7 +449,9 @@ const SingleFinanceManagerDashboard = () => {
                     <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 border-r border-blue-400">
                       Date
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-left bg-gray-700 border-r border-blue-500">VIN</th>
+                    <th className="font-medium text-white py-2 px-2 text-left bg-gray-700 border-r border-blue-500">
+                      VIN
+                    </th>
                     <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 border-r border-blue-600">
                       N/U/CPO
                     </th>
@@ -461,7 +461,9 @@ const SingleFinanceManagerDashboard = () => {
                     <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-blue-800">
                       Front End
                     </th>
-                    <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-blue-900">VSC</th>
+                    <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-blue-900">
+                      VSC
+                    </th>
                     <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-slate-100">
                       PPM
                     </th>
@@ -509,9 +511,9 @@ const SingleFinanceManagerDashboard = () => {
                     const vehicleType =
                       dealData.vehicleType ||
                       (deal.vehicle.toLowerCase().includes('new')
-                      ? 'N'
-                      : deal.vehicle.toLowerCase().includes('cpo')
-                      ? 'C'
+                        ? 'N'
+                        : deal.vehicle.toLowerCase().includes('cpo')
+                        ? 'C'
                         : 'U');
 
                     console.log(`[Dashboard] Processing deal ${deal.id}:`, {
@@ -631,7 +633,9 @@ const SingleFinanceManagerDashboard = () => {
                         <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
                           ${twProfit.toLocaleString()}
                         </td>
-                        <td className="py-2 px-2 text-center bg-white border-r border-gray-200 font-medium">{ppd}</td>
+                        <td className="py-2 px-2 text-center bg-white border-r border-gray-200 font-medium">
+                          {ppd}
+                        </td>
                         <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
                           ${pvr.toLocaleString()}
                         </td>
