@@ -9,6 +9,7 @@ import {
   getCurrentDirectAuthUser,
   getRedirectPath,
 } from '../../lib/directAuth';
+import { isAuthenticatedDemoUser, getDemoUserInfo } from '../../lib/demoAuth';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -79,6 +80,35 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <>{children}</>;
   }
 
+  // Check for demo user authentication first
+  const isDemoUserAuthenticated = isAuthenticatedDemoUser();
+  const demoUserInfo = getDemoUserInfo();
+
+  if (isDemoUserAuthenticated && demoUserInfo) {
+    console.log('[ProtectedRoute] Demo user authenticated, allowing access to:', location.pathname);
+
+    // Check role requirements if specified
+    if (requiredRoles.length > 0) {
+      const hasRequiredRole = requiredRoles.some(
+        role => role.toLowerCase() === demoUserInfo.user_metadata.role.toLowerCase()
+      );
+
+      if (!hasRequiredRole) {
+        console.warn('[ProtectedRoute] Demo user missing required role, but allowing demo access');
+        // For demo users, we're more permissive with role requirements
+      }
+    }
+
+    // Check dealership requirements if specified
+    if (requiredDealership && demoUserInfo.app_metadata.dealership_id !== requiredDealership) {
+      console.warn('[ProtectedRoute] Demo user dealership mismatch, but allowing demo access');
+      // For demo users, we're more permissive with dealership requirements
+    }
+
+    // Allow access for authenticated demo users
+    return <>{children}</>;
+  }
+
   // Check for direct authentication first - but only if not overridden by recent login
   const directAuthUser = getCurrentDirectAuthUser();
   const isDirectlyAuthenticated = isDirectAuthAuthenticated();
@@ -91,6 +121,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     recentLoginCleared: recentLoginCleared,
     recentSupabaseLogin: recentSupabaseLogin,
     path: location.pathname,
+    isDemoUser: isDemoUserAuthenticated,
   });
 
   // If we have a fresh login flag, give auth state time to propagate
