@@ -21,16 +21,16 @@ export default function SignUp() {
     },
     {
       id: 'single-dealership',
-      title: 'Single Dealership',
-      description: 'Individual dealership wanting to manage sales and finance teams',
+      title: 'Small Dealer Groups',
+      description: '1-5 Dealerships',
       icon: Building,
       route: '/signup/dealership',
       features: ['Team management', 'Sales tracking', 'Finance oversight', 'Performance reporting'],
     },
     {
       id: 'dealer-group',
-      title: 'Dealer Group',
-      description: 'Multi-location dealer group needing centralized management',
+      title: 'Dealer Groups 6+',
+      description: 'Everything Single Dealership offers plus Area VP Dashboard',
       icon: Users,
       route: '/signup/dealer-group',
       features: [
