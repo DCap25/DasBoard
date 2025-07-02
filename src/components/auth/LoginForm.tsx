@@ -5,9 +5,11 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { supabase } from '../../lib/supabaseClient';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,19 +30,10 @@ export default function LoginForm() {
     setError(null);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
+      // Use AuthContext signIn which includes demo user detection
+      await signIn(email.trim(), password, rememberMe);
 
-      if (error) {
-        throw error;
-      }
-
-      if (data?.user) {
-        // Let the AuthContext handle the redirect
-        console.log('[LoginForm] Login successful, letting AuthContext handle redirect');
-      }
+      console.log('[LoginForm] Login successful, AuthContext handling redirect');
     } catch (error: any) {
       console.error('[LoginForm] Login error:', error);
       if (error.message?.includes('Invalid login credentials')) {
