@@ -952,6 +952,62 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         rememberMe: !!rememberMe,
       });
 
+      // Check for demo user credentials first
+      const { isDemoLogin, authenticateDemoUser } = await import('../lib/demoAuth');
+
+      if (isDemoLogin(email, password)) {
+        console.log('[AuthContext] Demo user login detected');
+
+        const demoAuthResult = authenticateDemoUser(email, password);
+
+        if (demoAuthResult.isDemo) {
+          // Create a mock user object for demo session
+          const demoUser = {
+            id: 'demo-user-authenticated',
+            email: email,
+            user_metadata: {
+              full_name: 'Demo Sales Manager',
+              role: 'sales_manager',
+              is_demo_user: true,
+            },
+            app_metadata: {
+              role: 'sales_manager',
+              dealership_id: 1,
+              is_demo: true,
+            },
+          };
+
+          // Set auth state for demo user
+          setUser(demoUser as any);
+          setRole('sales_manager');
+          setUserRole('sales_manager');
+          setHasSession(true);
+          setDealershipId(1);
+          setLoading(false);
+
+          console.log('[AuthContext] Demo user authenticated successfully');
+
+          // Use a toast notification instead of alert
+          try {
+            const { toast } = await import('../lib/use-toast');
+            toast({
+              title: 'Demo Access Granted',
+              description: 'Welcome to The DAS Board sales demonstration',
+              duration: 3000,
+            });
+          } catch (err) {
+            console.log('Demo user authenticated successfully');
+          }
+
+          // Redirect to demo dashboard
+          setTimeout(() => {
+            window.location.href = '/demo-dashboard';
+          }, 500);
+
+          return;
+        }
+      }
+
       // Special handling for test accounts with @exampletest.com domain
       if (isTestEmail(email)) {
         console.log('[AuthContext] Test email detected, using special login flow');
@@ -1230,6 +1286,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         userId: user?.id,
         timestamp: new Date().toISOString(),
       });
+
+      // Check if this is a demo user and clear demo session
+      try {
+        const { isAuthenticatedDemoUser, clearDemoAuth } = await import('../lib/demoAuth');
+        if (isAuthenticatedDemoUser()) {
+          console.log('[AuthContext] Demo user logout detected, clearing demo session');
+          clearDemoAuth();
+        }
+      } catch (demoError) {
+        console.error('[AuthContext] Error clearing demo session:', demoError);
+      }
 
       // First try to clean up some state immediately for a smoother experience
       try {

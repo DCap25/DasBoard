@@ -1,15 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { isAuthenticatedDemoUser } from '../lib/demoAuth';
+import DemoLogin from '../components/auth/DemoLogin';
 
 /**
  * This page provides direct access to any dashboard by bypassing the authentication flow
  * For development and testing purposes only
+ * Also serves as the demo dashboard for authenticated demo users
  */
 const DashboardSelector: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('Select a dashboard to access');
   const [error, setError] = useState<string | null>(null);
   const [useBypass, setUseBypass] = useState(true); // Default to bypass mode
+  const [isDemoUser, setIsDemoUser] = useState(false);
+
+  // Check if this is a demo user on component mount
+  useEffect(() => {
+    const checkDemoUser = () => {
+      const demoUserStatus = isAuthenticatedDemoUser();
+      setIsDemoUser(demoUserStatus);
+
+      if (demoUserStatus) {
+        console.log('[DashboardSelector] Demo user detected - showing demo interface');
+        setMessage('Welcome to The DAS Board Demo Environment');
+      }
+    };
+
+    checkDemoUser();
+  }, []);
+
+  // If this is a demo user, show the demo interface instead of dashboard selector
+  if (isDemoUser) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="container mx-auto py-8">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              The DAS Board - Sales Demo
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              Authenticated Demo Environment - Explore Our Features
+            </p>
+          </div>
+          <DemoLogin />
+        </div>
+      </div>
+    );
+  }
 
   const dashboards = [
     { name: 'Master Admin', path: '/master-admin', email: 'testadmin@example.com', role: 'admin' },

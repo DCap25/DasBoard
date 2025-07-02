@@ -990,6 +990,16 @@ function App() {
                       {/* Dashboard Selector - Direct Access */}
                       <Route path="/dashboard-selector" element={<DashboardSelector />} />
 
+                      {/* Demo Dashboard - Protected Route for Demo Users */}
+                      <Route
+                        path="/demo-dashboard"
+                        element={
+                          <ProtectedRoute>
+                            <DashboardSelector />
+                          </ProtectedRoute>
+                        }
+                      />
+
                       {/* Fallback - redirect to dashboard */}
                       <Route path="*" element={<RedirectLogger to="/dashboard" />} />
                     </Routes>
