@@ -78,9 +78,9 @@ export default function DemoLogin({ onDemoLogin }: DemoLoginProps) {
 
     try {
       // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Store demo data in localStorage for the session
+      // Ensure demo data is stored in localStorage for the session
       localStorage.setItem('demo_session', JSON.stringify(demoData));
       localStorage.setItem('demo_mode', 'true');
 
@@ -89,8 +89,8 @@ export default function DemoLogin({ onDemoLogin }: DemoLoginProps) {
         onDemoLogin(demoData);
       }
 
-      // Navigate to dashboard selector
-      navigate('/dashboard-selector');
+      // Navigate to the sales manager dashboard (default demo view)
+      navigate('/dashboard/sales-manager');
     } catch (error) {
       console.error('Demo login error:', error);
     } finally {
@@ -174,24 +174,79 @@ export default function DemoLogin({ onDemoLogin }: DemoLoginProps) {
         </div>
       </div>
 
-      {/* Demo Login Button */}
-      <button
-        onClick={handleDemoLogin}
-        disabled={isLoading}
-        className="w-full bg-green-600 hover:bg-green-500 text-white py-4 px-6 rounded-lg text-lg font-semibold transition-colors duration-200 flex items-center justify-center hover:shadow-xl hover:shadow-green-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {isLoading ? (
-          <>
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-            Loading Demo...
-          </>
-        ) : (
-          <>
-            Launch Sales Demo
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </>
-        )}
-      </button>
+      {/* Demo Dashboard Options */}
+      <div className="space-y-4">
+        <h3 className="text-white font-semibold text-center mb-4">Choose Demo Dashboard</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <button
+            onClick={() => {
+              localStorage.setItem('demo_session', JSON.stringify(demoData));
+              localStorage.setItem('demo_mode', 'true');
+              navigate('/dashboard/sales-manager');
+            }}
+            className="bg-blue-600 hover:bg-blue-500 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center"
+          >
+            <Users className="mr-2 w-4 h-4" />
+            Sales Manager
+          </button>
+
+          <button
+            onClick={() => {
+              localStorage.setItem('demo_session', JSON.stringify(demoData));
+              localStorage.setItem('demo_mode', 'true');
+              navigate('/dashboard/finance');
+            }}
+            className="bg-green-600 hover:bg-green-500 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center"
+          >
+            <DollarSign className="mr-2 w-4 h-4" />
+            Finance Manager
+          </button>
+
+          <button
+            onClick={() => {
+              localStorage.setItem('demo_session', JSON.stringify(demoData));
+              localStorage.setItem('demo_mode', 'true');
+              navigate('/dashboard/gm');
+            }}
+            className="bg-purple-600 hover:bg-purple-500 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center"
+          >
+            <Building className="mr-2 w-4 h-4" />
+            General Manager
+          </button>
+
+          <button
+            onClick={() => {
+              localStorage.setItem('demo_session', JSON.stringify(demoData));
+              localStorage.setItem('demo_mode', 'true');
+              navigate('/dashboard/sales');
+            }}
+            className="bg-orange-600 hover:bg-orange-500 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center"
+          >
+            <TrendingUp className="mr-2 w-4 h-4" />
+            Salesperson
+          </button>
+        </div>
+
+        {/* Primary Demo Button */}
+        <button
+          onClick={handleDemoLogin}
+          disabled={isLoading}
+          className="w-full bg-green-600 hover:bg-green-500 text-white py-4 px-6 rounded-lg text-lg font-semibold transition-colors duration-200 flex items-center justify-center hover:shadow-xl hover:shadow-green-500/25 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+        >
+          {isLoading ? (
+            <>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+              Loading Demo...
+            </>
+          ) : (
+            <>
+              Launch Sales Manager Demo
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </>
+          )}
+        </button>
+      </div>
 
       <div className="text-center mt-6">
         <p className="text-gray-400 text-sm">
