@@ -123,7 +123,7 @@ export const getDemoUserInfo = () => {
     },
     app_metadata: {
       role: 'sales_manager',
-      dealership_id: 1,
+      dealership_id: 46, // Use the actual demo dealership ID
       is_demo: true,
     },
   };

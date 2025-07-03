@@ -126,14 +126,15 @@ const GMDashboard = () => {
   };
 
   return (
-    <div className="container py-6">
+    <>
+      {/* Standardized Dashboard Header */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex-grow">
           <h1 className="text-3xl font-bold">General Manager Dashboard</h1>
         </div>
       </div>
 
-      {/* Dashboard Header with Month/Year */}
+      {/* Standardized Period Controls */}
       <div className="mb-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex flex-row items-center gap-4">
@@ -741,7 +742,7 @@ const GMDashboard = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </>
   );
 };
 

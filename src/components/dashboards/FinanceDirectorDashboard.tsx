@@ -392,9 +392,9 @@ const FinanceDirectorDashboard = () => {
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="overview">Quick View</TabsTrigger>
-          <TabsTrigger value="leaderboard">F&I Leaderboard</TabsTrigger>
+          <TabsTrigger value="leaderboard">F&I DAS Board</TabsTrigger>
           <TabsTrigger value="deals">Department Deals</TabsTrigger>
-          <TabsTrigger value="managers">Manager Deals</TabsTrigger>
+          <TabsTrigger value="managers">F&I Manager</TabsTrigger>
           <TabsTrigger value="schedules">Schedules</TabsTrigger>
           <TabsTrigger value="payplans">Pay Plans</TabsTrigger>
         </TabsList>
@@ -404,11 +404,11 @@ const FinanceDirectorDashboard = () => {
           {/* Department Metrics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card>
-              <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-white">
+              <CardHeader className="bg-blue-600 rounded-t-md flex flex-row items-center justify-between space-y-0 py-2">
+                <CardTitle className="text-lg font-semibold text-white">
                   Department F&I Gross
                 </CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <DollarSign className="h-5 w-5 text-white" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -424,9 +424,9 @@ const FinanceDirectorDashboard = () => {
             </Card>
 
             <Card>
-              <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-white">Deals Processed</CardTitle>
-                <FileText className="h-4 w-4 text-muted-foreground" />
+              <CardHeader className="bg-blue-600 rounded-t-md flex flex-row items-center justify-between space-y-0 py-2">
+                <CardTitle className="text-lg font-semibold text-white">Deals Processed</CardTitle>
+                <FileText className="h-5 w-5 text-white" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{departmentMetrics.deals_processed}</div>
@@ -438,11 +438,11 @@ const FinanceDirectorDashboard = () => {
             </Card>
 
             <Card>
-              <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-white">
+              <CardHeader className="bg-blue-600 rounded-t-md flex flex-row items-center justify-between space-y-0 py-2">
+                <CardTitle className="text-lg font-semibold text-white">
                   Products Per Deal (PPD)
                 </CardTitle>
-                <BarChart4 className="h-4 w-4 text-muted-foreground" />
+                <BarChart4 className="h-5 w-5 text-white" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{departmentMetrics.products_per_deal}</div>
@@ -451,11 +451,11 @@ const FinanceDirectorDashboard = () => {
             </Card>
 
             <Card>
-              <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-white">
+              <CardHeader className="bg-blue-600 rounded-t-md flex flex-row items-center justify-between space-y-0 py-2">
+                <CardTitle className="text-lg font-semibold text-white">
                   Per Vehicle Retail (PVR)
                 </CardTitle>
-                <Calculator className="h-4 w-4 text-muted-foreground" />
+                <Calculator className="h-5 w-5 text-white" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">${departmentMetrics.per_vehicle_retail}</div>
@@ -467,11 +467,11 @@ const FinanceDirectorDashboard = () => {
           {/* Additional Metrics Row */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card>
-              <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-white">
+              <CardHeader className="bg-blue-600 rounded-t-md flex flex-row items-center justify-between space-y-0 py-2">
+                <CardTitle className="text-lg font-semibold text-white">
                   Total VSC Penetration
                 </CardTitle>
-                <Star className="h-4 w-4 text-yellow-500" />
+                <Star className="h-5 w-5 text-yellow-300" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{departmentMetrics.total_vsc_penetration}%</div>
@@ -480,11 +480,11 @@ const FinanceDirectorDashboard = () => {
             </Card>
 
             <Card>
-              <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-white">
+              <CardHeader className="bg-blue-600 rounded-t-md flex flex-row items-center justify-between space-y-0 py-2">
+                <CardTitle className="text-lg font-semibold text-white">
                   Finance Penetration Rate
                 </CardTitle>
-                <Percent className="h-4 w-4 text-muted-foreground" />
+                <Percent className="h-5 w-5 text-white" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{departmentMetrics.penetration_rate}%</div>
@@ -493,9 +493,9 @@ const FinanceDirectorDashboard = () => {
             </Card>
 
             <Card>
-              <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-white">Team Performance</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
+              <CardHeader className="bg-blue-600 rounded-t-md flex flex-row items-center justify-between space-y-0 py-2">
+                <CardTitle className="text-lg font-semibold text-white">Team Performance</CardTitle>
+                <Users className="h-5 w-5 text-white" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -508,12 +508,12 @@ const FinanceDirectorDashboard = () => {
 
           {/* Team Performance Overview */}
           <Card>
-            <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600">
-              <CardTitle className="flex items-center text-white">
+            <CardHeader className="bg-blue-600 rounded-t-md py-2">
+              <CardTitle className="flex items-center text-white text-lg font-semibold">
                 <Users className="w-5 h-5 mr-2" />
                 Team Performance Overview
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-blue-100">
                 Current performance status:{' '}
                 {getPerformanceBadge(departmentMetrics.team_performance)}
               </CardDescription>
@@ -569,12 +569,12 @@ const FinanceDirectorDashboard = () => {
         {/* F&I Leaderboard Tab */}
         <TabsContent value="leaderboard" className="space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-white">
-                <Trophy className="w-5 h-5 mr-2 text-yellow-500" />
-                Finance Department Leaderboard
+            <CardHeader className="bg-blue-600 rounded-t-md py-2">
+              <CardTitle className="flex items-center text-white text-lg font-semibold">
+                <Trophy className="w-5 h-5 mr-2 text-yellow-300" />
+                F&I DAS Board
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-blue-100">
                 Performance rankings for {getPeriodLabel(timePeriod)}
               </CardDescription>
             </CardHeader>
@@ -639,14 +639,14 @@ const FinanceDirectorDashboard = () => {
         {/* Department Deals Tab */}
         <TabsContent value="deals" className="space-y-6">
           <Card>
-            <CardHeader>
+            <CardHeader className="bg-blue-600 rounded-t-md py-2">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="flex items-center text-white">
+                  <CardTitle className="flex items-center text-white text-lg font-semibold">
                     <FileText className="w-5 h-5 mr-2" />
                     All Department Deals
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-blue-100">
                     Complete view of all F&I deals for {getPeriodLabel(timePeriod)}
                   </CardDescription>
                 </div>
@@ -746,8 +746,8 @@ const FinanceDirectorDashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {financeManagers.map(manager => (
               <Card key={manager.id}>
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between text-white">
+                <CardHeader className="bg-blue-600 rounded-t-md py-2">
+                  <CardTitle className="flex items-center justify-between text-white text-lg font-semibold">
                     <span>{manager.name}</span>
                     <div className="flex items-center space-x-2">
                       {getVSCIcon(manager.vsc_penetration)}
@@ -756,9 +756,9 @@ const FinanceDirectorDashboard = () => {
                       </Badge>
                     </div>
                   </CardTitle>
-                  <CardDescription>{manager.email}</CardDescription>
+                  <CardDescription className="text-blue-100">{manager.email}</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-6">
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="text-center p-3 bg-blue-50 rounded-lg">
@@ -817,12 +817,14 @@ const FinanceDirectorDashboard = () => {
         {/* Schedules Tab */}
         <TabsContent value="schedules" className="space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-white">
+            <CardHeader className="bg-blue-600 rounded-t-md py-2">
+              <CardTitle className="flex items-center text-white text-lg font-semibold">
                 <Calendar className="w-5 h-5 mr-2" />
                 F&I Manager Schedules
               </CardTitle>
-              <CardDescription>View and edit finance manager schedules</CardDescription>
+              <CardDescription className="text-blue-100">
+                View and edit finance manager schedules
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
@@ -859,12 +861,12 @@ const FinanceDirectorDashboard = () => {
         {/* Pay Plans Tab */}
         <TabsContent value="payplans" className="space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-white">
+            <CardHeader className="bg-blue-600 rounded-t-md py-2">
+              <CardTitle className="flex items-center text-white text-lg font-semibold">
                 <Settings className="w-5 h-5 mr-2" />
                 Pay Plan Management
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-blue-100">
                 Limited access: Add/remove monthly bonuses for finance managers
               </CardDescription>
             </CardHeader>

@@ -1,53 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { isAuthenticatedDemoUser } from '../lib/demoAuth';
-import DemoLogin from '../components/auth/DemoLogin';
 
 /**
- * This page provides direct access to any dashboard by bypassing the authentication flow
- * For development and testing purposes only
- * Also serves as the demo dashboard for authenticated demo users
+ * Dashboard Selector - Access to All Dashboards
+ * For development and testing purposes - provides direct access to any dashboard role
+ * This is the original dashboard selector without demo functionality
  */
 const DashboardSelector: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('Select a dashboard to access');
   const [error, setError] = useState<string | null>(null);
   const [useBypass, setUseBypass] = useState(true); // Default to bypass mode
-  const [isDemoUser, setIsDemoUser] = useState(false);
-
-  // Check if this is a demo user on component mount
-  useEffect(() => {
-    const checkDemoUser = () => {
-      const demoUserStatus = isAuthenticatedDemoUser();
-      setIsDemoUser(demoUserStatus);
-
-      if (demoUserStatus) {
-        console.log('[DashboardSelector] Demo user detected - showing demo interface');
-        setMessage('Welcome to The DAS Board Demo Environment');
-      }
-    };
-
-    checkDemoUser();
-  }, []);
-
-  // If this is a demo user, show the demo interface instead of dashboard selector
-  if (isDemoUser) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="container mx-auto py-8">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              The DAS Board - Sales Demo
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Authenticated Demo Environment - Explore Our Features
-            </p>
-          </div>
-          <DemoLogin />
-        </div>
-      </div>
-    );
-  }
 
   const dashboards = [
     { name: 'Master Admin', path: '/master-admin', email: 'testadmin@example.com', role: 'admin' },
@@ -202,109 +165,147 @@ const DashboardSelector: React.FC = () => {
       const userUpdateResult = await supabase.auth.updateUser({
         data: {
           role: dashboard.role,
-          is_group_admin: dashboard.role === 'dealer_group_admin',
+          email: dashboard.email,
         },
       });
 
       if (userUpdateResult.error) {
         console.error('[DashboardSelector] User metadata update error:', userUpdateResult.error);
-        // Continue anyway - this might not be critical
+        // Continue anyway - metadata update failure shouldn't block access
       }
 
-      // 4. Update profile record - with better error handling
+      // 4. Update the profiles table
       console.log(`[DashboardSelector] Updating profile record for user: ${data.user.id}`);
       const profileUpdateResult = await supabase
         .from('profiles')
-        .update({
+        .upsert({
+          id: data.user.id,
+          email: dashboard.email,
           role: dashboard.role,
-          is_group_admin: dashboard.role === 'dealer_group_admin',
+          updated_at: new Date().toISOString(),
         })
-        .eq('id', data.user.id);
+        .select();
 
       if (profileUpdateResult.error) {
         console.error('[DashboardSelector] Profile update error:', profileUpdateResult.error);
-        // Continue anyway - this might not be critical
+        // Continue anyway
       }
 
-      // 5. Force redirect to appropriate dashboard using direct browser navigation
-      // This bypasses React Router and any potential redirect loops
+      // 5. Navigate to the dashboard
       console.log(`[DashboardSelector] Redirecting to: ${dashboard.path}`);
       window.location.href = dashboard.path;
     } catch (err) {
       console.error('[DashboardSelector] Error:', err);
-      setError(`Login failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setError(
+        `Failed to access dashboard: ${err instanceof Error ? err.message : 'Unknown error'}`
+      );
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-indigo-50 to-white p-4">
-      <div className="w-full max-w-md space-y-8 rounded-xl bg-white p-8 shadow-xl">
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard Direct Access</h1>
-          <p className="text-sm text-red-500 font-bold">FOR DEVELOPMENT USE ONLY</p>
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="container mx-auto py-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Dashboard Selector
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Development & Testing - Direct Access to All Dashboard Types
+          </p>
+          <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+            🔧 Development Tool
+          </div>
+        </div>
 
-          <div className="flex items-center mb-2 w-full justify-between">
-            <span className="text-sm text-gray-700">Authentication Method:</span>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setUseBypass(true)}
-                className={`px-3 py-1 text-xs rounded ${
-                  useBypass ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                Quick Bypass
-              </button>
-              <button
-                onClick={() => setUseBypass(false)}
-                className={`px-3 py-1 text-xs rounded ${
-                  !useBypass ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                Full Auth
-              </button>
+        {/* Authentication Method Toggle */}
+        <div className="max-w-md mx-auto mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+              Access Method
+            </h3>
+            <div className="space-y-2">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="authMethod"
+                  checked={useBypass}
+                  onChange={() => setUseBypass(true)}
+                  className="mr-2"
+                />
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  Direct Bypass (Recommended)
+                </span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="authMethod"
+                  checked={!useBypass}
+                  onChange={() => setUseBypass(false)}
+                  className="mr-2"
+                />
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  Supabase Authentication
+                </span>
+              </label>
             </div>
           </div>
+        </div>
 
-          {error && (
-            <div className="p-4 rounded-md bg-red-50 text-red-800 w-full">
-              <p>{error}</p>
+        {/* Status Messages */}
+        {message && (
+          <div className="max-w-md mx-auto mb-4">
+            <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded">
+              {message}
             </div>
-          )}
-
-          <p className="text-center text-gray-600">{message}</p>
-
-          <div className="grid grid-cols-1 gap-3 w-full">
-            {dashboards.map(dashboard => (
-              <button
-                key={dashboard.path}
-                onClick={() => accessDashboard(dashboard)}
-                disabled={loading}
-                className={`p-3 rounded-md text-white w-full
-                  ${loading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}
-                  ${dashboard.name === 'Master Admin' ? 'bg-purple-700 hover:bg-purple-800' : ''}
-                  ${dashboard.name === 'Group Admin' ? 'bg-green-600 hover:bg-green-700' : ''}
-                  ${
-                    dashboard.name.includes('Finance Manager')
-                      ? 'bg-indigo-600 hover:bg-indigo-700'
-                      : ''
-                  }
-                `}
-              >
-                {dashboard.name}
-              </button>
-            ))}
           </div>
+        )}
 
-          {loading && (
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-700"></div>
-          )}
-
-          <div className="mt-6 border-t border-gray-200 pt-4 w-full">
-            <a href="/" className="text-sm text-blue-600 hover:underline">
-              Back to regular login
-            </a>
+        {error && (
+          <div className="max-w-md mx-auto mb-4">
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+              {error}
+            </div>
           </div>
+        )}
+
+        {/* Dashboard Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {dashboards.map((dashboard, index) => (
+            <div
+              key={index}
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200"
+            >
+              <div className="p-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  {dashboard.name}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                  <strong>Role:</strong> {dashboard.role}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  <strong>Email:</strong> {dashboard.email}
+                </p>
+                <button
+                  onClick={() => accessDashboard(dashboard)}
+                  disabled={loading}
+                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+                >
+                  {loading ? 'Accessing...' : 'Access Dashboard'}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="text-center mt-12">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            This tool is for development and testing purposes only.
+            <br />
+            In production, users will access dashboards through normal authentication flows.
+          </p>
         </div>
       </div>
     </div>

@@ -528,11 +528,11 @@ export const SingleFinanceHomePage: React.FC = () => {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card className="border-l-4 border-l-green-500 hover:shadow-md transition-shadow">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        <Card className="border-l-4 border-l-blue-600 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-base font-semibold text-slate-700">F&I Gross</CardTitle>
-            <DollarSign className="h-4 w-4 text-green-500" />
+            <DollarSign className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-slate-900">
@@ -554,12 +554,12 @@ export const SingleFinanceHomePage: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
+        <Card className="border-l-4 border-l-blue-600 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-base font-semibold text-slate-700">
               Deals Processed
             </CardTitle>
-            <FileText className="h-4 w-4 text-blue-500" />
+            <FileText className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-slate-900">{metrics.dealsProcessed}</div>
@@ -572,10 +572,10 @@ export const SingleFinanceHomePage: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-indigo-500 hover:shadow-md transition-shadow">
+        <Card className="border-l-4 border-l-blue-600 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-base font-semibold text-slate-700">Deal Types</CardTitle>
-            <Car className="h-4 w-4 text-indigo-500" />
+            <Car className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="space-y-1">
@@ -597,12 +597,12 @@ export const SingleFinanceHomePage: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-purple-500 hover:shadow-md transition-shadow">
+        <Card className="border-l-4 border-l-blue-600 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-base font-semibold text-slate-700">
               Products Per Deal
             </CardTitle>
-            <BarChart4 className="h-4 w-4 text-purple-500" />
+            <BarChart4 className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-slate-900">
@@ -624,12 +624,12 @@ export const SingleFinanceHomePage: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-amber-500 hover:shadow-md transition-shadow">
+        <Card className="border-l-4 border-l-blue-600 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-base font-semibold text-slate-700">
               PVR (Per Vehicle Retailed)
             </CardTitle>
-            <CreditCard className="h-4 w-4 text-amber-500" />
+            <CreditCard className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-slate-900">${metrics.pvr.toLocaleString()}</div>

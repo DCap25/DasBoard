@@ -972,7 +972,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             },
             app_metadata: {
               role: 'sales_manager',
-              dealership_id: 1,
+              dealership_id: 46, // Use the actual demo dealership ID
               is_demo: true,
             },
           };
@@ -982,26 +982,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setRole('sales_manager');
           setUserRole('sales_manager');
           setHasSession(true);
-          setDealershipId(1);
+          setDealershipId(46); // Use the actual demo dealership ID
           setLoading(false);
 
           console.log('[AuthContext] Demo user authenticated successfully');
 
-          // Use a toast notification instead of alert
-          try {
-            const { toast } = await import('../lib/use-toast');
-            toast({
-              title: 'Demo Access Granted',
-              description: 'Welcome to The DAS Board sales demonstration',
-              duration: 3000,
-            });
-          } catch (err) {
-            console.log('Demo user authenticated successfully');
-          }
+          // Log successful demo authentication
+          logAuthEvent('Demo user authenticated', {
+            email: email,
+            timestamp: new Date().toISOString(),
+            demo_mode: true,
+          });
+
+          // Use the existing showSuccessToast function
+          showSuccessToast('Demo Access Granted', 'Welcome to The DAS Board sales demonstration');
 
           // Redirect to demo dashboard
           setTimeout(() => {
-            window.location.href = '/demo-dashboard';
+            window.location.href = '/sales-experience-demo';
           }, 500);
 
           return;

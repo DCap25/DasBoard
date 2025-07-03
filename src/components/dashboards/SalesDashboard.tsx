@@ -295,35 +295,37 @@ const SalesDashboard = () => {
   };
 
   return (
-    <div className="container py-6">
+    <>
+      {/* Standardized Dashboard Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Sales Dashboard</h1>
-
-        {/* Daily Sales Tip - Centered */}
-        <div className="bg-white px-3 py-1 rounded-md text-center flex-1 mx-8 border border-blue-100">
-          <p className="text-xs italic text-blue-800 truncate">
-            <Lightbulb className="h-3 w-3 inline-block mr-1" />
-            <strong>Daily Tip:</strong>{' '}
-            {
-              [
-                'Listen twice as much as you talk. You have two ears and one mouth for a reason.',
-                'The first 5 minutes with a customer sets the tone for the entire deal.',
-                'Be the expert they can trust, not just the salesperson they deal with.',
-                "Follow up with past customers - they're your best source of referrals.",
-                'Know your inventory better than anyone else on the floor.',
-                'Sell the experience and lifestyle, not just the vehicle.',
-                "Always ask for referrals - it's the easiest way to grow your business.",
-              ][new Date().getDay()]
-            }
-          </p>
+        <div className="flex-grow">
+          <h1 className="text-3xl font-bold">Sales Dashboard</h1>
+          {/* Daily Sales Tip */}
+          <div className="bg-blue-50 p-2 rounded-md mt-2 border border-blue-100 max-w-2xl">
+            <p className="text-xs italic text-blue-800">
+              <Lightbulb className="h-3 w-3 inline-block mr-1" />
+              <strong>Daily Tip:</strong>{' '}
+              {
+                [
+                  'Listen twice as much as you talk. You have two ears and one mouth for a reason.',
+                  'The first 5 minutes with a customer sets the tone for the entire deal.',
+                  'Be the expert they can trust, not just the salesperson they deal with.',
+                  "Follow up with past customers - they're your best source of referrals.",
+                  'Know your inventory better than anyone else on the floor.',
+                  'Sell the experience and lifestyle, not just the vehicle.',
+                  "Always ask for referrals - it's the easiest way to grow your business.",
+                ][new Date().getDay()]
+              }
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Dashboard Header with Month/Year and Time Period Filter */}
+      {/* Standardized Period Controls */}
       <div className="mb-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex flex-row items-center gap-4">
-            <h2 className="text-2xl font-bold text-gray-900">{getPeriodLabel(timePeriod)}</h2>
+            <h2 className="text-3xl font-bold text-gray-900">{getPeriodLabel(timePeriod)}</h2>
             <div className="flex items-center">
               <Calendar className="h-5 w-5 text-gray-500 mr-1" />
               <select
@@ -338,7 +340,7 @@ const SalesDashboard = () => {
                 <option value="last-year">Last Year</option>
               </select>
             </div>
-            <p className="text-gray-500">Sales Performance</p>
+            <p className="text-gray-500">Sales Performance Dashboard</p>
           </div>
 
           <div className="flex items-center">
@@ -890,7 +892,7 @@ const SalesDashboard = () => {
           </Card>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

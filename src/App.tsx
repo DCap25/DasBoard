@@ -51,6 +51,7 @@ import LogoutPage from './pages/LogoutPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import GroupAdminBypass from './pages/GroupAdminBypass';
 import DashboardSelector from './pages/DashboardSelector';
+import SalesExperienceDemo from './pages/SalesExperienceDemo';
 import { DealsProvider } from './contexts/DealsContext';
 import DealLogPage from './pages/DealLogPage';
 import TeamManagementPage from './pages/manager/TeamManagementPage';
@@ -990,12 +991,12 @@ function App() {
                       {/* Dashboard Selector - Direct Access */}
                       <Route path="/dashboard-selector" element={<DashboardSelector />} />
 
-                      {/* Demo Dashboard - Protected Route for Demo Users */}
+                      {/* Sales Experience Demo - Protected Route for Demo Users */}
                       <Route
-                        path="/demo-dashboard"
+                        path="/sales-experience-demo"
                         element={
                           <ProtectedRoute>
-                            <DashboardSelector />
+                            <SalesExperienceDemo />
                           </ProtectedRoute>
                         }
                       />

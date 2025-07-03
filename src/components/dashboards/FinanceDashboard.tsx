@@ -16,6 +16,7 @@ import {
   CreditCard,
   PlusCircle,
   Lightbulb,
+  Calendar,
 } from 'lucide-react';
 import FinanceHomePage from '../../pages/finance/FinanceHomePage';
 import FinanceDealsPage from '../../pages/finance/FinanceDealsPage';
@@ -104,53 +105,57 @@ const FinanceDashboard = () => {
   ];
 
   return (
-    <div className="container py-4">
-      {/* Dashboard header */}
-      <div className="flex justify-between items-start mb-6">
+    <>
+      {/* Standardized Dashboard Header */}
+      <div className="flex justify-between items-center mb-6">
         <div className="flex-grow">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
-            <div>
-              <h1 className="text-3xl font-bold">Finance Manager Dashboard</h1>
-              <p className="text-gray-600 mt-1">
-                Finance Manager: {user?.email?.split('@')[0] || 'Not Assigned'}
-              </p>
-            </div>
-
-            {/* Daily Finance Tip - Best Practices */}
-            <div className="bg-blue-50 p-2 rounded-md mt-2 md:mt-0 border border-blue-100 max-w-2xl">
-              <p className="text-xs italic text-blue-800">
-                <Lightbulb className="h-3 w-3 inline-block mr-1" />
-                <strong>F&I Best Practice:</strong>{' '}
-                {bestPractices[new Date().getDay() % bestPractices.length]}
-              </p>
-            </div>
+          <h1 className="text-3xl font-bold">Finance Manager Dashboard</h1>
+          {/* Daily Finance Tip - Best Practices */}
+          <div className="bg-blue-50 p-2 rounded-md mt-2 border border-blue-100 max-w-2xl">
+            <p className="text-xs italic text-blue-800">
+              <Lightbulb className="h-3 w-3 inline-block mr-1" />
+              <strong>F&I Best Practice:</strong>{' '}
+              {bestPractices[new Date().getDay() % bestPractices.length]}
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Month/Year and New Deal Button row */}
-      <div className="flex justify-between items-center mb-3">
-        <div className="flex items-center">
-          <h2 className="text-2xl font-bold mr-3">{getPeriodLabel(timePeriod)}</h2>
-          <select
-            value={timePeriod}
-            onChange={e => setTimePeriod(e.target.value)}
-            className="p-2 border rounded-md shadow-sm"
-          >
-            <option value="this-month">This Month</option>
-            <option value="last-month">Last Month</option>
-            <option value="last-quarter">Last Quarter</option>
-            <option value="ytd">Year to Date</option>
-            <option value="last-year">Last Year</option>
-          </select>
-        </div>
+      {/* Standardized Period Controls */}
+      <div className="mb-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex flex-row items-center gap-4">
+            <h2 className="text-3xl font-bold text-gray-900">{getPeriodLabel(timePeriod)}</h2>
+            <div className="flex items-center">
+              <Calendar className="h-5 w-5 text-gray-500 mr-1" />
+              <select
+                value={timePeriod}
+                onChange={e => setTimePeriod(e.target.value)}
+                className="p-2 border rounded-md shadow-sm"
+              >
+                <option value="this-month">This Month</option>
+                <option value="last-month">Last Month</option>
+                <option value="last-quarter">Last Quarter</option>
+                <option value="ytd">Year to Date</option>
+                <option value="last-year">Last Year</option>
+              </select>
+            </div>
+            <p className="text-gray-500">Finance Performance Dashboard</p>
+          </div>
 
-        <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={handleLogNewDealClick}>
-          <span className="flex items-center">
-            <PlusCircle className="mr-2 h-5 w-5" />
-            Log New Deal
-          </span>
-        </Button>
+          <div className="flex items-center">
+            <Button
+              size="lg"
+              className="bg-blue-600 hover:bg-blue-700"
+              onClick={handleLogNewDealClick}
+            >
+              <span className="flex items-center">
+                <PlusCircle className="mr-2 h-5 w-5" />
+                Log New Deal
+              </span>
+            </Button>
+          </div>
+        </div>
       </div>
 
       <Routes>
@@ -159,7 +164,7 @@ const FinanceDashboard = () => {
         <Route path="/schedule" element={<FinanceSchedulePage />} />
         <Route path="*" element={<Navigate to="/dashboard/finance" replace />} />
       </Routes>
-    </div>
+    </>
   );
 };
 
