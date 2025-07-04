@@ -337,6 +337,7 @@ const FinanceDirectorDashboard = () => {
   }
 
   return (
+    <>
       {/* Dashboard header */}
       <div className="flex justify-between items-start mb-6">
         <div className="flex-grow">
