@@ -41,18 +41,33 @@ export default function ScreenshotsPage() {
 
         {/* Dashboard Screenshots */}
         <div className="grid lg:grid-cols-2 gap-8 mb-16">
-          {/* Finance Manager Dashboard */}
+          {/* Finance Director Dashboard */}
+          <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 transition-all duration-300 hover:scale-[1.01] relative z-0">
+            <h3 className="text-xl font-semibold mb-4 text-blue-400">Finance Director Dashboard</h3>
+            <div className="relative overflow-hidden rounded-lg border border-gray-600">
+              <img
+                src="/images/FINANCE_DIR_DASH.JPG"
+                alt="Finance Director Dashboard"
+                className="w-full h-auto object-cover transition-transform duration-300 hover:scale-105"
+              />
+            </div>
+            <p className="text-gray-300 mt-4">
+              Comprehensive departmental oversight and management for finance directors.
+            </p>
+          </div>
+
+          {/* Single Finance Manager Dashboard */}
           <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 transition-all duration-300 hover:scale-[1.01] relative z-0">
             <h3 className="text-xl font-semibold mb-4 text-blue-400">Finance Manager Dashboard</h3>
             <div className="relative overflow-hidden rounded-lg border border-gray-600">
               <img
-                src="/images/FINANCEMANAGER_DASH.JPG"
+                src="/images/NEW_F&I_DASH.JPG"
                 alt="Finance Manager Dashboard"
                 className="w-full h-auto object-cover transition-transform duration-300 hover:scale-105"
               />
             </div>
             <p className="text-gray-300 mt-4">
-              Comprehensive financial tracking and deal management for finance managers.
+              Individual F&I performance tracking and deal management for finance managers.
             </p>
           </div>
 
@@ -61,44 +76,28 @@ export default function ScreenshotsPage() {
             <h3 className="text-xl font-semibold mb-4 text-blue-400">Sales Manager Dashboard</h3>
             <div className="relative overflow-hidden rounded-lg border border-gray-600">
               <img
-                src="/images/SALESMANAGER_DASH.JPG"
+                src="/images/SALES_MGR_DASH.JPG"
                 alt="Sales Manager Dashboard"
                 className="w-full h-auto object-cover transition-transform duration-300 hover:scale-105"
               />
             </div>
             <p className="text-gray-300 mt-4">
-              Team performance tracking and sales analytics for managers.
+              Team performance tracking and sales analytics for sales managers.
             </p>
           </div>
 
-          {/* Salesperson Dashboard 1 */}
+          {/* Salesperson Dashboard */}
           <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 transition-all duration-300 hover:scale-[1.01] relative z-0">
             <h3 className="text-xl font-semibold mb-4 text-blue-400">Salesperson Dashboard</h3>
             <div className="relative overflow-hidden rounded-lg border border-gray-600">
               <img
-                src="/images/SALESPERSON_DASH1.JPG"
+                src="/images/SALES_PERSON_DASH.JPG"
                 alt="Salesperson Dashboard"
                 className="w-full h-auto object-cover transition-transform duration-300 hover:scale-105"
               />
             </div>
             <p className="text-gray-300 mt-4">
-              Individual performance tracking and goal management for sales staff.
-            </p>
-          </div>
-
-          {/* Salesperson Dashboard 2 */}
-          <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 transition-all duration-300 hover:scale-[1.01] relative z-0">
-            <h3 className="text-xl font-semibold mb-4 text-blue-400">Advanced Salesperson View</h3>
-            <div className="relative overflow-hidden rounded-lg border border-gray-600">
-              <img
-                src="/images/SALESPERSON_DASH_2.JPG"
-                alt="Advanced Salesperson Dashboard"
-                className="w-full h-auto object-cover transition-transform duration-300 hover:scale-105"
-              />
-            </div>
-            <p className="text-gray-300 mt-4">
-              Enhanced analytics and detailed performance metrics for experienced sales
-              professionals.
+              Individual performance tracking and goal management for sales associates.
             </p>
           </div>
         </div>

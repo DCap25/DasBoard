@@ -631,7 +631,7 @@ export function AdminDashboard() {
       {/* Top Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total Salespeople */}
-        <Card>
+        <Card className="border-l-4 border-l-blue-600 rounded-lg shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Salespeople</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
@@ -643,7 +643,7 @@ export function AdminDashboard() {
         </Card>
 
         {/* Finance Managers */}
-        <Card>
+        <Card className="border-l-4 border-l-blue-600 rounded-lg shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Finance Managers</CardTitle>
             <Calculator className="h-4 w-4 text-muted-foreground" />
@@ -655,7 +655,7 @@ export function AdminDashboard() {
         </Card>
 
         {/* Sales Managers */}
-        <Card>
+        <Card className="border-l-4 border-l-blue-600 rounded-lg shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Sales Managers</CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
@@ -667,7 +667,7 @@ export function AdminDashboard() {
         </Card>
 
         {/* GM/GSM */}
-        <Card>
+        <Card className="border-l-4 border-l-blue-600 rounded-lg shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">GM/GSM</CardTitle>
             <Crown className="h-4 w-4 text-muted-foreground" />
@@ -682,7 +682,7 @@ export function AdminDashboard() {
       </div>
 
       {/* Staff Management Section */}
-      <Card>
+      <Card className="border-l-4 border-l-blue-600 rounded-lg shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center">
             <Users className="w-5 h-5 mr-2" />
@@ -912,7 +912,7 @@ export function AdminDashboard() {
               </div>
 
               {/* Dealership Hours Configuration */}
-              <Card>
+              <Card className="border-l-4 border-l-blue-600 rounded-lg shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <Building className="w-5 h-5 mr-2" />
@@ -978,7 +978,7 @@ export function AdminDashboard() {
               </Card>
 
               {/* Current Week Schedule Overview */}
-              <Card>
+              <Card className="border-l-4 border-l-blue-600 rounded-lg shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <Users className="w-5 h-5 mr-2" />
@@ -1045,7 +1045,7 @@ export function AdminDashboard() {
       </Card>
 
       {/* Add New User Form */}
-      <Card>
+      <Card className="border-l-4 border-l-blue-600 rounded-lg shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center">
             <Plus className="w-5 h-5 mr-2" />
@@ -1196,7 +1196,7 @@ export function AdminDashboard() {
       </Card>
 
       {/* Team Overview Section */}
-      <Card>
+      <Card className="border-l-4 border-l-blue-600 rounded-lg shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center">
             <BarChart3 className="w-5 h-5 mr-2" />

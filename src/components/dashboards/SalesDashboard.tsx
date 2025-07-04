@@ -36,7 +36,9 @@ import {
   User,
   Lightbulb,
   ArrowUpDown,
+  BarChart3,
 } from 'lucide-react';
+import { Progress } from '../ui/progress';
 
 // Mock data for salesperson deals
 const MOCK_DEALS = [
@@ -141,6 +143,7 @@ const SalesDashboard = () => {
   const [displayBackEnd, setDisplayBackEnd] = useState(true);
   const [goalProgress, setGoalProgress] = useState(60);
   const [timePeriod, setTimePeriod] = useState<string>('this-month');
+  const [expandedDasBoard, setExpandedDasBoard] = useState(false);
 
   // Use the custom hook to manage deal data
   const salespersonId = user?.id || user?.user_metadata?.salesperson_id;
@@ -299,7 +302,7 @@ const SalesDashboard = () => {
       {/* Standardized Dashboard Header */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex-grow">
-          <h1 className="text-3xl font-bold">Sales Dashboard</h1>
+          <h1 className="text-3xl font-bold">Sales Person Dashboard</h1>
           {/* Daily Sales Tip */}
           <div className="bg-blue-50 p-2 rounded-md mt-2 border border-blue-100 max-w-2xl">
             <p className="text-xs italic text-blue-800">
@@ -386,11 +389,14 @@ const SalesDashboard = () => {
       )}
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-6">
-        <Card className="border-l-4 border-l-blue-500">
-          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 pb-2">
-            <CardTitle className="text-sm font-medium flex items-center text-white">
-              <ShoppingBag className="mr-2 h-4 w-4 text-blue-500" />
-              Total Deals This Month
+        <Card className="border-l-4 border-l-blue-600 rounded-lg shadow-sm">
+          <CardHeader className="py-2">
+            <CardTitle className="text-lg font-semibold flex items-center justify-between text-black">
+              <span className="flex items-center">
+                <ShoppingBag className="mr-2 h-5 w-5 text-gray-600" />
+                Total Deals This Month
+              </span>
+              <span>📊</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -404,81 +410,71 @@ const SalesDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-green-500">
-          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 pb-2">
-            <CardTitle className="text-sm font-medium flex items-center text-white">
-              <DollarSign className="mr-2 h-4 w-4 text-green-500" />
-              Gross
+        <Card className="border-l-4 border-l-blue-600 rounded-lg shadow-sm">
+          <CardHeader className="py-2">
+            <CardTitle className="text-lg font-semibold flex items-center justify-between text-black">
+              <span className="flex items-center">
+                <DollarSign className="mr-2 h-5 w-5 text-gray-600" />
+                Total Gross
+              </span>
+              <span>💰</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalGross.toLocaleString()}</div>
-            <div className="flex flex-col text-xs mt-1">
-              {displayFrontEnd && (
-                <span className="text-green-600">
-                  Front: ${totalFrontEndGross.toLocaleString()}
-                </span>
-              )}
-              {displayBackEnd && (
-                <span className="text-blue-600">Back: ${totalBackEndGross.toLocaleString()}</span>
-              )}
+            <div className="text-2xl font-bold">
+              ${dealData?.metrics?.totalGross?.toLocaleString() || '32,450'}
             </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-l-4 border-l-amber-500">
-          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 pb-2">
-            <CardTitle className="text-sm font-medium flex items-center text-white">
-              <AlertTriangle className="mr-2 h-4 w-4 text-amber-500" />
-              Minis
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{miniDeals}</div>
-            <p className="text-xs text-amber-600 flex items-center mt-1">
-              {miniDeals > 2 ? (
-                <>
-                  <ChevronUp className="h-3 w-3 mr-1" />
-                  Focus on higher gross deals
-                </>
-              ) : (
-                <>
-                  <ChevronDown className="h-3 w-3 mr-1" />
-                  Good job keeping minis low
-                </>
-              )}
+            <p className="text-xs text-green-600 flex items-center mt-1">
+              <ChevronUp className="h-3 w-3 mr-1" />
+              12% from last month
             </p>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-purple-500">
-          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 pb-2">
-            <CardTitle className="text-sm font-medium flex items-center text-white">
-              <Target className="mr-2 h-4 w-4 text-purple-500" />
-              Monthly Goal Progress
+        <Card className="border-l-4 border-l-blue-600 rounded-lg shadow-sm">
+          <CardHeader className="py-2">
+            <CardTitle className="text-lg font-semibold flex items-center justify-between text-black">
+              <span className="flex items-center">
+                <TrendingUp className="mr-2 h-5 w-5 text-gray-600" />
+                Average PVR
+              </span>
+              <span>📈</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{goalProgress}%</div>
-            <div className="w-full h-2 bg-blue-300 border-r border-blue-400 mt-2 rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full"
-                style={{
-                  width: `${goalProgress}%`,
-                  background: `linear-gradient(90deg, #4338ca, #3b82f6 ${goalProgress}%)`,
-                }}
-              ></div>
+            <div className="text-2xl font-bold">
+              ${dealData?.metrics?.avgPVR?.toLocaleString() || '2,315'}
             </div>
+            <p className="text-xs text-red-600 flex items-center mt-1">
+              <ChevronDown className="h-3 w-3 mr-1" />
+              4% from last month
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-blue-600 rounded-lg shadow-sm">
+          <CardHeader className="py-2">
+            <CardTitle className="text-lg font-semibold flex items-center justify-between text-black">
+              <span className="flex items-center">
+                <Target className="mr-2 h-5 w-5 text-gray-600" />
+                Goal Progress
+              </span>
+              <span>🎯</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">78%</div>
+            <Progress value={78} className="mt-2" />
           </CardContent>
         </Card>
       </div>
 
       {/* Compact Weekly Schedule with left/right navigation */}
       <div className="mb-6">
-        <Card className="border hover:shadow-md transition-shadow">
-          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 py-2 px-4">
-            <CardTitle className="text-sm font-medium flex items-center text-white">
-              <CalendarClock className="mr-2 h-4 w-4 text-indigo-500" />
+        <Card className="border-l-4 border-l-blue-600 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="py-2 px-4">
+            <CardTitle className="text-lg font-semibold flex items-center text-black">
+              <CalendarClock className="mr-2 h-5 w-5 text-gray-600" />
               Schedule
             </CardTitle>
           </CardHeader>
@@ -526,244 +522,244 @@ const SalesDashboard = () => {
         </Card>
       </div>
 
-      {/* Leader Board - The Das Board */}
+      {/* My Deals - Full Width Expandable */}
       <div className="mb-6">
-        <Card className="border hover:shadow-md transition-shadow">
-          <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 py-2 px-4">
+        <Card className="border-l-4 border-l-blue-600 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="py-2 px-4">
             <div className="flex justify-between items-center">
-              <CardTitle className="text-sm font-medium flex items-center text-white">
-                <Trophy className="mr-2 h-4 w-4 text-yellow-500" />
-                The Das Board
+              <CardTitle className="text-lg font-semibold flex items-center text-black">
+                <FileText className="mr-2 h-5 w-5 text-gray-600" />
+                My Deals
               </CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="py-1">
-            {/* Sortable Header - Performance View */}
-            <div className="flex items-center text-xs font-medium text-white border-b py-2 px-1">
-              <div className="w-10 text-center bg-blue-400 border-r border-blue-500 py-2 rounded-l-md">
-                #
-              </div>
-              <div className="w-40 flex-shrink-0 bg-white border-r border-blue-500 border-r border-blue-600 py-2 px-2">
-                Salesperson
-              </div>
-              <div className="w-28 text-center bg-blue-600 border-r border-blue-700 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
-                PVR <ChevronDown className="ml-1 h-3 w-3" />
-              </div>
-              <div className="w-36 text-center bg-blue-700 border-r border-blue-800 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
-                Total Gross <ChevronDown className="ml-1 h-3 w-3" />
-              </div>
-              <div className="w-28 text-center bg-blue-800 border-r border-blue-900 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
-                Avg/Mo <ChevronDown className="ml-1 h-3 w-3" />
-              </div>
-              <div className="w-28 text-center bg-blue-900 border-r border-slate-100 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-600">
-                Last Mo <ChevronDown className="ml-1 h-3 w-3" />
-              </div>
-              <div className="w-28 text-center bg-slate-600 border-r border-slate-700 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
-                YTD <ChevronDown className="ml-1 h-3 w-3" />
-              </div>
-              <div className="w-28 text-center bg-slate-700 border-r border-slate-800 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-600">
-                Annual <ChevronDown className="ml-1 h-3 w-3" />
-              </div>
-              <div className="w-24 text-center bg-slate-800 border-r border-slate-900 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
-                New <ChevronDown className="ml-1 h-3 w-3" />
-              </div>
-              <div className="w-24 text-center bg-slate-900 border-r border-gray-700 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
-                Used <ChevronDown className="ml-1 h-3 w-3" />
-              </div>
-              <div className="w-36 text-right bg-gray-700 border-r border-gray-800 py-2 pr-3 flex items-center justify-end cursor-pointer hover:bg-blue-700 font-semibold rounded-r-md">
-                Current Month <ChevronDown className="ml-1 h-3 w-3" />
-              </div>
-            </div>
-
-            {/* Leaderboard Entries */}
-            <div>
-              {[
-                {
-                  name: 'Michael Scott',
-                  units: 14,
-                  frontGross: 18200,
-                  backGross: 14300,
-                  totalGross: 32500,
-                  avgMonth: 12,
-                  lastMonth: 15,
-                  ytd: 82,
-                  annualPace: 144,
-                  newUnits: 9,
-                  usedUnits: 5,
-                  pvr: 2321,
-                },
-                {
-                  name: 'Jim Halpert',
-                  units: 12,
-                  frontGross: 16400,
-                  backGross: 12500,
-                  totalGross: 28900,
-                  avgMonth: 10,
-                  lastMonth: 11,
-                  ytd: 65,
-                  annualPace: 120,
-                  newUnits: 7,
-                  usedUnits: 5,
-                  pvr: 2408,
-                },
-                {
-                  name: 'Dwight Schrute',
-                  units: 11,
-                  frontGross: 14800,
-                  backGross: 11600,
-                  totalGross: 26400,
-                  avgMonth: 9,
-                  lastMonth: 10,
-                  ytd: 58,
-                  annualPace: 108,
-                  newUnits: 4,
-                  usedUnits: 7,
-                  pvr: 2400,
-                },
-                {
-                  name: 'Pam Beesly',
-                  units: 9,
-                  frontGross: 11900,
-                  backGross: 9800,
-                  totalGross: 21700,
-                  avgMonth: 8,
-                  lastMonth: 7,
-                  ytd: 48,
-                  annualPace: 96,
-                  newUnits: 5,
-                  usedUnits: 4,
-                  pvr: 2411,
-                },
-                {
-                  name: 'Stanley Hudson',
-                  units: 8,
-                  frontGross: 10500,
-                  backGross: 8700,
-                  totalGross: 19200,
-                  avgMonth: 7,
-                  lastMonth: 9,
-                  ytd: 42,
-                  annualPace: 84,
-                  newUnits: 3,
-                  usedUnits: 5,
-                  pvr: 2400,
-                },
-              ].map((person, index) => (
-                <div
-                  key={index}
-                  className={`flex items-center py-2 px-1 ${
-                    index !== 4 ? 'border-b' : ''
-                  } border-gray-100 text-sm hover:bg-gray-50`}
-                >
-                  <div className="w-10 flex justify-center">
-                    <div
-                      className={`w-5 h-5 rounded-full flex items-center justify-center
-                      ${
-                        index === 0
-                          ? 'bg-yellow-100 text-yellow-600'
-                          : index === 1
-                          ? 'bg-gray-100 text-gray-600'
-                          : index === 2
-                          ? 'bg-amber-100 text-amber-600'
-                          : 'bg-white border-r border-gray-200 text-blue-500'
-                      }`}
-                    >
-                      <span className="text-xs font-bold">{index + 1}</span>
-                    </div>
-                  </div>
-                  <div className="w-40 flex-shrink-0 font-medium truncate px-2">{person.name}</div>
-                  <div className="w-28 text-center bg-gray-800 border-r border-gray-900">
-                    ${person.pvr}
-                  </div>
-                  <div className="w-36 text-center bg-gray-900">
-                    ${person.totalGross.toLocaleString()}
-                  </div>
-                  <div className="w-28 text-center bg-blue-600">{person.avgMonth}</div>
-                  <div className="w-28 text-center">{person.lastMonth}</div>
-                  <div className="w-28 text-center bg-gray-600">{person.ytd}</div>
-                  <div className="w-28 text-center">{person.annualPace}</div>
-                  <div className="w-24 text-center bg-gray-600">{person.newUnits}</div>
-                  <div className="w-24 text-center bg-gray-600">{person.usedUnits}</div>
-                  <div className="w-36 text-right pr-3">
-                    <span className="text-lg font-bold text-indigo-700">{person.units}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-2 pt-2 text-center">
-              <Button variant="ghost" size="sm" className="text-xs text-blue-600">
-                View All Salespeople
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setExpandedDasBoard(!expandedDasBoard)}
+                className="flex items-center text-blue-600 hover:text-blue-700"
+              >
+                {expandedDasBoard ? (
+                  <>
+                    <ChevronUp className="h-4 w-4 mr-1" />
+                    Collapse
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-4 w-4 mr-1" />
+                    Expand All
+                  </>
+                )}
               </Button>
             </div>
+          </CardHeader>
+          <CardContent className="py-2">
+            {!expandedDasBoard ? (
+              /* Compact View - Recent deals only */
+              <>
+                <div className="overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="text-left border-b">
+                          <th className="pb-2 font-medium text-xs text-gray-700">STOCK #</th>
+                          <th className="pb-2 font-medium text-xs text-gray-700">CUSTOMER</th>
+                          <th className="pb-2 font-medium text-xs text-gray-700 text-right">
+                            FRONT
+                          </th>
+                          <th className="pb-2 font-medium text-xs text-gray-700 text-right">
+                            BACK
+                          </th>
+                          <th className="pb-2 font-medium text-xs text-gray-700 text-right">
+                            TOTAL
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {currentDeals.slice(0, 5).map((deal, index) => (
+                          <tr
+                            key={deal.id || deal.dealNumber}
+                            className={`border-b hover:bg-gray-50 ${
+                              index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                            }`}
+                          >
+                            <td className="py-2 text-sm font-medium">
+                              {deal.stockNumber || `STK${1000 + index}`}
+                            </td>
+                            <td className="py-2 text-sm">
+                              {deal.customerName || deal.lastName || 'N/A'}
+                            </td>
+                            <td className="py-2 text-sm text-right">
+                              ${(deal.frontEndGross || deal.frontGross || 0).toLocaleString()}
+                            </td>
+                            <td className="py-2 text-sm text-right">
+                              ${(deal.backEndGross || 0).toLocaleString()}
+                            </td>
+                            <td className="py-2 text-sm text-right font-semibold">
+                              $
+                              {(
+                                (deal.frontEndGross || deal.frontGross || 0) +
+                                (deal.backEndGross || 0)
+                              ).toLocaleString()}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </>
+            ) : (
+              /* Expanded View - All deals with more details */
+              <>
+                <div className="overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="text-left border-b">
+                          <th className="pb-2 font-medium text-xs text-gray-700">DATE</th>
+                          <th className="pb-2 font-medium text-xs text-gray-700">STOCK #</th>
+                          <th className="pb-2 font-medium text-xs text-gray-700">CUSTOMER</th>
+                          <th className="pb-2 font-medium text-xs text-gray-700 text-center">
+                            TYPE
+                          </th>
+                          <th className="pb-2 font-medium text-xs text-gray-700 text-right">
+                            FRONT
+                          </th>
+                          <th className="pb-2 font-medium text-xs text-gray-700 text-right">
+                            BACK
+                          </th>
+                          <th className="pb-2 font-medium text-xs text-gray-700 text-right">
+                            TOTAL
+                          </th>
+                          <th className="pb-2 font-medium text-xs text-gray-700 text-center">
+                            STATUS
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {currentDeals.map((deal, index) => (
+                          <tr
+                            key={deal.id || deal.dealNumber}
+                            className={`border-b hover:bg-gray-50 ${
+                              index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                            }`}
+                          >
+                            <td className="py-2 text-sm">
+                              {deal.date ? new Date(deal.date).toLocaleDateString() : 'N/A'}
+                            </td>
+                            <td className="py-2 text-sm font-medium">
+                              {deal.stockNumber || `STK${1000 + index}`}
+                            </td>
+                            <td className="py-2 text-sm">
+                              {deal.customerName || deal.lastName || 'N/A'}
+                            </td>
+                            <td className="py-2 text-sm text-center">
+                              <span
+                                className={`px-2 py-1 rounded text-xs ${
+                                  deal.isNew
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-blue-100 text-blue-800'
+                                }`}
+                              >
+                                {deal.isNew ? 'New' : 'Used'}
+                              </span>
+                            </td>
+                            <td className="py-2 text-sm text-right">
+                              ${(deal.frontEndGross || deal.frontGross || 0).toLocaleString()}
+                            </td>
+                            <td className="py-2 text-sm text-right">
+                              ${(deal.backEndGross || 0).toLocaleString()}
+                            </td>
+                            <td className="py-2 text-sm text-right font-semibold">
+                              $
+                              {(
+                                (deal.frontEndGross || deal.frontGross || 0) +
+                                (deal.backEndGross || 0)
+                              ).toLocaleString()}
+                            </td>
+                            <td className="py-2 text-sm text-center">
+                              <span className="px-2 py-1 rounded text-xs bg-green-100 text-green-800">
+                                Funded
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="flex-grow border hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2 border-b bg-gradient-to-r from-blue-500 to-gray-600">
+      {/* Three Big Sections: The DAS Board, Goal Tracker, and Pay Configurator */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* The DAS Board Section */}
+        <Card className="border-l-4 border-l-blue-600 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="py-2 px-4">
             <div className="flex justify-between items-center">
-              <CardTitle className="text-lg font-medium flex items-center text-white">
-                <FileText className="mr-2 h-5 w-5 text-blue-500" />
-                My Deals
+              <CardTitle className="text-lg font-semibold flex items-center text-black">
+                <Trophy className="mr-2 h-5 w-5 text-gray-600" />
+                The DAS Board
               </CardTitle>
               <div
                 className={`h-3 w-3 rounded-full ${
-                  performanceColor === 'green'
-                    ? 'bg-white border-r border-blue-500'
-                    : performanceColor === 'yellow'
-                    ? 'bg-blue-500'
-                    : 'bg-blue-500'
+                  getDealsPerformanceIndicator() === 'green'
+                    ? 'bg-green-400'
+                    : getDealsPerformanceIndicator() === 'yellow'
+                    ? 'bg-yellow-400'
+                    : 'bg-red-400'
                 }`}
               ></div>
             </div>
           </CardHeader>
-          <CardContent className="pt-4">
+          <CardContent className="py-2">
             <div className="overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="text-left border-b">
-                      <th className="pb-2 font-medium text-xs text-white">STOCK #</th>
-                      <th className="pb-2 font-medium text-xs text-white">CUSTOMER</th>
-                      <th className="pb-2 font-medium text-xs text-white text-right">FRONT</th>
-                      <th className="pb-2 font-medium text-xs text-white text-right">BACK</th>
-                      <th className="pb-2 font-medium text-xs text-white text-right">TOTAL</th>
+                      <th className="pb-2 font-medium text-xs text-gray-700">#</th>
+                      <th className="pb-2 font-medium text-xs text-gray-700">SALESPERSON</th>
+                      <th className="pb-2 font-medium text-xs text-gray-700 text-right">PVR</th>
+                      <th className="pb-2 font-medium text-xs text-gray-700 text-right">UNITS</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {currentDeals.slice(0, 10).map((deal, index) => (
+                    {[
+                      { name: 'Michael Scott', units: 14, pvr: 2321 },
+                      { name: 'Jim Halpert', units: 12, pvr: 2408 },
+                      { name: 'Dwight Schrute', units: 11, pvr: 2400 },
+                      { name: 'Pam Beesly', units: 9, pvr: 2411 },
+                      { name: 'Stanley Hudson', units: 8, pvr: 2400 },
+                    ].map((person, index) => (
                       <tr
-                        key={deal.id || deal.dealNumber}
-                        className={`${
-                          index !== currentDeals.slice(0, 10).length - 1 ? 'border-b' : ''
-                        } ${
-                          deal.vehicleType === 'N' || deal.isNew
-                            ? 'bg-white border-r border-gray-200'
-                            : ''
+                        key={index}
+                        className={`border-b hover:bg-gray-50 ${
+                          index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
                         }`}
                       >
-                        <td className="py-3 text-sm">{deal.stockNumber}</td>
-                        <td className="py-3 text-sm">{deal.lastName || deal.customer}</td>
-                        <td
-                          className={`py-3 text-sm text-right ${
-                            (deal.frontEndGross || deal.frontGross || 0) === 0
-                              ? 'text-red-500 font-medium'
-                              : ''
-                          }`}
-                        >
-                          ${(deal.frontEndGross || deal.frontGross || 0).toLocaleString()}
+                        <td className="py-2 text-sm">
+                          <div
+                            className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold
+                            ${
+                              index === 0
+                                ? 'bg-yellow-100 text-yellow-600'
+                                : index === 1
+                                ? 'bg-gray-100 text-gray-600'
+                                : index === 2
+                                ? 'bg-amber-100 text-amber-600'
+                                : 'bg-blue-100 text-blue-600'
+                            }`}
+                          >
+                            {index + 1}
+                          </div>
                         </td>
-                        <td className="py-3 text-sm text-right">
-                          ${(deal.backEndGross || deal.profit || 0).toLocaleString()}
-                        </td>
-                        <td className="py-3 text-sm font-medium text-right">
-                          $
-                          {(
-                            (deal.frontEndGross || deal.frontGross || 0) +
-                            (deal.backEndGross || deal.profit || 0)
-                          ).toLocaleString()}
+                        <td className="py-2 text-sm font-medium">{person.name}</td>
+                        <td className="py-2 text-sm text-right">${person.pvr}</td>
+                        <td className="py-2 text-sm text-right font-semibold text-indigo-700">
+                          {person.units}
                         </td>
                       </tr>
                     ))}
@@ -772,168 +768,151 @@ const SalesDashboard = () => {
               </div>
             </div>
 
-            <div className="mt-8">
-              <div className="bg-gray-600 rounded-lg border border-blue-100 p-4">
-                <h3 className="font-semibold text-blue-700 mb-2">Deal Performance</h3>
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div>
-                    <div className="text-xs text-gray-500">Avg Front</div>
-                    <div className="font-bold text-blue-700">
-                      ${Math.round(totalFrontEndGross / MOCK_DEALS.length).toLocaleString()}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500">Avg Back</div>
-                    <div className="font-bold text-blue-700">
-                      ${Math.round(totalBackEndGross / MOCK_DEALS.length).toLocaleString()}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500">Avg Total</div>
-                    <div className="font-bold text-blue-700">
-                      ${Math.round(totalGross / MOCK_DEALS.length).toLocaleString()}
-                    </div>
-                  </div>
+            {/* View More Button */}
+            <div className="mt-3 pt-2 text-center border-t">
+              <Button variant="ghost" size="sm" className="text-xs text-blue-600">
+                View Full Leaderboard
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Goal Tracker */}
+        <Card className="border-l-4 border-l-blue-600 rounded-lg shadow-sm">
+          <CardHeader className="py-2 px-4">
+            <CardTitle className="text-lg font-semibold flex items-center text-black">
+              <Target className="mr-2 h-5 w-5 text-gray-600" />
+              Goal Tracker
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="py-4">
+            <div className="space-y-4">
+              {/* Monthly Goal Progress */}
+              <div className="text-center">
+                <div className="text-3xl font-bold text-blue-600 mb-2">
+                  {Math.round(goalProgress)}%
+                </div>
+                <div className="text-sm text-gray-600 mb-3">Monthly Goal Progress</div>
+                <Progress value={goalProgress} className="mb-3" />
+                <div className="text-xs text-gray-500">
+                  {Math.round((goalProgress / 100) * 15)} of 15 deals
+                </div>
+              </div>
+
+              {/* Car Progression */}
+              <div className="text-center border-t pt-4">
+                <div className="text-4xl mb-2">{getCurrentCar(goalProgress).emoji}</div>
+                <div className="text-sm font-medium text-gray-700">
+                  {getCurrentCar(goalProgress).name}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">Current Level</div>
+              </div>
+
+              {/* Quick Stats */}
+              <div className="space-y-3 border-t pt-4">
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">This Month</span>
+                  <span className="font-semibold">{totalDeals} deals</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Avg PVR</span>
+                  <span className="font-semibold">
+                    ${dealData?.metrics?.avgPVR?.toLocaleString() || '2,315'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Total Gross</span>
+                  <span className="font-semibold">${totalGross?.toLocaleString() || '32,450'}</span>
                 </div>
               </div>
             </div>
           </CardContent>
-          <CardFooter className="border-t px-6 py-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="ml-auto flex items-center text-blue-600 text-sm"
-            >
-              View All Deals
-              <ArrowRight className="ml-1 h-4 w-4" />
-            </Button>
-          </CardFooter>
         </Card>
 
-        {/* Right column with Goal Tracker and Pay Calculator */}
-        <div className="flex flex-col gap-6 h-full">
-          {/* Taller Monthly Goal Tracker */}
-          <GoalTracking />
-
-          {/* Pay Calculator with Disclaimer */}
-          <Card className="border hover:shadow-md transition-shadow overflow-hidden bg-white z-10 relative">
-            <CardHeader className="pb-2 border-b bg-gradient-to-r from-blue-500 to-gray-600">
-              <CardTitle className="text-lg font-medium flex items-center text-white">
-                <Calculator className="mr-2 h-5 w-5 text-white" />
-                Pay Calculator
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4 bg-white">
-              <div className="flex items-center justify-center mb-3">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-green-600">
-                    ${Math.round(currentEarnings).toLocaleString()}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">Month-to-Date Earnings</div>
+        {/* Month-to-Date Pay Configurator */}
+        <Card className="border-l-4 border-l-blue-600 rounded-lg shadow-sm">
+          <CardHeader className="py-2 px-4">
+            <CardTitle className="text-lg font-semibold flex items-center text-black">
+              <Calculator className="mr-2 h-5 w-5 text-gray-600" />
+              Pay Calculator
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="py-4">
+            <div className="space-y-4">
+              {/* Current Month Earnings */}
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600 mb-2">
+                  $
+                  {(
+                    (totalFrontEndGross * PAY_CALCULATOR.frontEndGrossPercent) / 100 +
+                    (totalBackEndGross * PAY_CALCULATOR.backEndGrossPercent) / 100 +
+                    PAY_CALCULATOR.spiffs
+                  ).toLocaleString()}
                 </div>
+                <div className="text-sm text-gray-600 mb-3">Estimated Month-to-Date</div>
               </div>
 
-              <div className="space-y-2 mt-2">
+              {/* Breakdown */}
+              <div className="space-y-3 border-t pt-4">
                 <div className="flex justify-between">
-                  <span className="text-xs text-gray-600">
+                  <span className="text-sm text-gray-600">
                     Front End ({PAY_CALCULATOR.frontEndGrossPercent}%)
                   </span>
-                  <span className="text-xs font-medium">
+                  <span className="font-semibold">
                     $
-                    {Math.round(
-                      totalFrontEndGross * (PAY_CALCULATOR.frontEndGrossPercent / 100)
+                    {(
+                      (totalFrontEndGross * PAY_CALCULATOR.frontEndGrossPercent) /
+                      100
                     ).toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-xs text-gray-600">
+                  <span className="text-sm text-gray-600">
                     Back End ({PAY_CALCULATOR.backEndGrossPercent}%)
                   </span>
-                  <span className="text-xs font-medium">
+                  <span className="font-semibold">
                     $
-                    {Math.round(
-                      totalBackEndGross * (PAY_CALCULATOR.backEndGrossPercent / 100)
+                    {(
+                      (totalBackEndGross * PAY_CALCULATOR.backEndGrossPercent) /
+                      100
                     ).toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-xs text-gray-600">Spiffs & Bonuses</span>
-                  <span className="text-xs font-medium">
-                    ${PAY_CALCULATOR.spiffs.toLocaleString()}
-                  </span>
-                </div>
-                <div className="pt-2 border-t">
-                  <div className="flex justify-between">
-                    <span className="text-xs font-semibold text-gray-700">
-                      Potential Monthly Total
-                    </span>
-                    <span className="text-xs font-bold text-green-600">
-                      ${Math.round(projectedEarningsWithBonus).toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    {projectedDeals >= PAY_CALCULATOR.bonusThreshold && (
-                      <div className="text-green-600 mt-1 font-medium text-xs">
-                        Includes ${PAY_CALCULATOR.bonusAmount} volume bonus!
-                      </div>
-                    )}
-                  </div>
+                  <span className="text-sm text-gray-600">Spiffs & Bonuses</span>
+                  <span className="font-semibold">${PAY_CALCULATOR.spiffs}</span>
                 </div>
               </div>
 
-              <div className="mt-3 pt-2 border-t">
-                <p className="text-[10px] text-gray-400 italic">
-                  <strong>Disclaimer:</strong> These figures are estimates only and not actual
-                  earnings. Final compensation may vary based on dealership policies and deal
-                  structures.
-                </p>
+              {/* Bonus Tracker */}
+              <div className="border-t pt-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-gray-600">Bonus Tracker</span>
+                  <span className="text-xs text-gray-500">
+                    {totalDeals}/{PAY_CALCULATOR.bonusThreshold} deals
+                  </span>
+                </div>
+                <Progress
+                  value={Math.min((totalDeals / PAY_CALCULATOR.bonusThreshold) * 100, 100)}
+                  className="mb-2"
+                />
+                <div className="text-xs text-center text-gray-500">
+                  {totalDeals >= PAY_CALCULATOR.bonusThreshold
+                    ? `Bonus Earned: $${PAY_CALCULATOR.bonusAmount}`
+                    : `${PAY_CALCULATOR.bonusThreshold - totalDeals} deals to bonus`}
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+
+              {/* Disclaimer */}
+              <div className="text-xs text-gray-400 border-t pt-3">
+                *Estimates only. Actual pay may vary based on final accounting.
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </>
   );
 };
-
-// Placeholder components for the routes
-function PayCalculator() {
-  return (
-    <Card className="p-6">
-      <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600">
-        <CardTitle className="text-white">Pay Calculator</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p>The pay calculator feature is coming soon.</p>
-      </CardContent>
-    </Card>
-  );
-}
-
-function GoalTracker() {
-  return (
-    <Card className="p-6">
-      <CardHeader>
-        <CardTitle className="text-white">Goal Tracker</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p>The goal tracker feature is coming soon.</p>
-      </CardContent>
-    </Card>
-  );
-}
-
-function PerformanceMetrics() {
-  return (
-    <Card className="p-6">
-      <CardHeader>
-        <CardTitle className="text-white">Performance Metrics</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p>Performance metrics are coming soon.</p>
-      </CardContent>
-    </Card>
-  );
-}
 
 export default SalesDashboard;
