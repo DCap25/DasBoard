@@ -336,7 +336,7 @@ const AVPDashboard = () => {
   };
 
   return (
-    <div className="container py-4">
+    <>
       {/* Dashboard header */}
       <div className="flex justify-between items-start mb-6">
         <div className="flex-grow">
@@ -890,7 +890,7 @@ const AVPDashboard = () => {
           </div>
         </TabsContent>
       </Tabs>
-    </div>
+    </>
   );
 };
 

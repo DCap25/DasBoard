@@ -776,13 +776,11 @@ const SingleFinanceManagerDashboard = () => {
   );
 
   return (
-    <div className="container py-4">
-      <Routes>
-        <Route path="/" element={<MainDashboardContent />} />
-        <Route path="/deals" element={<SingleFinanceDealsPage />} />
-        <Route path="*" element={<Navigate to="/dashboard/single-finance" replace />} />
-      </Routes>
-    </div>
+    <Routes>
+      <Route path="/" element={<MainDashboardContent />} />
+      <Route path="/deals" element={<SingleFinanceDealsPage />} />
+      <Route path="*" element={<Navigate to="/dashboard/single-finance" replace />} />
+    </Routes>
   );
 };
 

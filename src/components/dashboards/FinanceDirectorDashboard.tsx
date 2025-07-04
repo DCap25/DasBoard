@@ -315,7 +315,7 @@ const FinanceDirectorDashboard = () => {
   // If showing the log deal form, render it instead of the normal dashboard
   if (showLogDealForm) {
     return (
-      <div className="container py-4">
+      <>
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold">Finance Director Dashboard</h1>
@@ -332,12 +332,11 @@ const FinanceDirectorDashboard = () => {
           </Button>
         </div>
         <DealLogPage dashboardType="finance-director" />
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="container py-4">
       {/* Dashboard header */}
       <div className="flex justify-between items-start mb-6">
         <div className="flex-grow">
@@ -892,7 +891,6 @@ const FinanceDirectorDashboard = () => {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
   );
 };
 

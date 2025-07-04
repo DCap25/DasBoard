@@ -97,7 +97,7 @@ export default function GeneralManagerDashboard() {
   };
 
   return (
-    <div className="container py-6">
+    <>
       <div className="flex justify-between items-center mb-6">
         <div className="flex-grow">
           <h1 className="text-3xl font-bold">General Manager Dashboard</h1>
@@ -539,6 +539,6 @@ export default function GeneralManagerDashboard() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </>
   );
 }
