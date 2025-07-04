@@ -892,6 +892,7 @@ const FinanceDirectorDashboard = () => {
           </Card>
         </TabsContent>
       </Tabs>
+    </>
   );
 };
 
