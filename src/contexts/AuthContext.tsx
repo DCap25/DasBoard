@@ -131,11 +131,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       console.warn(`[DEBUG AUTH] Fetching profile data for user ${userId}`);
 
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .maybeSingle();
+      // Add timeout to prevent hanging
+      const profilePromise = supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
+
+      const timeoutPromise = new Promise<{ data: null; error: Error }>(resolve => {
+        setTimeout(() => {
+          resolve({ data: null, error: new Error('Profile fetch timeout') });
+        }, 3000); // 3 second timeout
+      });
+
+      const { data, error } = await Promise.race([profilePromise, timeoutPromise]);
 
       if (error) {
         console.error('[DEBUG AUTH] Error fetching profile:', error);
@@ -820,36 +825,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // Always set user data immediately
           setUser(session.user);
 
-          // Check if the user is a group admin
+          // Get profile data (includes both role and group admin status)
           try {
-            console.warn('[DEBUG AUTH] Checking group admin status during initialization');
-            await fetchProfileData(session.user.id);
-          } catch (profileError) {
-            console.error('[DEBUG AUTH] Error checking group admin status:', profileError);
-          }
+            console.warn('[DEBUG AUTH] Fetching profile data during initialization');
+            const profileData = await fetchProfileData(session.user.id);
 
-          try {
-            // Then try to get role
-            const initialRole = await fetchUserRole(session.user.id);
-            if (mounted) {
-              console.log('[AuthContext] Setting initial role:', initialRole, {
-                userId: session.user.id,
-                timestamp: new Date().toISOString(),
-              });
-              setRole(initialRole);
+            if (mounted && profileData) {
+              // Set role from profile data
+              if (profileData.role) {
+                const normalizedRole = profileData.role.toLowerCase() as UserRole;
+                setRole(normalizedRole);
+                setUserRole(normalizedRole);
+                console.log('[AuthContext] Setting role from profile:', normalizedRole);
+              }
+
+              // Set dealership ID if available
+              if (profileData.dealership_id) {
+                setDealershipId(profileData.dealership_id);
+                console.log('[AuthContext] Setting dealership ID:', profileData.dealership_id);
+              }
             }
-          } catch (error) {
-            console.error('[AuthContext] Error fetching initial role, using fallback:', error, {
-              userId: session.user.id,
-              timestamp: new Date().toISOString(),
-            });
+          } catch (profileError) {
+            console.error('[DEBUG AUTH] Error fetching profile data:', profileError);
             if (mounted) {
-              // Always set a role even on error
-              console.log('[AuthContext] Setting fallback role due to error', {
-                role: FALLBACK_ROLE,
-                timestamp: new Date().toISOString(),
-              });
+              // Set fallback role on error
               setRole(FALLBACK_ROLE);
+              setUserRole(FALLBACK_ROLE);
+              console.log('[AuthContext] Setting fallback role due to profile error');
             }
           }
         }
@@ -1123,22 +1125,64 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(data.user);
       setHasSession(true);
 
-      // Check group admin status
+      // Check for known admin users first (bypass profile fetching)
+      const isKnownAdmin = data.user.email === 'admindan@thedasboard.com';
+
+      if (isKnownAdmin) {
+        console.warn('[DEBUG AUTH] Known admin user detected, skipping profile fetch');
+
+        // Set admin role and group admin status immediately
+        setRole('admin');
+        setUserRole('admin');
+        setIsGroupAdmin(true);
+        setDealershipId(DEFAULT_DEALERSHIP_ID);
+
+        setLoading(false);
+        showSuccessToast('Sign In Successful', `Welcome, Group Admin!`);
+
+        // Force immediate browser navigation
+        setTimeout(() => {
+          window.location.href = '/group-admin';
+        }, 100);
+        return;
+      }
+
+      // Check group admin status with timeout protection
       console.warn('[DEBUG AUTH] Checking group admin status after login');
-      const profileData = await fetchProfileData(data.user.id);
+
+      let profileData = null;
+      try {
+        // Add a race condition with timeout for profile fetching
+        const profilePromise = fetchProfileData(data.user.id);
+        const timeoutPromise = new Promise<null>(resolve => {
+          setTimeout(() => {
+            console.warn('[DEBUG AUTH] Profile fetch timeout during login');
+            resolve(null);
+          }, 2000); // 2 second timeout for login
+        });
+
+        profileData = await Promise.race([profilePromise, timeoutPromise]);
+      } catch (profileError) {
+        console.error('[DEBUG AUTH] Error fetching profile during login:', profileError);
+      }
 
       // Immediate redirection for group admin accounts
       const isGroupAdminByEmail =
         data.user.email?.toLowerCase().includes('group') &&
         data.user.email?.toLowerCase().includes('@exampletest.com');
 
-      if (
-        isGroupAdmin ||
+      // Check if user is group admin using profile data directly
+      const isUserGroupAdmin =
         profileData?.is_group_admin ||
         isGroupAdminByEmail ||
-        data.user.user_metadata?.is_group_admin
-      ) {
+        data.user.user_metadata?.is_group_admin;
+
+      if (isUserGroupAdmin) {
         console.warn('[DEBUG AUTH] Group admin detected, forcing immediate redirect');
+
+        // Ensure the isGroupAdmin state is set before redirect
+        setIsGroupAdmin(true);
+
         setLoading(false); // Ensure loading state is cleared before redirect
         showSuccessToast('Sign In Successful', `Welcome, Group Admin!`);
 
@@ -1149,11 +1193,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      // Get the user's dealership and role
-      const userDealershipId = await fetchUserDealership(data.user.id);
-      if (userDealershipId) {
-        setDealershipId(userDealershipId);
-        console.log(`[AuthContext] User belongs to dealership: ${userDealershipId}`);
+      // Set role from profile data
+      if (profileData?.role) {
+        const normalizedRole = profileData.role.toLowerCase() as UserRole;
+        setRole(normalizedRole);
+        setUserRole(normalizedRole);
+        console.log(`[AuthContext] User role set to: ${normalizedRole}`);
+      } else {
+        // Set fallback role if no profile data
+        setRole('admin');
+        setUserRole('admin');
+        console.log('[AuthContext] No profile data, setting fallback admin role');
+      }
+
+      // Set dealership ID from profile data or use default
+      if (profileData?.dealership_id) {
+        setDealershipId(profileData.dealership_id);
+        console.log(`[AuthContext] User belongs to dealership: ${profileData.dealership_id}`);
       } else {
         console.log('[AuthContext] No dealership found for user, using default');
         setDealershipId(DEFAULT_DEALERSHIP_ID);

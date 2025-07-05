@@ -1,172 +1,128 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
-export const EnvTest: React.FC = () => {
-  const [fetchTest, setFetchTest] = useState<any>(null);
-  const [fetchLoading, setFetchLoading] = useState(false);
-  const [supabaseTest, setSupabaseTest] = useState<any>(null);
-  const [supabaseLoading, setSupabaseLoading] = useState(false);
+const EnvTest: React.FC = () => {
+  const [connectionStatus, setConnectionStatus] = useState<string>('Testing...');
+  const [envVars, setEnvVars] = useState<any>({});
 
-  const envVars = {
-    VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
-    VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,
-    MODE: import.meta.env.MODE,
-    DEV: import.meta.env.DEV,
-    PROD: import.meta.env.PROD,
-  };
+  useEffect(() => {
+    // Get environment variables
+    const vars = {
+      VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
+      VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,
+      VITE_API_URL: import.meta.env.VITE_API_URL,
+      USE_MOCK_SUPABASE: import.meta.env.USE_MOCK_SUPABASE,
+    };
+    setEnvVars(vars);
 
-  const testDirectFetch = async () => {
-    setFetchLoading(true);
-    setFetchTest(null);
+    // Test Supabase connection
+    testConnection(vars);
+  }, []);
 
+  const testConnection = async (vars: any) => {
     try {
-      const url = `${envVars.VITE_SUPABASE_URL}/rest/v1/dealerships?select=id,name&limit=1`;
-      console.log('[FETCH TEST] Testing direct fetch to:', url);
-
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${envVars.VITE_SUPABASE_ANON_KEY}`,
-          apikey: envVars.VITE_SUPABASE_ANON_KEY,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      console.log('[FETCH TEST] Response status:', response.status);
-      console.log('[FETCH TEST] Response headers:', Object.fromEntries(response.headers.entries()));
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        setFetchTest({
-          success: false,
-          status: response.status,
-          statusText: response.statusText,
-          error: errorText,
-        });
+      if (!vars.VITE_SUPABASE_URL || !vars.VITE_SUPABASE_ANON_KEY) {
+        setConnectionStatus('❌ Missing environment variables');
         return;
       }
 
-      const data = await response.json();
-      console.log('[FETCH TEST] Response data:', data);
+      // Test direct API call
+      const url = `${vars.VITE_SUPABASE_URL}/rest/v1/dealerships?select=id,name&limit=1`;
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${vars.VITE_SUPABASE_ANON_KEY}`,
+          apikey: vars.VITE_SUPABASE_ANON_KEY,
+        },
+      });
 
-      setFetchTest({
-        success: true,
-        status: response.status,
-        data: data,
-      });
+      if (response.ok) {
+        const data = await response.json();
+        setConnectionStatus(`✅ Connected! Found ${data.length} dealership(s)`);
+      } else {
+        const errorText = await response.text();
+        setConnectionStatus(`❌ API Error: ${response.status} - ${errorText}`);
+      }
     } catch (error) {
-      console.error('[FETCH TEST] Fetch error:', error);
-      setFetchTest({
-        success: false,
-        error: error.message,
-      });
-    } finally {
-      setFetchLoading(false);
+      setConnectionStatus(`❌ Connection failed: ${error}`);
     }
   };
 
   const testSupabaseClient = async () => {
-    setSupabaseLoading(true);
-    setSupabaseTest(null);
-
     try {
-      console.log('[SUPABASE TEST] Creating new Supabase client...');
+      if (!envVars.VITE_SUPABASE_URL || !envVars.VITE_SUPABASE_ANON_KEY) {
+        setConnectionStatus('❌ Missing environment variables for client test');
+        return;
+      }
 
-      // Create a fresh Supabase client instance
+      setConnectionStatus('Testing Supabase client...');
+
       const testClient = createClient(envVars.VITE_SUPABASE_URL, envVars.VITE_SUPABASE_ANON_KEY, {
         auth: {
           persistSession: false,
-          autoRefreshToken: false,
         },
       });
 
-      console.log('[SUPABASE TEST] Client created, testing query...');
+      const { data, error } = await testClient.from('dealerships').select('id, name').limit(1);
 
-      // Add timeout to the Supabase query
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Supabase query timeout after 5 seconds')), 5000);
-      });
-
-      const queryPromise = testClient.from('dealerships').select('id, name').limit(1);
-
-      console.log('[SUPABASE TEST] Starting query with timeout...');
-      const result = await Promise.race([queryPromise, timeoutPromise]);
-
-      console.log('[SUPABASE TEST] Query completed:', result);
-
-      if (result.error) {
-        setSupabaseTest({
-          success: false,
-          error: result.error,
-        });
+      if (error) {
+        setConnectionStatus(`❌ Client Error: ${error.message}`);
       } else {
-        setSupabaseTest({
-          success: true,
-          data: result.data,
-        });
+        setConnectionStatus(`✅ Client Connected! Found ${data?.length || 0} dealership(s)`);
       }
     } catch (error) {
-      console.error('[SUPABASE TEST] Error:', error);
-      setSupabaseTest({
-        success: false,
-        error: error.message,
-      });
-    } finally {
-      setSupabaseLoading(false);
+      setConnectionStatus(`❌ Client failed: ${error}`);
     }
   };
 
   return (
-    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded space-y-4">
-      <h3 className="font-semibold mb-2">Environment Variables Test</h3>
-      <div className="space-y-2">
-        <div>
-          <strong>URL:</strong> {envVars.VITE_SUPABASE_URL}
-        </div>
-        <div>
-          <strong>API Key:</strong> {envVars.VITE_SUPABASE_ANON_KEY}
-        </div>
-        <div>
-          <strong>Mode:</strong> {envVars.MODE}
-        </div>
-        <div>
-          <strong>Dev:</strong> {envVars.DEV ? 'true' : 'false'}
-        </div>
-      </div>
+    <div className="p-6 max-w-4xl mx-auto">
+      <h1 className="text-2xl font-bold mb-6">Environment & Supabase Test</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <button
-            onClick={testDirectFetch}
-            disabled={fetchLoading}
-            className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 disabled:opacity-50"
-          >
-            {fetchLoading ? 'Testing...' : 'Test Direct Fetch'}
-          </button>
-
-          {fetchTest && (
-            <div className="mt-2 p-2 bg-white border rounded">
-              <strong>Direct Fetch Result:</strong>
-              <pre className="text-xs mt-1">{JSON.stringify(fetchTest, null, 2)}</pre>
+      <div className="grid gap-6">
+        {/* Environment Variables */}
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <h2 className="text-lg font-semibold mb-3">Environment Variables</h2>
+          <div className="space-y-2 font-mono text-sm">
+            <div>
+              <strong>URL:</strong> {envVars.VITE_SUPABASE_URL}
             </div>
-          )}
+            <div>
+              <strong>API Key:</strong> {envVars.VITE_SUPABASE_ANON_KEY}
+            </div>
+            <div>
+              <strong>API URL:</strong> {envVars.VITE_API_URL}
+            </div>
+            <div>
+              <strong>Mock Mode:</strong> {envVars.USE_MOCK_SUPABASE}
+            </div>
+          </div>
         </div>
 
-        <div>
+        {/* Connection Status */}
+        <div className="bg-blue-50 p-4 rounded-lg">
+          <h2 className="text-lg font-semibold mb-3">Connection Status</h2>
+          <p className="text-lg">{connectionStatus}</p>
           <button
             onClick={testSupabaseClient}
-            disabled={supabaseLoading}
-            className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600 disabled:opacity-50"
+            className="mt-3 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
-            {supabaseLoading ? 'Testing...' : 'Test Supabase Client'}
+            Test Supabase Client
           </button>
+        </div>
 
-          {supabaseTest && (
-            <div className="mt-2 p-2 bg-white border rounded">
-              <strong>Supabase Client Result:</strong>
-              <pre className="text-xs mt-1">{JSON.stringify(supabaseTest, null, 2)}</pre>
-            </div>
-          )}
+        {/* Quick Login Test */}
+        <div className="bg-green-50 p-4 rounded-lg">
+          <h2 className="text-lg font-semibold mb-3">Quick Login Test</h2>
+          <div className="space-y-2">
+            <p>
+              <strong>Demo User:</strong> demo@thedasboard.com / password
+            </p>
+            <p>
+              <strong>Admin User:</strong> admindan@thedasboard.com / password
+            </p>
+          </div>
         </div>
       </div>
     </div>
