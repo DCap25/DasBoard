@@ -5,19 +5,27 @@
  * Run this with: node setup-env.js
  */
 
-const fs = require('fs');
-const path = require('path');
-const readline = require('readline');
-const crypto = require('crypto');
+import fs from 'fs';
+import path from 'path';
+import readline from 'readline';
+import crypto from 'crypto';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Sample configuration
-const SAMPLE_ENV = `# Das Board Master (Main Project)
+const SAMPLE_ENV = `# Das Board Master (Main Project) - VERIFIED CORRECT VALUES
 VITE_SUPABASE_URL=https://iugjtokydvbcvmrpeziv.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1Z2p0b2t5ZHZiY3ZtcnBleml2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTQyNjI5NjYsImV4cCI6MjAyOTgzODk2Nn0.HkOUHJz-bF1kY21hfh2eZH1Wf9k0wJG1PSC5eQ4Jgjc
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1Z2p0b2t5ZHZiY3ZtcnBleml2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU3MTk3NjUsImV4cCI6MjA2MTI5NTc2NX0.XCNQoJbGQiXuyR_CFevro1Y8lqvh2_jmjrD181UYtY4
+VITE_SUPABASE_PROJECT_ID=iugjtokydvbcvmrpeziv
 
-# Dealership1 Project
-VITE_DEALERSHIP1_SUPABASE_URL=https://dijulexxrgfmaiewtavb.supabase.co
-VITE_DEALERSHIP1_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpanVsZXh4cmdmbWFpZXd0YXZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU3MjI4MTUsImV4cCI6MjA2MTI5ODgxNX0.8wHE8CliPJooMvp4qqg7HAqqZ7vSX8wSWacjgp4M9sA`;
+# All dealerships use the same project with RLS policies
+VITE_DEALERSHIP1_SUPABASE_URL=https://iugjtokydvbcvmrpeziv.supabase.co
+VITE_DEALERSHIP1_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1Z2p0b2t5ZHZiY3ZtcnBleml2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU3MTk3NjUsImV4cCI6MjA2MTI5NTc2NX0.XCNQoJbGQiXuyR_CFevro1Y8lqvh2_jmjrD181UYtY4
+
+# Environment
+VITE_APP_ENV=development`;
 
 const ENV_FILE_PATH = path.join(__dirname, '.env.local');
 

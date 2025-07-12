@@ -16,6 +16,25 @@ import {
   isDirectAuthAuthenticated,
   getCurrentDirectAuthUser as getDirectAuthUser,
 } from '../lib/directAuth';
+import {
+  signInWithPassword as authServiceSignIn,
+  signOut as authServiceSignOut,
+  getCurrentSession as authServiceGetSession,
+  type AuthResult,
+} from '../lib/authService';
+import {
+  handleSupabaseError,
+  withErrorHandling,
+  SupabaseErrorType,
+  isAuthError,
+  isRLSError,
+  isNetworkError,
+} from '../lib/supabaseErrorHandler';
+import {
+  handleAuthSuccessRedirect,
+  handleAuthFailureRedirect,
+  handleLogoutRedirect,
+} from '../lib/authRedirectHandler';
 
 // Use lowercase role names to match database
 type UserRole =
@@ -126,63 +145,79 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isGroupAdmin, setIsGroupAdmin] = useState<boolean>(false);
   const [authCheckComplete, setAuthCheckComplete] = useState<boolean>(false);
 
-  // Fetch profile data to check for is_group_admin flag
+  // Enhanced profile data fetching with comprehensive error handling
   const fetchProfileData = async (userId: string) => {
-    try {
-      console.warn(`[DEBUG AUTH] Fetching profile data for user ${userId}`);
+    const { data, error } = await withErrorHandling(
+      async () => {
+        console.warn(`[DEBUG AUTH] Fetching profile data for user ${userId}`);
 
-      // Add timeout to prevent hanging
-      const profilePromise = supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
+        // Add timeout to prevent hanging
+        const profilePromise = supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
 
-      const timeoutPromise = new Promise<{ data: null; error: Error }>(resolve => {
-        setTimeout(() => {
-          resolve({ data: null, error: new Error('Profile fetch timeout') });
-        }, 3000); // 3 second timeout
-      });
-
-      const { data, error } = await Promise.race([profilePromise, timeoutPromise]);
-
-      if (error) {
-        console.error('[DEBUG AUTH] Error fetching profile:', error);
-        return null;
-      }
-
-      if (data) {
-        console.warn('[DEBUG AUTH] Profile data found:', data);
-
-        // Add more detailed logging for group admin detection
-        console.warn('[DEBUG AUTH] Group admin detection:', {
-          isGroupAdmin: !!data.is_group_admin,
-          userEmail: data.email,
-          userRole: data.role,
-          userData: data,
-          userMetadata: user?.user_metadata,
+        const timeoutPromise = new Promise<{ data: null; error: Error }>(resolve => {
+          setTimeout(() => {
+            resolve({ data: null, error: new Error('Profile fetch timeout') });
+          }, 3000); // 3 second timeout
         });
 
-        // Check user metadata if profile doesn't have the flag
-        if (!data.is_group_admin && user?.user_metadata?.is_group_admin) {
-          console.warn('[DEBUG AUTH] Group admin flag found in user metadata');
-          setIsGroupAdmin(true);
+        const { data, error } = await Promise.race([profilePromise, timeoutPromise]);
+
+        if (error) throw error;
+
+        if (data) {
+          console.warn('[DEBUG AUTH] Profile data found:', data);
+
+          // Add more detailed logging for group admin detection
+          console.warn('[DEBUG AUTH] Group admin detection:', {
+            isGroupAdmin: !!data.is_group_admin,
+            userEmail: data.email,
+            userRole: data.role,
+            userData: data,
+            userMetadata: user?.user_metadata,
+          });
+
+          // Check user metadata if profile doesn't have the flag
+          if (!data.is_group_admin && user?.user_metadata?.is_group_admin) {
+            console.warn('[DEBUG AUTH] Group admin flag found in user metadata');
+            setIsGroupAdmin(true);
+          }
+
+          // Set the isGroupAdmin flag based on profile data
+          if (data.is_group_admin) {
+            console.warn('[DEBUG AUTH] User is a group admin!');
+            setIsGroupAdmin(true);
+          } else {
+            console.warn('[DEBUG AUTH] User is not a group admin');
+            setIsGroupAdmin(false);
+          }
+
+          return data;
         }
 
-        // Set the isGroupAdmin flag based on profile data
-        if (data.is_group_admin) {
-          console.warn('[DEBUG AUTH] User is a group admin!');
-          setIsGroupAdmin(true);
-        } else {
-          console.warn('[DEBUG AUTH] User is not a group admin');
-          setIsGroupAdmin(false);
-        }
+        console.warn('[DEBUG AUTH] No profile data found');
+        return null;
+      },
+      'profile_fetch',
+      {
+        showToast: false, // Don't show toast for profile fetches
+        logToConsole: true,
+      }
+    );
 
-        return data;
+    if (error) {
+      console.error('[DEBUG AUTH] Enhanced error in fetchProfileData:', error);
+
+      // Handle specific error types
+      if (error.type === SupabaseErrorType.RLS) {
+        console.warn('[DEBUG AUTH] RLS policy may be blocking profile access');
+      } else if (error.type === SupabaseErrorType.NETWORK) {
+        console.warn('[DEBUG AUTH] Network issue during profile fetch');
       }
 
-      console.warn('[DEBUG AUTH] No profile data found');
-      return null;
-    } catch (err) {
-      console.error('[DEBUG AUTH] Error in fetchProfileData:', err);
       return null;
     }
+
+    return data;
   };
 
   // Set the current dealership context
@@ -937,6 +972,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [handleAuthStateChange, initialized, fetchUserRole]);
 
+  // Enhanced error handling for auth operations with comprehensive Supabase error handling
+  const handleAuthError = (error: any, operation: string) => {
+    // Use the centralized error handler
+    const enhancedError = handleSupabaseError(error, operation.toLowerCase(), {
+      showToast: true,
+      logToConsole: true,
+      customMessage: `${operation} failed. Please try again.`,
+    });
+
+    // Log auth-specific events
+    logAuthEvent(`${operation} error`, {
+      error: enhancedError.message,
+      errorType: enhancedError.type,
+      errorCode: enhancedError.technicalDetails?.code || 'UNKNOWN',
+      severity: enhancedError.severity,
+      suggestions: enhancedError.suggestions,
+      timestamp: new Date().toISOString(),
+    });
+
+    logSecurityEvent(`Failed ${operation.toLowerCase()} attempt`, {
+      error: enhancedError.message,
+      errorType: enhancedError.type,
+      ip_address: 'client-side',
+      userAgent: navigator.userAgent,
+    });
+
+    const authError = error instanceof Error ? error : new Error(`${operation} failed`);
+    setError(authError);
+
+    // Additional specific handling for auth errors
+    if (enhancedError.type === SupabaseErrorType.CORS) {
+      console.error('[AuthContext] CORS error detected - check Supabase configuration');
+    } else if (enhancedError.type === SupabaseErrorType.RLS) {
+      console.error('[AuthContext] RLS policy violation - check user permissions');
+    } else if (enhancedError.type === SupabaseErrorType.NETWORK) {
+      console.error('[AuthContext] Network error - check internet connection');
+    }
+  };
+
   // Sign in with email and password
   const signIn = async (email: string, password: string, rememberMe?: boolean) => {
     try {
@@ -1098,23 +1172,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      // Normal login flow for non-test accounts
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-        options: {
-          // Set session persistence based on remember me option
-          // Default to false if not specified (session expires when tab is closed)
-          persistSession: rememberMe ?? false,
+      // Normal login flow for non-test accounts with enhanced error handling
+      const { data, error } = await withErrorHandling(
+        async () => {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+            options: {
+              // Set session persistence based on remember me option
+              // Default to false if not specified (session expires when tab is closed)
+              persistSession: rememberMe ?? false,
+            },
+          });
+
+          if (error) throw error;
+          if (!data.user) throw new Error('No user returned from authentication');
+
+          return data;
         },
-      });
+        'sign_in',
+        {
+          showToast: false, // We'll handle toast in the catch block
+          logToConsole: true,
+        }
+      );
 
       if (error) {
         console.error('[AuthContext] Sign in error:', error);
-        throw error;
+
+        // Handle specific authentication errors
+        if (error.type === SupabaseErrorType.AUTH) {
+          if (error.message.includes('Invalid login credentials')) {
+            throw new Error('Invalid email or password. Please check your credentials.');
+          } else if (error.message.includes('Email not confirmed')) {
+            throw new Error('Please check your email and confirm your account before signing in.');
+          }
+        } else if (error.type === SupabaseErrorType.NETWORK) {
+          throw new Error('Network connection problem. Please check your internet connection.');
+        } else if (error.type === SupabaseErrorType.CORS) {
+          throw new Error('Connection error. Please try refreshing the page.');
+        }
+
+        throw new Error(error.message || 'Sign in failed. Please try again.');
       }
 
-      if (!data.user) {
+      if (!data?.user) {
         console.error('[AuthContext] No user returned from authentication');
         throw new Error('No user returned from authentication');
       }
@@ -1341,54 +1443,77 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         timestamp: new Date().toISOString(),
       });
 
+      setLoading(true);
+
       // Check if this is a demo user and clear demo session
       try {
         const { isAuthenticatedDemoUser, clearDemoAuth } = await import('../lib/demoAuth');
         if (isAuthenticatedDemoUser()) {
           console.log('[AuthContext] Demo user logout detected, clearing demo session');
           clearDemoAuth();
+
+          // Clear state and redirect for demo users
+          setUser(null);
+          setRole(null);
+          setUserRole(null);
+          setHasSession(false);
+          setDealershipId(null);
+          setIsGroupAdmin(false);
+          setError(null);
+          setLoading(false);
+
+          showSuccessToast('Signed Out', 'Demo session ended successfully');
+          window.location.href = '/';
+          return;
         }
       } catch (demoError) {
         console.error('[AuthContext] Error clearing demo session:', demoError);
       }
 
-      // First try to clean up some state immediately for a smoother experience
-      try {
-        // Mark that we're in the logout process to prevent redirects
-        localStorage.setItem('logout_in_progress', 'true');
+      // Use the new auth service for improved error handling
+      const result = await authServiceSignOut();
 
-        // Start the loading spinner
-        setLoading(true);
+      if (result.success) {
+        // Clear all state
+        setUser(null);
+        setRole(null);
+        setUserRole(null);
+        setHasSession(false);
+        setDealershipId(null);
+        setIsGroupAdmin(false);
+        setError(null);
 
-        // Signal to the UI that we're logging out
-        showInfoToast('Signing Out', 'Please wait while we sign you out...');
-      } catch (localError) {
-        console.error('[AuthContext] Error during pre-logout cleanup:', localError);
+        // Clear any stored session data
+        localStorage.removeItem('logout_in_progress');
+        localStorage.removeItem('demo_session');
+        localStorage.removeItem('demo_mode');
+
+        logAuthEvent('Sign out successful', {
+          user_id: user?.id,
+          timestamp: new Date().toISOString(),
+        });
+
+        showSuccessToast('Signed Out', 'You have been signed out successfully');
+
+        // Redirect to login page
+        window.location.href = '/auth';
+      } else {
+        // Handle sign out error
+        handleAuthError(new Error(result.error || 'Sign out failed'), 'Sign Out');
+
+        // Still try to clear state and redirect on error
+        setUser(null);
+        setRole(null);
+        setUserRole(null);
+        setHasSession(false);
+        setDealershipId(null);
+        setIsGroupAdmin(false);
+
+        // Redirect to logout page to handle cleanup
+        window.location.href = '/logout';
       }
-
-      // Redirect to the dedicated logout page to handle the complete logout process
-      console.log('[AuthContext] Redirecting to logout page');
-      window.location.href = '/logout';
-
-      return; // Early return to skip the rest of the function
-
-      // This code will not run, but is kept for reference
     } catch (error) {
-      logAuthEvent('Sign out error', {
-        user_id: user?.id,
-        error: error instanceof Error ? error.message : String(error),
-      });
-
-      console.error('[AuthContext] Error during signOut:', error);
-
-      setError(
-        error instanceof Error ? error : new Error('Unknown error occurred during sign out')
-      );
-
-      showErrorToast(
-        'Sign Out Failed',
-        error instanceof Error ? error.message : 'Unknown error occurred'
-      );
+      handleAuthError(error, 'Sign Out');
 
       // Even if there's an error, still try to navigate to the logout page
       window.location.href = '/logout';

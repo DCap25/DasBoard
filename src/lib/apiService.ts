@@ -1,10 +1,29 @@
 /**
  * API Service
- * Provides functions to interact with the Supabase API
+ * Provides functions to interact with the Supabase API with comprehensive error handling
  */
 
 import { supabase, getUserSession, getCurrentUser } from './supabaseClient';
 import type { User } from '@supabase/supabase-js';
+import {
+  handleSupabaseError,
+  withErrorHandling,
+  SupabaseErrorType,
+  isSupabaseError,
+  isCORSError,
+  isRLSError,
+  isNetworkError,
+} from './supabaseErrorHandler';
+import {
+  executeRLSQuery,
+  executeAdminQuery,
+  executeDealershipQuery,
+  getCurrentUserProfile,
+  isCurrentUserAdmin,
+  canAccessDealership,
+  ensureAuthenticated,
+  clearProfileCache,
+} from './rlsHelpers';
 
 // Types
 interface SignInCredentials {
@@ -101,43 +120,84 @@ const handleResponse = async (response: Response) => {
   return response.json();
 };
 
-// Get auth headers for API requests
+// Enhanced auth headers getter with comprehensive error handling
 const getAuthHeaders = async () => {
-  const user = await getCurrentUser();
-  if (!user) {
-    throw new Error('No authenticated user');
+  const { data, error } = await withErrorHandling(
+    async () => {
+      const user = await getCurrentUser();
+      if (!user) {
+        throw new Error('No authenticated user');
+      }
+
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+      if (error) throw error;
+      if (!session) throw new Error('Failed to get auth session');
+
+      return {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.access_token}`,
+      };
+    },
+    'get_auth_headers',
+    {
+      showToast: false, // Don't show toast for header operations
+      logToConsole: true,
+    }
+  );
+
+  if (error) {
+    console.error('[ApiService] Failed to get auth headers:', error);
+    throw new Error(error.message || 'Failed to get authentication headers');
   }
 
-  const {
-    data: { session },
-    error,
-  } = await supabase.auth.getSession();
-  if (error || !session) {
-    throw new Error('Failed to get auth session');
-  }
-
-  return {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${session.access_token}`,
-  };
+  return data;
 };
 
-// Generic API request function with auth
+// Enhanced generic API request function with comprehensive error handling
 export const apiRequest = async <T>(endpoint: string, options: RequestInit = {}): Promise<T> => {
-  try {
-    const headers = await getAuthHeaders();
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      ...options,
-      headers: {
-        ...headers,
-        ...options.headers,
-      },
+  const { data, error } = await withErrorHandling(
+    async () => {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_URL}${endpoint}`, {
+        ...options,
+        headers: {
+          ...headers,
+          ...options.headers,
+        },
+      });
+      return handleResponse(response);
+    },
+    'api_request',
+    {
+      showToast: true, // Show toast for API errors
+      logToConsole: true,
+    }
+  );
+
+  if (error) {
+    console.error('[ApiService] API request failed:', {
+      endpoint,
+      error: error.message,
+      errorType: error.type,
+      suggestions: error.suggestions,
     });
-    return handleResponse(response);
-  } catch (error) {
-    console.error('API request failed:', error);
-    throw error;
+
+    // Handle specific error types
+    if (error.type === SupabaseErrorType.CORS) {
+      throw new Error('Connection blocked. Please check your network settings.');
+    } else if (error.type === SupabaseErrorType.NETWORK) {
+      throw new Error('Network connection problem. Please check your internet connection.');
+    } else if (error.type === SupabaseErrorType.AUTH) {
+      throw new Error('Authentication failed. Please log in again.');
+    }
+
+    throw new Error(error.message || 'API request failed');
   }
+
+  return data;
 };
 
 // Example API methods
@@ -172,17 +232,22 @@ export async function signIn(credentials: SignInCredentials): Promise<AuthRespon
   try {
     console.log('Attempting sign in for:', credentials.email);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    // Use the new auth service for improved error handling
+    const { signInWithPassword } = await import('./authService');
+
+    const result = await signInWithPassword({
       email: credentials.email,
       password: credentials.password,
+      rememberMe: false, // Default to false for API service
     });
 
-    if (error) {
+    if (!result.success) {
+      const error = new Error(result.error || 'Authentication failed');
       console.error('Sign in error:', error);
       throw error;
     }
 
-    if (!data.user) {
+    if (!result.user) {
       throw new Error('No user returned from authentication');
     }
 
@@ -190,7 +255,7 @@ export async function signIn(credentials: SignInCredentials): Promise<AuthRespon
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('*')
-      .eq('id', data.user.id)
+      .eq('id', result.user.id)
       .single();
 
     if (profileError) {
@@ -198,13 +263,13 @@ export async function signIn(credentials: SignInCredentials): Promise<AuthRespon
     }
 
     // Combine auth user with profile data
-    const userWithProfile = profileData ? { ...data.user, ...profileData } : data.user;
+    const userWithProfile = profileData ? { ...result.user, ...profileData } : result.user;
 
-    console.log('Sign in successful:', { userId: data.user.id });
+    console.log('Sign in successful:', { userId: result.user.id });
 
     return {
       user: userWithProfile,
-      session: data.session,
+      session: result.session,
     };
   } catch (error) {
     console.error('Sign in failed:', error);
@@ -242,9 +307,24 @@ export async function signUp(credentials: SignUpCredentials): Promise<AuthRespon
 }
 
 export async function signOut(): Promise<void> {
-  const { error } = await supabase.auth.signOut();
-  if (error) {
-    console.error('Sign out error:', error);
+  try {
+    // Use the new auth service for improved error handling
+    const { signOut: authServiceSignOut } = await import('./authService');
+
+    const result = await authServiceSignOut();
+
+    if (!result.success) {
+      const error = new Error(result.error || 'Sign out failed');
+      console.error('Sign out error:', error);
+      throw error;
+    }
+
+    // Clear profile cache on successful sign out
+    clearProfileCache();
+
+    console.log('Sign out successful');
+  } catch (error) {
+    console.error('Sign out failed:', error);
     throw error;
   }
 }
@@ -348,17 +428,63 @@ export async function getData(table: string) {
   return data;
 }
 
-// Connection test
+// Enhanced connection test with comprehensive error handling and diagnostics
 export async function testConnection(): Promise<boolean> {
-  try {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('count', { count: 'exact', head: true });
-    return !error;
-  } catch (error) {
-    console.error('Connection test failed:', error);
+  console.log('[ApiService] Testing Supabase connection...');
+
+  const { data, error } = await withErrorHandling(
+    async () => {
+      // Test multiple endpoints to get a comprehensive view
+      const tests = await Promise.allSettled([
+        supabase.from('roles').select('count').limit(1),
+        supabase.auth.getSession(),
+        supabase.from('profiles').select('count', { count: 'exact', head: true }), // This might fail due to RLS
+      ]);
+
+      const results = {
+        roles: tests[0].status === 'fulfilled' && !tests[0].value.error,
+        auth: tests[1].status === 'fulfilled' && !tests[1].value.error,
+        profiles: tests[2].status === 'fulfilled' && !tests[2].value.error,
+      };
+
+      console.log('[ApiService] Connection test results:', results);
+
+      // At least roles and auth should work
+      if (!results.roles || !results.auth) {
+        const failedTests = [];
+        if (!results.roles) failedTests.push('roles table access');
+        if (!results.auth) failedTests.push('authentication');
+        throw new Error(`Connection test failed: ${failedTests.join(', ')}`);
+      }
+
+      return true;
+    },
+    'connection_test',
+    {
+      showToast: true, // Show toast for connection test results
+      logToConsole: true,
+    }
+  );
+
+  if (error) {
+    console.error('[ApiService] Connection test failed:', error);
+
+    // Provide specific guidance based on error type
+    if (error.type === SupabaseErrorType.CORS) {
+      console.error('[ApiService] CORS error - check Supabase URL and allowed origins');
+    } else if (error.type === SupabaseErrorType.AUTH) {
+      console.error('[ApiService] Auth error - check Supabase anon key');
+    } else if (error.type === SupabaseErrorType.NETWORK) {
+      console.error('[ApiService] Network error - check internet connection');
+    } else if (error.type === SupabaseErrorType.RLS) {
+      console.warn('[ApiService] RLS policy blocking access - this might be expected');
+    }
+
     return false;
   }
+
+  console.log('[ApiService] ✅ Connection test successful');
+  return true;
 }
 
 // Dealership Group functions

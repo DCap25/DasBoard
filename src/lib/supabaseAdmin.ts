@@ -7,17 +7,54 @@
 
 import { createClient } from '@supabase/supabase-js';
 
+// Validate admin configuration
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseServiceKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseServiceKey) {
+  const missingVars = [];
+  if (!supabaseUrl) missingVars.push('VITE_SUPABASE_URL');
+  if (!supabaseServiceKey) missingVars.push('VITE_SUPABASE_SERVICE_ROLE_KEY');
+  throw new Error(
+    `Missing required Supabase admin configuration: ${missingVars.join(
+      ', '
+    )}. Please check your .env file.`
+  );
+}
+
 // Admin client with service role key for privileged operations
-const supabaseAdmin = createClient(
-  import.meta.env.VITE_SUPABASE_URL || '',
-  import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY || '',
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false,
+    debug: import.meta.env.DEV,
+  },
+  db: {
+    schema: 'public',
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'dasboard-admin',
     },
+  },
+});
+
+// Test the admin connection on initialization
+(async () => {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('schema_user_mappings')
+      .select('count')
+      .limit(1);
+    if (error) {
+      console.error('[supabaseAdmin] Failed to initialize admin client:', error);
+      throw error;
+    }
+    console.log('[supabaseAdmin] Admin client initialized successfully');
+  } catch (error) {
+    console.error('[supabaseAdmin] Admin client initialization error:', error);
   }
-);
+})();
 
 /**
  * Creates a new schema for a Finance Manager

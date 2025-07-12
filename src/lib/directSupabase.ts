@@ -4,9 +4,26 @@
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// Validate configuration with detailed error messages
 if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing Supabase configuration for direct API calls');
+  const missingVars = [];
+  if (!supabaseUrl) missingVars.push('VITE_SUPABASE_URL');
+  if (!supabaseKey) missingVars.push('VITE_SUPABASE_ANON_KEY');
+  throw new Error(`Missing Supabase configuration for direct API calls: ${missingVars.join(', ')}. Please check your .env file.`);
 }
+
+// Validate URL format
+try {
+  new URL(supabaseUrl);
+} catch (e) {
+  throw new Error(`Invalid VITE_SUPABASE_URL format: ${supabaseUrl}. Must be a valid URL.`);
+}
+
+console.log('DirectSupabase initialized:', {
+  url: supabaseUrl,
+  keyLength: supabaseKey.length,
+  timestamp: new Date().toISOString(),
+});
 
 const baseHeaders = {
   Authorization: `Bearer ${supabaseKey}`,

@@ -15,11 +15,31 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2023-10-16',
 });
 
+// Validate Supabase configuration
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseServiceKey) {
+  const missingVars = [];
+  if (!supabaseUrl) missingVars.push('VITE_SUPABASE_URL');
+  if (!supabaseServiceKey) missingVars.push('SUPABASE_SERVICE_ROLE_KEY');
+  throw new Error(
+    `Missing required Supabase configuration: ${missingVars.join(
+      ', '
+    )}. Please check your .env file.`
+  );
+}
+
 // Initialize Supabase
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY // Use service role key for server-side operations
-);
+const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false,
+  },
+  db: {
+    schema: 'public',
+  },
+});
 
 // Create checkout session endpoint
 app.post('/api/create-checkout-session', async (req, res) => {
