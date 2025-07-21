@@ -23,10 +23,11 @@ const createSupabaseClient = () => {
     timestamp: new Date().toISOString(),
   });
 
-  supabaseInstance = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: true, // Enable session persistence
-      autoRefreshToken: true, // Enable auto-refresh
+  try {
+    supabaseInstance = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: true, // Enable session persistence
+        autoRefreshToken: true, // Enable auto-refresh
       detectSessionInUrl: true, // Enable URL session detection for redirects
       storage: window.localStorage, // Use localStorage for session storage
     },
@@ -38,6 +39,11 @@ const createSupabaseClient = () => {
   });
 
   return supabaseInstance;
+  } catch (error) {
+    console.error('[Supabase] Failed to create client:', error);
+    // Return a minimal mock client that won't break the app
+    throw new Error(`Failed to initialize Supabase client: ${error}`);
+  }
 };
 
 // Export the main client - this replaces the old direct createClient call

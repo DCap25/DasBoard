@@ -784,16 +784,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         }
 
-        // Get initial session
+        // Get initial session with timeout protection
+        const sessionPromise = supabase.auth.getSession();
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Session fetch timeout')), 3000);
+        });
+        
         const {
           data: { session },
           error: sessionError,
-        } = await supabase.auth.getSession();
+        } = await Promise.race([sessionPromise, timeoutPromise]) as any;
 
         if (sessionError) {
           console.error('[AuthContext] Error getting initial session:', sessionError, {
             timestamp: new Date().toISOString(),
           });
+          
+          // If it's a timeout or network error, continue without session
+          if (sessionError.message?.includes('timeout') || sessionError.message?.includes('network')) {
+            console.log('[AuthContext] Network/timeout error - continuing without session');
+            if (mounted) {
+              setLoading(false);
+              setAuthCheckComplete(true);
+              setHasSession(false);
+              setUser(null);
+              setRole(null);
+            }
+            return;
+          }
+          
           if (mounted) {
             setLoading(false); // Make sure to set loading to false even on error
             setAuthCheckComplete(true); // Mark auth check as complete
@@ -895,6 +914,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('[AuthContext] Error in initialization:', error, {
           timestamp: new Date().toISOString(),
         });
+        
+        // For timeout or network errors, don't show error toast - just continue
+        if (error instanceof Error && (error.message.includes('timeout') || error.message.includes('network'))) {
+          console.log('[AuthContext] Network/timeout during initialization - continuing without auth');
+          if (mounted) {
+            setLoading(false);
+            setAuthCheckComplete(true);
+            setHasSession(false);
+            setUser(null);
+            setRole(null);
+          }
+          return;
+        }
+        
         if (mounted) {
           setLoading(false); // Ensure loading is set to false on any error
           setAuthCheckComplete(true); // Mark auth check as complete
