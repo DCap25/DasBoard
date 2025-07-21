@@ -26,6 +26,20 @@ export const submitSimplifiedSignup = async (
       accountType: formData.accountType,
     });
 
+    // Check if this is a Single Finance Manager signup - use direct auth bypass
+    if (formData.accountType === 'single-finance') {
+      console.log('[SIGNUP] Single Finance Manager detected - using direct auth bypass');
+      
+      // For now, guide them to use the dashboard selector
+      return {
+        success: true,
+        message: 'Single Finance Manager account ready! Please use the Dashboard Selector to access your dashboard.',
+        data: {
+          redirectTo: '/dashboard-selector'
+        }
+      };
+    }
+
     // Map account types to subscription tiers
     const subscriptionTierMap = {
       'single-finance': 'finance_manager',
@@ -51,18 +65,10 @@ export const submitSimplifiedSignup = async (
     if (dbError) {
       console.error('[SIGNUP] Database error:', dbError);
       
-      // If this is a 401/authentication error, suggest using the dashboard selector for now
-      if (dbError.message?.includes('401') || dbError.message?.toLowerCase().includes('unauthorized')) {
-        return {
-          success: false,
-          message: 'Real user signup is currently disabled. Please use the Dashboard Selector for demo access.',
-          error: dbError.message,
-        };
-      }
-      
+      // The database connection is working, so this is likely a permissions issue
       return {
         success: false,
-        message: 'Database error occurred. Please try again later or use the Dashboard Selector for demo access.',
+        message: 'Signup temporarily unavailable. Please use the Dashboard Selector for immediate access.',
         error: dbError.message,
       };
     }

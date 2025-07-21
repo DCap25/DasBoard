@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Fix Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-section { border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 3px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0056b3; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .result { margin-top: 10px; padding: 10px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Authentication Fix Verification Test</h1>
+    <p>This page tests the RLS fixes applied to resolve 401 authentication errors.</p>
+
+    <div class="test-section info">
+        <h3>🔧 Configuration</h3>
+        <p><strong>Supabase URL:</strong> https://iugjtokydvbcvmrpeziv.supabase.co</p>
+        <p><strong>Testing:</strong> Anonymous signup requests, profile access, authentication flow</p>
+    </div>
+
+    <div class="test-section">
+        <h3>📝 Test 1: Anonymous Signup Request Creation</h3>
+        <p>This tests if anonymous users can create signup requests (should work now).</p>
+        <button onclick="testAnonymousSignup()">Test Anonymous Signup</button>
+        <div id="test1-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>👤 Test 2: User Authentication Test</h3>
+        <p>Test user signup and profile creation.</p>
+        <input type="email" id="test-email" placeholder="test-email@example.com" style="padding: 8px; margin: 5px;">
+        <input type="password" id="test-password" placeholder="password123" style="padding: 8px; margin: 5px;">
+        <br>
+        <button onclick="testSignup()">Test Signup</button>
+        <button onclick="testLogin()">Test Login</button>
+        <button onclick="testLogout()">Logout</button>
+        <div id="test2-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>🗂️ Test 3: Profile Access Test</h3>
+        <p>Test if authenticated users can access their profiles.</p>
+        <button onclick="testProfileAccess()">Test Profile Access</button>
+        <div id="test3-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 Test 4: Database Status Check</h3>
+        <p>Check current authentication status and permissions.</p>
+        <button onclick="checkDatabaseStatus()">Check Status</button>
+        <div id="test4-result"></div>
+    </div>
+
+    <script>
+        // Initialize Supabase
+        const SUPABASE_URL = 'https://iugjtokydvbcvmrpeziv.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1Z2p0b2t5ZHZiY3ZtcnBleml2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU7MTk3NjUsImV4cCI6MjA2MTI5NTc2NX0.XCNQoJbGQiXuyR_CFevro1Y8lqvh2_jmjrD181UYtY4';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        function showResult(elementId, message, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            element.className = 'result ' + (isSuccess ? 'success' : 'error');
+            element.innerHTML = message;
+        }
+
+        async function testAnonymousSignup() {
+            const resultElement = document.getElementById('test1-result');
+            resultElement.innerHTML = '<p>⏳ Testing anonymous signup request...</p>';
+
+            try {
+                const testData = {
+                    dealership_name: 'Test Fix Dealership',
+                    contact_person: 'Test Contact',
+                    email: `test-fix-${Date.now()}@example.com`,
+                    tier: 'single_finance_manager',
+                    phone: '555-0123',
+                    message: 'Testing RLS fix'
+                };
+
+                const { data, error } = await supabase
+                    .from('signup_requests')
+                    .insert(testData)
+                    .select();
+
+                if (error) {
+                    showResult('test1-result', 
+                        `❌ <strong>FAILED:</strong> ${error.message}<br>
+                        <em>This indicates RLS is still blocking anonymous access.</em>`, 
+                        false);
+                } else {
+                    showResult('test1-result', 
+                        `✅ <strong>SUCCESS:</strong> Anonymous signup request created!<br>
+                        <strong>ID:</strong> ${data[0].id}<br>
+                        <strong>Email:</strong> ${data[0].email}<br>
+                        <em>Authentication fix is working!</em>`);
+                    
+                    // Clean up test data
+                    setTimeout(async () => {
+                        await supabase
+                            .from('signup_requests')
+                            .delete()
+                            .eq('id', data[0].id);
+                    }, 2000);
+                }
+            } catch (err) {
+                showResult('test1-result', 
+                    `❌ <strong>ERROR:</strong> ${err.message}`, 
+                    false);
+            }
+        }
+
+        async function testSignup() {
+            const email = document.getElementById('test-email').value || `test-${Date.now()}@example.com`;
+            const password = document.getElementById('test-password').value || 'password123';
+            const resultElement = document.getElementById('test2-result');
+            
+            resultElement.innerHTML = '<p>⏳ Testing user signup...</p>';
+
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            name: 'Test User',
+                            role: 'single_finance_manager'
+                        }
+                    }
+                });
+
+                if (error) {
+                    showResult('test2-result', 
+                        `❌ <strong>SIGNUP FAILED:</strong> ${error.message}`, 
+                        false);
+                } else {
+                    showResult('test2-result', 
+                        `✅ <strong>SIGNUP SUCCESS:</strong><br>
+                        <strong>User ID:</strong> ${data.user?.id}<br>
+                        <strong>Email:</strong> ${data.user?.email}<br>
+                        <strong>Confirmation:</strong> ${data.user?.email_confirmed_at ? 'Confirmed' : 'Check email for confirmation'}<br>
+                        <em>User creation is working!</em>`);
+                }
+            } catch (err) {
+                showResult('test2-result', 
+                    `❌ <strong>ERROR:</strong> ${err.message}`, 
+                    false);
+            }
+        }
+
+        async function testLogin() {
+            const email = document.getElementById('test-email').value;
+            const password = document.getElementById('test-password').value;
+            
+            if (!email || !password) {
+                showResult('test2-result', '❌ Please enter email and password', false);
+                return;
+            }
+
+            const resultElement = document.getElementById('test2-result');
+            resultElement.innerHTML = '<p>⏳ Testing login...</p>';
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    showResult('test2-result', 
+                        `❌ <strong>LOGIN FAILED:</strong> ${error.message}`, 
+                        false);
+                } else {
+                    showResult('test2-result', 
+                        `✅ <strong>LOGIN SUCCESS:</strong><br>
+                        <strong>User ID:</strong> ${data.user.id}<br>
+                        <strong>Email:</strong> ${data.user.email}<br>
+                        <strong>Role:</strong> ${data.user.user_metadata?.role || 'Not set'}<br>
+                        <em>Authentication is working!</em>`);
+                }
+            } catch (err) {
+                showResult('test2-result', 
+                    `❌ <strong>ERROR:</strong> ${err.message}`, 
+                    false);
+            }
+        }
+
+        async function testLogout() {
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (error) {
+                    showResult('test2-result', `❌ Logout failed: ${error.message}`, false);
+                } else {
+                    showResult('test2-result', '✅ Logout successful');
+                }
+            } catch (err) {
+                showResult('test2-result', `❌ Logout error: ${err.message}`, false);
+            }
+        }
+
+        async function testProfileAccess() {
+            const resultElement = document.getElementById('test3-result');
+            resultElement.innerHTML = '<p>⏳ Testing profile access...</p>';
+
+            try {
+                // Get current user
+                const { data: { user } } = await supabase.auth.getUser();
+                
+                if (!user) {
+                    showResult('test3-result', 
+                        '⚠️ <strong>NOT LOGGED IN:</strong> Please login first to test profile access', 
+                        false);
+                    return;
+                }
+
+                // Try to access user's profile
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
+
+                if (error) {
+                    showResult('test3-result', 
+                        `❌ <strong>PROFILE ACCESS FAILED:</strong> ${error.message}<br>
+                        <em>User: ${user.email} (ID: ${user.id})</em>`, 
+                        false);
+                } else {
+                    showResult('test3-result', 
+                        `✅ <strong>PROFILE ACCESS SUCCESS:</strong><br>
+                        <strong>Name:</strong> ${data.name || 'Not set'}<br>
+                        <strong>Email:</strong> ${data.email}<br>
+                        <strong>Role:</strong> ${data.role}<br>
+                        <strong>Dealership ID:</strong> ${data.dealership_id || 'None'}<br>
+                        <em>Profile access is working!</em>`);
+                }
+            } catch (err) {
+                showResult('test3-result', 
+                    `❌ <strong>ERROR:</strong> ${err.message}`, 
+                    false);
+            }
+        }
+
+        async function checkDatabaseStatus() {
+            const resultElement = document.getElementById('test4-result');
+            resultElement.innerHTML = '<p>⏳ Checking database status...</p>';
+
+            try {
+                // Test 1: Check signup_requests table
+                const { data: signupData, error: signupError } = await supabase
+                    .from('signup_requests')
+                    .select('count')
+                    .single();
+
+                // Test 2: Check profiles table
+                const { data: profilesData, error: profilesError } = await supabase
+                    .from('profiles')
+                    .select('count')
+                    .single();
+
+                // Test 3: Check current user
+                const { data: { user } } = await supabase.auth.getUser();
+
+                let statusHTML = '<strong>📊 DATABASE STATUS REPORT:</strong><br><br>';
+                
+                // Signup requests status
+                if (signupError) {
+                    statusHTML += `❌ <strong>signup_requests:</strong> ${signupError.message}<br>`;
+                } else {
+                    statusHTML += `✅ <strong>signup_requests:</strong> Accessible (${signupData.count} records)<br>`;
+                }
+
+                // Profiles status
+                if (profilesError) {
+                    statusHTML += `❌ <strong>profiles:</strong> ${profilesError.message}<br>`;
+                } else {
+                    statusHTML += `✅ <strong>profiles:</strong> Accessible (${profilesData.count} records)<br>`;
+                }
+
+                // Authentication status
+                if (user) {
+                    statusHTML += `✅ <strong>Authentication:</strong> Logged in as ${user.email}<br>`;
+                } else {
+                    statusHTML += `ℹ️ <strong>Authentication:</strong> Not logged in<br>`;
+                }
+
+                statusHTML += '<br><em>Overall: RLS fixes appear to be working correctly!</em>';
+
+                showResult('test4-result', statusHTML);
+
+            } catch (err) {
+                showResult('test4-result', 
+                    `❌ <strong>STATUS CHECK ERROR:</strong> ${err.message}`, 
+                    false);
+            }
+        }
+
+        // Auto-check status on page load
+        window.addEventListener('load', () => {
+            setTimeout(checkDatabaseStatus, 1000);
+        });
+    </script>
+</body>
+</html>

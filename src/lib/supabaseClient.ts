@@ -20,7 +20,6 @@ const createSupabaseClient = () => {
 
   console.log('Initializing Supabase client:', {
     url: supabaseUrl,
-    keyLength: supabaseAnonKey.length,
     timestamp: new Date().toISOString(),
   });
 
