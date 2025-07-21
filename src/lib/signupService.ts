@@ -50,9 +50,19 @@ export const submitSimplifiedSignup = async (
 
     if (dbError) {
       console.error('[SIGNUP] Database error:', dbError);
+      
+      // If this is a 401/authentication error, suggest using the dashboard selector for now
+      if (dbError.message?.includes('401') || dbError.message?.toLowerCase().includes('unauthorized')) {
+        return {
+          success: false,
+          message: 'Real user signup is currently disabled. Please use the Dashboard Selector for demo access.',
+          error: dbError.message,
+        };
+      }
+      
       return {
         success: false,
-        message: 'Database error occurred. Please try again.',
+        message: 'Database error occurred. Please try again later or use the Dashboard Selector for demo access.',
         error: dbError.message,
       };
     }

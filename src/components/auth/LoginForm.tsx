@@ -42,8 +42,10 @@ export default function LoginForm() {
         setError('Please check your email and confirm your account before signing in.');
       } else if (error.message?.includes('Too many requests')) {
         setError('Too many login attempts. Please wait a few minutes and try again.');
+      } else if (error.message?.includes('401') || error.message?.toLowerCase().includes('unauthorized')) {
+        setError('Authentication system is currently disabled. Please use the Dashboard Selector for demo access.');
       } else {
-        setError(error.message || 'Login failed. Please try again.');
+        setError(error.message || 'Login failed. Please use the Dashboard Selector for demo access.');
       }
     } finally {
       setLoading(false);

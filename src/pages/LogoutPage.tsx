@@ -9,8 +9,19 @@ export default function LogoutPage() {
     // Clear all authentication data
     logoutDirectAuth();
 
-    // Also clear any other potential auth keys
-    localStorage.clear();
+    // Clear only authentication-related localStorage keys (preserve user data like deals)
+    const authKeys = [
+      'supabase.auth.token',
+      'supabase.auth.expires_at', 
+      'supabase.auth.expires_in',
+      'directauth_user',
+      'direct_auth_user',
+      'force_redirect_after_login',
+      'force_redirect_timestamp',
+      'logout_in_progress'
+    ];
+    
+    authKeys.forEach(key => localStorage.removeItem(key));
 
     // Small delay then redirect to home
     setTimeout(() => {
