@@ -13,6 +13,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Th
   const { signOut, user, userRole, dealershipId, currentDealershipName } = useAuth();
   const location = useLocation();
 
+
   const handleSignOut = () => {
     // Navigate to the dedicated logout page instead of calling signOut
     window.location.href = '/logout';
@@ -52,77 +53,111 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Th
           </div>
 
           <nav className="space-y-1">
-            {/* Adjust links based on dealership context */}
-            <Link to={isDealershipPath ? `/dealership/${dealershipIdFromPath}` : '/dashboard'}>
-              <button
-                className={`flex items-center w-full px-4 py-2 text-left text-sm rounded-md ${
-                  (isActive('/dashboard') &&
-                    !isActive('/dashboard/deals') &&
-                    !isActive('/dashboard/schedule')) ||
-                  (isDealershipPath &&
-                    !location.pathname.includes('/deals') &&
-                    !location.pathname.includes('/schedule'))
-                    ? 'bg-blue-700 text-white'
-                    : 'text-blue-100 hover:bg-blue-800 hover:text-white'
-                }`}
-              >
-                <Home size={18} className="mr-2" />
-                Home
-              </button>
-            </Link>
+            {/* Role-specific navigation */}
+            {userRole === 'single_finance_manager' ? (
+              <>
+                {/* Single Finance Manager Navigation */}
+                <Link to="/dashboard/single-finance">
+                  <button
+                    className={`flex items-center w-full px-4 py-2 text-left text-sm rounded-md ${
+                      isActive('/dashboard/single-finance') && !isActive('/dashboard/single-finance/deals')
+                        ? 'bg-blue-700 text-white'
+                        : 'text-blue-100 hover:bg-blue-800 hover:text-white'
+                    }`}
+                  >
+                    <Home size={18} className="mr-2" />
+                    Home
+                  </button>
+                </Link>
 
-            <Link
-              to={
-                isDealershipPath ? `/dealership/${dealershipIdFromPath}/deals` : '/dashboard/deals'
-              }
-            >
-              <button
-                className={`flex items-center w-full px-4 py-2 text-left text-sm rounded-md ${
-                  isActive('/dashboard/deals') ||
-                  (isDealershipPath && location.pathname.includes('/deals'))
-                    ? 'bg-blue-700 text-white'
-                    : 'text-blue-100 hover:bg-blue-800 hover:text-white'
-                }`}
-              >
-                <BarChart2 size={18} className="mr-2" />
-                Deals
-              </button>
-            </Link>
+                <Link to="/dashboard/single-finance/deals">
+                  <button
+                    className={`flex items-center w-full px-4 py-2 text-left text-sm rounded-md ${
+                      isActive('/dashboard/single-finance/deals')
+                        ? 'bg-blue-700 text-white'
+                        : 'text-blue-100 hover:bg-blue-800 hover:text-white'
+                    }`}
+                  >
+                    <BarChart2 size={18} className="mr-2" />
+                    Deals
+                  </button>
+                </Link>
+              </>
+            ) : (
+              <>
+                {/* Default navigation for other roles */}
+                <Link to={isDealershipPath ? `/dealership/${dealershipIdFromPath}` : '/dashboard'}>
+                  <button
+                    className={`flex items-center w-full px-4 py-2 text-left text-sm rounded-md ${
+                      (isActive('/dashboard') &&
+                        !isActive('/dashboard/deals') &&
+                        !isActive('/dashboard/schedule')) ||
+                      (isDealershipPath &&
+                        !location.pathname.includes('/deals') &&
+                        !location.pathname.includes('/schedule'))
+                        ? 'bg-blue-700 text-white'
+                        : 'text-blue-100 hover:bg-blue-800 hover:text-white'
+                    }`}
+                  >
+                    <Home size={18} className="mr-2" />
+                    Home
+                  </button>
+                </Link>
 
-            <Link
-              to={
-                isDealershipPath
-                  ? `/dealership/${dealershipIdFromPath}/schedule`
-                  : '/dashboard/schedule'
-              }
-            >
-              <button
-                className={`flex items-center w-full px-4 py-2 text-left text-sm rounded-md ${
-                  isActive('/dashboard/schedule') ||
-                  (isDealershipPath && location.pathname.includes('/schedule'))
-                    ? 'bg-blue-700 text-white'
-                    : 'text-blue-100 hover:bg-blue-800 hover:text-white'
-                }`}
-              >
-                <Calendar size={18} className="mr-2" />
-                Schedule
-              </button>
-            </Link>
-
-            {/* Master Admin Panel link for admins */}
-            {userRole === 'admin' && !dealershipId && (
-              <Link to="/master-admin">
-                <button
-                  className={`flex items-center w-full px-4 py-2 text-left text-sm rounded-md ${
-                    isActive('/master-admin')
-                      ? 'bg-blue-700 text-white'
-                      : 'text-blue-100 hover:bg-blue-800 hover:text-white'
-                  }`}
+                <Link
+                  to={
+                    isDealershipPath ? `/dealership/${dealershipIdFromPath}/deals` : '/dashboard/deals'
+                  }
                 >
-                  <Building2 size={18} className="mr-2" />
-                  Master Admin
-                </button>
-              </Link>
+                  <button
+                    className={`flex items-center w-full px-4 py-2 text-left text-sm rounded-md ${
+                      isActive('/dashboard/deals') ||
+                      (isDealershipPath && location.pathname.includes('/deals'))
+                        ? 'bg-blue-700 text-white'
+                        : 'text-blue-100 hover:bg-blue-800 hover:text-white'
+                    }`}
+                  >
+                    <BarChart2 size={18} className="mr-2" />
+                    Deals
+                  </button>
+                </Link>
+
+                <Link
+                  to={
+                    isDealershipPath
+                      ? `/dealership/${dealershipIdFromPath}/schedule`
+                      : '/dashboard/schedule'
+                  }
+                >
+                  <button
+                    className={`flex items-center w-full px-4 py-2 text-left text-sm rounded-md ${
+                      isActive('/dashboard/schedule') ||
+                      (isDealershipPath && location.pathname.includes('/schedule'))
+                        ? 'bg-blue-700 text-white'
+                        : 'text-blue-100 hover:bg-blue-800 hover:text-white'
+                    }`}
+                  >
+                    <Calendar size={18} className="mr-2" />
+                    Schedule
+                  </button>
+                </Link>
+
+                {/* Master Admin Panel link for admins */}
+                {userRole === 'admin' && !dealershipId && (
+                  <Link to="/master-admin">
+                    <button
+                      className={`flex items-center w-full px-4 py-2 text-left text-sm rounded-md ${
+                        isActive('/master-admin')
+                          ? 'bg-blue-700 text-white'
+                          : 'text-blue-100 hover:bg-blue-800 hover:text-white'
+                      }`}
+                    >
+                      <Building2 size={18} className="mr-2" />
+                      Master Admin
+                    </button>
+                  </Link>
+                )}
+              </>
             )}
           </nav>
         </div>

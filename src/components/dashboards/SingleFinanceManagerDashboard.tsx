@@ -302,13 +302,20 @@ const SingleFinanceManagerDashboard = () => {
 
       // Update the deal status
       const updatedDeals = existingDeals.map((deal: any) =>
-        deal.id === dealId ? { ...deal, status: newStatus } : deal
+        deal.id === dealId ? { ...deal, status: newStatus, dealStatus: newStatus } : deal
       );
 
       // Save back to localStorage
       localStorage.setItem(storageKey, JSON.stringify(updatedDeals));
 
-      // Reload deals to reflect the change
+      // Update state immediately to trigger re-render
+      setDeals(currentDeals => 
+        currentDeals.map(deal => 
+          deal.id === dealId ? { ...deal, status: newStatus } : deal
+        )
+      );
+
+      // Also reload from storage to keep consistency
       loadDealsFromLocalStorage();
 
       console.log(`[SingleFinanceManagerDashboard] Updated deal ${dealId} status to ${newStatus}`);
@@ -364,44 +371,38 @@ const SingleFinanceManagerDashboard = () => {
   // Component for the main dashboard content
   const MainDashboardContent = () => (
     <>
-      {/* Dashboard header */}
-      <div className="flex justify-between items-start mb-6">
-        <div className="flex-grow">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
-            <div>
-              <h1 className="text-3xl font-bold">Single Finance Manager Dashboard</h1>
-              <p className="text-gray-600 mt-1">
-                Finance Manager: {user?.email?.split('@')[0] || 'Not Assigned'}
-              </p>
-            </div>
-
-            {/* Daily Finance Tip - Best Practices */}
-            <div className="bg-white p-2 rounded-md mt-2 md:mt-0 border border-orange-100 max-w-2xl">
-              <p className="text-xs italic text-orange-800">
-                <Lightbulb className="h-3 w-3 inline-block mr-1" />
-                <strong>F&I Best Practice:</strong>{' '}
-                {bestPractices[new Date().getDay() % bestPractices.length]}
-              </p>
-            </div>
-          </div>
+      {/* F&I Best Practice Tip - Back to top */}
+      <div className="mb-4">
+        <div className="bg-white p-3 rounded-md border border-orange-100 max-w-4xl mx-auto">
+          <p className="text-sm text-orange-800 text-center">
+            <Lightbulb className="h-4 w-4 inline-block mr-2" />
+            <strong>F&I Best Practice:</strong>{' '}
+            {bestPractices[new Date().getDay() % bestPractices.length]}
+          </p>
         </div>
       </div>
 
-      {/* Month/Year and New Deal Button row */}
-      <div className="flex justify-between items-center mb-3">
-        <div className="flex items-center">
-          <h2 className="text-2xl font-bold mr-3">{getPeriodLabel(timePeriod)}</h2>
-          <select
-            value={timePeriod}
-            onChange={e => setTimePeriod(e.target.value)}
-            className="p-2 border rounded-md shadow-sm"
-          >
-            <option value="this-month">This Month</option>
-            <option value="last-month">Last Month</option>
-            <option value="last-quarter">Last Quarter</option>
-            <option value="ytd">Year to Date</option>
-            <option value="last-year">Last Year</option>
-          </select>
+      {/* Dashboard header with Month/Year underneath */}
+      <div className="flex justify-between items-start mb-3">
+        <div>
+          <h1 className="text-2xl font-bold">Single Finance Manager Dashboard</h1>
+          <p className="text-gray-600 text-sm mb-2">
+            Finance Manager: {user?.email?.split('@')[0] || 'Not Assigned'}
+          </p>
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg font-medium text-gray-700">{getPeriodLabel(timePeriod)}</h2>
+            <select
+              value={timePeriod}
+              onChange={e => setTimePeriod(e.target.value)}
+              className="p-1 border rounded-md shadow-sm text-sm"
+            >
+              <option value="this-month">This Month</option>
+              <option value="last-month">Last Month</option>
+              <option value="last-quarter">Last Quarter</option>
+              <option value="ytd">Year to Date</option>
+              <option value="last-year">Last Year</option>
+            </select>
+          </div>
         </div>
 
         <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={handleLogNewDealClick}>
@@ -418,10 +419,10 @@ const SingleFinanceManagerDashboard = () => {
       </div>
 
       {/* Deals Log Section */}
-      <Card className="col-span-12 bg-white border-slate-200 shadow-sm">
-        <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 py-2 px-4 flex flex-row items-center justify-between space-y-0">
+      <Card className="col-span-12 bg-white border-slate-200 shadow-sm rounded-lg">
+        <CardHeader className="bg-blue-500 border-b border-gray-300 py-2 px-4 flex flex-row items-center justify-between space-y-0 rounded-t-lg">
           <CardTitle className="text-lg font-medium flex items-center text-white">
-            <FileText className="mr-2 h-5 w-5 text-orange-500" />
+            <FileText className="mr-2 h-5 w-5 text-white" />
             Deals Log
           </CardTitle>
           <Button variant="outline" size="sm" asChild>
@@ -569,14 +570,18 @@ const SingleFinanceManagerDashboard = () => {
                     const status =
                       deal.status === 'Complete' || deal.status === 'Funded'
                         ? 'Funded'
+                        : deal.status === 'Held'
+                        ? 'Held'
                         : deal.status === 'Canceled' || deal.status === 'Unwound'
                         ? 'Unwound'
-                        : 'Pending';
+                        : deal.status || 'Pending';
 
                     // Status badge colors
                     const statusColor =
                       status === 'Funded'
                         ? 'bg-green-100 text-green-800 border-green-200'
+                        : status === 'Held'
+                        ? 'bg-red-100 text-red-800 border-red-200'
                         : status === 'Unwound'
                         ? 'bg-red-100 text-red-800 border-red-200'
                         : 'bg-amber-100 text-amber-800 border-amber-200';
@@ -584,9 +589,11 @@ const SingleFinanceManagerDashboard = () => {
                     return (
                       <tr
                         key={deal.id}
-                        className={`border-b ${
-                          index % 2 === 1 ? 'bg-gray-50' : ''
-                        } hover:bg-blue-50`}
+                        className="border-b"
+                        style={{
+                          backgroundColor: status === 'Held' ? '#fef2f2' : 
+                            index % 2 === 1 ? '#f9fafb' : 'white'
+                        }}
                       >
                         <td className="py-2 px-2 text-center font-medium">
                           {deals.length - index}
@@ -618,25 +625,25 @@ const SingleFinanceManagerDashboard = () => {
                         <td className="py-2 px-2 text-left text-gray-600 text-xs">
                           {dealData.lender || 'N/A'}
                         </td>
-                        <td className="py-2 px-2 text-right bg-white border-r border-gray-200 font-medium">
+                        <td className="py-2 px-2 text-right border-r border-gray-200 font-medium">
                           ${(dealData.frontEndGross || 0).toLocaleString()}
                         </td>
-                        <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
+                        <td className="py-2 px-2 text-right border-r border-gray-200">
                           ${vscProfit.toLocaleString()}
                         </td>
-                        <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
+                        <td className="py-2 px-2 text-right border-r border-gray-200">
                           ${ppmProfit.toLocaleString()}
                         </td>
-                        <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
+                        <td className="py-2 px-2 text-right border-r border-gray-200">
                           ${gapProfit.toLocaleString()}
                         </td>
-                        <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
+                        <td className="py-2 px-2 text-right border-r border-gray-200">
                           ${twProfit.toLocaleString()}
                         </td>
-                        <td className="py-2 px-2 text-center bg-white border-r border-gray-200 font-medium">
+                        <td className="py-2 px-2 text-center border-r border-gray-200 font-medium">
                           {ppd}
                         </td>
-                        <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
+                        <td className="py-2 px-2 text-right border-r border-gray-200">
                           ${pvr.toLocaleString()}
                         </td>
                         <td className="py-2 px-2 text-right font-medium text-green-600">
@@ -646,10 +653,12 @@ const SingleFinanceManagerDashboard = () => {
                           <select
                             value={status}
                             onChange={e => handleStatusChange(deal.id, e.target.value)}
+                            onClick={e => e.stopPropagation()}
                             className={`text-xs px-2 py-1 rounded border-0 focus:ring-1 focus:ring-blue-500 ${statusColor}`}
                           >
                             <option value="Pending">Pending</option>
                             <option value="Funded">Funded</option>
+                            <option value="Held">Held</option>
                             <option value="Unwound">Unwound</option>
                           </select>
                         </td>
@@ -776,7 +785,7 @@ const SingleFinanceManagerDashboard = () => {
   );
 
   return (
-    <div className="container py-4">
+    <div className="w-full px-2 py-4">
       <Routes>
         <Route path="/" element={<MainDashboardContent />} />
         <Route path="/deals" element={<SingleFinanceDealsPage />} />

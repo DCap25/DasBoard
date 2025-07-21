@@ -769,6 +769,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
               setUser(mockUser as any);
               setRole(directUser.role as any);
+              setUserRole(directUser.role); // Fix: Also set userRole for direct auth users
               setIsGroupAdmin(directUser.isGroupAdmin || false);
               setLoading(false);
               setAuthCheckComplete(true);
