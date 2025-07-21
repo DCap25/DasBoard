@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       outDir: 'dist',
-      sourcemap: true,
+      sourcemap: false,  // Disabled to fix Netlify build issues
       minify: 'terser',
       target: 'es2015',
       rollupOptions: {

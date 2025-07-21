@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, lazy, Suspense } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import {
   BrowserRouter as Router,
   Routes,
@@ -6,26 +6,18 @@ import {
   Navigate,
   useLocation,
   useNavigationType,
-  useNavigate,
   useParams,
 } from 'react-router-dom';
 import { useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AuthPage from './pages/AuthPage';
-import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import DashboardLayout from './components/layout/DashboardLayout';
-import LogNewDeal from './components/dealership/LogNewDeal';
 import { Toaster } from './components/ui/toaster';
-import { AdminDashboard as MasterAdminDashboard } from './components/admin/AdminDashboard';
-import TempAdminDashboard from './components/TempAdminDashboard';
-import MasterAdminPanel from './components/admin/MasterAdminPanel';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import { queryClient } from './lib/react-query';
-import { DealLogEditor } from './components/manager/DealLogEditor';
-import { ScheduleEditor } from './components/manager/ScheduleEditor';
 import { ToastContextProvider } from './lib/use-toast';
 import {
   SalesDashboard,
@@ -46,13 +38,11 @@ import {
   getCurrentDirectAuthUser,
   getRedirectPath,
 } from './lib/directAuth';
-import ResetPage from './pages/ResetPage';
 import LogoutPage from './pages/LogoutPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import GroupAdminBypass from './pages/GroupAdminBypass';
 import DashboardSelector from './pages/DashboardSelector';
 import SalesExperienceDemo from './pages/SalesExperienceDemo';
-import { DealsProvider } from './contexts/DealsContext';
 import DealLogPage from './pages/DealLogPage';
 import TeamManagementPage from './pages/manager/TeamManagementPage';
 import GoalsPage from './pages/manager/GoalsPage';
@@ -61,6 +51,7 @@ import SalesReportPage from './pages/manager/SalesReportPage';
 import SingleFinanceManagerDashboard from './components/dashboards/SingleFinanceManagerDashboard';
 import FinanceDirectorDashboard from './components/dashboards/FinanceDirectorDashboard';
 import LogFinanceManagerDeal from './pages/finance/LogFinanceManagerDeal';
+import LogSingleFinanceDeal from './pages/finance/LogSingleFinanceDeal';
 import MasterAdminPage from './pages/admin/MasterAdminPage';
 import SignUp from './components/auth/SignUp';
 import SingleFinanceSignup from './components/auth/SingleFinanceSignup';
@@ -74,8 +65,6 @@ import SubscriptionPage from './pages/legal/SubscriptionPage';
 import AboutPage from './pages/AboutPage';
 import ScreenshotsPage from './pages/ScreenshotsPage';
 import { TranslationProvider } from './contexts/TranslationContext';
-import LoginForm from './components/auth/LoginForm';
-import AdminDashboard from './pages/AdminDashboard';
 import ResetAuth from './pages/ResetPage';
 import TestUserMiddleware from './components/auth/TestUserMiddleware';
 
@@ -546,68 +535,6 @@ function GroupAdminAccessCheck({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Add this function before the App component
-function AuthStateReset() {
-  useEffect(() => {
-    console.log('[AuthStateReset] Clearing all auth state...');
-
-    // Sign out from Supabase
-    supabase.auth
-      .signOut()
-      .then(() => {
-        console.log('[AuthStateReset] Signed out from Supabase');
-      })
-      .catch(error => {
-        console.error('[AuthStateReset] Error signing out from Supabase:', error);
-      });
-
-    // Clear all storage
-    try {
-      console.log('[AuthStateReset] Clearing localStorage and sessionStorage');
-
-      // Clear localStorage
-      if (typeof window !== 'undefined' && window.localStorage) {
-        window.localStorage.clear();
-      }
-
-      // Clear sessionStorage
-      if (typeof window !== 'undefined' && window.sessionStorage) {
-        window.sessionStorage.clear();
-      }
-
-      // Clear cookies (non-HTTP only cookies)
-      if (typeof document !== 'undefined') {
-        document.cookie.split(';').forEach(cookie => {
-          const [name] = cookie.trim().split('=');
-          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-        });
-      }
-
-      console.log('[AuthStateReset] All storage cleared');
-    } catch (error) {
-      console.error('[AuthStateReset] Error clearing storage:', error);
-    }
-
-    // Redirect to login page after a short delay
-    setTimeout(() => {
-      console.log('[AuthStateReset] Redirecting to login page');
-      if (typeof window !== 'undefined') {
-        window.location.href = '/';
-      }
-    }, 1000);
-
-    return () => {
-      console.log('[AuthStateReset] Reset component unmounted');
-    };
-  }, []);
-
-  return (
-    <div style={{ padding: '2rem', textAlign: 'center' }}>
-      <h1>Resetting Auth State...</h1>
-      <p>Clearing all authentication state and redirecting to login page.</p>
-    </div>
-  );
-}
 
 function App() {
   useEffect(() => {
@@ -997,6 +924,20 @@ function App() {
                         element={
                           <ProtectedRoute>
                             <SalesExperienceDemo />
+                          </ProtectedRoute>
+                        }
+                      />
+
+                      {/* Single Finance Manager Deal Log - Separate Route */}
+                      <Route
+                        path="/single-finance-deal-log"
+                        element={
+                          <ProtectedRoute
+                            requiredRoles={['finance_manager', 'single_finance_manager']}
+                          >
+                            <DashboardLayout>
+                              <LogSingleFinanceDeal />
+                            </DashboardLayout>
                           </ProtectedRoute>
                         }
                       />

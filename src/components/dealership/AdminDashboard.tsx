@@ -373,4 +373,5 @@ const AdminDashboard: React.FC = () => {
   );
 };
 
+export { AdminDashboard };
 export default AdminDashboard; 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useToast } from '../../hooks/use-toast';
+import { toast } from '../../lib/use-toast';
 import {
   getDealershipGroups,
   createDealershipGroup,
@@ -79,7 +79,6 @@ interface Dealership {
 
 export function AdminPanel() {
   const { user, role } = useAuth();
-  const { toast } = useToast();
 
   const [dealershipGroups, setDealershipGroups] = useState<DealershipGroup[]>([]);
   const [dealerships, setDealerships] = useState<Dealership[]>([]);

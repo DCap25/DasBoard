@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
+import { Badge } from '../../components/ui/badge';
 // Removed unused imports
 import {
   DollarSign,
@@ -99,6 +101,7 @@ const SCHEDULE_DATA = [
 const MOCK_DEALS: Deal[] = [];
 
 export const SingleFinanceHomePage: React.FC = () => {
+  const navigate = useNavigate();
   const [deals, setDeals] = useState<Deal[]>([]);
   const [, setPendingDeals] = useState<Deal[]>([]);
   const [timePeriod] = useState<TimePeriod>('this-month');
@@ -478,7 +481,7 @@ export const SingleFinanceHomePage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="w-full px-2 py-8">
       {/* Promotional Banner */}
       {showPromoBanner && (
         <div className="mb-6 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-lg shadow-sm relative">
@@ -528,13 +531,13 @@ export const SingleFinanceHomePage: React.FC = () => {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-        <Card className="border-l-4 border-l-blue-600 hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-base font-semibold text-slate-700">F&I Gross</CardTitle>
-            <DollarSign className="h-4 w-4 text-blue-600" />
+            <DollarSign className="h-5 w-5 text-blue-500" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-2">
             <div className="text-2xl font-bold text-slate-900">
               ${metrics.mtdRevenue.toLocaleString()}
             </div>
@@ -554,14 +557,14 @@ export const SingleFinanceHomePage: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-blue-600 hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-base font-semibold text-slate-700">
               Deals Processed
             </CardTitle>
-            <FileText className="h-4 w-4 text-blue-600" />
+            <FileText className="h-5 w-5 text-blue-500" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-2">
             <div className="text-2xl font-bold text-slate-900">{metrics.dealsProcessed}</div>
             <p className="text-xs text-muted-foreground">
               <span className="text-green-500 flex items-center">
@@ -572,12 +575,12 @@ export const SingleFinanceHomePage: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-blue-600 hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-base font-semibold text-slate-700">Deal Types</CardTitle>
-            <Car className="h-4 w-4 text-blue-600" />
+            <Car className="h-5 w-5 text-blue-500" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-2">
             <div className="space-y-1">
               <div className="flex justify-between items-center">
                 <span className="text-xs text-gray-600">Finance:</span>
@@ -597,14 +600,14 @@ export const SingleFinanceHomePage: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-blue-600 hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-base font-semibold text-slate-700">
               Products Per Deal
             </CardTitle>
-            <BarChart4 className="h-4 w-4 text-blue-600" />
+            <BarChart4 className="h-5 w-5 text-blue-500" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-2">
             <div className="text-2xl font-bold text-slate-900">
               {metrics.productsPerDeal.toFixed(1)}
             </div>
@@ -624,14 +627,14 @@ export const SingleFinanceHomePage: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-blue-600 hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-base font-semibold text-slate-700">
               PVR (Per Vehicle Retailed)
             </CardTitle>
-            <CreditCard className="h-4 w-4 text-blue-600" />
+            <CreditCard className="h-5 w-5 text-blue-500" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-2">
             <div className="text-2xl font-bold text-slate-900">${metrics.pvr.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
               {metrics.pvr > 1500 ? (
@@ -650,222 +653,91 @@ export const SingleFinanceHomePage: React.FC = () => {
         </Card>
       </div>
 
-      {/* F&I Product Mix and Finance Das Board Row */}
-      <div className="grid gap-6 md:grid-cols-2">
+      {/* F&I Product Mix Section - Full Width */}
+      <div className="grid gap-6 grid-cols-1">
         <Card className="border hover:shadow-md transition-shadow">
-          <CardHeader>
-            <CardTitle className="flex items-center text-lg font-medium">
-              <BarChart4 className="mr-2 h-5 w-5 text-blue-500" />
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center text-xl font-medium">
+              <BarChart4 className="mr-2 h-6 w-6 text-blue-500" />
               F&I Product Mix & Avg. Profit
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            {metrics.dealsProcessed > 0 ? (
-              <div className="space-y-2">
-                {[
-                  {
-                    name: 'Vehicle Service Contract (VSC)',
-                    percent: metrics.productMix.extendedWarranty,
-                    value: `${metrics.avgProfits.extendedWarranty.toLocaleString()}`,
-                    color: 'bg-blue-600',
-                  },
-                  {
-                    name: 'PrePaid Maintenance (PPM)',
-                    percent: metrics.productMix.ppm,
-                    value: `${metrics.avgProfits.ppm.toLocaleString()}`,
-                    color: 'bg-blue-600',
-                  },
-                  {
-                    name: 'GAP Insurance',
-                    percent: metrics.productMix.gapInsurance,
-                    value: `${metrics.avgProfits.gapInsurance.toLocaleString()}`,
-                    color: 'bg-blue-600',
-                  },
-                  {
-                    name: 'Paint and Fabric Protection',
-                    percent: metrics.productMix.paintProtection,
-                    value: `${metrics.avgProfits.paintProtection.toLocaleString()}`,
-                    color: 'bg-blue-600',
-                  },
-                  {
-                    name: 'Tire & Wheel Bundle',
-                    percent: metrics.productMix.tireWheel,
-                    value: `${metrics.avgProfits.tireWheel.toLocaleString()}`,
-                    color: 'bg-blue-600',
-                  },
-                  {
-                    name: 'Other Products',
-                    percent: metrics.productMix.other,
-                    value: `${metrics.avgProfits.other.toLocaleString()}`,
-                    color: 'bg-blue-600',
-                  },
+          <CardContent className="px-8 pb-8">
+            <div className="grid grid-cols-2 gap-6">
+              {[
+                {
+                  name: 'Vehicle Service Contract (VSC)',
+                  percent: metrics.productMix.extendedWarranty,
+                  value: `${metrics.avgProfits.extendedWarranty.toLocaleString()}`,
+                  color: 'bg-blue-500',
+                },
+                {
+                  name: 'PrePaid Maintenance (PPM)',
+                  percent: metrics.productMix.ppm,
+                  value: `${metrics.avgProfits.ppm.toLocaleString()}`,
+                  color: 'bg-blue-500',
+                },
+                {
+                  name: 'GAP Insurance',
+                  percent: metrics.productMix.gapInsurance,
+                  value: `${metrics.avgProfits.gapInsurance.toLocaleString()}`,
+                  color: 'bg-blue-500',
+                },
+                {
+                  name: 'Paint and Fabric Protection',
+                  percent: metrics.productMix.paintProtection,
+                  value: `${metrics.avgProfits.paintProtection.toLocaleString()}`,
+                  color: 'bg-blue-500',
+                },
+                {
+                  name: 'Tire & Wheel Bundle',
+                  percent: metrics.productMix.tireWheel,
+                  value: `${metrics.avgProfits.tireWheel.toLocaleString()}`,
+                  color: 'bg-blue-500',
+                },
+                {
+                  name: 'Other Products',
+                  percent: metrics.productMix.other,
+                  value: `${metrics.avgProfits.other.toLocaleString()}`,
+                  color: 'bg-blue-500',
+                },
                 ].map((product, index) => (
-                  <div key={index} className="space-y-1">
+                  <div key={index} className="space-y-1 p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center justify-between">
-                      <div className="font-medium flex items-center text-sm">
+                      <div className="font-medium flex items-center text-base">
                         <div className={`w-3 h-3 ${product.color} rounded-full mr-2`}></div>
                         {product.name}
                       </div>
                       <div className="text-right">
-                        <div className="text-xs text-gray-500">Avg. Profit</div>
-                        <div className="font-medium text-sm">{product.value}</div>
+                        <div className="text-sm text-gray-500">Avg. Profit</div>
+                        <div className="font-medium text-base">${product.value}</div>
                       </div>
                     </div>
-                    <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                    <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-100">
                       <div
                         className={`absolute inset-y-0 left-0 rounded-full ${product.color}`}
                         style={{ width: `${product.percent}%` }}
                       />
                     </div>
-                    <div className="text-right text-xs text-gray-500">{product.percent}%</div>
+                    <div className="text-right text-sm text-gray-500">{product.percent}%</div>
                   </div>
                 ))}
 
                 {/* Add PPD metric at the bottom */}
-                <div className="mt-4 pt-3 border-t border-gray-200">
+                <div className="col-span-2 mt-4 pt-3 border-t border-gray-200">
                   <div className="flex items-center justify-between">
-                    <div className="font-medium text-sm">Products Per Deal (PPD)</div>
-                    <div className="font-bold text-lg text-blue-700">
+                    <div className="font-medium text-base">Products Per Deal (PPD)</div>
+                    <div className="font-bold text-xl text-blue-500">
                       {metrics.productsPerDeal.toFixed(1)}
                     </div>
                   </div>
                 </div>
               </div>
-            ) : (
-              <div className="py-8 text-center text-gray-500">
-                No F&I product data available yet. Log deals with products to see the mix.
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="border hover:shadow-md transition-shadow">
-          <CardHeader className="py-2 px-4 border-b">
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-sm font-medium flex items-center">
-                <Trophy className="mr-2 h-4 w-4 text-blue-600" />
-                Finance Das Board
-              </CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="py-1">
-            {/* Sortable Header */}
-            <div className="flex items-center text-xs font-medium text-white border-b py-2 px-1">
-              <div className="w-10 text-center bg-gray-600 py-2 rounded-l-md">#</div>
-              <div className="w-36 flex-shrink-0 bg-gray-600 py-2 px-2">F&I Manager</div>
-              <div className="w-28 text-center bg-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
-                PVR <ChevronDown className="ml-1 h-3 w-3" />
-              </div>
-              <div className="w-28 text-center bg-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
-                VSC % <ChevronDown className="ml-1 h-3 w-3" />
-              </div>
-              <div className="w-28 text-center bg-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
-                GAP % <ChevronDown className="ml-1 h-3 w-3" />
-              </div>
-              <div className="w-28 text-center bg-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
-                PPM % <ChevronDown className="ml-1 h-3 w-3" />
-              </div>
-              <div className="w-24 text-center bg-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
-                PPD <ChevronDown className="ml-1 h-3 w-3" />
-              </div>
-              <div className="w-36 text-right bg-blue-600 py-2 pr-3 flex items-center justify-end cursor-pointer hover:bg-blue-700 font-semibold rounded-r-md">
-                Profit <ChevronDown className="ml-1 h-3 w-3" />
-              </div>
-            </div>
-
-            {/* Leaderboard Entries */}
-            <div>
-              {[
-                {
-                  name: 'Ashley Rodriguez',
-                  pvr: 2650,
-                  vscPen: 68,
-                  gapPen: 72,
-                  ppmPen: 54,
-                  ppd: 3.2,
-                  profit: 143200,
-                },
-                {
-                  name: 'Michael Parker',
-                  pvr: 2450,
-                  vscPen: 65,
-                  gapPen: 70,
-                  ppmPen: 48,
-                  ppd: 2.9,
-                  profit: 127500,
-                },
-                {
-                  name: 'Sophia Martinez',
-                  pvr: 2320,
-                  vscPen: 61,
-                  gapPen: 68,
-                  ppmPen: 45,
-                  ppd: 2.7,
-                  profit: 115300,
-                },
-                {
-                  name: 'James Wilson',
-                  pvr: 2200,
-                  vscPen: 58,
-                  gapPen: 65,
-                  ppmPen: 42,
-                  ppd: 2.5,
-                  profit: 96500,
-                },
-                {
-                  name: 'Emma Johnson',
-                  pvr: 2100,
-                  vscPen: 55,
-                  gapPen: 62,
-                  ppmPen: 38,
-                  ppd: 2.4,
-                  profit: 89200,
-                },
-              ].map((person, index) => (
-                <div
-                  key={index}
-                  className={`flex items-center py-2 px-1 ${
-                    index !== 4 ? 'border-b' : ''
-                  } border-gray-100 text-sm hover:bg-gray-50`}
-                >
-                  <div className="w-10 flex justify-center">
-                    <div
-                      className={`w-5 h-5 rounded-full flex items-center justify-center
-                        ${
-                          index === 0
-                            ? 'bg-yellow-100 text-yellow-600'
-                            : index === 1
-                            ? 'bg-gray-100 text-gray-600'
-                            : index === 2
-                            ? 'bg-amber-100 text-amber-600'
-                            : 'bg-blue-50 text-blue-500'
-                        }`}
-                    >
-                      <span className="text-xs font-bold">{index + 1}</span>
-                    </div>
-                  </div>
-                  <div className="w-36 flex-shrink-0 font-medium truncate px-2">{person.name}</div>
-                  <div className="w-28 text-center bg-blue-50">${person.pvr.toLocaleString()}</div>
-                  <div className="w-28 text-center bg-blue-50">{person.vscPen}%</div>
-                  <div className="w-28 text-center bg-blue-50">{person.gapPen}%</div>
-                  <div className="w-28 text-center bg-blue-50">{person.ppmPen}%</div>
-                  <div className="w-24 text-center bg-blue-50">{person.ppd}</div>
-                  <div className="w-36 text-right pr-3">
-                    <span className="text-lg font-bold text-green-600">
-                      ${person.profit.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Schedule Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-        {/* ... existing schedule section ... */}
-      </div>
+
     </div>
   );
 };

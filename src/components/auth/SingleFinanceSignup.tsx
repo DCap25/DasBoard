@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   AlertCircle,
@@ -118,13 +118,15 @@ export default function SingleFinanceSignup() {
       const fullName = `${formState.firstName} ${formState.lastName}`;
 
       // First check if user already exists in signup_requests table
-      const { data: existingSignup } = await supabase
+      const { data: existingSignup, error: checkError } = await supabase
         .from('signup_requests')
-        .select('email')
-        .eq('email', formState.email)
-        .single();
+        .select('email, status')
+        .eq('email', formState.email.trim())
+        .maybeSingle();
 
-      if (existingSignup) {
+      // If user exists and query was successful
+      if (existingSignup && !checkError) {
+        console.log('[SingleFinanceSignup] User already exists:', existingSignup);
         // User already exists, show login form
         setLoginData({ email: formState.email, password: '' });
         setShowExistingUserLogin(true);
@@ -133,6 +135,11 @@ export default function SingleFinanceSignup() {
         );
         setLoading(false);
         return;
+      }
+
+      // Log any check errors but continue with signup
+      if (checkError) {
+        console.log('[SingleFinanceSignup] Error checking existing user:', checkError);
       }
 
       // Create signup request in database (Finance Manager is FREE promotional)
@@ -228,6 +235,27 @@ export default function SingleFinanceSignup() {
         console.log('User created but email confirmation may be required');
       }
 
+      // Auto-sign in the newly created user
+      if (authData.user) {
+        console.log('Auto-signing in the newly created user...');
+        try {
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email: formState.email,
+            password: tempPassword,
+          });
+
+          if (signInError) {
+            console.error('Auto sign-in failed:', signInError);
+            // Continue to show success even if auto sign-in fails
+          } else {
+            console.log('Auto sign-in successful');
+          }
+        } catch (signInErr) {
+          console.error('Auto sign-in exception:', signInErr);
+          // Continue to show success even if auto sign-in fails
+        }
+      }
+
       // Store the temporary password to show to user
       setFormState(prev => ({ ...prev, tempPassword }));
 
@@ -239,7 +267,16 @@ export default function SingleFinanceSignup() {
       // Provide more specific error messages
       let errorMessage = err.message || 'Failed to create account';
 
-      if (err.message?.includes('Email rate limit exceeded')) {
+      // Handle duplicate key constraint violations (user already exists)
+      if (err.code === '23505' || err.message?.includes('duplicate key') || err.message?.includes('unique constraint')) {
+        console.log('[SingleFinanceSignup] Duplicate email detected, showing login form');
+        setLoginData({ email: formState.email, password: '' });
+        setShowExistingUserLogin(true);
+        errorMessage = 'An account with this email already exists. Please login below or reset your password.';
+        setLoading(false);
+        setError(errorMessage);
+        return;
+      } else if (err.message?.includes('Email rate limit exceeded')) {
         errorMessage = 'Too many signup attempts. Please wait a few minutes and try again.';
       } else if (err.message?.includes('User already registered')) {
         errorMessage =
@@ -390,38 +427,62 @@ export default function SingleFinanceSignup() {
   }
 
   if (success) {
+    // Auto-redirect to dashboard after 3 seconds
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        navigate('/dashboard/single-finance');
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }, [navigate]);
+
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
         <div className="max-w-lg w-full text-center">
-          <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-6" />
-          <h2 className="text-3xl font-bold mb-4 text-white">Welcome to The DAS Board!</h2>
-
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-6">
-            <h3 className="text-xl font-semibold text-white mb-4">Your Login Credentials</h3>
-            <div className="space-y-3">
-              <div className="bg-gray-700 p-3 rounded-lg">
-                <p className="text-gray-300 text-sm">Email:</p>
-                <p className="text-blue-400 font-mono break-all">{formState.email}</p>
-              </div>
-              <div className="bg-gray-700 p-3 rounded-lg">
-                <p className="text-gray-300 text-sm">Temporary Password:</p>
-                <p className="text-green-400 font-mono text-lg">{formState.tempPassword}</p>
-              </div>
-            </div>
-            <div className="mt-4 p-3 bg-yellow-900/30 border border-yellow-600 rounded-lg">
-              <p className="text-yellow-200 text-sm">
-                <strong>Important:</strong> Save these credentials! You'll need them to log in. We
-                recommend changing your password after your first login.
+          <CheckCircle2 className="h-24 w-24 text-green-500 mx-auto mb-8" />
+          <h1 className="text-4xl font-bold mb-6 text-white">Welcome to The DAS Board!</h1>
+          
+          <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 mb-8">
+            <h2 className="text-2xl font-semibold text-white mb-4">🎉 Account Created Successfully!</h2>
+            <p className="text-gray-300 text-lg mb-6">
+              Your Single Finance Manager account has been set up and is ready to use.
+            </p>
+            
+            <div className="bg-blue-900/30 border border-blue-500 rounded-lg p-4 mb-6">
+              <p className="text-blue-200 text-lg font-medium">
+                Welcome! You will soon be redirected to your Dashboard.
               </p>
+              <div className="mt-3 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-400"></div>
+                <span className="ml-2 text-blue-300 text-sm">Redirecting in 3 seconds...</span>
+              </div>
             </div>
+
+            <div className="bg-gray-700 rounded-lg p-4 mb-4">
+              <h3 className="text-white font-medium mb-2">Your Login Details:</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Email:</span>
+                  <span className="text-blue-400 font-mono">{formState.email}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Password:</span>
+                  <span className="text-green-400 font-mono">{formState.tempPassword}</span>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-yellow-200 text-sm">
+              💡 <strong>Tip:</strong> Save your login details and consider changing your password after first login.
+            </p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             <button
-              onClick={() => navigate('/auth')}
+              onClick={() => navigate('/dashboard/single-finance')}
               className="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 px-8 rounded-lg font-semibold transition-colors"
             >
-              Go to Login
+              Go to Dashboard Now
             </button>
             <button
               onClick={() => navigate('/')}

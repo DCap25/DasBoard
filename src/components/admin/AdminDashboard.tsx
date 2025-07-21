@@ -9,7 +9,7 @@ import { Label } from '../ui/label';
 import { Checkbox } from '../ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
-import { useToast } from '../../lib/use-toast';
+import { toast } from '../../lib/use-toast';
 import { supabase } from '../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -92,7 +92,6 @@ interface StaffCounts {
 
 export function AdminDashboard() {
   const { user } = useAuth();
-  const { toast } = useToast();
   const navigate = useNavigate();
 
   // Check for direct auth if Supabase auth is not available

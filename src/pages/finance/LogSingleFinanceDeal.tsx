@@ -254,40 +254,62 @@ export default function LogSingleFinanceDeal() {
       // Prepare deal data for metrics calculation - SINGLE FINANCE SPECIFIC
       const dealData = {
         id: dealId,
+        dealNumber: dealId,
         customer_name: formData.customerName,
         customer: formData.customerName, // Backward compatibility
+        lastName: formData.customerName, // For table display
         vehicle: `${
           formData.vehicleType === 'N' ? 'New' : formData.vehicleType === 'U' ? 'Used' : 'CPO'
         } - ${formData.vehicleDescription}`,
         vin: formData.vinLast8,
+        vinLast8: formData.vinLast8,
         stock_number: formData.stockNumber,
+        stockNumber: formData.stockNumber,
         sale_date: formData.saleDate,
         saleDate: formData.saleDate, // Backward compatibility
+        dealDate: formData.saleDate, // For form field mapping
         deal_type: formData.dealType,
+        dealType: formData.dealType,
+        vehicleType: formData.vehicleType,
         salesperson: salespersonDisplay,
         salesperson_id: formData.salespersonId,
         is_split_deal: formData.isSplitDeal,
         second_salesperson_id: formData.isSplitDeal ? formData.secondSalespersonId : null,
         lender: formData.lender,
         front_end_gross: parseFloat(formData.frontEndGross) || 0,
+        frontEndGross: parseFloat(formData.frontEndGross) || 0,
         back_end_gross: parseFloat(formData.backEndGross) || 0,
+        backEndGross: parseFloat(formData.backEndGross) || 0,
         total_gross: parseFloat(formData.totalGross) || 0,
+        totalGross: parseFloat(formData.totalGross) || 0,
         amount: parseFloat(formData.totalGross) || 0, // Backward compatibility
         profit: parseFloat(formData.backEndGross) || 0, // Backward compatibility
         reserve_flat: parseFloat(formData.reserveFlat) || 0,
         vsc_profit: parseFloat(formData.vscProfit) || 0,
+        vscProfit: parseFloat(formData.vscProfit) || 0,
         gap_profit: parseFloat(formData.gapProfit) || 0,
+        gapProfit: parseFloat(formData.gapProfit) || 0,
         ppm_profit: parseFloat(formData.ppmProfit) || 0,
+        ppmProfit: parseFloat(formData.ppmProfit) || 0,
         tire_wheel_profit: parseFloat(formData.tireWheelProfit) || 0,
+        tireAndWheelProfit: parseFloat(formData.tireWheelProfit) || 0,
         appearance_profit: parseFloat(formData.appearanceProfit) || 0,
+        appearanceProfit: parseFloat(formData.appearanceProfit) || 0,
         key_replacement_profit: parseFloat(formData.keyReplacementProfit) || 0,
+        keyReplacementProfit: parseFloat(formData.keyReplacementProfit) || 0,
         theft_profit: parseFloat(formData.theftProfit) || 0,
+        theftProfit: parseFloat(formData.theftProfit) || 0,
         windshield_profit: parseFloat(formData.windshieldProfit) || 0,
+        windshieldProfit: parseFloat(formData.windshieldProfit) || 0,
         lojack_profit: parseFloat(formData.lojackProfit) || 0,
+        lojackProfit: parseFloat(formData.lojackProfit) || 0,
         ext_warranty_profit: parseFloat(formData.extWarrantyProfit) || 0,
+        extWarrantyProfit: parseFloat(formData.extWarrantyProfit) || 0,
         other_profit: parseFloat(formData.otherProfit) || 0,
+        otherProfit: parseFloat(formData.otherProfit) || 0,
         products: productsSold,
         status: formData.status,
+        dealStatus: formData.status,
         notes: formData.notes,
         vsc_sold: parseFloat(formData.vscProfit) > 0,
         created_by: user?.email || 'unknown',
@@ -331,9 +353,8 @@ export default function LogSingleFinanceDeal() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Log New Deal - Single Finance Dashboard</h1>
         <Button
-          variant="outline"
           onClick={() => navigate('/dashboard/single-finance')}
-          className="flex items-center"
+          className="flex items-center bg-blue-500 text-white hover:bg-blue-600"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Dashboard
@@ -349,7 +370,7 @@ export default function LogSingleFinanceDeal() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Deal Information Card */}
-        <Card className="p-6">
+        <Card className="p-6 border-l-4 border-l-blue-500 shadow-lg hover:shadow-xl transition-shadow">
           <div className="space-y-4">
             <h2 className="text-xl font-semibold flex items-center border-b pb-2 mb-4">
               <FileText className="mr-2 h-5 w-5 text-blue-500" />
@@ -440,7 +461,7 @@ export default function LogSingleFinanceDeal() {
         </Card>
 
         {/* Customer & Vehicle Information */}
-        <Card className="p-6">
+        <Card className="p-6 border-l-4 border-l-blue-500 shadow-lg hover:shadow-xl transition-shadow">
           <div className="space-y-4">
             <h2 className="text-xl font-semibold flex items-center border-b pb-2 mb-4">
               <User className="mr-2 h-5 w-5 text-green-500" />
@@ -476,7 +497,7 @@ export default function LogSingleFinanceDeal() {
         </Card>
 
         {/* Sales Information */}
-        <Card className="p-6">
+        <Card className="p-6 border-l-4 border-l-blue-500 shadow-lg hover:shadow-xl transition-shadow">
           <div className="space-y-4">
             <h2 className="text-xl font-semibold flex items-center border-b pb-2 mb-4">
               <User className="mr-2 h-5 w-5 text-purple-500" />
@@ -563,7 +584,7 @@ export default function LogSingleFinanceDeal() {
         </Card>
 
         {/* F&I Products */}
-        <Card className="p-6">
+        <Card className="p-6 border-l-4 border-l-blue-500 shadow-lg hover:shadow-xl transition-shadow">
           <div className="space-y-4">
             <h2 className="text-xl font-semibold flex items-center border-b pb-2 mb-4">
               <DollarSign className="mr-2 h-5 w-5 text-green-500" />
@@ -679,7 +700,7 @@ export default function LogSingleFinanceDeal() {
         </Card>
 
         {/* Totals & Status */}
-        <Card className="p-6">
+        <Card className="p-6 border-l-4 border-l-blue-500 shadow-lg hover:shadow-xl transition-shadow">
           <div className="space-y-4">
             <h2 className="text-xl font-semibold flex items-center border-b pb-2 mb-4">
               <Calculator className="mr-2 h-5 w-5 text-amber-500" />
@@ -742,7 +763,7 @@ export default function LogSingleFinanceDeal() {
           >
             Cancel
           </Button>
-          <Button type="submit" disabled={isSubmitting} className="px-8">
+          <Button type="submit" disabled={isSubmitting} className="px-8 bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-400">
             {isSubmitting ? 'Saving Deal...' : 'Save Deal'}
           </Button>
         </div>

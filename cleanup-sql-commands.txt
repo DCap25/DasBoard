@@ -1,0 +1,53 @@
+🧹 SUPABASE CLEANUP COMMANDS
+============================
+
+Copy and paste these SQL commands one by one into your Supabase SQL Editor:
+
+1. PREVIEW what will be deleted (run this first to see what will be removed):
+
+SELECT email, status, created_at 
+FROM signup_requests 
+WHERE email NOT IN (
+  SELECT email FROM auth.users WHERE email IS NOT NULL
+)
+ORDER BY created_at DESC;
+
+
+2. DELETE orphaned signup_requests:
+
+DELETE FROM signup_requests 
+WHERE email NOT IN (
+  SELECT email FROM auth.users WHERE email IS NOT NULL
+);
+
+
+3. VERIFY the cleanup worked:
+
+SELECT COUNT(*) as remaining_requests FROM signup_requests;
+
+
+4. VIEW remaining requests (should all have corresponding auth users):
+
+SELECT 
+  sr.email as signup_email,
+  au.email as auth_email,
+  sr.status,
+  sr.created_at
+FROM signup_requests sr
+LEFT JOIN auth.users au ON sr.email = au.email
+ORDER BY sr.created_at DESC;
+
+============================
+🎯 STEPS TO FOLLOW:
+
+1. Go to https://supabase.com/dashboard
+2. Select your project: iugjtokydvbcvmrpeziv  
+3. Click "SQL Editor" in the sidebar
+4. Click "New Query"
+5. Copy and paste command #1 above, click "Run"
+6. Review the results - these are the records that will be deleted
+7. If it looks correct, copy and paste command #2, click "Run"
+8. Run command #3 to verify cleanup
+9. Try your signup process again with testsingle@example.com
+
+============================

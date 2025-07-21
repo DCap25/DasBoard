@@ -60,6 +60,99 @@ const SingleFinanceDealsPage: React.FC = () => {
     navigate('/dashboard/single-finance');
   };
 
+  // Handle status change for a deal
+  const handleStatusChange = (dealId: string, newStatus: string) => {
+    try {
+      // Get existing deals from localStorage
+      const existingDealsJson = localStorage.getItem('singleFinanceDeals');
+      const existingDeals = existingDealsJson ? JSON.parse(existingDealsJson) : [];
+
+      // Update the deal status
+      const updatedDeals = existingDeals.map((deal: any) =>
+        deal.id === dealId ? { ...deal, status: newStatus, dealStatus: newStatus } : deal
+      );
+
+      // Save back to localStorage
+      localStorage.setItem('singleFinanceDeals', JSON.stringify(updatedDeals));
+
+      // Update state immediately to trigger re-render
+      setDeals(currentDeals => 
+        currentDeals.map(deal => 
+          deal.id === dealId ? { ...deal, status: newStatus } : deal
+        )
+      );
+
+      // Also reload deals to keep consistency
+      const formattedDeals: Deal[] = updatedDeals.map((rawDeal: any) => {
+        const deal: Deal = {
+          id: rawDeal.id,
+          customer: rawDeal.customer || rawDeal.lastName || 'Unknown',
+          vehicle: rawDeal.vehicle || `${rawDeal.vehicleType === 'N' ? 'New' : rawDeal.vehicleType === 'U' ? 'Used' : 'CPO'} - Stock #${rawDeal.stockNumber}`,
+          vin: rawDeal.vin || rawDeal.vinLast8 || '',
+          saleDate: rawDeal.saleDate || rawDeal.dealDate || rawDeal.created_at,
+          salesperson: rawDeal.salesperson || 'Self',
+          amount: rawDeal.amount || rawDeal.totalGross || 0,
+          status: rawDeal.status || rawDeal.dealStatus || 'Pending',
+          products: rawDeal.products || [],
+          profit: rawDeal.profit || rawDeal.backEndGross || 0,
+          created_at: rawDeal.created_at || new Date().toISOString(),
+        };
+        return Object.assign(deal, rawDeal);
+      });
+      setDeals(formattedDeals);
+
+      console.log(`Updated deal ${dealId} status to ${newStatus}`);
+    } catch (error) {
+      console.error('Error updating deal status:', error);
+    }
+  };
+
+  // Handle deal deletion
+  const handleDeleteDeal = (dealId: string, shouldDelete: boolean) => {
+    if (!shouldDelete) return;
+
+    // First confirmation
+    if (confirm('⚠️ DELETE CONFIRMATION\n\nAre you sure you want to delete this deal?\n\nThis action cannot be undone and will permanently remove all deal data.')) {
+      // Second confirmation for extra safety
+      if (confirm('🚨 FINAL CONFIRMATION\n\nThis is your last chance!\n\nClick OK to permanently delete this deal, or Cancel to keep it.')) {
+      try {
+        // Get existing deals from localStorage
+        const existingDealsJson = localStorage.getItem('singleFinanceDeals');
+        const existingDeals = existingDealsJson ? JSON.parse(existingDealsJson) : [];
+
+        // Remove the deal
+        const updatedDeals = existingDeals.filter((deal: any) => deal.id !== dealId);
+
+        // Save back to localStorage
+        localStorage.setItem('singleFinanceDeals', JSON.stringify(updatedDeals));
+
+        // Reload deals to reflect the change
+        const formattedDeals: Deal[] = updatedDeals.map((rawDeal: any) => {
+          const deal: Deal = {
+            id: rawDeal.id,
+            customer: rawDeal.customer || rawDeal.lastName || 'Unknown',
+            vehicle: rawDeal.vehicle || `${rawDeal.vehicleType === 'N' ? 'New' : rawDeal.vehicleType === 'U' ? 'Used' : 'CPO'} - Stock #${rawDeal.stockNumber}`,
+            vin: rawDeal.vin || rawDeal.vinLast8 || '',
+            saleDate: rawDeal.saleDate || rawDeal.dealDate || rawDeal.created_at,
+            salesperson: rawDeal.salesperson || 'Self',
+            amount: rawDeal.amount || rawDeal.totalGross || 0,
+            status: rawDeal.status || rawDeal.dealStatus || 'Pending',
+            products: rawDeal.products || [],
+            profit: rawDeal.profit || rawDeal.backEndGross || 0,
+            created_at: rawDeal.created_at || new Date().toISOString(),
+          };
+          return Object.assign(deal, rawDeal);
+        });
+        setDeals(formattedDeals);
+
+        console.log(`Deleted deal ${dealId}`);
+      } catch (error) {
+        console.error('Error deleting deal:', error);
+      }
+      }
+    }
+  };
+
   // Load deals from localStorage - using singleFinanceDeals storage key
   useEffect(() => {
     try {
@@ -156,6 +249,12 @@ const SingleFinanceDealsPage: React.FC = () => {
             <AlertCircle className="w-3 h-3 mr-1" /> {status}
           </Badge>
         );
+      case 'Held':
+        return (
+          <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+            <Clock className="w-3 h-3 mr-1" /> {status}
+          </Badge>
+        );
       case 'Unwound':
       case 'Dead Deal':
         return (
@@ -191,7 +290,7 @@ const SingleFinanceDealsPage: React.FC = () => {
         <button
           type="button"
           onClick={handleBackToDashboard}
-          className="mr-4 flex items-center px-4 py-2 text-sm font-medium text-white bg-orange-600 border border-orange-600 rounded-md shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="mr-4 flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-500 border border-blue-500 rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Dashboard
@@ -230,6 +329,7 @@ const SingleFinanceDealsPage: React.FC = () => {
               <option value="All">All Statuses</option>
               <option value="Pending">Pending</option>
               <option value="Funded">Funded</option>
+              <option value="Held">Held</option>
               <option value="Unwound">Unwound</option>
               <option value="Dead Deal">Dead Deal</option>
             </select>
@@ -242,7 +342,16 @@ const SingleFinanceDealsPage: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-orange-50 border-b">
+                <tr className="bg-gray-50 border-b text-xs">
+                  <th className="py-3 px-4 text-center font-medium">#</th>
+                  <th className="py-3 px-4 text-left font-medium">
+                    <button className="flex items-center" onClick={() => toggleSort('customer')}>
+                      Last Name
+                      {sortField === 'customer' && (
+                        <ArrowUpDown size={14} className="ml-1 text-gray-500" />
+                      )}
+                    </button>
+                  </th>
                   <th className="py-3 px-4 text-left font-medium">
                     <button className="flex items-center" onClick={() => toggleSort('dealNumber')}>
                       Deal #
@@ -251,7 +360,8 @@ const SingleFinanceDealsPage: React.FC = () => {
                       )}
                     </button>
                   </th>
-                  <th className="py-3 px-4 text-left font-medium">
+                  <th className="py-3 px-4 text-left font-medium">Stock #</th>
+                  <th className="py-3 px-4 text-center font-medium">
                     <button className="flex items-center" onClick={() => toggleSort('saleDate')}>
                       Date
                       {sortField === 'saleDate' && (
@@ -259,90 +369,164 @@ const SingleFinanceDealsPage: React.FC = () => {
                       )}
                     </button>
                   </th>
-                  <th className="py-3 px-4 text-left font-medium">
-                    <button className="flex items-center" onClick={() => toggleSort('customer')}>
-                      Customer
-                      {sortField === 'customer' && (
-                        <ArrowUpDown size={14} className="ml-1 text-gray-500" />
-                      )}
-                    </button>
-                  </th>
-                  <th className="py-3 px-4 text-left font-medium">Vehicle</th>
-                  <th className="py-3 px-4 text-left font-medium">Stock #</th>
                   <th className="py-3 px-4 text-left font-medium">VIN</th>
-                  <th className="py-3 px-4 text-right font-medium">
-                    <button
-                      className="flex items-center ml-auto"
-                      onClick={() => toggleSort('amount')}
-                    >
-                      Total Gross
-                      {sortField === 'amount' && (
-                        <ArrowUpDown size={14} className="ml-1 text-gray-500" />
-                      )}
-                    </button>
-                  </th>
+                  <th className="py-3 px-4 text-center font-medium">N/U/CPO</th>
+                  <th className="py-3 px-4 text-left font-medium">Lender</th>
+                  <th className="py-3 px-4 text-right font-medium">Front End</th>
+                  <th className="py-3 px-4 text-right font-medium">VSC</th>
+                  <th className="py-3 px-4 text-right font-medium">PPM</th>
+                  <th className="py-3 px-4 text-right font-medium">GAP</th>
+                  <th className="py-3 px-4 text-right font-medium">T&W/Bundle</th>
+                  <th className="py-3 px-4 text-center font-medium">PPD</th>
+                  <th className="py-3 px-4 text-right font-medium">PVR</th>
                   <th className="py-3 px-4 text-right font-medium">
                     <button
                       className="flex items-center ml-auto"
                       onClick={() => toggleSort('profit')}
                     >
-                      Back End
+                      Total
                       {sortField === 'profit' && (
                         <ArrowUpDown size={14} className="ml-1 text-gray-500" />
                       )}
                     </button>
                   </th>
-                  <th className="py-3 px-4 text-left font-medium">Lender</th>
                   <th className="py-3 px-4 text-center font-medium">Status</th>
+                  <th className="py-3 px-4 text-center font-medium bg-red-600 text-white">Delete</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredDeals.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className="py-8 text-center text-gray-500">
+                    <td colSpan={18} className="py-8 text-center text-gray-500">
                       {deals.length === 0
                         ? "No deals logged yet. Use the 'Log New Deal' button to add deals."
                         : 'No deals match your search criteria.'}
                     </td>
                   </tr>
                 ) : (
-                  filteredDeals.map(deal => {
+                  filteredDeals.map((deal, index) => {
                     const dealData = deal as any; // Access extended properties
+                    
+                    // Extract last name from customer
+                    const lastName = deal.customer.split(' ').pop() || '';
+
+                    // Format date for display
+                    const actualDealDate = dealData.dealDate || deal.saleDate;
+                    const dealDate = new Date(actualDealDate);
+                    const formattedDate = dealDate.toLocaleDateString('en-US', {
+                      month: '2-digit',
+                      day: '2-digit',
+                      year: '2-digit',
+                    });
+
+                    // Determine if New, Used or CPO
+                    const vehicleType = dealData.vehicleType || 
+                      (deal.vehicle.toLowerCase().includes('new') ? 'N' : 
+                       deal.vehicle.toLowerCase().includes('cpo') ? 'C' : 'U');
+
+                    // Get individual product profits
+                    const vscProfit = parseFloat(dealData.vscProfit) || 0;
+                    const ppmProfit = parseFloat(dealData.ppmProfit) || 0;
+                    const gapProfit = parseFloat(dealData.gapProfit) || 0;
+                    const twProfit = parseFloat(dealData.tireAndWheelProfit) || 0;
+
+                    // Products per deal
+                    const ppd = deal.products.length;
+
+                    // PVR (per vehicle retailed)
+                    const pvr = Math.round(deal.profit / (ppd || 1));
+
+                    // Debug logging
+                    if (deal.id === 'some-id') {
+                      console.log(`[ViewAllDeals] Deal ${deal.id} status: "${deal.status}", Should be red: ${deal.status === 'Held'}`);
+                    }
+
                     return (
-                      <tr key={deal.id} className="border-b hover:bg-gray-50">
+                      <tr 
+                        key={deal.id} 
+                        className="border-b"
+                        style={{
+                          backgroundColor: deal.status === 'Held' ? '#fef2f2' : 'white'
+                        }}
+                      >
+                        <td className="py-3 px-4 text-center font-medium">
+                          {filteredDeals.length - index}
+                        </td>
+                        <td className="py-3 px-4 font-medium">{lastName}</td>
                         <td className="py-3 px-4 font-medium text-blue-600">
                           {dealData.dealNumber || deal.id}
                         </td>
-                        <td className="py-3 px-4">{formatDate(deal.saleDate)}</td>
-                        <td className="py-3 px-4">{deal.customer}</td>
-                        <td className="py-3 px-4">
-                          {dealData.vehicleType && (
-                            <span
-                              className={`inline-block w-6 h-6 text-xs font-bold text-white text-center rounded mr-2 ${
-                                dealData.vehicleType === 'N'
-                                  ? 'bg-green-600'
-                                  : dealData.vehicleType === 'U'
-                                  ? 'bg-blue-600'
-                                  : 'bg-purple-600'
-                              }`}
-                            >
-                              {dealData.vehicleType}
-                            </span>
-                          )}
-                          {deal.vehicle}
-                        </td>
                         <td className="py-3 px-4 font-mono">{dealData.stockNumber || 'N/A'}</td>
+                        <td className="py-3 px-4 text-center text-gray-600">{formattedDate}</td>
                         <td className="py-3 px-4 font-mono text-xs">
-                          {deal.vin ? `...${deal.vin.slice(-8)}` : 'N/A'}
+                          {dealData.vinLast8 || (deal.vin ? deal.vin.slice(-8) : 'N/A')}
                         </td>
+                        <td className="py-3 px-4 text-center">
+                          <span
+                            className={`px-1.5 py-0.5 rounded text-xs font-medium ${
+                              vehicleType === 'N'
+                                ? 'bg-green-100 text-green-800'
+                                : vehicleType === 'C'
+                                ? 'bg-blue-100 text-blue-800'
+                                : 'bg-amber-100 text-amber-800'
+                            }`}
+                          >
+                            {vehicleType}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-gray-600 text-xs">{dealData.lender || 'N/A'}</td>
                         <td className="py-3 px-4 text-right font-medium">
-                          {formatCurrency(deal.amount)}
+                          {formatCurrency(dealData.frontEndGross || 0)}
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          {formatCurrency(vscProfit)}
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          {formatCurrency(ppmProfit)}
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          {formatCurrency(gapProfit)}
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          {formatCurrency(twProfit)}
+                        </td>
+                        <td className="py-3 px-4 text-center font-medium">{ppd}</td>
+                        <td className="py-3 px-4 text-right">
+                          {formatCurrency(pvr)}
                         </td>
                         <td className="py-3 px-4 text-right font-medium text-green-600">
                           {formatCurrency(deal.profit)}
                         </td>
-                        <td className="py-3 px-4">{dealData.lender || 'N/A'}</td>
-                        <td className="py-3 px-4 text-center">{getStatusBadge(deal.status)}</td>
+                        <td className="py-3 px-4 text-center">
+                          <select
+                            value={deal.status}
+                            onChange={e => handleStatusChange(deal.id, e.target.value)}
+                            className={`text-xs px-2 py-1 rounded border-0 focus:ring-1 focus:ring-blue-500 ${
+                              deal.status === 'Funded' 
+                                ? 'bg-green-100 text-green-800'
+                                : deal.status === 'Held'
+                                ? 'bg-red-100 text-red-800'
+                                : deal.status === 'Pending'
+                                ? 'bg-blue-100 text-blue-800'
+                                : deal.status === 'Unwound'
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-gray-100 text-gray-800'
+                            }`}
+                          >
+                            <option value="Pending">Pending</option>
+                            <option value="Funded">Funded</option>
+                            <option value="Held">Held</option>
+                            <option value="Unwound">Unwound</option>
+                            <option value="Dead Deal">Dead Deal</option>
+                          </select>
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          <input
+                            type="checkbox"
+                            onChange={e => handleDeleteDeal(deal.id, e.target.checked)}
+                            className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                          />
+                        </td>
                       </tr>
                     );
                   })

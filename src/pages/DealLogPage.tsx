@@ -362,7 +362,7 @@ const DealLogPage: React.FC<DealLogPageProps> = ({ dashboardType = 'finance' }) 
           <button
             type="button"
             onClick={handleBackToDashboard}
-            className="mr-4 flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="mr-4 flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-500 border border-blue-500 rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
@@ -373,7 +373,7 @@ const DealLogPage: React.FC<DealLogPageProps> = ({ dashboardType = 'finance' }) 
 
       <form onSubmit={handleSubmit}>
         {/* Deal Information Card */}
-        <div className="bg-white rounded-lg shadow mb-6">
+        <div className="bg-white rounded-lg shadow mb-6 border-l-4 border-l-blue-500">
           <div className="bg-blue-50 border-b border-blue-100 px-6 py-4 rounded-t-lg flex items-center justify-between">
             <div className="flex items-center">
               <Car className="h-5 w-5 text-blue-500 mr-2" />
@@ -381,7 +381,7 @@ const DealLogPage: React.FC<DealLogPageProps> = ({ dashboardType = 'finance' }) 
             </div>
             <button
               type="submit"
-              className="bg-green-600 hover:bg-green-700 border border-transparent rounded-md shadow-sm py-2 px-6 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              className="bg-blue-500 hover:bg-blue-600 border border-transparent rounded-md shadow-sm py-2 px-6 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               Log Deal
             </button>
@@ -718,7 +718,7 @@ const DealLogPage: React.FC<DealLogPageProps> = ({ dashboardType = 'finance' }) 
           {/* Left Column - Products */}
           <div>
             {/* Products */}
-            <div className="bg-white rounded-lg shadow h-full">
+            <div className="bg-white rounded-lg shadow h-full border-l-4 border-l-blue-500">
               <div className="bg-purple-50 border-b border-purple-100 px-6 py-4 rounded-t-lg flex items-center">
                 <Package className="h-5 w-5 text-purple-500 mr-2" />
                 <h2 className="text-lg font-semibold text-purple-700">Product Profits</h2>
@@ -875,7 +875,7 @@ const DealLogPage: React.FC<DealLogPageProps> = ({ dashboardType = 'finance' }) 
           {/* Right Column */}
           <div>
             {/* Deal Profit & Summary combined */}
-            <div className="bg-white rounded-lg shadow h-full">
+            <div className="bg-white rounded-lg shadow h-full border-l-4 border-l-blue-500">
               <div className="bg-green-50 border-b border-green-100 px-6 py-4 rounded-t-lg flex items-center">
                 <DollarSign className="h-5 w-5 text-green-500 mr-2" />
                 <h2 className="text-lg font-semibold text-green-700">Deal Profit</h2>
