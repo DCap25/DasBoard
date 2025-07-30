@@ -168,9 +168,18 @@ interface Translations {
     dealerGroup: string;
     dealership: string;
     financeManager: string;
+    simple: {
+      title: string;
+      subtitle: string;
+      description: string;
+      submitButton: string;
+      whyTitle: string;
+      whyBenefits: string[];
+    };
     form: {
       firstName: string;
       lastName: string;
+      fullName: string;
       email: string;
       password: string;
       confirmPassword: string;
@@ -181,6 +190,8 @@ interface Translations {
       alreadyHave: string;
       signIn: string;
       terms: string;
+      agreePrefix: string;
+      emailNote: string;
     };
   };
   common: {
@@ -411,9 +422,23 @@ export const translations: Record<Language, Translations | Partial<Translations>
       dealerGroup: 'Dealer Group Signup',
       dealership: 'Dealership Signup',
       financeManager: 'Finance Manager Signup',
+      simple: {
+        title: 'Simple Signup',
+        subtitle: 'Get Started Free',
+        description: 'Sign up as a Single Finance Manager in under 2 minutes',
+        submitButton: 'Start Free Account',
+        whyTitle: 'Why Single Finance Manager?',
+        whyBenefits: [
+          'Track your personal performance metrics',
+          'Calculate your pay with real-time data',
+          'Monitor your PVR and product penetration',
+          'Completely FREE for individual use'
+        ],
+      },
       form: {
         firstName: 'First Name',
         lastName: 'Last Name',
+        fullName: 'Full Name',
         email: 'Email Address',
         password: 'Password',
         confirmPassword: 'Confirm Password',
@@ -424,6 +449,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
         alreadyHave: 'Already have an account?',
         signIn: 'Sign In',
         terms: 'I agree to the Terms of Service and Privacy Policy',
+        agreePrefix: 'I agree to the',
+        emailNote: 'Must be a verified dealership email address',
       },
     },
     common: {
@@ -654,9 +681,23 @@ export const translations: Record<Language, Translations | Partial<Translations>
       dealerGroup: 'Registro de Grupo de Concesionarios',
       dealership: 'Registro de Concesionario',
       financeManager: 'Registro de Gerente Financiero',
+      simple: {
+        title: 'Registro Sencillo',
+        subtitle: 'Comienza Gratis',
+        description: 'Regístrate como Gerente Financiero Individual en menos de 2 minutos',
+        submitButton: 'Comenzar Cuenta Gratuita',
+        whyTitle: '¿Por qué Gerente Financiero Individual?',
+        whyBenefits: [
+          'Rastrea tus métricas de rendimiento personal',
+          'Calcula tu pago con datos en tiempo real',
+          'Monitorea tu PVR y penetración de productos',
+          'Completamente GRATIS para uso individual'
+        ],
+      },
       form: {
         firstName: 'Nombre',
         lastName: 'Apellido',
+        fullName: 'Nombre Completo',
         email: 'Dirección de Email',
         password: 'Contraseña',
         confirmPassword: 'Confirmar Contraseña',
@@ -667,6 +708,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
         alreadyHave: '¿Ya tienes una cuenta?',
         signIn: 'Iniciar Sesión',
         terms: 'Acepto los Términos de Servicio y la Política de Privacidad',
+        agreePrefix: 'Acepto los',
+        emailNote: 'Debe ser una dirección de email verificada del concesionario',
       },
     },
     common: {

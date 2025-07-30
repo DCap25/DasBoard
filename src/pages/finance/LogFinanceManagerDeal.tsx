@@ -20,6 +20,39 @@ const SALESPEOPLE = [
   { id: 5, initials: 'BH', firstName: 'Brandon', lastName: 'Harris' },
 ];
 
+// Define lenders - matching the list from DealLogPage
+const LENDERS = [
+  'Ally Bank',
+  'American Credit Acceptance',
+  'Americredit',
+  'Bank of America',
+  'Capital One',
+  'Chase',
+  'Chrysler Capital',
+  'Crescent Bank',
+  'Exeter',
+  'First Help Financial',
+  'Ford Motor Credit',
+  'Global Lending Services',
+  'Huntington National Bank',
+  'Hyundai Financial',
+  'Navy Federal',
+  'Other',
+  'PNC Bank',
+  'Prestige Financial Services',
+  'Regional Acceptance',
+  'Santander',
+  'Stellantis',
+  'TD Auto',
+  'Tesla',
+  'Toyota Credit',
+  'Truist',
+  'US Bank',
+  'USAA',
+  'Wells Fargo',
+  'Westlake Financial Services',
+];
+
 // Define product options for finance managers with profit tracking
 const PRODUCT_OPTIONS = [
   { id: 'vsc', name: 'Vehicle Service Contract (VSC)', defaultProfit: 500 },
@@ -440,6 +473,7 @@ export default function LogFinanceManagerDeal() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="vehicleType">Vehicle Type</Label>
+                <div className="text-xs text-blue-600 mb-1">→ Feeds: Dashboard New/Used/CPO breakdowns, DAS Board rankings</div>
                 <select
                   id="vehicleType"
                   name="vehicleType"
@@ -547,6 +581,7 @@ export default function LogFinanceManagerDeal() {
 
               <div className="space-y-2">
                 <Label htmlFor="frontEndGross">Front End Gross</Label>
+                <div className="text-xs text-blue-600 mb-1">→ Feeds: Sales Dashboard Total Gross, AVP Front PVR, GM Front Gross</div>
                 <Input
                   id="frontEndGross"
                   name="frontEndGross"
@@ -560,14 +595,21 @@ export default function LogFinanceManagerDeal() {
 
               <div className="space-y-2">
                 <Label htmlFor="lender">Lender</Label>
-                <Input
+                <select
                   id="lender"
                   name="lender"
                   value={formData.lender}
                   onChange={handleInputChange}
-                  placeholder="Lender name"
                   disabled={formData.dealType === 'Cash'}
-                />
+                  className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                >
+                  <option value="">Select Lender</option>
+                  {LENDERS.map(lender => (
+                    <option key={lender} value={lender}>
+                      {lender}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -616,6 +658,7 @@ export default function LogFinanceManagerDeal() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="reserveFlat">Reserve/Flat</Label>
+                <div className="text-xs text-blue-600 mb-1">→ Feeds: Finance Dashboard Back End Gross, All PVR Calculations</div>
                 <Input
                   id="reserveFlat"
                   name="reserveFlat"
@@ -629,6 +672,7 @@ export default function LogFinanceManagerDeal() {
 
               <div className="space-y-2">
                 <Label htmlFor="vscProfit">VSC Profit</Label>
+                <div className="text-xs text-blue-600 mb-1">→ Feeds: Finance Dashboard VSC %, Product Mix Charts</div>
                 <Input
                   id="vscProfit"
                   name="vscProfit"
@@ -642,6 +686,7 @@ export default function LogFinanceManagerDeal() {
 
               <div className="space-y-2">
                 <Label htmlFor="gapProfit">GAP Profit</Label>
+                <div className="text-xs text-blue-600 mb-1">→ Feeds: Finance Dashboard GAP %, Product Mix Charts</div>
                 <Input
                   id="gapProfit"
                   name="gapProfit"
@@ -655,6 +700,7 @@ export default function LogFinanceManagerDeal() {
 
               <div className="space-y-2">
                 <Label htmlFor="ppmProfit">PPM Profit</Label>
+                <div className="text-xs text-blue-600 mb-1">→ Feeds: Finance Dashboard PPM %, Product Mix Charts</div>
                 <Input
                   id="ppmProfit"
                   name="ppmProfit"
@@ -732,6 +778,8 @@ export default function LogFinanceManagerDeal() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>Back End Gross</Label>
+                <div className="text-xs text-green-600 mb-1">→ AUTO-CALCULATED: Sum of all F&I products + Reserve</div>
+                <div className="text-xs text-blue-600 mb-1">→ Feeds: All Dashboard Back End Gross, Finance PVR</div>
                 <div className="p-2 bg-gray-100 border rounded-md">
                   ${parseFloat(formData.backEndGross || '0').toLocaleString()}
                 </div>
@@ -739,6 +787,8 @@ export default function LogFinanceManagerDeal() {
 
               <div className="space-y-2">
                 <Label>Total Gross</Label>
+                <div className="text-xs text-green-600 mb-1">→ AUTO-CALCULATED: Front End + Back End</div>
+                <div className="text-xs text-blue-600 mb-1">→ Feeds: ALL Dashboard Total Gross, PVR Calculations, Profit Metrics</div>
                 <div className="p-2 bg-gray-100 border rounded-md font-bold">
                   ${parseFloat(formData.totalGross || '0').toLocaleString()}
                 </div>

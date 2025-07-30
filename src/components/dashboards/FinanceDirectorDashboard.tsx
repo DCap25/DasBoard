@@ -70,6 +70,39 @@ interface DepartmentMetrics {
   penetration_rate: number;
 }
 
+// Lenders list from DealLogPage - matches the dropdown options
+const LENDERS = [
+  'Ally Bank',
+  'American Credit Acceptance',
+  'Americredit',
+  'Bank of America',
+  'Capital One',
+  'Chase',
+  'Chrysler Capital',
+  'Crescent Bank',
+  'Exeter',
+  'First Help Financial',
+  'Ford Motor Credit',
+  'Global Lending Services',
+  'Huntington National Bank',
+  'Hyundai Financial',
+  'Navy Federal',
+  'Other',
+  'PNC Bank',
+  'Prestige Financial Services',
+  'Regional Acceptance',
+  'Santander',
+  'Stellantis',
+  'TD Auto',
+  'Tesla',
+  'Toyota Credit',
+  'Truist',
+  'US Bank',
+  'USAA',
+  'Wells Fargo',
+  'Westlake Financial Services',
+];
+
 interface Deal {
   id: string;
   customer_name: string;
@@ -81,8 +114,90 @@ interface Deal {
   date: string;
   status: 'completed' | 'pending' | 'cancelled';
   deal_type: 'new' | 'used';
-  funding_source: 'bank' | 'credit_union' | 'captive' | 'cash';
+  lender: string;
 }
+
+// Deals by Lender Component
+const DealsByLenderComponent: React.FC<{ deals: Deal[] }> = ({ deals }) => {
+  const [showAll, setShowAll] = useState(false);
+
+  // Process deals to count by lender
+  const lenderCounts = deals.reduce((acc, deal) => {
+    const lenderName = deal.lender || 'Unknown';
+    
+    if (!acc[lenderName]) {
+      acc[lenderName] = 0;
+    }
+    acc[lenderName]++;
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Sort lenders by deal count
+  const sortedLenders = Object.entries(lenderCounts)
+    .sort(([, a], [, b]) => b - a)
+    .map(([lender, count], index) => ({ lender, count, rank: index + 1 }));
+
+  const topLenders = sortedLenders.slice(0, 5);
+  const displayLenders = showAll ? sortedLenders : topLenders;
+
+  const totalDeals = deals.length;
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-3">
+        {displayLenders.map(({ lender, count, rank }) => (
+          <div key={lender} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <span className="text-sm font-semibold text-blue-600">#{rank}</span>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900">{lender}</h4>
+                <p className="text-sm text-gray-500">
+                  {((count / totalDeals) * 100).toFixed(1)}% of total deals
+                </p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-lg font-bold text-gray-900">{count}</div>
+              <div className="text-sm text-gray-500">deals</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {sortedLenders.length > 5 && (
+        <div className="pt-3 border-t">
+          <Button
+            variant="outline"
+            onClick={() => setShowAll(!showAll)}
+            className="w-full"
+            size="sm"
+          >
+            {showAll ? (
+              <>
+                <ChevronUp className="w-4 h-4 mr-2" />
+                Show Top 5 Only
+              </>
+            ) : (
+              <>
+                <ChevronDown className="w-4 h-4 mr-2" />
+                View All Lenders ({sortedLenders.length})
+              </>
+            )}
+          </Button>
+        </div>
+      )}
+
+      {totalDeals === 0 && (
+        <div className="text-center py-8 text-gray-500">
+          <CreditCard className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+          <p>No deals found for the selected period</p>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const FinanceDirectorDashboard = () => {
   const { user, role, dealershipId } = useAuth();
@@ -160,7 +275,7 @@ const FinanceDirectorDashboard = () => {
       date: '2024-01-15',
       status: 'completed',
       deal_type: 'new',
-      funding_source: 'bank',
+      lender: 'Bank of America',
     },
     {
       id: 'D002',
@@ -173,7 +288,7 @@ const FinanceDirectorDashboard = () => {
       date: '2024-01-15',
       status: 'completed',
       deal_type: 'used',
-      funding_source: 'credit_union',
+      lender: 'Navy Federal',
     },
     {
       id: 'D003',
@@ -186,7 +301,7 @@ const FinanceDirectorDashboard = () => {
       date: '2024-01-14',
       status: 'completed',
       deal_type: 'new',
-      funding_source: 'captive',
+      lender: 'Ford Motor Credit',
     },
     {
       id: 'D004',
@@ -199,7 +314,7 @@ const FinanceDirectorDashboard = () => {
       date: '2024-01-14',
       status: 'pending',
       deal_type: 'used',
-      funding_source: 'bank',
+      lender: 'Wells Fargo',
     },
     {
       id: 'D005',
@@ -212,7 +327,98 @@ const FinanceDirectorDashboard = () => {
       date: '2024-01-13',
       status: 'completed',
       deal_type: 'new',
-      funding_source: 'captive',
+      lender: 'Chrysler Capital',
+    },
+    {
+      id: 'D006',
+      customer_name: 'Wilson, Sarah',
+      vehicle: '2024 Honda CR-V',
+      salesperson: 'David Lee',
+      finance_manager: 'John Valentine',
+      fi_gross: 2200,
+      products: ['Extended Warranty', 'GAP Insurance'],
+      date: '2024-01-13',
+      status: 'completed',
+      deal_type: 'new',
+      lender: 'Chase',
+    },
+    {
+      id: 'D007',
+      customer_name: 'Taylor, James',
+      vehicle: '2023 Toyota RAV4',
+      salesperson: 'Amy Chen',
+      finance_manager: 'Lloyd Hatter',
+      fi_gross: 1650,
+      products: ['Paint Protection'],
+      date: '2024-01-12',
+      status: 'completed',
+      deal_type: 'used',
+      lender: 'Navy Federal',
+    },
+    {
+      id: 'D008',
+      customer_name: 'Anderson, Lisa',
+      vehicle: '2024 Ford Explorer',
+      salesperson: 'Mike Davis',
+      finance_manager: 'Sarah Johnson',
+      fi_gross: 2900,
+      products: ['Extended Warranty', 'GAP Insurance', 'Tire & Wheel'],
+      date: '2024-01-12',
+      status: 'completed',
+      deal_type: 'new',
+      lender: 'Toyota Credit',
+    },
+    {
+      id: 'D009',
+      customer_name: 'Garcia, Carlos',
+      vehicle: '2023 Hyundai Elantra',
+      salesperson: 'Lisa Chen',
+      finance_manager: 'John Valentine',
+      fi_gross: 1750,
+      products: ['Extended Warranty'],
+      date: '2024-01-11',
+      status: 'completed',
+      deal_type: 'used',
+      lender: 'Ally Bank',
+    },
+    {
+      id: 'D010',
+      customer_name: 'Miller, Robert',
+      vehicle: '2024 BMW X3',
+      salesperson: 'Tom Wilson',
+      finance_manager: 'Sarah Johnson',
+      fi_gross: 3500,
+      products: ['Extended Warranty', 'GAP Insurance', 'Paint Protection', 'Tire & Wheel'],
+      date: '2024-01-11',
+      status: 'completed',
+      deal_type: 'new',
+      lender: 'Cash',
+    },
+    {
+      id: 'D011',
+      customer_name: 'Thompson, Karen',
+      vehicle: '2023 Subaru Outback',
+      salesperson: 'Sarah Miller',
+      finance_manager: 'Lloyd Hatter',
+      fi_gross: 2100,
+      products: ['Extended Warranty', 'GAP Insurance'],
+      date: '2024-01-10',
+      status: 'completed',
+      deal_type: 'used',
+      lender: 'PNC Bank',
+    },
+    {
+      id: 'D012',
+      customer_name: 'Rodriguez, Maria',
+      vehicle: '2024 Mazda CX-5',
+      salesperson: 'Kevin Johnson',
+      finance_manager: 'John Valentine',
+      fi_gross: 2400,
+      products: ['Extended Warranty', 'Paint Protection'],
+      date: '2024-01-10',
+      status: 'completed',
+      deal_type: 'new',
+      lender: 'Capital One',
     },
   ]);
 
@@ -315,7 +521,7 @@ const FinanceDirectorDashboard = () => {
   // If showing the log deal form, render it instead of the normal dashboard
   if (showLogDealForm) {
     return (
-      <div className="container py-4">
+      <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold">Finance Director Dashboard</h1>
@@ -337,7 +543,7 @@ const FinanceDirectorDashboard = () => {
   }
 
   return (
-    <div className="container py-4">
+    <div className="p-6">
       {/* Dashboard header */}
       <div className="flex justify-between items-start mb-6">
         <div className="flex-grow">
@@ -353,8 +559,8 @@ const FinanceDirectorDashboard = () => {
             </div>
 
             {/* Finance Leadership Tip */}
-            <div className="bg-blue-50 p-2 rounded-md mt-2 md:mt-0 border border-purple-100 max-w-2xl">
-              <p className="text-xs italic text-purple-800">
+            <div className="bg-blue-50 p-2 rounded-md mt-2 md:mt-0 border border-blue-100 max-w-2xl">
+              <p className="text-xs italic text-blue-800">
                 <Lightbulb className="h-3 w-3 inline-block mr-1" />
                 <strong>Leadership Tip:</strong> Regular one-on-ones with your F&I managers help
                 identify training opportunities and boost team performance.
@@ -506,61 +712,214 @@ const FinanceDirectorDashboard = () => {
             </Card>
           </div>
 
-          {/* Team Performance Overview */}
-          <Card>
-            <CardHeader className="bg-blue-600 rounded-t-md py-2">
-              <CardTitle className="flex items-center text-white text-lg font-semibold">
-                <Users className="w-5 h-5 mr-2" />
-                Team Performance Overview
+          {/* Deals by Lender and Team Performance Side by Side */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Deals by Lender */}
+            <Card>
+              <CardHeader className="bg-blue-600 rounded-t-md py-2">
+                <CardTitle className="flex items-center text-white text-lg font-semibold">
+                  <CreditCard className="w-5 h-5 mr-2" />
+                  Deals by Lender
+                </CardTitle>
+                <CardDescription className="text-blue-100">
+                  Top lenders and deal distribution for {getPeriodLabel(timePeriod)}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <DealsByLenderComponent deals={recentDeals} />
+              </CardContent>
+            </Card>
+
+            {/* Team Performance Overview */}
+            <Card>
+              <CardHeader className="bg-blue-600 rounded-t-md py-2">
+                <CardTitle className="flex items-center text-white text-lg font-semibold">
+                  <Users className="w-5 h-5 mr-2" />
+                  Team Performance Overview
+                </CardTitle>
+                <CardDescription className="text-blue-100">
+                  Current performance status:{' '}
+                  {getPerformanceBadge(departmentMetrics.team_performance)}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {financeManagers.map(manager => (
+                    <div key={manager.id} className="p-3 border rounded-lg bg-gray-50">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-semibold text-sm">{manager.name}</h4>
+                        <div className="flex items-center space-x-1">
+                          {getVSCIcon(manager.vsc_penetration)}
+                          <Badge variant={manager.status === 'active' ? 'default' : 'secondary'} className="text-xs">
+                            {manager.status}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Deals:</span>
+                          <span className="font-medium">{manager.deals_processed}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Revenue:</span>
+                          <span className="font-medium">${(manager.mtd_revenue / 1000).toFixed(1)}K</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">PPD:</span>
+                          <span className="font-medium">{manager.ppd}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">PVR:</span>
+                          <span className="font-medium">${manager.pvr}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">VSC:</span>
+                          <span className="font-medium">{manager.vsc_penetration}%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Rating:</span>
+                          <span className="text-xs">{getPerformanceBadge(manager.performance_rating)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Department Deals Log - Full Width */}
+          <Card className="mt-6 border hover:shadow-md transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-lg font-semibold flex items-center">
+                <FileText className="mr-2 h-5 w-5 text-blue-500" />
+                Department Deals Log
               </CardTitle>
-              <CardDescription className="text-blue-100">
-                Current performance status:{' '}
-                {getPerformanceBadge(departmentMetrics.team_performance)}
-              </CardDescription>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="h-8 text-xs px-2"
+                onClick={() => setSelectedTab('deals')}
+              >
+                View All Deals
+              </Button>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {financeManagers.map(manager => (
-                  <div key={manager.id} className="p-4 border rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-semibold">{manager.name}</h4>
-                      <div className="flex items-center space-x-2">
-                        {getVSCIcon(manager.vsc_penetration)}
-                        <Badge variant={manager.status === 'active' ? 'default' : 'secondary'}>
-                          {manager.status}
-                        </Badge>
-                      </div>
-                    </div>
-                    <div className="space-y-1 text-sm">
-                      <div className="flex justify-between">
-                        <span>Deals:</span>
-                        <span className="font-medium">{manager.deals_processed}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Revenue:</span>
-                        <span className="font-medium">${manager.mtd_revenue.toLocaleString()}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>PPD:</span>
-                        <span className="font-medium">{manager.ppd}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>PVR:</span>
-                        <span className="font-medium">${manager.pvr}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>VSC Penetration:</span>
-                        <span className="font-medium">{manager.vsc_penetration}%</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Rating:</span>
-                        <span className="font-medium">
-                          {getPerformanceBadge(manager.performance_rating)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+            <CardContent className="pt-4 px-0">
+              <div className="flex">
+                <div className="flex-grow overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-xs">
+                        <th className="font-medium text-white py-2 pl-3 text-center bg-blue-500 w-12 border-r border-gray-600 rounded-tl-md">
+                          #
+                        </th>
+                        <th className="font-medium text-white py-2 pl-4 pr-2 text-left bg-blue-500 border-r border-gray-600">
+                          Deal #
+                        </th>
+                        <th className="font-medium text-white py-2 px-2 text-left bg-blue-500 border-r border-gray-600">
+                          Stock #
+                        </th>
+                        <th className="font-medium text-white py-2 px-2 text-left bg-blue-500 border-r border-gray-600">
+                          Customer
+                        </th>
+                        <th className="font-medium text-white py-2 px-2 text-center bg-blue-500 border-r border-gray-600">
+                          Date
+                        </th>
+                        <th className="font-medium text-white py-2 px-2 text-center bg-blue-500 border-r border-gray-600">
+                          Type
+                        </th>
+                        <th className="font-medium text-white py-2 px-2 text-center bg-blue-500 border-r border-gray-600">
+                          F&I Manager
+                        </th>
+                        <th className="font-medium text-white py-2 px-2 text-right bg-blue-500 border-r border-gray-600">
+                          F&I Gross
+                        </th>
+                        <th className="font-medium text-white py-2 px-2 text-center bg-blue-500 border-r border-gray-600">
+                          PPD
+                        </th>
+                        <th className="font-medium text-white py-2 px-2 text-center bg-blue-500 border-r border-gray-600">
+                          Lender
+                        </th>
+                        <th className="font-medium text-white py-2 px-2 text-center bg-blue-500 border-r border-gray-600 w-20">
+                          Status
+                        </th>
+                        <th className="font-medium text-white py-2 px-2 text-center bg-blue-500 rounded-tr-md">
+                          Action
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {recentDeals.slice(0, 10).map((deal, index) => (
+                        <tr
+                          key={deal.id}
+                          className={`group border-b ${
+                            index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                          } hover:bg-gray-100 transition-colors`}
+                        >
+                          <td className="py-2 pl-3 text-center text-gray-600">
+                            {index + 1}
+                          </td>
+                          <td className="py-2 pl-4 pr-2 text-left font-medium">
+                            {deal.id}
+                          </td>
+                          <td className="py-2 px-2 text-left">S{Math.floor(Math.random() * 9000) + 1000}</td>
+                          <td className="py-2 px-2 text-left">{deal.customer_name}</td>
+                          <td className="py-2 px-2 text-center text-xs">
+                            {new Date(deal.date).toLocaleDateString('en-US', { 
+                              month: '2-digit', 
+                              day: '2-digit', 
+                              year: '2-digit' 
+                            })}
+                          </td>
+                          <td className="py-2 px-2 text-center">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              deal.deal_type === 'new' 
+                                ? 'bg-blue-100 text-blue-700' 
+                                : deal.deal_type === 'used'
+                                ? 'bg-purple-100 text-purple-700'
+                                : 'bg-green-100 text-green-700'
+                            }`}>
+                              {deal.deal_type === 'new' ? 'N' : deal.deal_type === 'used' ? 'U' : 'C'}
+                            </span>
+                          </td>
+                          <td className="py-2 px-2 text-center text-xs">
+                            {deal.finance_manager.split(' ').map(n => n[0]).join('')}
+                          </td>
+                          <td className="py-2 px-2 text-right font-medium text-green-600">
+                            ${deal.fi_gross.toLocaleString()}
+                          </td>
+                          <td className="py-2 px-2 text-center">
+                            {deal.products.length}
+                          </td>
+                          <td className="py-2 px-2 text-center text-xs">
+                            {deal.lender.length > 15 ? deal.lender.substring(0, 15) + '...' : deal.lender}
+                          </td>
+                          <td className="py-2 px-2 text-center">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              deal.status === 'completed' 
+                                ? 'bg-green-100 text-green-700' 
+                                : deal.status === 'pending'
+                                ? 'bg-yellow-100 text-yellow-700'
+                                : 'bg-red-100 text-red-700'
+                            }`}>
+                              {deal.status === 'completed' ? 'Funded' : deal.status === 'pending' ? 'Pending' : 'Cancelled'}
+                            </span>
+                          </td>
+                          <td className="py-2 px-2 text-center">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 text-xs px-2 hover:bg-blue-100"
+                              onClick={() => navigate(`/deal/${deal.id}`)}
+                            >
+                              View
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -679,7 +1038,7 @@ const FinanceDirectorDashboard = () => {
                     <TableHead>F&I Manager</TableHead>
                     <TableHead className="text-right">F&I Gross</TableHead>
                     <TableHead>Products</TableHead>
-                    <TableHead>Funding</TableHead>
+                    <TableHead>Lender</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -717,8 +1076,8 @@ const FinanceDirectorDashboard = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className="text-xs capitalize">
-                            {deal.funding_source.replace('_', ' ')}
+                          <Badge variant="outline" className="text-xs">
+                            {deal.lender}
                           </Badge>
                         </TableCell>
                         <TableCell>{new Date(deal.date).toLocaleDateString()}</TableCell>

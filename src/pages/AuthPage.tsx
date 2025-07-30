@@ -5,9 +5,12 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../compone
 import LoginForm from '../components/auth/LoginForm';
 import { AlertCircle } from 'lucide-react';
 import AuthDebugButton from '../components/debug/AuthDebugButton';
+import { useTranslation } from '../contexts/TranslationContext';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const AuthPage: React.FC = () => {
   const { user, loading, hasSession, isGroupAdmin } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [loadingTimeout, setLoadingTimeout] = useState(false);
@@ -154,12 +157,39 @@ const AuthPage: React.FC = () => {
       </div>
 
       {/* Professional header with subtle gradient */}
-      <div className="h-16 bg-gradient-to-r from-blue-600 to-blue-700 shadow-lg flex items-center relative z-10">
+      <div className="h-16 bg-gradient-to-r from-blue-600 to-blue-700 shadow-lg flex items-center justify-between relative z-10">
         <div className="flex items-center ml-6">
           <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-3">
             <div className="w-4 h-4 bg-blue-600 rounded"></div>
           </div>
           <h1 className="text-white text-2xl font-bold tracking-wide">The DAS Board</h1>
+        </div>
+        <div className="hidden md:flex items-center space-x-8 mr-6">
+          <button
+            onClick={() => navigate('/')}
+            className="text-blue-100 hover:text-white transition-colors"
+          >
+            {t('nav.home')}
+          </button>
+          <button
+            onClick={() => navigate('/screenshots')}
+            className="text-blue-100 hover:text-white transition-colors"
+          >
+            {t('nav.screenshots')}
+          </button>
+          <button
+            onClick={() => navigate('/pricing')}
+            className="text-blue-100 hover:text-white transition-colors"
+          >
+            {t('nav.pricing')}
+          </button>
+          <button
+            onClick={() => navigate('/about')}
+            className="text-blue-100 hover:text-white transition-colors"
+          >
+            {t('nav.about')}
+          </button>
+          <LanguageSwitcher />
         </div>
       </div>
 
