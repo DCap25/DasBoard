@@ -624,10 +624,10 @@ const FinanceHomePage: React.FC = () => {
       <div className="space-y-6">
         {/* 4 Metric Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="border-l-4 border-l-blue-600 hover:shadow-md transition-shadow">
+          <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium flex items-center">
-                <DollarSign className="mr-2 h-4 w-4 text-blue-600" />
+                <DollarSign className="mr-2 h-4 w-4 text-blue-500" />
                 F&I Gross
               </CardTitle>
             </CardHeader>
@@ -636,7 +636,7 @@ const FinanceHomePage: React.FC = () => {
                 {metrics.mtdRevenue > 0 ? `$${metrics.mtdRevenue.toLocaleString()}` : 'No data yet'}
               </div>
               {metrics.mtdRevenue > 0 && (
-                <div className="flex items-center pt-1 text-blue-600">
+                <div className="flex items-center pt-1 text-blue-500">
                   <ChevronUp className="h-3 w-3 mr-1" />
                   <span className="text-xs">8.2% from previous period</span>
                 </div>
@@ -644,10 +644,10 @@ const FinanceHomePage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-slate-500 hover:shadow-md transition-shadow">
+          <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium flex items-center">
-                <CreditCard className="mr-2 h-4 w-4 text-slate-500" />
+                <CreditCard className="mr-2 h-4 w-4 text-blue-500" />
                 Deals Processed
               </CardTitle>
             </CardHeader>
@@ -656,7 +656,7 @@ const FinanceHomePage: React.FC = () => {
                 {metrics.dealsProcessed > 0 ? metrics.dealsProcessed : 'No deals yet'}
               </div>
               {metrics.dealsProcessed > 0 && (
-                <div className="flex items-center pt-1 text-slate-600">
+                <div className="flex items-center pt-1 text-blue-500">
                   <ChevronUp className="h-3 w-3 mr-1" />
                   <span className="text-xs">10.5% from previous period</span>
                 </div>
@@ -664,10 +664,10 @@ const FinanceHomePage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-blue-700 hover:shadow-md transition-shadow">
+          <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium flex items-center">
-                <BarChart4 className="mr-2 h-4 w-4 text-blue-700" />
+                <BarChart4 className="mr-2 h-4 w-4 text-blue-500" />
                 Pay Calculator MTD
               </CardTitle>
             </CardHeader>
@@ -676,7 +676,7 @@ const FinanceHomePage: React.FC = () => {
                 ${Math.round(metrics.mtdRevenue * 0.15).toLocaleString()}
               </div>
               {metrics.dealsProcessed > 0 && (
-                <div className="flex items-center pt-1 text-blue-700">
+                <div className="flex items-center pt-1 text-blue-500">
                   <ChevronUp className="h-3 w-3 mr-1" />
                   <span className="text-xs">15% of F&I revenue</span>
                 </div>
@@ -684,10 +684,10 @@ const FinanceHomePage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-slate-700 hover:shadow-md transition-shadow">
+          <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium flex items-center">
-                <Percent className="mr-2 h-4 w-4 text-slate-700" />
+                <Percent className="mr-2 h-4 w-4 text-blue-500" />
                 PVR
               </CardTitle>
             </CardHeader>
@@ -696,7 +696,7 @@ const FinanceHomePage: React.FC = () => {
                 {metrics.dealsProcessed > 0 ? `$${metrics.pvr.toLocaleString()}` : 'No data yet'}
               </div>
               {metrics.dealsProcessed > 0 && (
-                <div className="flex items-center pt-1 text-slate-700">
+                <div className="flex items-center pt-1 text-blue-500">
                   <ChevronUp className="h-3 w-3 mr-1" />
                   <span className="text-xs">$120 from previous period</span>
                 </div>
@@ -710,7 +710,7 @@ const FinanceHomePage: React.FC = () => {
           <Card className="border hover:shadow-md transition-shadow">
             <CardHeader className="py-2 px-4 border-b">
               <CardTitle className="text-sm font-medium flex items-center">
-                <CalendarClock className="mr-2 h-4 w-4 text-blue-600" />
+                <CalendarClock className="mr-2 h-4 w-4 text-blue-500" />
                 Finance Schedule
               </CardTitle>
             </CardHeader>
@@ -757,105 +757,102 @@ const FinanceHomePage: React.FC = () => {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
-          <Card className="border hover:shadow-md transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center text-lg font-medium">
-                <BarChart4 className="mr-2 h-5 w-5 text-blue-500" />
+          <Card className="border hover:shadow-md transition-shadow h-full">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center text-xl font-medium">
+                <BarChart4 className="mr-2 h-6 w-6 text-blue-500" />
                 F&I Product Mix & Avg. Profit
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              {metrics.dealsProcessed > 0 ? (
-                <div className="space-y-2">
-                  {[
-                    {
-                      name: 'Vehicle Service Contract (VSC)',
-                      percent: metrics.productMix.extendedWarranty,
-                      value: `$${metrics.avgProfits.extendedWarranty.toLocaleString()}`,
-                      color: 'bg-blue-600',
-                    },
-                    {
-                      name: 'PrePaid Maintenance (PPM)',
-                      percent: metrics.productMix.ppm,
-                      value: `$${metrics.avgProfits.ppm.toLocaleString()}`,
-                      color: 'bg-blue-600',
-                    },
-                    {
-                      name: 'GAP Insurance',
-                      percent: metrics.productMix.gapInsurance,
-                      value: `$${metrics.avgProfits.gapInsurance.toLocaleString()}`,
-                      color: 'bg-blue-600',
-                    },
-                    {
-                      name: 'Paint and Fabric Protection',
-                      percent: metrics.productMix.paintProtection,
-                      value: `$${metrics.avgProfits.paintProtection.toLocaleString()}`,
-                      color: 'bg-blue-600',
-                    },
-                    {
-                      name: 'Tire & Wheel Bundle',
-                      percent: metrics.productMix.tireWheel,
-                      value: `$${metrics.avgProfits.tireWheel.toLocaleString()}`,
-                      color: 'bg-blue-600',
-                    },
-                    {
-                      name: 'Other Products',
-                      percent: metrics.productMix.other,
-                      value: `$${metrics.avgProfits.other.toLocaleString()}`,
-                      color: 'bg-blue-600',
-                    },
-                  ].map((product, index) => (
-                    <div key={index} className="space-y-1">
-                      <div className="flex items-center justify-between">
-                        <div className="font-medium flex items-center text-sm">
-                          <div className={`w-3 h-3 ${product.color} rounded-full mr-2`}></div>
-                          {product.name}
-                        </div>
-                        <div className="text-right">
-                          <div className="text-xs text-gray-500">Avg. Profit</div>
-                          <div className="font-medium text-sm">{product.value}</div>
-                        </div>
+            <CardContent className="px-6 pb-6 flex-1">
+              <div className="grid grid-cols-1 gap-2">
+                {[
+                  {
+                    name: 'Vehicle Service Contract (VSC)',
+                    percent: metrics.productMix.extendedWarranty,
+                    value: `${metrics.avgProfits.extendedWarranty.toLocaleString()}`,
+                    color: 'bg-blue-500',
+                  },
+                  {
+                    name: 'PrePaid Maintenance (PPM)',
+                    percent: metrics.productMix.ppm,
+                    value: `${metrics.avgProfits.ppm.toLocaleString()}`,
+                    color: 'bg-blue-500',
+                  },
+                  {
+                    name: 'GAP Insurance',
+                    percent: metrics.productMix.gapInsurance,
+                    value: `${metrics.avgProfits.gapInsurance.toLocaleString()}`,
+                    color: 'bg-blue-500',
+                  },
+                  {
+                    name: 'Paint and Fabric Protection',
+                    percent: metrics.productMix.paintProtection,
+                    value: `${metrics.avgProfits.paintProtection.toLocaleString()}`,
+                    color: 'bg-blue-500',
+                  },
+                  {
+                    name: 'Tire & Wheel Bundle',
+                    percent: metrics.productMix.tireWheel,
+                    value: `${metrics.avgProfits.tireWheel.toLocaleString()}`,
+                    color: 'bg-blue-500',
+                  },
+                  {
+                    name: 'Other Products',
+                    percent: metrics.productMix.other,
+                    value: `${metrics.avgProfits.other.toLocaleString()}`,
+                    color: 'bg-blue-500',
+                  },
+                ].map((product, index) => (
+                  <div key={index} className="space-y-1 p-2 bg-gray-50 rounded-md">
+                    <div className="grid grid-cols-3 gap-2 items-center">
+                      <div className="font-medium flex items-center text-sm">
+                        <div className={`w-2 h-2 ${product.color} rounded-full mr-1`}></div>
+                        {product.name}
                       </div>
-                      <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
-                        <div
-                          className={`absolute inset-y-0 left-0 rounded-full ${product.color}`}
-                          style={{ width: `${product.percent}%` }}
-                        />
+                      <div className="text-center">
+                        <div className="font-bold text-base text-blue-600">{product.percent}%</div>
+                        <div className="text-xs text-gray-500">Penetration</div>
                       </div>
-                      <div className="text-right text-xs text-gray-500">{product.percent}%</div>
+                      <div className="text-right">
+                        <div className="text-xs text-gray-500">Avg. Profit</div>
+                        <div className="font-semibold text-sm">${product.value}</div>
+                      </div>
                     </div>
-                  ))}
+                    <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
+                      <div
+                        className={`absolute inset-y-0 left-0 rounded-full ${product.color}`}
+                        style={{ width: `${product.percent}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
 
-                  {/* Add PPD metric at the bottom */}
-                  <div className="mt-4 pt-3 border-t border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <div className="font-medium text-sm">Products Per Deal (PPD)</div>
-                      <div className="font-bold text-lg text-blue-700">
-                        {metrics.productsPerDeal.toFixed(1)}
-                      </div>
+                {/* Add PPD metric at the bottom */}
+                <div className="mt-3 pt-2 border-t border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <div className="font-medium text-sm">Products Per Deal (PPD)</div>
+                    <div className="font-bold text-lg text-blue-500">
+                      {metrics.productsPerDeal.toFixed(1)}
                     </div>
                   </div>
                 </div>
-              ) : (
-                <div className="py-8 text-center text-gray-500">
-                  No F&I product data available yet. Log deals with products to see the mix.
-                </div>
-              )}
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="border hover:shadow-md transition-shadow">
+          <Card className="border hover:shadow-md transition-shadow h-full">
             <CardHeader className="py-2 px-4 border-b">
               <div className="flex justify-between items-center">
-                <CardTitle className="text-sm font-medium flex items-center">
-                  <Trophy className="mr-2 h-4 w-4 text-blue-600" />
+                <CardTitle className="text-lg font-medium flex items-center">
+                  <Trophy className="mr-2 h-5 w-5 text-blue-500" />
                   Finance Das Board
                 </CardTitle>
               </div>
             </CardHeader>
             <CardContent className="py-1">
               {/* Sortable Header */}
-              <div className="flex items-center text-xs font-medium text-white border-b py-2 px-1">
+              <div className="flex items-center text-sm font-medium text-white border-b py-3 px-1">
                 <div className="w-10 text-center bg-gray-600 py-2 rounded-l-md">#</div>
                 <div className="w-36 flex-shrink-0 bg-gray-600 py-2 px-2">F&I Manager</div>
                 <div className="w-28 text-center bg-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
@@ -929,9 +926,9 @@ const FinanceHomePage: React.FC = () => {
                 ].map((person, index) => (
                   <div
                     key={index}
-                    className={`flex items-center py-2 px-1 ${
+                    className={`flex items-center py-3 px-1 ${
                       index !== 4 ? 'border-b' : ''
-                    } border-gray-100 text-sm hover:bg-gray-50`}
+                    } border-gray-100 text-base hover:bg-gray-50`}
                   >
                     <div className="w-10 flex justify-center">
                       <div
@@ -949,18 +946,18 @@ const FinanceHomePage: React.FC = () => {
                         <span className="text-xs font-bold">{index + 1}</span>
                       </div>
                     </div>
-                    <div className="w-36 flex-shrink-0 font-medium truncate px-2">
+                    <div className="w-36 flex-shrink-0 font-medium truncate px-2 text-base">
                       {person.name}
                     </div>
-                    <div className="w-28 text-center bg-blue-50">
+                    <div className="w-28 text-center bg-blue-50 text-base font-medium">
                       ${person.pvr.toLocaleString()}
                     </div>
-                    <div className="w-28 text-center bg-blue-50">{person.vscPen}%</div>
-                    <div className="w-28 text-center bg-blue-50">{person.gapPen}%</div>
-                    <div className="w-28 text-center bg-blue-50">{person.ppmPen}%</div>
-                    <div className="w-24 text-center bg-blue-50">{person.ppd}</div>
+                    <div className="w-28 text-center bg-blue-50 text-base font-medium">{person.vscPen}%</div>
+                    <div className="w-28 text-center bg-blue-50 text-base font-medium">{person.gapPen}%</div>
+                    <div className="w-28 text-center bg-blue-50 text-base font-medium">{person.ppmPen}%</div>
+                    <div className="w-24 text-center bg-blue-50 text-base font-medium">{person.ppd}</div>
                     <div className="w-36 text-right pr-3">
-                      <span className="text-lg font-bold text-green-600">
+                      <span className="text-xl font-bold text-green-600">
                         ${person.profit.toLocaleString()}
                       </span>
                     </div>
@@ -987,55 +984,55 @@ const FinanceHomePage: React.FC = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-xs">
-                      <th className="font-medium text-white py-2 pl-3 text-center bg-gray-700 w-12 border-r border-gray-600">
+                      <th className="font-medium text-white py-2 pl-3 text-center bg-blue-500 w-12 border-r border-blue-400">
                         #
                       </th>
-                      <th className="font-medium text-white py-2 px-2 text-left bg-gray-700 border-r border-gray-600">
+                      <th className="font-medium text-white py-2 px-2 text-left bg-blue-500 border-r border-blue-400">
                         Last Name
                       </th>
-                      <th className="font-medium text-white py-2 pl-4 pr-2 text-left bg-gray-700 border-r border-gray-600">
+                      <th className="font-medium text-white py-2 pl-4 pr-2 text-left bg-blue-500 border-r border-blue-400">
                         Deal #
                       </th>
-                      <th className="font-medium text-white py-2 px-2 text-left bg-gray-700 border-r border-gray-600">
+                      <th className="font-medium text-white py-2 px-2 text-left bg-blue-500 border-r border-blue-400">
                         Stock #
                       </th>
-                      <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 border-r border-gray-600">
+                      <th className="font-medium text-white py-2 px-2 text-center bg-blue-500 border-r border-blue-400">
                         Date
                       </th>
-                      <th className="font-medium text-white py-2 px-2 text-left bg-gray-700 border-r border-gray-600">
+                      <th className="font-medium text-white py-2 px-2 text-left bg-blue-500 border-r border-blue-400">
                         VIN
                       </th>
-                      <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 border-r border-gray-600">
+                      <th className="font-medium text-white py-2 px-2 text-center bg-blue-500 border-r border-blue-400">
                         N/U/CPO
                       </th>
-                      <th className="font-medium text-white py-2 px-2 text-left bg-gray-700 border-r border-gray-600">
+                      <th className="font-medium text-white py-2 px-2 text-left bg-blue-500 border-r border-blue-400">
                         Lender
                       </th>
-                      <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-gray-600">
+                      <th className="font-medium text-white py-2 px-2 text-right bg-blue-500 border-r border-blue-400">
                         Front End
                       </th>
-                      <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-gray-600">
+                      <th className="font-medium text-white py-2 px-2 text-right bg-blue-500 border-r border-blue-400">
                         VSC
                       </th>
-                      <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-gray-600">
+                      <th className="font-medium text-white py-2 px-2 text-right bg-blue-500 border-r border-blue-400">
                         PPM
                       </th>
-                      <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-gray-600">
+                      <th className="font-medium text-white py-2 px-2 text-right bg-blue-500 border-r border-blue-400">
                         GAP
                       </th>
-                      <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-gray-600">
+                      <th className="font-medium text-white py-2 px-2 text-right bg-blue-500 border-r border-blue-400">
                         T&W/Bundle
                       </th>
-                      <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 border-r border-gray-600">
+                      <th className="font-medium text-white py-2 px-2 text-center bg-blue-500 border-r border-blue-400">
                         PPD
                       </th>
-                      <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-gray-600">
+                      <th className="font-medium text-white py-2 px-2 text-right bg-blue-500 border-r border-blue-400">
                         PVR
                       </th>
-                      <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-gray-600">
+                      <th className="font-medium text-white py-2 px-2 text-right bg-blue-500 border-r border-blue-400">
                         Total
                       </th>
-                      <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 w-20 border-r border-gray-600">
+                      <th className="font-medium text-white py-2 px-2 text-center bg-blue-500 w-20 border-r border-blue-400">
                         Status
                       </th>
                       <th className="font-medium text-white py-2 px-2 text-center bg-red-600 rounded-tr-md w-16">
@@ -1336,7 +1333,7 @@ const FinanceHomePage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
           {/* Pay Tracker */}
           <Card className="border hover:shadow-md transition-shadow">
-            <CardHeader className="pb-2 border-b bg-gradient-to-r from-blue-500 to-gray-600">
+            <CardHeader className="pb-2 border-b bg-blue-500 rounded-t-lg">
               <CardTitle className="text-lg font-medium flex items-center text-white">
                 <Calculator className="mr-2 h-5 w-5 text-white" />
                 Pay Tracker
@@ -1406,7 +1403,7 @@ const FinanceHomePage: React.FC = () => {
 
           {/* Goal Tracker */}
           <Card className="border hover:shadow-md transition-shadow">
-            <CardHeader className="pb-2 border-b bg-gradient-to-r from-blue-500 to-gray-600">
+            <CardHeader className="pb-2 border-b bg-blue-500 rounded-t-lg">
               <div className="flex justify-between items-center">
                 <CardTitle className="text-lg font-medium flex items-center text-white">
                   <Target className="mr-2 h-5 w-5 text-white" />

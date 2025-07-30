@@ -191,10 +191,10 @@ const GoalTracking: React.FC = () => {
 
   return (
     <Card className="border hover:shadow-md transition-shadow">
-      <CardHeader className="pb-2 border-b">
+      <CardHeader className="pb-1 border-b bg-blue-500 rounded-t-lg">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-lg font-medium flex items-center">
-            <Target className="mr-2 h-5 w-5 text-blue-600" />
+          <CardTitle className="text-lg font-medium flex items-center text-white">
+            <Target className="mr-2 h-5 w-5 text-white" />
             Goal Tracker
           </CardTitle>
 

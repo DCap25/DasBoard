@@ -321,27 +321,26 @@ const SalesManagerDashboard = () => {
   return (
     <>
       {/* Standardized Dashboard Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex-grow">
+      <div className="flex justify-between items-start mb-6">
+        <div>
           <h1 className="text-3xl font-bold">Sales Manager Dashboard</h1>
-          {/* Best Practices Quote */}
-          <div className="bg-blue-50 p-2 rounded-md mt-2 border border-blue-100 max-w-2xl">
-            <p className="text-xs italic text-blue-800">
-              <Lightbulb className="h-3 w-3 inline-block mr-1" />
-              <strong>Management Tip:</strong>{' '}
-              {
-                [
-                  "Great managers don't just set goals; they remove obstacles for their team members.",
-                  'Feedback is a gift. Deliver it with respect, receive it with gratitude.',
-                  'Celebrate small wins to build momentum toward big victories.',
-                  'Know your numbers, but remember that your people drive those numbers.',
-                  'The best way to predict the future is to create it through coaching and development.',
-                  'The quality of your leadership determines the quality of your team.',
-                  "Your team doesn't care how much you know until they know how much you care.",
-                ][new Date().getDay()]
-              }
-            </p>
-          </div>
+        </div>
+        <div className="bg-blue-50 p-2 rounded-md border border-blue-100 max-w-md mr-64">
+          <p className="text-xs italic text-blue-800">
+            <Lightbulb className="h-3 w-3 inline-block mr-1" />
+            <strong>Management Tip:</strong>{' '}
+            {
+              [
+                "Great managers don't just set goals; they remove obstacles for their team members.",
+                'Feedback is a gift. Deliver it with respect, receive it with gratitude.',
+                'Celebrate small wins to build momentum toward big victories.',
+                'Know your numbers, but remember that your people drive those numbers.',
+                'The best way to predict the future is to create it through coaching and development.',
+                'The quality of your leadership determines the quality of your team.',
+                "Your team doesn't care how much you know until they know how much you care.",
+              ][new Date().getDay()]
+            }
+          </p>
         </div>
       </div>
 

@@ -40,6 +40,7 @@ import {
 } from './lib/directAuth';
 import LogoutPage from './pages/LogoutPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import AuthCallback from './components/auth/AuthCallback';
 import GroupAdminBypass from './pages/GroupAdminBypass';
 import DashboardSelector from './pages/DashboardSelector';
 import SalesExperienceDemo from './pages/SalesExperienceDemo';
@@ -49,16 +50,21 @@ import GoalsPage from './pages/manager/GoalsPage';
 import SchedulePage from './pages/manager/SchedulePage';
 import SalesReportPage from './pages/manager/SalesReportPage';
 import SingleFinanceManagerDashboard from './components/dashboards/SingleFinanceManagerDashboard';
+import SingleFinanceWelcome from './pages/welcome/SingleFinanceWelcome';
 import FinanceDirectorDashboard from './components/dashboards/FinanceDirectorDashboard';
 import LogFinanceManagerDeal from './pages/finance/LogFinanceManagerDeal';
 import LogSingleFinanceDeal from './pages/finance/LogSingleFinanceDeal';
 import MasterAdminPage from './pages/admin/MasterAdminPage';
 import SignUp from './components/auth/SignUp';
 import SingleFinanceSignup from './components/auth/SingleFinanceSignup';
-import DealershipSignup from './components/auth/DealershipSignup';
+import DealershipSignupPage from './pages/DealershipSignup';
 import DealerGroupSignup from './components/auth/DealerGroupSignup';
 import HomePage from './pages/HomePage';
 import PricingPage from './pages/PricingPage';
+import SimpleSignup from './pages/SimpleSignup';
+import SubscriptionsPage from './pages/SubscriptionsPage';
+import SubscriptionSignup from './pages/SubscriptionSignup';
+import SubscriptionSuccess from './pages/SubscriptionSuccess';
 import TermsPage from './pages/legal/TermsPage';
 import PrivacyPage from './pages/legal/PrivacyPage';
 import SubscriptionPage from './pages/legal/SubscriptionPage';
@@ -421,13 +427,32 @@ function RoleBasedRedirect() {
     (roleValue === 'finance_manager' &&
       (user?.email?.includes('finance') || user?.email?.includes('testfinance')))
   ) {
-    redirectPath = '/dashboard/single-finance';
-    redirectReason = 'Single finance manager role (email-based routing)';
-    console.log('[AUTH DEBUG] User is redirected to Single Finance Manager Dashboard', {
-      user_id: user.id,
-      email: user.email,
-      role: roleValue,
-    });
+    // Check if this is a new user who should see the welcome page
+    const hasSeenWelcome = localStorage.getItem(`welcome_seen_${user.id}`) === 'true';
+    const isNewSignup = window.location.search.includes('newuser=true') || 
+                       window.location.pathname.includes('/welcome/');
+    
+    if (!hasSeenWelcome && !isNewSignup) {
+      // First-time user - show welcome page
+      redirectPath = '/welcome/single-finance?newuser=true';
+      redirectReason = 'New single finance manager - welcome page';
+      console.log('[AUTH DEBUG] New Single Finance Manager redirected to welcome page', {
+        user_id: user.id,
+        email: user.email,
+        role: roleValue,
+        hasSeenWelcome,
+      });
+    } else {
+      // Existing user or returning from welcome - go to dashboard
+      redirectPath = '/dashboard/single-finance';
+      redirectReason = 'Single finance manager role (email-based routing)';
+      console.log('[AUTH DEBUG] User is redirected to Single Finance Manager Dashboard', {
+        user_id: user.id,
+        email: user.email,
+        role: roleValue,
+        hasSeenWelcome,
+      });
+    }
   } else if (roleValue === 'finance_manager' || roleValue.includes('finance')) {
     redirectPath = '/dashboard/finance';
     redirectReason = 'Finance manager role (regular)';
@@ -684,6 +709,10 @@ function App() {
                       <Route path="/about" element={<AboutPage />} />
                       <Route path="/screenshots" element={<ScreenshotsPage />} />
                       <Route path="/pricing" element={<PricingPage />} />
+                      <Route path="/subscriptions" element={<SubscriptionsPage />} />
+                      <Route path="/signup/subscription" element={<SubscriptionSignup />} />
+                      <Route path="/signup/success" element={<SubscriptionSuccess />} />
+                      <Route path="/subscription/success" element={<SubscriptionSuccess />} />
                       <Route path="/auth" element={<AuthPage />} />
 
                       {/* Legal Pages - Public Access */}
@@ -693,15 +722,22 @@ function App() {
 
                       {/* Signup routes - public access */}
                       <Route path="/signup" element={<SignUp />} />
+                      <Route path="/simple-signup" element={<SimpleSignup />} />
                       <Route path="/signup/single-finance" element={<SingleFinanceSignup />} />
-                      <Route path="/signup/dealership" element={<DealershipSignup />} />
+                      <Route path="/signup/dealership" element={<DealershipSignupPage />} />
                       <Route path="/signup/dealer-group" element={<DealerGroupSignup />} />
+
+                      {/* Welcome pages */}
+                      <Route path="/welcome/single-finance" element={<SingleFinanceWelcome />} />
 
                       {/* New Logout Route - accessible to everyone */}
                       <Route path="/logout" element={<LogoutPage />} />
 
                       {/* Password Reset Route - accessible to everyone */}
                       <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+
+                      {/* Auth Callback Route for email verification */}
+                      <Route path="/auth/callback" element={<AuthCallback />} />
 
                       {/* New Direct Login route */}
                       <Route path="/direct-login" element={<DirectLoginPage />} />

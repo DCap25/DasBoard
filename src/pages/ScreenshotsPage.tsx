@@ -10,24 +10,55 @@ export default function ScreenshotsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      {/* Header */}
-      <div className="bg-gray-900/50 border-b border-gray-700">
+      {/* Navigation - consistent with home page */}
+      <nav className="border-b border-gray-700 bg-gray-800/50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <button
-              onClick={() => navigate('/')}
-              className="flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span>{t('nav.home')}</span>
-            </button>
-
-            <div className="flex items-center space-x-4">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <h1 className="text-2xl font-bold text-white">The DAS Board</h1>
+            </div>
+            <div className="hidden md:flex items-center space-x-8">
+              <button
+                onClick={() => navigate('/')}
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                {t('nav.home')}
+              </button>
+              <button
+                onClick={() => navigate('/screenshots')}
+                className="text-white border-b-2 border-blue-500"
+              >
+                {t('nav.screenshots')}
+              </button>
+              <button
+                onClick={() => navigate('/pricing')}
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                {t('nav.pricing')}
+              </button>
+              <button
+                onClick={() => navigate('/about')}
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                {t('nav.about')}
+              </button>
               <LanguageSwitcher />
+              <button
+                onClick={() => navigate('/auth')}
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                {t('nav.login')}
+              </button>
+              <button
+                onClick={() => navigate('/signup')}
+                className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                {t('nav.signup')}
+              </button>
             </div>
           </div>
         </div>
-      </div>
+      </nav>
 
       <section className="py-20 px-6 max-w-7xl mx-auto">
         <div className="text-center mb-16">
@@ -35,7 +66,7 @@ export default function ScreenshotsPage() {
             Dashboard Screenshots
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Explore our different dashboard solutions designed for various roles in your dealership
+            Explore our role-specific dashboard solutions designed for every level of your dealership
           </p>
         </div>
 
@@ -46,13 +77,13 @@ export default function ScreenshotsPage() {
             <h3 className="text-xl font-semibold mb-4 text-blue-400">Finance Manager Dashboard</h3>
             <div className="relative overflow-hidden rounded-lg border border-gray-600">
               <img
-                src="/images/FINANCEMANAGER_DASH.JPG"
+                src="/images/FINANCEMNG_DASH.JPG"
                 alt="Finance Manager Dashboard"
                 className="w-full h-auto object-cover transition-transform duration-300 hover:scale-105"
               />
             </div>
             <p className="text-gray-300 mt-4">
-              Comprehensive financial tracking and deal management for finance managers.
+              Comprehensive financial tracking, deal management, and PVR analytics for finance managers.
             </p>
           </div>
 
@@ -61,44 +92,73 @@ export default function ScreenshotsPage() {
             <h3 className="text-xl font-semibold mb-4 text-blue-400">Sales Manager Dashboard</h3>
             <div className="relative overflow-hidden rounded-lg border border-gray-600">
               <img
-                src="/images/SALESMANAGER_DASH.JPG"
+                src="/images/SALESMNG_DASH.JPG"
                 alt="Sales Manager Dashboard"
                 className="w-full h-auto object-cover transition-transform duration-300 hover:scale-105"
               />
             </div>
             <p className="text-gray-300 mt-4">
-              Team performance tracking and sales analytics for managers.
+              Team performance tracking, sales analytics, and goal management for sales managers.
             </p>
           </div>
 
-          {/* Salesperson Dashboard 1 */}
+          {/* Salesperson Dashboard */}
           <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 transition-all duration-300 hover:scale-[1.01] relative z-0">
-            <h3 className="text-xl font-semibold mb-4 text-blue-400">Salesperson Dashboard</h3>
+            <h3 className="text-xl font-semibold mb-4 text-blue-400">Sales Person Dashboard</h3>
             <div className="relative overflow-hidden rounded-lg border border-gray-600">
               <img
-                src="/images/SALESPERSON_DASH1.JPG"
-                alt="Salesperson Dashboard"
+                src="/images/SALESPERSON_DASH.JPG"
+                alt="Sales Person Dashboard"
                 className="w-full h-auto object-cover transition-transform duration-300 hover:scale-105"
               />
             </div>
             <p className="text-gray-300 mt-4">
-              Individual performance tracking and goal management for sales staff.
+              Individual performance tracking, deal logging, and personal goal management for sales staff.
             </p>
           </div>
 
-          {/* Salesperson Dashboard 2 */}
+          {/* General Manager Dashboard */}
           <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 transition-all duration-300 hover:scale-[1.01] relative z-0">
-            <h3 className="text-xl font-semibold mb-4 text-blue-400">Advanced Salesperson View</h3>
+            <h3 className="text-xl font-semibold mb-4 text-blue-400">General Manager Dashboard</h3>
             <div className="relative overflow-hidden rounded-lg border border-gray-600">
               <img
-                src="/images/SALESPERSON_DASH_2.JPG"
-                alt="Advanced Salesperson Dashboard"
+                src="/images/GENERALMNG_DASH.JPG"
+                alt="General Manager Dashboard"
                 className="w-full h-auto object-cover transition-transform duration-300 hover:scale-105"
               />
             </div>
             <p className="text-gray-300 mt-4">
-              Enhanced analytics and detailed performance metrics for experienced sales
-              professionals.
+              Complete dealership overview with comprehensive analytics and team management tools.
+            </p>
+          </div>
+
+          {/* Finance Director Dashboard */}
+          <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 transition-all duration-300 hover:scale-[1.01] relative z-0">
+            <h3 className="text-xl font-semibold mb-4 text-blue-400">Finance Director Dashboard</h3>
+            <div className="relative overflow-hidden rounded-lg border border-gray-600">
+              <img
+                src="/images/FINANCEDIR_DASH.JPG"
+                alt="Finance Director Dashboard"
+                className="w-full h-auto object-cover transition-transform duration-300 hover:scale-105"
+              />
+            </div>
+            <p className="text-gray-300 mt-4">
+              Advanced financial oversight with department-wide analytics and strategic insights.
+            </p>
+          </div>
+
+          {/* Area Vice President Dashboard */}
+          <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 transition-all duration-300 hover:scale-[1.01] relative z-0">
+            <h3 className="text-xl font-semibold mb-4 text-blue-400">Area Vice President Dashboard</h3>
+            <div className="relative overflow-hidden rounded-lg border border-gray-600">
+              <img
+                src="/images/AVP_DASH.JPG"
+                alt="Area Vice President Dashboard"
+                className="w-full h-auto object-cover transition-transform duration-300 hover:scale-105"
+              />
+            </div>
+            <p className="text-gray-300 mt-4">
+              Multi-location analytics and executive-level insights for area vice presidents.
             </p>
           </div>
         </div>
@@ -130,8 +190,8 @@ export default function ScreenshotsPage() {
               <p className="text-gray-300">Detailed analytics for informed decision making</p>
             </div>
             <div className="text-center">
-              <h3 className="text-lg font-semibold text-white mb-2">Multi-role Support</h3>
-              <p className="text-gray-300">Customized dashboards for different user roles</p>
+              <h3 className="text-lg font-semibold text-white mb-2">Role-Based Access</h3>
+              <p className="text-gray-300">Customized dashboards for every dealership role</p>
             </div>
           </div>
         </div>
@@ -143,7 +203,7 @@ export default function ScreenshotsPage() {
           Ready to Get Started?
         </h2>
         <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-          Experience these powerful dashboards for yourself. Start your free trial today!
+          Experience these powerful dashboards for yourself. Start your journey today!
         </p>
         <div className="space-x-4">
           <button

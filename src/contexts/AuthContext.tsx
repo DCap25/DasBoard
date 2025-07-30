@@ -787,7 +787,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Get initial session with timeout protection
         const sessionPromise = supabase.auth.getSession();
         const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Session fetch timeout')), 3000);
+          setTimeout(() => reject(new Error('Session fetch timeout')), 10000); // Increased to 10 seconds
         });
         
         const {
@@ -958,7 +958,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setLoading(false);
         setAuthCheckComplete(true); // Mark auth check as complete even on timeout
       }
-    }, 5000); // 5 second safety timeout
+    }, 15000); // 15 second safety timeout
 
     return () => {
       mounted = false;

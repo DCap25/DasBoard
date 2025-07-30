@@ -14,12 +14,9 @@ import {
   Copy,
   Mail
 } from 'lucide-react';
-import { useTranslation } from '../contexts/TranslationContext';
-import LanguageSwitcher from '../components/LanguageSwitcher';
 
-export default function PricingPage() {
+export default function SubscriptionsPage() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
   const [showDiscountPopup, setShowDiscountPopup] = useState(false);
   const [discountEmail, setDiscountEmail] = useState('');
   const [discountCodeRevealed, setDiscountCodeRevealed] = useState(false);
@@ -60,7 +57,7 @@ export default function PricingPage() {
   };
 
   const handleSingleFinanceManager = () => {
-    navigate('/simple-signup', { 
+    navigate('/auth', { 
       state: { 
         signupType: 'single_finance_manager' 
       } 
@@ -68,7 +65,7 @@ export default function PricingPage() {
   };
 
   const handleDealershipGroup = () => {
-    navigate('/signup', {
+    navigate('/signup/dealership', {
       state: {
         signupType: 'dealership_group'
       }
@@ -82,45 +79,35 @@ export default function PricingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
+              <button
+                onClick={() => navigate('/pricing')}
+                className="text-gray-400 hover:text-white mr-4 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
               <h1 className="text-2xl font-bold text-white">The DAS Board</h1>
+              <span className="ml-3 px-3 py-1 bg-blue-600 text-white text-sm rounded-full">
+                Sign Up
+              </span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <button
                 onClick={() => navigate('/')}
                 className="text-gray-300 hover:text-white transition-colors"
               >
-                {t('nav.home')}
-              </button>
-              <button
-                onClick={() => navigate('/screenshots')}
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                {t('nav.screenshots')}
+                Home
               </button>
               <button
                 onClick={() => navigate('/pricing')}
-                className="text-white border-b-2 border-blue-500"
-              >
-                {t('nav.pricing')}
-              </button>
-              <button
-                onClick={() => navigate('/about')}
                 className="text-gray-300 hover:text-white transition-colors"
               >
-                {t('nav.about')}
+                Pricing
               </button>
-              <LanguageSwitcher />
               <button
                 onClick={() => navigate('/auth')}
                 className="text-gray-300 hover:text-white transition-colors"
               >
-                {t('nav.login')}
-              </button>
-              <button
-                onClick={() => navigate('/signup')}
-                className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                {t('nav.signup')}
+                Login
               </button>
             </div>
           </div>
@@ -209,8 +196,8 @@ export default function PricingPage() {
                 <p className="text-gray-400 mb-6">
                   Complete dealership management with role-specific dashboards, team management, and multi-location support.
                 </p>
-                <div className="text-3xl font-bold text-white mb-2">$250/mo base</div>
-                <div className="text-sm text-gray-500">per dealership + add-ons</div>
+                <div className="text-3xl font-bold text-white mb-2">Starting at $250/mo</div>
+                <div className="text-sm text-gray-500">per dealership</div>
               </div>
 
               <div className="space-y-4 mb-8">
@@ -240,7 +227,7 @@ export default function PricingPage() {
                 onClick={handleDealershipGroup}
                 className="w-full bg-blue-600 hover:bg-blue-500 text-white py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/25 flex items-center justify-center"
               >
-                View Dynamic Package Pricing
+                Configure Your Package
                 <ArrowRight className="w-5 h-5 ml-2" />
               </button>
 
@@ -317,7 +304,7 @@ export default function PricingPage() {
       {/* Discount Popup */}
       {showDiscountPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-blue-50 rounded-xl p-8 max-w-md w-full border-2 border-blue-500 relative animate-in fade-in duration-300 shadow-2xl shadow-blue-500/50">
+          <div className="bg-white rounded-xl p-8 max-w-md w-full border-2 border-blue-500 relative animate-in fade-in duration-300 shadow-2xl shadow-blue-500/50">
             <button
               onClick={() => setShowDiscountPopup(false)}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
@@ -331,7 +318,7 @@ export default function PricingPage() {
               </div>
 
               <h3 className="text-3xl font-bold text-gray-800 mb-6">
-                {discountCodeRevealed ? 'Your Discount Code!' : 'Special Summer Savings!'}
+                {discountCodeRevealed ? 'Your Discount Code!' : 'Special Launch Offer!'}
               </h3>
               
               {!discountCodeRevealed ? (

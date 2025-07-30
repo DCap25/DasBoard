@@ -16,14 +16,10 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
-import { useTranslation } from '../../contexts/TranslationContext';
-import LanguageSwitcher from '../LanguageSwitcher';
 
-export default function SignUp() {
+export default function DealershipSignup() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
-  const [hoveredRole, setHoveredRole] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     organizationName: '',
     address: '',
@@ -100,6 +96,13 @@ export default function SignUp() {
     }
   };
 
+  const pricingTiers = [
+    { dealerships: '1-2', price: 250, popular: false },
+    { dealerships: '3-5', price: 225, popular: true },
+    { dealerships: '6-10', price: 200, popular: false },
+    { dealerships: '11-25', price: 175, popular: false },
+    { dealerships: '26+', price: 150, popular: false },
+  ];
 
   const features = [
     'Complete dashboard suite for all roles',
@@ -126,43 +129,16 @@ export default function SignUp() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
+              <button
+                onClick={() => navigate('/subscriptions')}
+                className="text-gray-400 hover:text-white mr-4 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
               <h1 className="text-2xl font-bold text-white">The DAS Board</h1>
-              <span className="ml-3 px-3 py-1 bg-blue-600 text-white text-sm rounded-full">
-                Sign Up
+              <span className="ml-3 px-3 py-1 bg-green-600 text-white text-sm rounded-full">
+                Dealership Signup
               </span>
-            </div>
-            <div className="hidden md:flex items-center space-x-8">
-              <button
-                onClick={() => navigate('/')}
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                {t('nav.home')}
-              </button>
-              <button
-                onClick={() => navigate('/screenshots')}
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                {t('nav.screenshots')}
-              </button>
-              <button
-                onClick={() => navigate('/pricing')}
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                {t('nav.pricing')}
-              </button>
-              <button
-                onClick={() => navigate('/about')}
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                {t('nav.about')}
-              </button>
-              <LanguageSwitcher />
-              <button
-                onClick={() => navigate('/auth')}
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                {t('nav.login')}
-              </button>
             </div>
           </div>
         </div>
@@ -178,213 +154,81 @@ export default function SignUp() {
                 Dealership Management
               </h1>
               <p className="text-xl text-gray-300">
-                Build your custom package with flexible pricing tailored to your dealership's needs.
+                Complete solution for managing your dealership or dealer group with volume-based pricing.
               </p>
             </div>
 
-            {/* Custom Configurator Pricing */}
+            {/* Volume Pricing */}
             <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-8">
               <div className="flex items-center mb-4">
                 <Calculator className="w-6 h-6 text-blue-400 mr-3" />
-                <h2 className="text-xl font-bold text-white">Dynamic Package Pricing</h2>
+                <h2 className="text-xl font-bold text-white">Volume-Based Pricing</h2>
               </div>
               
-              {/* Base Price */}
-              <div className="bg-blue-600/20 border border-blue-500 rounded-lg p-4 mb-4">
-                <div className="flex justify-between items-center mb-4">
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">Base Price per Dealership</h3>
-                    <p className="text-sm text-gray-400 mt-1">Includes dashboard access for standard team</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-2xl font-bold text-blue-400">$250</span>
-                    <span className="text-gray-400 text-sm">/mo</span>
-                  </div>
-                </div>
-                
-                {/* What's Included */}
-                <div className="border-t border-blue-400/30 pt-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <h4 className="text-sm font-semibold text-blue-300 mb-2">Standard Team Access:</h4>
-                      <ul className="space-y-1 text-sm text-gray-300">
-                        <li>• Up to 10 Sales People</li>
-                        <li>• Up to 3 Finance Managers</li>
-                        <li>• Up to 3 Sales Managers</li>
-                        <li>• 1 General Manager</li>
-                      </ul>
+              <div className="space-y-3">
+                {pricingTiers.map((tier, index) => (
+                  <div 
+                    key={index}
+                    className={`flex justify-between items-center p-3 rounded-lg ${
+                      tier.popular ? 'bg-green-600/20 border border-green-500' : 'bg-gray-700/50'
+                    }`}
+                  >
+                    <div className="flex items-center">
+                      <span className="text-white font-medium">{tier.dealerships} dealerships</span>
+                      {tier.popular && (
+                        <Star className="w-4 h-4 text-blue-400 ml-2" />
+                      )}
                     </div>
-                    <div>
-                      <h4 className="text-sm font-semibold text-blue-300 mb-2">Core Features:</h4>
-                      <ul className="space-y-1 text-sm text-gray-300">
-                        <li>• Real-time deal tracking</li>
-                        <li>• Performance analytics</li>
-                        <li>• Schedule management</li>
-                        <li>• Goal tracking</li>
-                      </ul>
+                    <div className="text-right">
+                      <span className="text-xl font-bold text-blue-400">${tier.price}</span>
+                      <span className="text-gray-400 text-sm ml-1">/mo each</span>
                     </div>
                   </div>
-                  <div>
-                    <h4 className="text-sm font-semibold text-blue-300 mb-2">What's Included:</h4>
-                    <ul className="space-y-1 text-sm text-gray-300">
-                      <li>• Complete dashboard suite for all roles</li>
-                      <li>• Real-time deal tracking & analytics</li>
-                      <li>• Multi-location management</li>
-                      <li>• Flexible admin structure</li>
-                      <li>• Schedule & goal management</li>
-                      <li>• Performance reporting</li>
-                      <li>• Volume discounts available</li>
-                    </ul>
-                  </div>
-                </div>
+                ))}
               </div>
-
-              {/* Bundle Offers */}
-              <div className="bg-gray-700/30 rounded-lg p-4 mb-6">
-                <h3 className="text-base font-semibold text-white mb-3 flex items-center">
-                  <Star className="w-4 h-4 text-yellow-400 mr-2" />
-                  Special Bundle Offers
-                </h3>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-start">
-                    <Check className="w-4 h-4 text-green-400 mr-2 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-300">
-                      <strong className="text-white">Sell More Bundle (+$50/mo):</strong> 10 Additional Sales People, 2 Additional Finance Managers, 2 Additional Sales Managers
-                    </span>
-                  </li>
-                  <li className="flex items-start">
-                    <Check className="w-4 h-4 text-green-400 mr-2 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-300">
-                      <strong className="text-white">Sell Most Bundle (+$100/mo):</strong> 20 Additional Sales People, 4 Sales Managers, 1 GSM, 1 Finance Director
-                    </span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* À La Carte Add-ons */}
-              <div className="relative">
-                <h3 className="text-base font-semibold text-white mb-2">À La Carte Add-ons</h3>
-                <div className="space-y-2">
-                  <div 
-                    className="flex justify-between items-center p-2 bg-gray-700/50 rounded-lg hover:bg-gray-700/70 transition-colors cursor-pointer"
-                    onMouseEnter={() => setHoveredRole('salesperson')}
-                    onMouseLeave={() => setHoveredRole(null)}
-                  >
-                    <div className="flex items-center">
-                      <User className="w-3 h-3 text-blue-400 mr-2" />
-                      <span className="text-white text-sm">Additional Sales Person</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-base font-semibold text-white">$5</span>
-                      <span className="text-gray-400 text-xs">/mo</span>
-                    </div>
-                  </div>
-
-                  <div 
-                    className="flex justify-between items-center p-2 bg-gray-700/50 rounded-lg hover:bg-gray-700/70 transition-colors cursor-pointer"
-                    onMouseEnter={() => setHoveredRole('financemanager')}
-                    onMouseLeave={() => setHoveredRole(null)}
-                  >
-                    <div className="flex items-center">
-                      <Users className="w-3 h-3 text-blue-400 mr-2" />
-                      <span className="text-white text-sm">Additional Finance Manager</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-base font-semibold text-white">$20</span>
-                      <span className="text-gray-400 text-xs">/mo</span>
-                    </div>
-                  </div>
-
-                  <div 
-                    className="flex justify-between items-center p-2 bg-gray-700/50 rounded-lg hover:bg-gray-700/70 transition-colors cursor-pointer"
-                    onMouseEnter={() => setHoveredRole('salesmanager')}
-                    onMouseLeave={() => setHoveredRole(null)}
-                  >
-                    <div className="flex items-center">
-                      <Shield className="w-3 h-3 text-blue-400 mr-2" />
-                      <span className="text-white text-sm">Additional Sales Manager</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-base font-semibold text-white">$30</span>
-                      <span className="text-gray-400 text-xs">/mo</span>
-                    </div>
-                  </div>
-
-                  <div 
-                    className="flex justify-between items-center p-2 bg-gray-700/50 rounded-lg hover:bg-gray-700/70 transition-colors cursor-pointer"
-                    onMouseEnter={() => setHoveredRole('financedirector')}
-                    onMouseLeave={() => setHoveredRole(null)}
-                  >
-                    <div className="flex items-center">
-                      <Users className="w-3 h-3 text-blue-400 mr-2" />
-                      <span className="text-white text-sm">Finance Director</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-base font-semibold text-white">$25</span>
-                      <span className="text-gray-400 text-xs">/mo</span>
-                    </div>
-                  </div>
-
-                  <div 
-                    className="flex justify-between items-center p-2 bg-gray-700/50 rounded-lg hover:bg-gray-700/70 transition-colors cursor-pointer"
-                    onMouseEnter={() => setHoveredRole('generalmanager')}
-                    onMouseLeave={() => setHoveredRole(null)}
-                  >
-                    <div className="flex items-center">
-                      <Shield className="w-3 h-3 text-blue-400 mr-2" />
-                      <span className="text-white text-sm">General Sales Manager (GSM)</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-base font-semibold text-white">$30</span>
-                      <span className="text-gray-400 text-xs">/mo</span>
-                    </div>
-                  </div>
-
-                  <div 
-                    className="flex justify-between items-center p-2 bg-gray-700/50 rounded-lg hover:bg-gray-700/70 transition-colors cursor-pointer"
-                    onMouseEnter={() => setHoveredRole('avp')}
-                    onMouseLeave={() => setHoveredRole(null)}
-                  >
-                    <div className="flex items-center">
-                      <TrendingUp className="w-3 h-3 text-blue-400 mr-2" />
-                      <span className="text-white text-sm">Area Vice President (AVP)</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-base font-semibold text-white">$50</span>
-                      <span className="text-gray-400 text-xs">/mo</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Dashboard Preview Tooltip */}
-                {hoveredRole && (
-                  <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-80 bg-white rounded-lg shadow-2xl border border-gray-300 p-4">
-                    <h4 className="text-gray-800 font-semibold mb-2 text-sm">
-                      {hoveredRole === 'salesperson' && 'Sales Person Dashboard'}
-                      {hoveredRole === 'financemanager' && 'Finance Manager Dashboard'}
-                      {hoveredRole === 'salesmanager' && 'Sales Manager Dashboard'}
-                      {hoveredRole === 'financedirector' && 'Finance Director Dashboard'}
-                      {hoveredRole === 'generalmanager' && 'General Manager Dashboard'}
-                      {hoveredRole === 'avp' && 'Area Vice President Dashboard'}
-                    </h4>
-                    <img 
-                      src={`/images/${
-                        hoveredRole === 'salesperson' ? 'SALESPERSON_DASH.JPG' :
-                        hoveredRole === 'financemanager' ? 'FINANCEMNG_DASH.JPG' :
-                        hoveredRole === 'salesmanager' ? 'SALESMNG_DASH.JPG' :
-                        hoveredRole === 'financedirector' ? 'FINANCEDIR_DASH.JPG' :
-                        hoveredRole === 'generalmanager' ? 'GENERALMNG_DASH.JPG' :
-                        hoveredRole === 'avp' ? 'AVP_DASH.JPG' : ''
-                      }`}
-                      alt="Dashboard Preview"
-                      className="w-full h-auto rounded border border-gray-200"
-                    />
-                  </div>
-                )}
+              
+              <div className="mt-4 p-3 bg-blue-600/20 rounded-lg border border-blue-500">
+                <p className="text-blue-300 text-sm">
+                  <strong>Central Billing Discount:</strong> Pay for multiple dealerships under one account 
+                  and receive volume pricing automatically.
+                </p>
               </div>
             </div>
 
+            {/* Included Features */}
+            <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-8">
+              <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+                <Check className="w-5 h-5 text-blue-400 mr-2" />
+                Included Features
+              </h3>
+              <div className="space-y-2">
+                {features.map((feature, index) => (
+                  <div key={index} className="flex items-start">
+                    <Check className="w-4 h-4 text-blue-400 mr-2 mt-0.5 flex-shrink-0" />
+                    <span className="text-white text-sm">{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
 
+            {/* Premium Add-ons */}
+            <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+              <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+                <Star className="w-5 h-5 text-blue-400 mr-2" />
+                Premium Add-ons
+              </h3>
+              <div className="space-y-2 mb-4">
+                {premiumFeatures.map((feature, index) => (
+                  <div key={index} className="flex items-start">
+                    <Star className="w-4 h-4 text-blue-400 mr-2 mt-0.5 flex-shrink-0" />
+                    <span className="text-white text-sm">{feature}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-gray-400 text-xs">
+                Available after signup through your admin dashboard
+              </p>
+            </div>
           </div>
 
           {/* Right Side - Signup Form */}

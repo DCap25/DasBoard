@@ -336,30 +336,25 @@ const AVPDashboard = () => {
   };
 
   return (
-    <div className="container py-4">
+    <>
       {/* Dashboard header */}
       <div className="flex justify-between items-start mb-6">
-        <div className="flex-grow">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
-            <div>
-              <h1 className="text-3xl font-bold flex items-center">
-                <Building2 className="w-8 h-8 mr-3 text-blue-600" />
-                Area Vice President Dashboard
-              </h1>
-              <p className="text-gray-600 mt-1">
-                AVP: {user?.email?.split('@')[0] || 'Not Assigned'} | District Overview
-              </p>
-            </div>
-
-            {/* Leadership Tip */}
-            <div className="bg-blue-50 p-2 rounded-md mt-2 md:mt-0 border border-blue-100 max-w-2xl">
-              <p className="text-xs italic text-blue-800">
-                <Lightbulb className="h-3 w-3 inline-block mr-1" />
-                <strong>Leadership Tip:</strong> Focus on developing your General Managers - their
-                success drives district performance.
-              </p>
-            </div>
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold flex items-center">
+            <Building2 className="w-8 h-8 mr-3 text-blue-600" />
+            Area Vice President Dashboard
+          </h1>
+          <p className="text-gray-600 mt-1">
+            AVP: {user?.email?.split('@')[0] || 'Not Assigned'} | District Overview
+          </p>
+        </div>
+        {/* Leadership Tip */}
+        <div className="bg-blue-50 p-2 rounded-md border border-blue-100 max-w-md mr-64">
+          <p className="text-xs italic text-blue-800">
+            <Lightbulb className="h-3 w-3 inline-block mr-1" />
+            <strong>Leadership Tip:</strong> Focus on developing your General Managers - their
+            success drives district performance.
+          </p>
         </div>
       </div>
 
@@ -411,10 +406,10 @@ const AVPDashboard = () => {
         <TabsContent value="overview" className="space-y-6">
           {/* District Metrics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card>
-              <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-white">Total Gross Profit</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <Card className="border-l-4 border-l-blue-500">
+              <CardHeader className="bg-white flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-black">Total Gross Profit</CardTitle>
+                <DollarSign className="h-4 w-4 text-blue-500" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -429,10 +424,10 @@ const AVPDashboard = () => {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-white">Total Units</CardTitle>
-                <BarChart4 className="h-4 w-4 text-muted-foreground" />
+            <Card className="border-l-4 border-l-blue-500">
+              <CardHeader className="bg-white flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-black">Total Units</CardTitle>
+                <BarChart4 className="h-4 w-4 text-blue-500" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{districtMetrics.total_units}</div>
@@ -442,10 +437,10 @@ const AVPDashboard = () => {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-white">District Front PVR</CardTitle>
-                <Calculator className="h-4 w-4 text-muted-foreground" />
+            <Card className="border-l-4 border-l-blue-500">
+              <CardHeader className="bg-white flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-black">District Front PVR</CardTitle>
+                <Calculator className="h-4 w-4 text-blue-500" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">${districtMetrics.district_front_pvr}</div>
@@ -453,10 +448,10 @@ const AVPDashboard = () => {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600 border-b border-gray-300 flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-white">District Back PVR</CardTitle>
-                <CreditCard className="h-4 w-4 text-muted-foreground" />
+            <Card className="border-l-4 border-l-blue-500">
+              <CardHeader className="bg-white flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-black">District Back PVR</CardTitle>
+                <CreditCard className="h-4 w-4 text-blue-500" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">${districtMetrics.district_back_pvr}</div>
@@ -465,12 +460,134 @@ const AVPDashboard = () => {
             </Card>
           </div>
 
-          {/* Goal Achievement and Top Performer */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* DAS Boards and Goal Achievement */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Finance Das Board */}
             <Card>
-              <CardHeader className="bg-gradient-to-r from-blue-500 to-gray-600">
-                <CardTitle className="flex items-center text-white">
-                  <Target className="w-5 h-5 mr-2" />
+              <CardHeader className="bg-white border-b border-gray-300 py-2 rounded-t-lg flex flex-row items-center justify-between space-y-0">
+                <CardTitle className="text-black text-base font-medium flex items-center">
+                  <Trophy className="mr-2 h-5 w-5 text-yellow-500" />
+                  Finance Das Board
+                </CardTitle>
+                <Button variant="outline" size="sm" className="h-8 text-xs px-2">
+                  View All
+                </Button>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <div className="min-w-full">
+                    {/* Sortable Header */}
+                    <div className="flex items-center text-sm font-semibold text-white border-b py-2 px-1">
+                      <div className="w-10 text-center bg-blue-500 border-r border-blue-600 py-2 rounded-l-md">
+                        #
+                      </div>
+                      <div className="w-36 flex-shrink-0 bg-gray-700 text-white border-r border-gray-800 py-2 px-2">
+                        F&I Manager
+                      </div>
+                      <div className="w-28 text-center bg-blue-500 border-r border-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
+                        PVR <ChevronDown className="ml-1 h-3 w-3" />
+                      </div>
+                      <div className="w-28 text-center bg-blue-500 border-r border-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
+                        VSC % <ChevronDown className="ml-1 h-3 w-3" />
+                      </div>
+                      <div className="w-28 text-center bg-blue-500 border-r border-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
+                        PPM % <ChevronDown className="ml-1 h-3 w-3" />
+                      </div>
+                      <div className="w-24 text-center bg-blue-500 border-r border-blue-600 py-2 flex items-center justify-center cursor-pointer hover:bg-blue-700">
+                        PPD <ChevronDown className="ml-1 h-3 w-3" />
+                      </div>
+                      <div className="w-36 text-right bg-blue-500 border-r border-blue-600 py-2 pr-3 flex items-center justify-end cursor-pointer hover:bg-blue-700 font-semibold rounded-r-md">
+                        Profit <ChevronDown className="ml-1 h-3 w-3" />
+                      </div>
+                    </div>
+
+                    {/* Leaderboard Entries */}
+                    <div>
+                      {[
+                        {
+                          name: 'Ashley Rodriguez',
+                          pvr: 2650,
+                          vscPen: 68,
+                          ppmPen: 54,
+                          ppd: 3.2,
+                          profit: 143200,
+                        },
+                        {
+                          name: 'Michael Parker',
+                          pvr: 2450,
+                          vscPen: 65,
+                          ppmPen: 48,
+                          ppd: 2.9,
+                          profit: 127500,
+                        },
+                        {
+                          name: 'Sophia Martinez',
+                          pvr: 2320,
+                          vscPen: 61,
+                          ppmPen: 45,
+                          ppd: 2.7,
+                          profit: 115300,
+                        },
+                        {
+                          name: 'James Wilson',
+                          pvr: 2200,
+                          vscPen: 58,
+                          ppmPen: 42,
+                          ppd: 2.5,
+                          profit: 96500,
+                        },
+                        {
+                          name: 'Emma Johnson',
+                          pvr: 2100,
+                          vscPen: 55,
+                          ppmPen: 38,
+                          ppd: 2.3,
+                          profit: 84200,
+                        },
+                      ].map((manager, index) => (
+                        <div
+                          key={index}
+                          className={`flex items-center py-2 px-1 ${
+                            index !== 4 ? 'border-b' : ''
+                          } border-gray-100 text-sm hover:bg-gray-50`}
+                        >
+                          <div className="w-10 flex justify-center">
+                            <div
+                              className={`w-5 h-5 rounded-full flex items-center justify-center
+                              ${
+                                index === 0
+                                  ? 'bg-yellow-100 text-yellow-600'
+                                  : index === 1
+                                  ? 'bg-gray-100 text-gray-600'
+                                  : index === 2
+                                  ? 'bg-amber-100 text-amber-600'
+                                  : 'bg-white border-r border-gray-200 text-blue-500'
+                              }`}
+                            >
+                              <span className="text-xs font-bold">{index + 1}</span>
+                            </div>
+                          </div>
+                          <div className="w-36 flex-shrink-0 font-medium px-2">{manager.name}</div>
+                          <div className="w-28 text-center">${manager.pvr}</div>
+                          <div className="w-28 text-center">{manager.vscPen}%</div>
+                          <div className="w-28 text-center">{manager.ppmPen}%</div>
+                          <div className="w-24 text-center">{manager.ppd}</div>
+                          <div className="w-36 text-right pr-3 font-semibold text-green-700">
+                            ${manager.profit.toLocaleString()}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* District Goal Achievement */}
+            <Card>
+              <CardHeader className="bg-white border-b border-gray-300 py-2 rounded-t-lg">
+                <CardTitle className="flex items-center text-black text-base font-medium">
+                  <Target className="w-5 h-5 mr-2 text-blue-500" />
                   District Goal Achievement
                 </CardTitle>
               </CardHeader>
@@ -484,24 +601,101 @@ const AVPDashboard = () => {
                     ? 'On track'
                     : 'Needs attention'}
                 </p>
+                <div className="mt-4">
+                  <h4 className="font-semibold mb-2">Top Performing Store</h4>
+                  <div className="text-xl font-bold mb-1">{districtMetrics.top_performer}</div>
+                  <p className="text-sm text-muted-foreground">
+                    Leading in overall performance this month
+                  </p>
+                  <Button variant="outline" size="sm" className="mt-2">
+                    View Details
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
+            {/* Sales Manager Das Board */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center text-white">
-                  <Trophy className="w-5 h-5 mr-2 text-yellow-500" />
-                  Top Performing Store
+              <CardHeader className="bg-white border-b border-gray-300 py-2 rounded-t-lg flex flex-row items-center justify-between space-y-0">
+                <CardTitle className="text-black text-base font-medium flex items-center">
+                  <Users className="h-5 w-5 text-purple-600 mr-2" />
+                  Sales Manager Das Board
                 </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold mb-2">{districtMetrics.top_performer}</div>
-                <p className="text-sm text-muted-foreground">
-                  Leading in overall performance this month
-                </p>
-                <Button variant="outline" size="sm" className="mt-2">
-                  View Details
+                <Button variant="outline" size="sm" className="h-8 text-xs px-2">
+                  View All
                 </Button>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <div className="min-w-full">
+                    <div className="flex items-center text-sm font-semibold text-white border-b py-2 px-1">
+                      <div className="flex-1 text-center bg-blue-500 border-r border-blue-600 py-2 rounded-l-md">
+                        #
+                      </div>
+                      <div className="flex-[3] bg-gray-700 text-white border-r border-gray-800 py-2 px-2">
+                        Manager
+                      </div>
+                      <div className="flex-[2] text-center bg-blue-500 border-r border-blue-600 py-2">
+                        Total Deals
+                      </div>
+                      <div className="flex-1 text-center bg-blue-500 border-r border-blue-600 py-2">
+                        New
+                      </div>
+                      <div className="flex-1 text-center bg-blue-500 border-r border-blue-600 py-2">
+                        U/CPO
+                      </div>
+                      <div className="flex-[2] text-center bg-blue-500 border-r border-blue-600 py-2">
+                        Avg Front
+                      </div>
+                      <div className="flex-[2] text-center bg-blue-500 border-r border-blue-600 py-2">
+                        Avg Back
+                      </div>
+                      <div className="flex-[2] text-center bg-blue-500 border-r border-blue-600 py-2 rounded-r-md">
+                        Total Gross
+                      </div>
+                    </div>
+
+                    {/* Sample data rows */}
+                    <div>
+                    {[
+                      {
+                        name: 'John Smith',
+                        totalDeals: 45,
+                        newDeals: 28,
+                        usedDeals: 17,
+                        gross: 84500,
+                        avgFront: 1250,
+                        avgBack: 950,
+                      },
+                      {
+                        name: 'Jessica Lee',
+                        totalDeals: 41,
+                        newDeals: 25,
+                        usedDeals: 16,
+                        gross: 78900,
+                        avgFront: 1180,
+                        avgBack: 920,
+                      },
+                    ].map((manager, index) => (
+                      <div
+                        key={index}
+                        className={`flex items-center py-2 px-1 ${
+                          index !== 1 ? 'border-b' : ''
+                        } border-gray-100 text-sm hover:bg-gray-50`}
+                      >
+                        <div className="flex-1 flex justify-center">{index + 1}</div>
+                        <div className="flex-[3] font-medium px-2">{manager.name}</div>
+                        <div className="flex-[2] text-center">{manager.totalDeals}</div>
+                        <div className="flex-1 text-center">{manager.newDeals}</div>
+                        <div className="flex-1 text-center">{manager.usedDeals}</div>
+                        <div className="flex-[2] text-center">${manager.avgFront}</div>
+                        <div className="flex-[2] text-center">${manager.avgBack}</div>
+                        <div className="flex-[2] text-center">${manager.gross.toLocaleString()}</div>
+                      </div>
+                    ))}
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -884,7 +1078,7 @@ const AVPDashboard = () => {
           </div>
         </TabsContent>
       </Tabs>
-    </div>
+    </>
   );
 };
 

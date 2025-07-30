@@ -8,6 +8,9 @@ import {
   Calendar,
   Calculator,
   TrendingUp,
+  User,
+  Building2,
+  Check,
 } from 'lucide-react';
 import { useTranslation } from '../contexts/TranslationContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
@@ -51,23 +54,20 @@ export default function HomePage() {
 
   const pricingTiers = [
     {
-      name: t('pricing.tiers.finance.name'),
-      price: t('pricing.tiers.finance.price'),
-      originalPrice: t('pricing.tiers.finance.originalPrice'),
-      description: t('pricing.tiers.finance.description'),
+      name: 'Single Finance Manager',
+      price: 'FREE',
+      description: 'Perfect for individual finance managers who want to track their personal performance',
+      popular: false,
+      icon: User,
+      features: ['Personal deal tracking', 'PVR & product profit analytics', 'Pay calculator', 'Performance metrics']
+    },
+    {
+      name: 'Dealership / Dealer Group',
+      price: '$250/mo base',
+      description: 'Complete dealership management with role-specific dashboards and team management',
       popular: true,
-    },
-    {
-      name: t('pricing.tiers.dealership.name'),
-      price: t('pricing.tiers.dealership.price'),
-      description: t('pricing.tiers.dealership.description'),
-      popular: false,
-    },
-    {
-      name: t('pricing.tiers.group.name'),
-      price: t('pricing.tiers.group.price'),
-      description: t('pricing.tiers.group.description'),
-      popular: false,
+      icon: Building2,
+      features: ['All single manager features', 'Team dashboards for all roles', 'Multi-location analytics', 'Flexible admin structures']
     },
   ];
 
@@ -147,11 +147,15 @@ export default function HomePage() {
             </div>
             <div className="relative">
               <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 shadow-2xl">
-                <div className="aspect-video bg-gradient-to-br from-blue-900/50 to-gray-900 rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <BarChart3 className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-                    <p className="text-gray-300 text-lg">The DAS Board Finance Manager Dashboard</p>
-                  </div>
+                <div className="aspect-video rounded-lg overflow-hidden">
+                  <img
+                    src="/images/FINANCEMNG_DASH.JPG"
+                    alt="The DAS Board Finance Manager Dashboard"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="text-center mt-4">
+                  <p className="text-gray-300 text-lg">Finance Manager Dashboard</p>
                 </div>
               </div>
             </div>
@@ -205,63 +209,65 @@ export default function HomePage() {
             <h2 className="text-4xl font-bold text-white mb-4">{t('home.pricing.title')}</h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">{t('home.pricing.subtitle')}</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {pricingTiers.map((tier, index) => (
-              <div
-                key={index}
-                className={`relative bg-gray-800 rounded-xl p-8 border transition-all duration-300 hover:shadow-xl ${
-                  tier.popular
-                    ? 'border-blue-500 shadow-xl shadow-blue-500/20'
-                    : 'border-gray-700 hover:border-blue-500'
-                }`}
-              >
-                {tier.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                      {t('pricing.popular')}
-                    </span>
-                  </div>
-                )}
-                <div className="text-center">
-                  <h3 className="text-xl font-bold text-white mb-2">{tier.name}</h3>
-                  <div className="mb-4">
-                    {tier.originalPrice && (
-                      <span className="text-red-400 line-through text-lg mr-2">
-                        {(() => {
-                          const currency = t('currency.symbol') as string;
-                          const price = tier.originalPrice;
-                          if (price.includes('$') && currency !== '$') {
-                            return price.replace('$', currency);
-                          }
-                          return price;
-                        })()}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {pricingTiers.map((tier, index) => {
+              const IconComponent = tier.icon;
+              return (
+                <div
+                  key={index}
+                  className={`relative bg-gray-800 rounded-xl p-8 border transition-all duration-300 hover:shadow-xl ${
+                    tier.popular
+                      ? 'border-2 border-blue-500 shadow-xl shadow-blue-500/20'
+                      : 'border-gray-700 hover:border-blue-500'
+                  }`}
+                >
+                  {tier.popular && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                      <span className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                        Most Popular
                       </span>
+                    </div>
+                  )}
+                  
+                  <div className="text-center mb-8">
+                    <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <IconComponent className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-4">{tier.name}</h3>
+                    <p className="text-gray-400 mb-6">{tier.description}</p>
+                    <div className="text-3xl font-bold text-blue-400 mb-2">{tier.price}</div>
+                    {tier.price !== 'FREE' && (
+                      <div className="text-sm text-gray-500">per dealership + add-ons</div>
                     )}
-                    <span className="text-3xl font-bold text-blue-400">
-                      {(() => {
-                        const currency = t('currency.symbol') as string;
-                        const price = tier.price;
-                        if (price.includes('$') && currency !== '$') {
-                          return price.replace('$', currency);
-                        }
-                        return price;
-                      })()}
-                    </span>
                   </div>
-                  <p className="text-gray-300 mb-8">{tier.description}</p>
+
+                  <div className="space-y-4 mb-8">
+                    {tier.features.map((feature, featureIndex) => (
+                      <div key={featureIndex} className="flex items-center">
+                        <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
+                        <span className="text-gray-300">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+
                   <button
-                    onClick={() => navigate('/signup')}
-                    className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
+                    onClick={() => navigate('/pricing')}
+                    className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/25 flex items-center justify-center ${
                       tier.popular
                         ? 'bg-blue-600 hover:bg-blue-500 text-white'
-                        : 'bg-gray-700 hover:bg-gray-600 text-white'
+                        : 'bg-blue-600 hover:bg-blue-500 text-white'
                     }`}
                   >
-                    {t('pricing.getStarted')}
+                    {tier.price === 'FREE' ? 'Get Started Free' : 'Configure Your Package'}
+                    <ArrowRight className="w-5 h-5 ml-2" />
                   </button>
+
+                  <div className="mt-4 text-center text-sm text-gray-400">
+                    {tier.price === 'FREE' ? 'Setup takes less than 2 minutes' : 'Get started today'}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           <div className="text-center mt-12">
             <button
