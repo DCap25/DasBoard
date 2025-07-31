@@ -2,6 +2,8 @@
 
 A comprehensive dashboard application for automotive dealerships built with React, TypeScript, and Vite.
 
+**Latest Update**: Added Deals by Lender analytics, improved pricing system, and enhanced dashboard layouts.
+
 ## Features
 
 - **Role-based Authentication**: Secure login system with multiple user roles
