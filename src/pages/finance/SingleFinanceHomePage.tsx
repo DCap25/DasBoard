@@ -107,6 +107,11 @@ const MOCK_DEALS: Deal[] = [];
 export const SingleFinanceHomePage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  // Helper function to get user ID consistently
+  const getUserId = () => {
+    return user?.id || user?.user?.id || user?.email;
+  };
   const [deals, setDeals] = useState<Deal[]>([]);
   const [, setPendingDeals] = useState<Deal[]>([]);
   const [timePeriod] = useState<TimePeriod>('this-month');
@@ -150,9 +155,10 @@ export const SingleFinanceHomePage: React.FC = () => {
   // Check and handle monthly reset
   const checkMonthlyReset = () => {
     try {
-      if (!user?.id) return;
+      const userId = getUserId();
+      if (!userId) return;
       
-      const lastResetMonth = SingleFinanceStorage.getLastResetMonth(user.id);
+      const lastResetMonth = SingleFinanceStorage.getLastResetMonth(userId);
       const currentMonth = new Date().getMonth();
       const currentYear = new Date().getFullYear();
       const currentMonthYear = `${currentYear}-${currentMonth}`;
@@ -161,10 +167,10 @@ export const SingleFinanceHomePage: React.FC = () => {
         console.log('[SingleFinanceHomePage] New month detected, resetting data...');
         
         // Clear deals but preserve team members and settings
-        SingleFinanceStorage.clearDeals(user.id);
+        SingleFinanceStorage.clearDeals(userId);
         
         // Update the last reset month
-        SingleFinanceStorage.setLastResetMonth(user.id, currentMonthYear);
+        SingleFinanceStorage.setLastResetMonth(userId, currentMonthYear);
         
         console.log('[SingleFinanceHomePage] Monthly reset completed');
       }
@@ -239,29 +245,41 @@ export const SingleFinanceHomePage: React.FC = () => {
 
   // Load and save pay privacy state from user-specific localStorage
   useEffect(() => {
-    if (!user?.id) return;
+    const userId = getUserId();
+    if (!userId) return;
     
     // Load privacy state on mount
-    const savedPrivacyState = SingleFinanceStorage.getPayPrivacyState(user.id);
+    const savedPrivacyState = SingleFinanceStorage.getPayPrivacyState(userId);
     setShowPayAmounts(savedPrivacyState);
-  }, [user?.id]);
+  }, [user]);
+
+  // Additional effect to ensure privacy state loads on every page visit
+  useEffect(() => {
+    const userId = getUserId();
+    if (userId) {
+      const savedPrivacyState = SingleFinanceStorage.getPayPrivacyState(userId);
+      setShowPayAmounts(savedPrivacyState);
+    }
+  }, []); // Run once on component mount
 
   // Save privacy state when it changes
   const handleTogglePayVisibility = () => {
-    if (!user?.id) return;
+    const userId = getUserId();
+    if (!userId) return;
     
     const newShowState = !showPayAmounts;
     setShowPayAmounts(newShowState);
-    SingleFinanceStorage.setPayPrivacyState(user.id, newShowState);
+    SingleFinanceStorage.setPayPrivacyState(userId, newShowState);
   };
 
   // Function to load deals from localStorage
   const loadDealsFromStorage = useCallback(() => {
     try {
       // Load from user-specific storage for Single Finance Dashboard
-      if (!user?.id) return;
+      const userId = getUserId();
+      if (!userId) return;
       
-      const parsedDeals = SingleFinanceStorage.getDeals(user.id);
+      const parsedDeals = SingleFinanceStorage.getDeals(userId);
       if (parsedDeals.length > 0) {
         console.log(
           '[SingleFinanceHomePage] Loaded deals from singleFinanceDeals storage:',
@@ -831,6 +849,7 @@ export const SingleFinanceHomePage: React.FC = () => {
                 onClick={handleTogglePayVisibility}
                 className="p-2 hover:bg-green-200 rounded-lg transition-colors shadow-sm border border-green-300"
                 title={showPayAmounts ? "Hide pay amounts" : "Show pay amounts"}
+                type="button"
               >
                 {showPayAmounts ? (
                   <Eye className="h-6 w-6 text-green-700" />
@@ -845,7 +864,8 @@ export const SingleFinanceHomePage: React.FC = () => {
               // Load pay configuration from localStorage
               let payConfig;
               try {
-                const savedPayConfig = user?.id ? SingleFinanceStorage.getPayConfig(user.id) : null;
+                const userId = getUserId();
+                const savedPayConfig = userId ? SingleFinanceStorage.getPayConfig(userId) : null;
                 payConfig = savedPayConfig || {
                   commissionRate: 25,
                   baseRate: 500,
