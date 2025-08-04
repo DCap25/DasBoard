@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '../../components/ui/card';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { SingleFinanceStorage } from '../../lib/singleFinanceStorage';
 import {
   Search,
   Filter,
@@ -50,6 +52,7 @@ interface Deal {
 
 const SingleFinanceDealsPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [deals, setDeals] = useState<Deal[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -64,8 +67,9 @@ const SingleFinanceDealsPage: React.FC = () => {
   const handleStatusChange = (dealId: string, newStatus: string) => {
     try {
       // Get existing deals from localStorage
-      const existingDealsJson = localStorage.getItem('singleFinanceDeals');
-      const existingDeals = existingDealsJson ? JSON.parse(existingDealsJson) : [];
+      if (!user?.id) return;
+      
+      const existingDeals = SingleFinanceStorage.getDeals(user.id);
 
       // Update the deal status
       const updatedDeals = existingDeals.map((deal: any) =>
@@ -73,7 +77,7 @@ const SingleFinanceDealsPage: React.FC = () => {
       );
 
       // Save back to localStorage
-      localStorage.setItem('singleFinanceDeals', JSON.stringify(updatedDeals));
+      SingleFinanceStorage.setDeals(user.id, updatedDeals);
 
       // Update state immediately to trigger re-render
       setDeals(currentDeals => 
@@ -107,48 +111,71 @@ const SingleFinanceDealsPage: React.FC = () => {
     }
   };
 
-  // Handle deal deletion
+  // Handle deal editing
+  const handleEditDeal = (dealId: string) => {
+    // Navigate to the deal edit page with the deal ID
+    navigate(`/single-finance-deal-log/edit/${dealId}`);
+  };
+
+  // Handle deal deletion with enhanced warning popup
   const handleDeleteDeal = (dealId: string, shouldDelete: boolean) => {
     if (!shouldDelete) return;
 
-    // First confirmation
-    if (confirm('⚠️ DELETE CONFIRMATION\n\nAre you sure you want to delete this deal?\n\nThis action cannot be undone and will permanently remove all deal data.')) {
+    // Enhanced warning popup with better messaging
+    const confirmed = confirm(
+      '⚠️ DELETE CONFIRMATION\n\n' +
+      'Are you sure you want to delete this deal?\n\n' +
+      'This action will:\n' +
+      '• Permanently remove all deal data\n' +
+      '• Update your dashboard metrics\n' +
+      '• Cannot be undone\n\n' +
+      'Click OK to delete or Cancel to keep the deal.'
+    );
+
+    if (confirmed) {
       // Second confirmation for extra safety
-      if (confirm('🚨 FINAL CONFIRMATION\n\nThis is your last chance!\n\nClick OK to permanently delete this deal, or Cancel to keep it.')) {
-      try {
-        // Get existing deals from localStorage
-        const existingDealsJson = localStorage.getItem('singleFinanceDeals');
-        const existingDeals = existingDealsJson ? JSON.parse(existingDealsJson) : [];
+      const finalConfirm = confirm(
+        '🚨 FINAL CONFIRMATION\n\n' +
+        'This is your last chance!\n\n' +
+        'Click OK to permanently delete this deal, or Cancel to keep it.'
+      );
 
-        // Remove the deal
-        const updatedDeals = existingDeals.filter((deal: any) => deal.id !== dealId);
+      if (finalConfirm) {
+        try {
+          // Get existing deals from localStorage
+          if (!user?.id) return;
+          
+          const existingDeals = SingleFinanceStorage.getDeals(user.id);
 
-        // Save back to localStorage
-        localStorage.setItem('singleFinanceDeals', JSON.stringify(updatedDeals));
+          // Remove the deal
+          const updatedDeals = existingDeals.filter((deal: any) => deal.id !== dealId);
 
-        // Reload deals to reflect the change
-        const formattedDeals: Deal[] = updatedDeals.map((rawDeal: any) => {
-          const deal: Deal = {
-            id: rawDeal.id,
-            customer: rawDeal.customer || rawDeal.lastName || 'Unknown',
-            vehicle: rawDeal.vehicle || `${rawDeal.vehicleType === 'N' ? 'New' : rawDeal.vehicleType === 'U' ? 'Used' : 'CPO'} - Stock #${rawDeal.stockNumber}`,
-            vin: rawDeal.vin || rawDeal.vinLast8 || '',
-            saleDate: rawDeal.saleDate || rawDeal.dealDate || rawDeal.created_at,
-            salesperson: rawDeal.salesperson || 'Self',
-            amount: rawDeal.amount || rawDeal.totalGross || 0,
-            status: rawDeal.status || rawDeal.dealStatus || 'Pending',
-            products: rawDeal.products || [],
-            profit: rawDeal.profit || rawDeal.backEndGross || 0,
-            created_at: rawDeal.created_at || new Date().toISOString(),
-          };
-          return Object.assign(deal, rawDeal);
-        });
-        setDeals(formattedDeals);
+          // Save back to localStorage
+          SingleFinanceStorage.setDeals(user.id, updatedDeals);
 
-        console.log(`Deleted deal ${dealId}`);
-      } catch (error) {
-        console.error('Error deleting deal:', error);
-      }
+          // Reload deals to reflect the change
+          const formattedDeals: Deal[] = updatedDeals.map((rawDeal: any) => {
+            const deal: Deal = {
+              id: rawDeal.id,
+              customer: rawDeal.customer || rawDeal.lastName || 'Unknown',
+              vehicle: rawDeal.vehicle || `${rawDeal.vehicleType === 'N' ? 'New' : rawDeal.vehicleType === 'U' ? 'Used' : 'CPO'} - Stock #${rawDeal.stockNumber}`,
+              vin: rawDeal.vin || rawDeal.vinLast8 || '',
+              saleDate: rawDeal.saleDate || rawDeal.dealDate || rawDeal.created_at,
+              salesperson: rawDeal.salesperson || 'Self',
+              amount: rawDeal.amount || rawDeal.totalGross || 0,
+              status: rawDeal.status || rawDeal.dealStatus || 'Pending',
+              products: rawDeal.products || [],
+              profit: rawDeal.profit || rawDeal.backEndGross || 0,
+              created_at: rawDeal.created_at || new Date().toISOString(),
+            };
+            return Object.assign(deal, rawDeal);
+          });
+          setDeals(formattedDeals);
+
+          console.log(`Deleted deal ${dealId}`);
+        } catch (error) {
+          console.error('Error deleting deal:', error);
+        }
       }
     }
   };
@@ -156,9 +183,10 @@ const SingleFinanceDealsPage: React.FC = () => {
   // Load deals from localStorage - using singleFinanceDeals storage key
   useEffect(() => {
     try {
-      const storedDeals = localStorage.getItem('singleFinanceDeals');
-      if (storedDeals) {
-        const parsedDeals = JSON.parse(storedDeals);
+      if (!user?.id) return;
+      
+      const parsedDeals = SingleFinanceStorage.getDeals(user.id);
+      if (parsedDeals.length > 0) {
         // Map raw deal data to component interface while preserving extended properties
         const formattedDeals: Deal[] = parsedDeals.map((rawDeal: any) => {
           const deal: Deal = {
@@ -391,6 +419,7 @@ const SingleFinanceDealsPage: React.FC = () => {
                     </button>
                   </th>
                   <th className="py-3 px-4 text-center font-medium">Status</th>
+                  <th className="py-3 px-4 text-center font-medium bg-blue-600 text-white">Edit</th>
                   <th className="py-3 px-4 text-center font-medium bg-red-600 text-white">Delete</th>
                 </tr>
               </thead>
@@ -519,6 +548,14 @@ const SingleFinanceDealsPage: React.FC = () => {
                             <option value="Unwound">Unwound</option>
                             <option value="Dead Deal">Dead Deal</option>
                           </select>
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          <button
+                            onClick={() => handleEditDeal(deal.id)}
+                            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+                          >
+                            Edit
+                          </button>
                         </td>
                         <td className="py-3 px-4 text-center">
                           <input

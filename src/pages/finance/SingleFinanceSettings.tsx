@@ -6,6 +6,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { toast } from '../../components/ui/use-toast';
+import { SingleFinanceStorage } from '../../lib/singleFinanceStorage';
 import { 
   Settings, 
   Users, 
@@ -65,30 +66,32 @@ export default function SingleFinanceSettings() {
 
   // Load settings from localStorage on mount
   useEffect(() => {
+    if (!user?.id) return;
+    
     try {
-      const savedTeamMembers = localStorage.getItem('singleFinanceTeamMembers');
-      if (savedTeamMembers) {
-        setTeamMembers(JSON.parse(savedTeamMembers));
-      }
+      const savedTeamMembers = SingleFinanceStorage.getTeamMembers(user.id);
+      setTeamMembers(savedTeamMembers);
 
-      const savedPayConfig = localStorage.getItem('singleFinancePayConfig');
+      const savedPayConfig = SingleFinanceStorage.getPayConfig(user.id);
       if (savedPayConfig) {
-        setPayConfig(JSON.parse(savedPayConfig));
+        setPayConfig(savedPayConfig);
       }
     } catch (error) {
       console.error('Error loading settings:', error);
     }
-  }, []);
+  }, [user?.id]);
 
   // Save team members to localStorage
   const saveTeamMembers = (members: TeamMember[]) => {
+    if (!user?.id) return;
+    
     try {
-      localStorage.setItem('singleFinanceTeamMembers', JSON.stringify(members));
+      SingleFinanceStorage.setTeamMembers(user.id, members);
       setTeamMembers(members);
       
       // Dispatch custom event to notify other components
       window.dispatchEvent(new CustomEvent('teamMembersUpdated', { 
-        detail: { teamMembers: members } 
+        detail: { teamMembers: members, userId: user.id } 
       }));
       
       console.log('[Settings] Team members updated and event dispatched:', members.length, 'members');
@@ -104,8 +107,10 @@ export default function SingleFinanceSettings() {
 
   // Save pay configuration to localStorage
   const savePayConfig = (config: PayConfig) => {
+    if (!user?.id) return;
+    
     try {
-      localStorage.setItem('singleFinancePayConfig', JSON.stringify(config));
+      SingleFinanceStorage.setPayConfig(user.id, config);
       setPayConfig(config);
       toast({
         title: 'Success',

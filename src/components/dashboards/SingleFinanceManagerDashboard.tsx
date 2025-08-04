@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link, useLocation, useNavigate, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { SingleFinanceStorage } from '../../lib/singleFinanceStorage';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import {
@@ -64,20 +65,22 @@ const SingleFinanceManagerDashboard = () => {
     try {
       console.log('[SingleFinanceManagerDashboard] Loading deals from localStorage');
 
-      // Load raw deals directly from localStorage to preserve all form data
-      const singleFinanceDealsJson = localStorage.getItem('singleFinanceDeals');
+      // Load raw deals directly from user-specific storage to preserve all form data
+      if (!user?.id) return;
+      
+      const singleFinanceDeals = SingleFinanceStorage.getDeals(user.id);
       console.log(
         '[SingleFinanceManagerDashboard] Raw singleFinanceDeals:',
-        singleFinanceDealsJson
+        singleFinanceDeals
       );
 
-      if (!singleFinanceDealsJson) {
-        console.log('[SingleFinanceManagerDashboard] No deals found in localStorage');
+      if (!singleFinanceDeals || singleFinanceDeals.length === 0) {
+        console.log('[SingleFinanceManagerDashboard] No deals found in user storage');
         setDeals([]);
         return;
       }
 
-      const rawDeals = JSON.parse(singleFinanceDealsJson);
+      const rawDeals = singleFinanceDeals;
       console.log(`[SingleFinanceManagerDashboard] Found ${rawDeals.length} raw deals`);
       console.log('[SingleFinanceManagerDashboard] First deal sample:', rawDeals[0]);
 

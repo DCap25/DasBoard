@@ -8,6 +8,7 @@ import { Label } from '../../components/ui/label';
 import { Checkbox } from '../../components/ui/checkbox';
 import { Textarea } from '../../components/ui/textarea';
 import { toast } from '../../components/ui/use-toast';
+import { SingleFinanceStorage } from '../../lib/singleFinanceStorage';
 import { ArrowLeft, DollarSign, User, FileText, Calculator, Plus, Trash2 } from 'lucide-react';
 
 // Interface for team member
@@ -183,7 +184,7 @@ export default function LogSingleFinanceDeal() {
 
     // Listen for storage changes (fallback for cross-tab updates)
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'singleFinanceTeamMembers') {
+      if (user?.id && e.key === `singleFinanceTeamMembers_${user.id}`) {
         console.log('[LogSingleFinanceDeal] Team members storage changed, reloading');
         loadTeamMembers();
       }
@@ -200,11 +201,11 @@ export default function LogSingleFinanceDeal() {
 
   // Load team members from localStorage
   const loadTeamMembers = () => {
+    if (!user?.id) return;
+    
     try {
-      const savedTeamMembers = localStorage.getItem('singleFinanceTeamMembers');
-      if (savedTeamMembers) {
-        setTeamMembers(JSON.parse(savedTeamMembers));
-      }
+      const savedTeamMembers = SingleFinanceStorage.getTeamMembers(user.id);
+      setTeamMembers(savedTeamMembers);
     } catch (error) {
       console.error('Error loading team members:', error);
     }
@@ -212,8 +213,10 @@ export default function LogSingleFinanceDeal() {
 
   // Save team members to localStorage
   const saveTeamMembers = (members: TeamMember[]) => {
+    if (!user?.id) return;
+    
     try {
-      localStorage.setItem('singleFinanceTeamMembers', JSON.stringify(members));
+      SingleFinanceStorage.setTeamMembers(user.id, members);
       setTeamMembers(members);
     } catch (error) {
       console.error('Error saving team members:', error);
@@ -284,9 +287,10 @@ export default function LogSingleFinanceDeal() {
 
   // Load existing deal data for editing
   const loadDealForEdit = (dealIdToEdit: string) => {
+    if (!user?.id) return;
+    
     try {
-      const existingDealsJson = localStorage.getItem('singleFinanceDeals');
-      const existingDeals = existingDealsJson ? JSON.parse(existingDealsJson) : [];
+      const existingDeals = SingleFinanceStorage.getDeals(user.id);
       
       const dealToEdit = existingDeals.find((deal: any) => deal.id === dealIdToEdit);
       
@@ -520,10 +524,13 @@ export default function LogSingleFinanceDeal() {
         dashboard_type: 'single_finance',
       };
 
-      // Save to SEPARATE localStorage key for Single Finance Dashboard
+      // Save to user-specific localStorage key for Single Finance Dashboard
+      if (!user?.id) {
+        throw new Error('User ID is required');
+      }
+      
       try {
-        const existingDealsJson = localStorage.getItem('singleFinanceDeals');
-        const existingDeals = existingDealsJson ? JSON.parse(existingDealsJson) : [];
+        const existingDeals = SingleFinanceStorage.getDeals(user.id);
         
         let updatedDeals;
         if (isEditMode) {
@@ -538,7 +545,7 @@ export default function LogSingleFinanceDeal() {
           console.log('[LogSingleFinanceDeal] Deal saved to singleFinanceDeals storage:', dealData);
         }
         
-        localStorage.setItem('singleFinanceDeals', JSON.stringify(updatedDeals));
+        SingleFinanceStorage.setDeals(user.id, updatedDeals);
         
         // Dispatch custom event to notify dashboard of data change
         window.dispatchEvent(new CustomEvent('singleFinanceDealsUpdated', { 

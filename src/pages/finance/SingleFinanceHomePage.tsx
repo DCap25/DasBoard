@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { SingleFinanceStorage } from '../../lib/singleFinanceStorage';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 // Removed unused imports
@@ -104,6 +106,7 @@ const MOCK_DEALS: Deal[] = [];
 
 export const SingleFinanceHomePage: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [deals, setDeals] = useState<Deal[]>([]);
   const [, setPendingDeals] = useState<Deal[]>([]);
   const [timePeriod] = useState<TimePeriod>('this-month');
@@ -147,7 +150,9 @@ export const SingleFinanceHomePage: React.FC = () => {
   // Check and handle monthly reset
   const checkMonthlyReset = () => {
     try {
-      const lastResetMonth = localStorage.getItem('singleFinanceLastResetMonth');
+      if (!user?.id) return;
+      
+      const lastResetMonth = SingleFinanceStorage.getLastResetMonth(user.id);
       const currentMonth = new Date().getMonth();
       const currentYear = new Date().getFullYear();
       const currentMonthYear = `${currentYear}-${currentMonth}`;
@@ -156,10 +161,10 @@ export const SingleFinanceHomePage: React.FC = () => {
         console.log('[SingleFinanceHomePage] New month detected, resetting data...');
         
         // Clear deals but preserve team members and settings
-        localStorage.removeItem('singleFinanceDeals');
+        SingleFinanceStorage.clearDeals(user.id);
         
         // Update the last reset month
-        localStorage.setItem('singleFinanceLastResetMonth', currentMonthYear);
+        SingleFinanceStorage.setLastResetMonth(user.id, currentMonthYear);
         
         console.log('[SingleFinanceHomePage] Monthly reset completed');
       }
@@ -235,10 +240,11 @@ export const SingleFinanceHomePage: React.FC = () => {
   // Function to load deals from localStorage
   const loadDealsFromStorage = useCallback(() => {
     try {
-      // Load from SEPARATE storage for Single Finance Dashboard
-      const storedDeals = localStorage.getItem('singleFinanceDeals');
-      if (storedDeals) {
-        const parsedDeals = JSON.parse(storedDeals);
+      // Load from user-specific storage for Single Finance Dashboard
+      if (!user?.id) return;
+      
+      const parsedDeals = SingleFinanceStorage.getDeals(user.id);
+      if (parsedDeals.length > 0) {
         console.log(
           '[SingleFinanceHomePage] Loaded deals from singleFinanceDeals storage:',
           parsedDeals
@@ -822,8 +828,8 @@ export const SingleFinanceHomePage: React.FC = () => {
               // Load pay configuration from localStorage
               let payConfig;
               try {
-                const savedPayConfig = localStorage.getItem('singleFinancePayConfig');
-                payConfig = savedPayConfig ? JSON.parse(savedPayConfig) : {
+                const savedPayConfig = user?.id ? SingleFinanceStorage.getPayConfig(user.id) : null;
+                payConfig = savedPayConfig || {
                   commissionRate: 25,
                   baseRate: 500,
                   bonusThresholds: {
