@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Card } from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
@@ -8,16 +8,17 @@ import { Label } from '../../components/ui/label';
 import { Checkbox } from '../../components/ui/checkbox';
 import { Textarea } from '../../components/ui/textarea';
 import { toast } from '../../components/ui/use-toast';
-import { ArrowLeft, DollarSign, User, FileText, Calculator } from 'lucide-react';
+import { ArrowLeft, DollarSign, User, FileText, Calculator, Plus, Trash2 } from 'lucide-react';
 
-// Define salesperson options (this would typically come from a database)
-const SALESPEOPLE = [
-  { id: 1, initials: 'JD', firstName: 'John', lastName: 'Doe' },
-  { id: 2, initials: 'SM', firstName: 'Sarah', lastName: 'Miller' },
-  { id: 3, initials: 'MR', firstName: 'Maria', lastName: 'Rodriguez' },
-  { id: 4, initials: 'AK', firstName: 'Anna', lastName: 'Kim' },
-  { id: 5, initials: 'BH', firstName: 'Brandon', lastName: 'Harris' },
-];
+// Interface for team member
+interface TeamMember {
+  id: string;
+  firstName: string;
+  lastName: string;
+  initials: string;
+  role: 'salesperson' | 'sales_manager';
+  active: boolean;
+}
 
 // Status options
 const STATUS_OPTIONS = [
@@ -65,7 +66,13 @@ interface DealFormData {
 export default function LogSingleFinanceDeal() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { dealId } = useParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [originalDeal, setOriginalDeal] = useState<any>(null);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [showAddSalesperson, setShowAddSalesperson] = useState(false);
+  const [newSalesperson, setNewSalesperson] = useState({ firstName: '', lastName: '' });
 
   // Initialize form data
   const [formData, setFormData] = useState<DealFormData>({
@@ -158,7 +165,182 @@ export default function LogSingleFinanceDeal() {
 
   useEffect(() => {
     console.log('[LogSingleFinanceDeal] Component mounted');
-  }, []);
+    
+    // Load team members from localStorage
+    loadTeamMembers();
+    
+    // Check if we're in edit mode
+    if (dealId) {
+      setIsEditMode(true);
+      loadDealForEdit(dealId);
+    }
+  }, [dealId]);
+
+  // Load team members from localStorage
+  const loadTeamMembers = () => {
+    try {
+      const savedTeamMembers = localStorage.getItem('singleFinanceTeamMembers');
+      if (savedTeamMembers) {
+        setTeamMembers(JSON.parse(savedTeamMembers));
+      }
+    } catch (error) {
+      console.error('Error loading team members:', error);
+    }
+  };
+
+  // Save team members to localStorage
+  const saveTeamMembers = (members: TeamMember[]) => {
+    try {
+      localStorage.setItem('singleFinanceTeamMembers', JSON.stringify(members));
+      setTeamMembers(members);
+    } catch (error) {
+      console.error('Error saving team members:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to save team members',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  // Add new salesperson
+  const handleAddSalesperson = () => {
+    if (!newSalesperson.firstName || !newSalesperson.lastName) {
+      toast({
+        title: 'Validation Error',
+        description: 'First name and last name are required',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const initials = `${newSalesperson.firstName.charAt(0)}${newSalesperson.lastName.charAt(0)}`.toUpperCase();
+    
+    const member: TeamMember = {
+      id: `member_${Date.now()}`,
+      firstName: newSalesperson.firstName,
+      lastName: newSalesperson.lastName,
+      initials,
+      role: 'salesperson',
+      active: true
+    };
+
+    const updatedMembers = [...teamMembers, member];
+    saveTeamMembers(updatedMembers);
+    
+    // Reset form and close modal
+    setNewSalesperson({ firstName: '', lastName: '' });
+    setShowAddSalesperson(false);
+
+    toast({
+      title: 'Success',
+      description: `${member.firstName} ${member.lastName} added to team`
+    });
+  };
+
+  // Remove salesperson
+  const handleRemoveSalesperson = (memberId: string) => {
+    const member = teamMembers.find(m => m.id === memberId);
+    if (confirm(`Are you sure you want to remove ${member?.firstName} ${member?.lastName}?`)) {
+      const updatedMembers = teamMembers.filter(m => m.id !== memberId);
+      saveTeamMembers(updatedMembers);
+      
+      // Clear selection if the removed member was selected
+      if (formData.salespersonId === memberId) {
+        setFormData(prev => ({ ...prev, salespersonId: '' }));
+      }
+      if (formData.secondSalespersonId === memberId) {
+        setFormData(prev => ({ ...prev, secondSalespersonId: '' }));
+      }
+      
+      toast({
+        title: 'Success',
+        description: 'Team member removed'
+      });
+    }
+  };
+
+  // Load existing deal data for editing
+  const loadDealForEdit = (dealIdToEdit: string) => {
+    try {
+      const existingDealsJson = localStorage.getItem('singleFinanceDeals');
+      const existingDeals = existingDealsJson ? JSON.parse(existingDealsJson) : [];
+      
+      const dealToEdit = existingDeals.find((deal: any) => deal.id === dealIdToEdit);
+      
+      if (dealToEdit) {
+        console.log('[LogSingleFinanceDeal] Loading deal for edit:', dealToEdit);
+        setOriginalDeal(dealToEdit);
+        
+        // Map the deal data back to form data
+        setFormData({
+          dealNumber: dealToEdit.dealNumber || '',
+          stockNumber: dealToEdit.stockNumber || '',
+          vinLast8: dealToEdit.vinLast8 || '',
+          vehicleType: dealToEdit.vehicleType || 'N',
+          customerName: dealToEdit.customer || dealToEdit.lastName || '',
+          vehicleDescription: dealToEdit.vehicleDescription || '',
+          dealType: dealToEdit.dealType || 'Finance',
+          saleDate: dealToEdit.dealDate || dealToEdit.saleDate || new Date().toISOString().split('T')[0],
+          frontEndGross: dealToEdit.frontEndGross?.toString() || '',
+          salespersonId: dealToEdit.salesperson_id?.toString() || '',
+          isSplitDeal: dealToEdit.is_split_deal || false,
+          secondSalespersonId: dealToEdit.second_salesperson_id?.toString() || '',
+          lender: dealToEdit.lender || '',
+          reserveFlat: dealToEdit.reserve_flat?.toString() || '',
+          vscProfit: dealToEdit.vscProfit?.toString() || '',
+          gapProfit: dealToEdit.gapProfit?.toString() || '',
+          ppmProfit: dealToEdit.ppmProfit?.toString() || '',
+          tireWheelProfit: dealToEdit.tireAndWheelProfit?.toString() || '',
+          appearanceProfit: dealToEdit.appearanceProfit?.toString() || '',
+          keyReplacementProfit: dealToEdit.keyReplacementProfit?.toString() || '',
+          theftProfit: dealToEdit.theftProfit?.toString() || '',
+          windshieldProfit: dealToEdit.windshieldProfit?.toString() || '',
+          lojackProfit: dealToEdit.lojackProfit?.toString() || '',
+          extWarrantyProfit: dealToEdit.extWarrantyProfit?.toString() || '',
+          otherProfit: dealToEdit.otherProfit?.toString() || '',
+          backEndGross: dealToEdit.backEndGross?.toString() || '',
+          totalGross: dealToEdit.totalGross?.toString() || '',
+          status: dealToEdit.status || dealToEdit.dealStatus || 'pending',
+          notes: dealToEdit.notes || ''
+        });
+      } else {
+        console.error('[LogSingleFinanceDeal] Deal not found for editing:', dealIdToEdit);
+        toast({
+          title: 'Error',
+          description: 'Deal not found for editing',
+          variant: 'destructive'
+        });
+        navigate('/dashboard/single-finance');
+      }
+    } catch (error) {
+      console.error('[LogSingleFinanceDeal] Error loading deal for edit:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load deal for editing',
+        variant: 'destructive'
+      });
+      navigate('/dashboard/single-finance');
+    }
+  };
+
+  // Handle key press to prevent accidental form submission on Enter
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      console.log('[LogSingleFinanceDeal] Enter key pressed in input field - prevented form submission');
+      // Move focus to next field or keep focus on current field
+      const form = e.currentTarget.form;
+      if (form) {
+        const elements = Array.from(form.elements) as HTMLElement[];
+        const currentIndex = elements.indexOf(e.currentTarget as HTMLElement);
+        const nextElement = elements[currentIndex + 1] as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+        if (nextElement && nextElement.focus) {
+          nextElement.focus();
+        }
+      }
+    }
+  };
 
   // Handle input changes
   const handleInputChange = (
@@ -215,20 +397,18 @@ export default function LogSingleFinanceDeal() {
     setIsSubmitting(true);
 
     try {
-      console.log(`[LogSingleFinanceDeal] Submitting deal for Single Finance Dashboard`);
+      console.log(`[LogSingleFinanceDeal] ${isEditMode ? 'Updating' : 'Submitting'} deal for Single Finance Dashboard`);
 
-      // Generate deal ID if not provided
-      const dealId = formData.dealNumber || `SF${Math.floor(1000 + Math.random() * 9000)}`;
+      // Use existing ID for edit mode, or generate new ID for create mode
+      const dealIdToUse = isEditMode ? dealId : (formData.dealNumber || `SF${Math.floor(1000 + Math.random() * 9000)}`);
 
-      // Get salesperson information
-      const salesperson = SALESPEOPLE.find(s => s.id.toString() === formData.salespersonId);
+      // Get salesperson information from team members
+      const salesperson = teamMembers.find(s => s.id === formData.salespersonId);
       const salespersonInitials = salesperson ? salesperson.initials : '';
 
       let secondSalespersonInitials = '';
       if (formData.isSplitDeal && formData.secondSalespersonId) {
-        const secondSalesperson = SALESPEOPLE.find(
-          s => s.id.toString() === formData.secondSalespersonId
-        );
+        const secondSalesperson = teamMembers.find(s => s.id === formData.secondSalespersonId);
         secondSalespersonInitials = secondSalesperson ? secondSalesperson.initials : '';
       }
 
@@ -253,8 +433,8 @@ export default function LogSingleFinanceDeal() {
 
       // Prepare deal data for metrics calculation - SINGLE FINANCE SPECIFIC
       const dealData = {
-        id: dealId,
-        dealNumber: dealId,
+        id: dealIdToUse,
+        dealNumber: dealIdToUse,
         customer_name: formData.customerName,
         customer: formData.customerName, // Backward compatibility
         lastName: formData.customerName, // For table display
@@ -322,17 +502,35 @@ export default function LogSingleFinanceDeal() {
       try {
         const existingDealsJson = localStorage.getItem('singleFinanceDeals');
         const existingDeals = existingDealsJson ? JSON.parse(existingDealsJson) : [];
-        const updatedDeals = [dealData, ...existingDeals];
+        
+        let updatedDeals;
+        if (isEditMode) {
+          // Update existing deal
+          updatedDeals = existingDeals.map((deal: any) => 
+            deal.id === dealIdToUse ? dealData : deal
+          );
+          console.log('[LogSingleFinanceDeal] Deal updated in singleFinanceDeals storage:', dealData);
+        } else {
+          // Add new deal
+          updatedDeals = [dealData, ...existingDeals];
+          console.log('[LogSingleFinanceDeal] Deal saved to singleFinanceDeals storage:', dealData);
+        }
+        
         localStorage.setItem('singleFinanceDeals', JSON.stringify(updatedDeals));
-
-        console.log('[LogSingleFinanceDeal] Deal saved to singleFinanceDeals storage:', dealData);
+        
+        // Dispatch custom event to notify dashboard of data change
+        window.dispatchEvent(new CustomEvent('singleFinanceDealsUpdated', { 
+          detail: { deals: updatedDeals, updatedDeal: dealData } 
+        }));
       } catch (error) {
         console.error('Error saving to localStorage:', error);
       }
 
       toast({
         title: 'Success',
-        description: 'Deal logged successfully to Single Finance Dashboard!',
+        description: isEditMode 
+          ? 'Deal updated successfully!' 
+          : 'Deal logged successfully to Single Finance Dashboard!',
       });
 
       navigate('/dashboard/single-finance');
@@ -351,7 +549,9 @@ export default function LogSingleFinanceDeal() {
   return (
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Log New Deal - Single Finance Dashboard</h1>
+        <h1 className="text-2xl font-bold">
+          {isEditMode ? 'Edit Deal - Single Finance Dashboard' : 'Log New Deal - Single Finance Dashboard'}
+        </h1>
         <Button
           onClick={() => navigate('/dashboard/single-finance')}
           className="flex items-center bg-blue-500 text-white hover:bg-blue-600"
@@ -363,8 +563,10 @@ export default function LogSingleFinanceDeal() {
 
       <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-blue-800 text-sm">
-          <strong>Note:</strong> This deal will only appear on your Single Finance Manager Dashboard
-          and will not affect other dashboards in the system.
+          <strong>Note:</strong> {isEditMode 
+            ? 'You are editing an existing deal. Changes will be reflected immediately on your dashboard.'
+            : 'This deal will only appear on your Single Finance Manager Dashboard and will not affect other dashboards in the system.'
+          }
         </p>
       </div>
 
@@ -385,6 +587,7 @@ export default function LogSingleFinanceDeal() {
                   name="dealNumber"
                   value={formData.dealNumber}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   placeholder="Auto-generated if empty"
                 />
               </div>
@@ -396,6 +599,7 @@ export default function LogSingleFinanceDeal() {
                   name="stockNumber"
                   value={formData.stockNumber}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   placeholder="Stock Number"
                   required
                 />
@@ -408,6 +612,7 @@ export default function LogSingleFinanceDeal() {
                   name="vinLast8"
                   value={formData.vinLast8}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   placeholder="Last 8 of VIN"
                   maxLength={8}
                   required
@@ -454,6 +659,7 @@ export default function LogSingleFinanceDeal() {
                   name="saleDate"
                   value={formData.saleDate}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                 />
               </div>
             </div>
@@ -476,6 +682,7 @@ export default function LogSingleFinanceDeal() {
                   name="customerName"
                   value={formData.customerName}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   placeholder="Customer last name"
                   required
                 />
@@ -488,6 +695,7 @@ export default function LogSingleFinanceDeal() {
                   name="vehicleDescription"
                   value={formData.vehicleDescription}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   placeholder="e.g., 2023 Toyota Camry XLE"
                   required
                 />
@@ -507,20 +715,44 @@ export default function LogSingleFinanceDeal() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="salespersonId">Salesperson</Label>
-                <select
-                  id="salespersonId"
-                  name="salespersonId"
-                  value={formData.salespersonId}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="">Select Salesperson</option>
-                  {SALESPEOPLE.map(person => (
-                    <option key={person.id} value={person.id.toString()}>
-                      {person.initials} - {person.firstName} {person.lastName}
-                    </option>
-                  ))}
-                </select>
+                <div className="space-y-2">
+                  <select
+                    id="salespersonId"
+                    name="salespersonId"
+                    value={formData.salespersonId}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded-md"
+                  >
+                    <option value="">Select Salesperson</option>
+                    {teamMembers.filter(member => member.role === 'salesperson' && member.active).map(person => (
+                      <option key={person.id} value={person.id}>
+                        {person.initials} - {person.firstName} {person.lastName}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      onClick={() => setShowAddSalesperson(true)}
+                      className="flex items-center text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1"
+                      size="sm"
+                    >
+                      <Plus className="mr-1 h-3 w-3" />
+                      Add
+                    </Button>
+                    {formData.salespersonId && (
+                      <Button
+                        type="button"
+                        onClick={() => handleRemoveSalesperson(formData.salespersonId)}
+                        className="flex items-center text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-1"
+                        size="sm"
+                      >
+                        <Trash2 className="mr-1 h-3 w-3" />
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -530,6 +762,7 @@ export default function LogSingleFinanceDeal() {
                   name="frontEndGross"
                   value={formData.frontEndGross}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   placeholder="0.00"
                   type="number"
                   step="0.01"
@@ -543,6 +776,7 @@ export default function LogSingleFinanceDeal() {
                   name="lender"
                   value={formData.lender}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   placeholder="Lender name"
                   disabled={formData.dealType === 'Cash'}
                 />
@@ -564,20 +798,44 @@ export default function LogSingleFinanceDeal() {
             {formData.isSplitDeal && (
               <div className="space-y-2">
                 <Label htmlFor="secondSalespersonId">Second Salesperson</Label>
-                <select
-                  id="secondSalespersonId"
-                  name="secondSalespersonId"
-                  value={formData.secondSalespersonId}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="">Select Second Salesperson</option>
-                  {SALESPEOPLE.map(person => (
-                    <option key={person.id} value={person.id.toString()}>
-                      {person.initials} - {person.firstName} {person.lastName}
-                    </option>
-                  ))}
-                </select>
+                <div className="space-y-2">
+                  <select
+                    id="secondSalespersonId"
+                    name="secondSalespersonId"
+                    value={formData.secondSalespersonId}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded-md"
+                  >
+                    <option value="">Select Second Salesperson</option>
+                    {teamMembers.filter(member => member.role === 'salesperson' && member.active && member.id !== formData.salespersonId).map(person => (
+                      <option key={person.id} value={person.id}>
+                        {person.initials} - {person.firstName} {person.lastName}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      onClick={() => setShowAddSalesperson(true)}
+                      className="flex items-center text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1"
+                      size="sm"
+                    >
+                      <Plus className="mr-1 h-3 w-3" />
+                      Add
+                    </Button>
+                    {formData.secondSalespersonId && (
+                      <Button
+                        type="button"
+                        onClick={() => handleRemoveSalesperson(formData.secondSalespersonId)}
+                        className="flex items-center text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-1"
+                        size="sm"
+                      >
+                        <Trash2 className="mr-1 h-3 w-3" />
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -599,6 +857,7 @@ export default function LogSingleFinanceDeal() {
                   name="reserveFlat"
                   value={formData.reserveFlat}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   placeholder="0.00"
                   type="number"
                   step="0.01"
@@ -612,6 +871,7 @@ export default function LogSingleFinanceDeal() {
                   name="vscProfit"
                   value={formData.vscProfit}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   placeholder="0.00"
                   type="number"
                   step="0.01"
@@ -625,6 +885,7 @@ export default function LogSingleFinanceDeal() {
                   name="gapProfit"
                   value={formData.gapProfit}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   placeholder="0.00"
                   type="number"
                   step="0.01"
@@ -638,6 +899,7 @@ export default function LogSingleFinanceDeal() {
                   name="ppmProfit"
                   value={formData.ppmProfit}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   placeholder="0.00"
                   type="number"
                   step="0.01"
@@ -651,6 +913,7 @@ export default function LogSingleFinanceDeal() {
                   name="tireWheelProfit"
                   value={formData.tireWheelProfit}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   placeholder="0.00"
                   type="number"
                   step="0.01"
@@ -664,6 +927,7 @@ export default function LogSingleFinanceDeal() {
                   name="appearanceProfit"
                   value={formData.appearanceProfit}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   placeholder="0.00"
                   type="number"
                   step="0.01"
@@ -677,6 +941,7 @@ export default function LogSingleFinanceDeal() {
                   name="extWarrantyProfit"
                   value={formData.extWarrantyProfit}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   placeholder="0.00"
                   type="number"
                   step="0.01"
@@ -690,6 +955,7 @@ export default function LogSingleFinanceDeal() {
                   name="otherProfit"
                   value={formData.otherProfit}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   placeholder="0.00"
                   type="number"
                   step="0.01"
@@ -747,6 +1013,7 @@ export default function LogSingleFinanceDeal() {
                 name="notes"
                 value={formData.notes}
                 onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
                 placeholder="Any additional notes about this deal..."
                 className="min-h-[100px]"
               />
@@ -764,10 +1031,61 @@ export default function LogSingleFinanceDeal() {
             Cancel
           </Button>
           <Button type="submit" disabled={isSubmitting} className="px-8 bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-400">
-            {isSubmitting ? 'Saving Deal...' : 'Save Deal'}
+            {isSubmitting 
+              ? (isEditMode ? 'Updating Deal...' : 'Saving Deal...') 
+              : (isEditMode ? 'Update Deal' : 'Save Deal')
+            }
           </Button>
         </div>
       </form>
+
+      {/* Add Salesperson Modal */}
+      {showAddSalesperson && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold mb-4">Add New Salesperson</h3>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="newFirstName">First Name</Label>
+                <Input
+                  id="newFirstName"
+                  value={newSalesperson.firstName}
+                  onChange={(e) => setNewSalesperson(prev => ({ ...prev, firstName: e.target.value }))}
+                  placeholder="First name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="newLastName">Last Name</Label>
+                <Input
+                  id="newLastName"
+                  value={newSalesperson.lastName}
+                  onChange={(e) => setNewSalesperson(prev => ({ ...prev, lastName: e.target.value }))}
+                  placeholder="Last name"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end space-x-3 mt-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setShowAddSalesperson(false);
+                  setNewSalesperson({ firstName: '', lastName: '' });
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleAddSalesperson}
+                className="bg-green-500 hover:bg-green-600"
+              >
+                Add Salesperson
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

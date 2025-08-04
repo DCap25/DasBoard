@@ -25,6 +25,7 @@ import {
 
 import { SingleFinanceHomePage } from '../../pages/finance/SingleFinanceHomePage';
 import SingleFinanceDealsPage from '../../pages/finance/SingleFinanceDealsPage';
+import SingleFinanceSettings from '../../pages/finance/SingleFinanceSettings';
 import { getFinanceManagerDeals } from '../../lib/apiService';
 
 // Interface for a deal
@@ -325,32 +326,58 @@ const SingleFinanceManagerDashboard = () => {
     }
   };
 
-  // Handle deal deletion
+  // Handle deal editing
+  const handleEditDeal = (dealId: string) => {
+    // Navigate to the deal edit page with the deal ID
+    navigate(`/single-finance-deal-log/edit/${dealId}`);
+  };
+
+  // Handle deal deletion with warning popup
   const handleDeleteDeal = (dealId: string, shouldDelete: boolean) => {
     if (!shouldDelete) return;
 
-    if (confirm('Are you sure you want to delete this deal? This action cannot be undone.')) {
-      try {
-        // Use the correct storage key for single finance deals
-        const storageKey = 'singleFinanceDeals';
+    // Enhanced warning popup with better messaging
+    const confirmed = confirm(
+      '⚠️ DELETE CONFIRMATION\n\n' +
+      'Are you sure you want to delete this deal?\n\n' +
+      'This action will:\n' +
+      '• Permanently remove all deal data\n' +
+      '• Update your dashboard metrics\n' +
+      '• Cannot be undone\n\n' +
+      'Click OK to delete or Cancel to keep the deal.'
+    );
 
-        // Get existing deals from localStorage
-        const existingDealsJson = localStorage.getItem(storageKey);
-        const existingDeals = existingDealsJson ? JSON.parse(existingDealsJson) : [];
+    if (confirmed) {
+      // Second confirmation for extra safety
+      const finalConfirm = confirm(
+        '🚨 FINAL CONFIRMATION\n\n' +
+        'This is your last chance!\n\n' +
+        'Click OK to permanently delete this deal, or Cancel to keep it.'
+      );
 
-        // Remove the deal
-        const updatedDeals = existingDeals.filter((deal: any) => deal.id !== dealId);
+      if (finalConfirm) {
+        try {
+          // Use the correct storage key for single finance deals
+          const storageKey = 'singleFinanceDeals';
 
-        // Save back to localStorage
-        localStorage.setItem(storageKey, JSON.stringify(updatedDeals));
+          // Get existing deals from localStorage
+          const existingDealsJson = localStorage.getItem(storageKey);
+          const existingDeals = existingDealsJson ? JSON.parse(existingDealsJson) : [];
 
-        // Reload deals to reflect the change
-        loadDealsFromLocalStorage();
+          // Remove the deal
+          const updatedDeals = existingDeals.filter((deal: any) => deal.id !== dealId);
 
-        console.log(`[SingleFinanceManagerDashboard] Deleted deal ${dealId}`);
-      } catch (error) {
-        console.error('[SingleFinanceManagerDashboard] Error deleting deal:', error);
-        setError('Failed to delete deal');
+          // Save back to localStorage
+          localStorage.setItem(storageKey, JSON.stringify(updatedDeals));
+
+          // Reload deals to reflect the change
+          loadDealsFromLocalStorage();
+
+          console.log(`[SingleFinanceManagerDashboard] Deleted deal ${dealId}`);
+        } catch (error) {
+          console.error('[SingleFinanceManagerDashboard] Error deleting deal:', error);
+          setError('Failed to delete deal');
+        }
       }
     }
   };
@@ -371,19 +398,9 @@ const SingleFinanceManagerDashboard = () => {
   // Component for the main dashboard content
   const MainDashboardContent = () => (
     <>
-      {/* F&I Best Practice Tip - Back to top */}
-      <div className="mb-4">
-        <div className="bg-white p-3 rounded-md border border-orange-100 max-w-4xl mx-auto">
-          <p className="text-sm text-orange-800 text-center">
-            <Lightbulb className="h-4 w-4 inline-block mr-2" />
-            <strong>F&I Best Practice:</strong>{' '}
-            {bestPractices[new Date().getDay() % bestPractices.length]}
-          </p>
-        </div>
-      </div>
-
-      {/* Dashboard header with Month/Year underneath */}
-      <div className="flex justify-between items-start mb-3">
+      {/* Dashboard header - Three column layout */}
+      <div className="grid grid-cols-3 gap-4 items-center mb-4">
+        {/* Left Column - Title and Controls */}
         <div>
           <h1 className="text-2xl font-bold">Single Finance Manager Dashboard</h1>
           <p className="text-gray-600 text-sm mb-2">
@@ -405,12 +422,26 @@ const SingleFinanceManagerDashboard = () => {
           </div>
         </div>
 
-        <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={handleLogNewDealClick}>
-          <span className="flex items-center">
-            <PlusCircle className="mr-2 h-5 w-5" />
-            Log New Deal
-          </span>
-        </Button>
+        {/* Middle Column - F&I Best Practice */}
+        <div className="flex items-center justify-center">
+          <div className="bg-white p-3 rounded-md border border-orange-100 w-full">
+            <p className="text-sm text-orange-800 text-center">
+              <Lightbulb className="h-4 w-4 inline-block mr-2" />
+              <strong>F&I Best Practice:</strong>{' '}
+              {bestPractices[new Date().getDay() % bestPractices.length]}
+            </p>
+          </div>
+        </div>
+
+        {/* Right Column - Log New Deal Button */}
+        <div className="flex justify-end">
+          <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={handleLogNewDealClick}>
+            <span className="flex items-center">
+              <PlusCircle className="mr-2 h-5 w-5" />
+              Log New Deal
+            </span>
+          </Button>
+        </div>
       </div>
 
       {/* Main Dashboard Content */}
@@ -485,6 +516,9 @@ const SingleFinanceManagerDashboard = () => {
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 border-r border-gray-900 w-20">
                       Status
+                    </th>
+                    <th className="font-medium text-white py-2 px-2 text-center bg-blue-600 w-16">
+                      Edit
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-center bg-red-600 rounded-tr-md w-16">
                       Delete
@@ -663,6 +697,14 @@ const SingleFinanceManagerDashboard = () => {
                           </select>
                         </td>
                         <td className="py-2 px-2 text-center">
+                          <button
+                            onClick={() => handleEditDeal(deal.id)}
+                            className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs"
+                          >
+                            Edit
+                          </button>
+                        </td>
+                        <td className="py-2 px-2 text-center">
                           <input
                             type="checkbox"
                             onChange={e => handleDeleteDeal(deal.id, e.target.checked)}
@@ -770,6 +812,7 @@ const SingleFinanceManagerDashboard = () => {
                     </td>
                     <td className="py-2 px-2"></td>
                     <td className="py-2 px-2"></td>
+                    <td className="py-2 px-2"></td>
                   </tr>
                 </tfoot>
               </table>
@@ -789,6 +832,7 @@ const SingleFinanceManagerDashboard = () => {
       <Routes>
         <Route path="/" element={<MainDashboardContent />} />
         <Route path="/deals" element={<SingleFinanceDealsPage />} />
+        <Route path="/settings" element={<SingleFinanceSettings />} />
         <Route path="*" element={<Navigate to="/dashboard/single-finance" replace />} />
       </Routes>
     </div>

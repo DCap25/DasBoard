@@ -141,8 +141,40 @@ export const SingleFinanceHomePage: React.FC = () => {
   // State to control promotional banner visibility
   const [showPromoBanner, setShowPromoBanner] = useState(true);
 
+  // Check and handle monthly reset
+  const checkMonthlyReset = () => {
+    try {
+      const lastResetMonth = localStorage.getItem('singleFinanceLastResetMonth');
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+      const currentMonthYear = `${currentYear}-${currentMonth}`;
+
+      if (!lastResetMonth || lastResetMonth !== currentMonthYear) {
+        console.log('[SingleFinanceHomePage] New month detected, resetting data...');
+        
+        // Clear deals but preserve team members and settings
+        localStorage.removeItem('singleFinanceDeals');
+        
+        // Update the last reset month
+        localStorage.setItem('singleFinanceLastResetMonth', currentMonthYear);
+        
+        console.log('[SingleFinanceHomePage] Monthly reset completed');
+      }
+    } catch (error) {
+      console.error('[SingleFinanceHomePage] Error during monthly reset:', error);
+    }
+  };
+
   // Load deals from localStorage and recalculate when component mounts or data changes
   useEffect(() => {
+    // Check for monthly reset first
+    checkMonthlyReset();
+    
+    // Force immediate reload on component mount
+    setTimeout(() => {
+      loadDealsFromStorage();
+    }, 100);
+    
     loadDealsFromStorage();
 
     // Listen for storage changes from other tabs/windows
@@ -159,12 +191,20 @@ export const SingleFinanceHomePage: React.FC = () => {
       loadDealsFromStorage();
     };
 
+    // Listen for custom event when deals are updated
+    const handleDealsUpdated = (e: any) => {
+      console.log('[SingleFinanceHomePage] Custom deals updated event received:', e.detail);
+      loadDealsFromStorage();
+    };
+
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('focus', handleWindowFocus);
+    window.addEventListener('singleFinanceDealsUpdated', handleDealsUpdated);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('focus', handleWindowFocus);
+      window.removeEventListener('singleFinanceDealsUpdated', handleDealsUpdated);
     };
   }, []);
 
@@ -200,6 +240,7 @@ export const SingleFinanceHomePage: React.FC = () => {
           '[SingleFinanceHomePage] Loaded deals from singleFinanceDeals storage:',
           parsedDeals
         );
+        console.log('[SingleFinanceHomePage] Number of deals loaded:', parsedDeals.length);
         setDeals(parsedDeals);
         setPendingDeals(
           parsedDeals.filter((deal: Deal) => deal.status === 'Pending' || deal.status === 'pending')
@@ -481,10 +522,10 @@ export const SingleFinanceHomePage: React.FC = () => {
   };
 
   return (
-    <div className="w-full px-2 py-8">
+    <div className="w-full px-2 py-2 scale-90 origin-top">
       {/* Promotional Banner */}
       {showPromoBanner && (
-        <div className="mb-6 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-lg shadow-sm relative">
+        <div className="mb-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-lg shadow-sm relative">
           <button
             className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
             onClick={() => setShowPromoBanner(false)}
@@ -523,7 +564,7 @@ export const SingleFinanceHomePage: React.FC = () => {
       )}
 
       {/* Page Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-1">
         <h1 className="text-2xl font-bold">Finance Manager Dashboard</h1>
         <div className="space-x-2">
           <DropdownMenu>{/* ... existing dropdown menu code ... */}</DropdownMenu>
@@ -531,7 +572,7 @@ export const SingleFinanceHomePage: React.FC = () => {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-4">
         <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-base font-semibold text-slate-700">F&I Gross</CardTitle>
@@ -653,86 +694,222 @@ export const SingleFinanceHomePage: React.FC = () => {
         </Card>
       </div>
 
-      {/* F&I Product Mix Section - Full Width */}
-      <div className="grid gap-6 grid-cols-1">
+      {/* F&I Product Mix & Pay Calculator Section - Side by Side */}
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+        {/* F&I Product Mix - Condensed */}
         <Card className="border hover:shadow-md transition-shadow">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center text-xl font-medium">
-              <BarChart4 className="mr-2 h-6 w-6 text-blue-500" />
-              F&I Product Mix & Avg. Profit
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center text-lg font-medium">
+              <BarChart4 className="mr-2 h-5 w-5 text-blue-500" />
+              F&I Product Mix
             </CardTitle>
           </CardHeader>
-          <CardContent className="px-8 pb-8">
-            <div className="grid grid-cols-2 gap-6">
+          <CardContent className="px-4 pb-4">
+            {/* Header Row */}
+            <div className="flex items-center py-2 px-3 mb-3 border-b border-gray-200">
+              <div className="flex-1">
+                <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">Product</span>
+              </div>
+              <div className="flex-1 text-center">
+                <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">Avg Profit $</span>
+              </div>
+              <div className="flex-1 text-right">
+                <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">Avg Per Deal %</span>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
               {[
                 {
-                  name: 'Vehicle Service Contract (VSC)',
+                  name: 'VSC',
                   percent: metrics.productMix.extendedWarranty,
                   value: `${metrics.avgProfits.extendedWarranty.toLocaleString()}`,
                   color: 'bg-blue-500',
                 },
                 {
-                  name: 'PrePaid Maintenance (PPM)',
+                  name: 'PPM',
                   percent: metrics.productMix.ppm,
                   value: `${metrics.avgProfits.ppm.toLocaleString()}`,
-                  color: 'bg-blue-500',
+                  color: 'bg-green-500',
                 },
                 {
-                  name: 'GAP Insurance',
+                  name: 'GAP',
                   percent: metrics.productMix.gapInsurance,
                   value: `${metrics.avgProfits.gapInsurance.toLocaleString()}`,
-                  color: 'bg-blue-500',
+                  color: 'bg-purple-500',
                 },
                 {
-                  name: 'Paint and Fabric Protection',
+                  name: 'Paint/Fabric',
                   percent: metrics.productMix.paintProtection,
                   value: `${metrics.avgProfits.paintProtection.toLocaleString()}`,
-                  color: 'bg-blue-500',
+                  color: 'bg-orange-500',
                 },
                 {
-                  name: 'Tire & Wheel Bundle',
+                  name: 'Tire & Wheel',
                   percent: metrics.productMix.tireWheel,
                   value: `${metrics.avgProfits.tireWheel.toLocaleString()}`,
-                  color: 'bg-blue-500',
+                  color: 'bg-red-500',
                 },
                 {
-                  name: 'Other Products',
+                  name: 'Other',
                   percent: metrics.productMix.other,
                   value: `${metrics.avgProfits.other.toLocaleString()}`,
-                  color: 'bg-blue-500',
+                  color: 'bg-gray-500',
                 },
                 ].map((product, index) => (
-                  <div key={index} className="space-y-1 p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <div className="font-medium flex items-center text-base">
-                        <div className={`w-3 h-3 ${product.color} rounded-full mr-2`}></div>
-                        {product.name}
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm text-gray-500">Avg. Profit</div>
-                        <div className="font-medium text-base">${product.value}</div>
+                  <div key={index} className="flex items-center py-2 px-3 bg-gray-50 rounded-md">
+                    <div className="flex items-center flex-1">
+                      <div className={`w-3 h-3 ${product.color} rounded-full mr-3 flex-shrink-0`}></div>
+                      <span className="font-medium text-sm">{product.name}</span>
+                    </div>
+                    <div className="flex-1 text-center">
+                      <div className="font-bold text-base">
+                        <span className="text-xs">$</span>{product.value}
                       </div>
                     </div>
-                    <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-100">
-                      <div
-                        className={`absolute inset-y-0 left-0 rounded-full ${product.color}`}
-                        style={{ width: `${product.percent}%` }}
-                      />
+                    <div className="flex-1 text-right">
+                      <div className="font-bold text-sm text-blue-600">{product.percent}%</div>
                     </div>
-                    <div className="text-right text-sm text-gray-500">{product.percent}%</div>
                   </div>
                 ))}
 
-                {/* Add PPD metric at the bottom */}
-                <div className="col-span-2 mt-4 pt-3 border-t border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <div className="font-medium text-base">Products Per Deal (PPD)</div>
-                    <div className="font-bold text-xl text-blue-500">
-                      {metrics.productsPerDeal.toFixed(1)}
+                {/* PPD metric */}
+                <div className="mt-4 pt-3 border-t border-gray-200">
+                  <div className="flex items-center py-2 px-3 bg-blue-50 rounded-md">
+                    <div className="flex-1">
+                      <span className="font-medium text-sm">Products Per Deal (PPD)</span>
+                    </div>
+                    <div className="flex-1 text-center">
+                      <div className="font-bold text-lg text-blue-600">
+                        {metrics.productsPerDeal.toFixed(1)}
+                      </div>
+                    </div>
+                    <div className="flex-1 text-right">
+                      {/* Empty space to maintain alignment */}
                     </div>
                   </div>
                 </div>
               </div>
+          </CardContent>
+        </Card>
+
+        {/* Pay Calculator Card */}
+        <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-bold flex items-center text-green-800">
+              <DollarSign className="mr-2 h-5 w-5" />
+              Monthly Pay Calculator
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {(() => {
+              // Load pay configuration from localStorage
+              let payConfig;
+              try {
+                const savedPayConfig = localStorage.getItem('singleFinancePayConfig');
+                payConfig = savedPayConfig ? JSON.parse(savedPayConfig) : {
+                  commissionRate: 25,
+                  baseRate: 500,
+                  bonusThresholds: {
+                    vscBonus: 100,
+                    gapBonus: 50,
+                    ppmBonus: 75,
+                    totalThreshold: 15000
+                  }
+                };
+              } catch (error) {
+                payConfig = {
+                  commissionRate: 25,
+                  baseRate: 500,
+                  bonusThresholds: {
+                    vscBonus: 100,
+                    gapBonus: 50,
+                    ppmBonus: 75,
+                    totalThreshold: 15000
+                  }
+                };
+              }
+
+              // Calculate pay based on current month's data
+              const totalProfit = filteredDeals.reduce((acc, deal) => {
+                const dealProfit = deal.back_end_gross || deal.profit || 0;
+                return acc + dealProfit;
+              }, 0);
+              const commissionEarnings = (totalProfit * payConfig.commissionRate) / 100;
+              const baseEarnings = payConfig.baseRate;
+              
+              // Calculate product bonuses (only for funded deals)
+              const fundedDeals = filteredDeals.filter(deal => deal.status === 'Funded' || deal.status === 'Complete');
+              const vscBonuses = fundedDeals.filter(deal => {
+                const dealData = deal as any;
+                return (dealData.vscProfit && dealData.vscProfit > 0) || (deal.vsc_profit && deal.vsc_profit > 0);
+              }).length * payConfig.bonusThresholds.vscBonus;
+              
+              const gapBonuses = fundedDeals.filter(deal => {
+                const dealData = deal as any;
+                return (dealData.gapProfit && dealData.gapProfit > 0) || (deal.gap_profit && deal.gap_profit > 0);
+              }).length * payConfig.bonusThresholds.gapBonus;
+              
+              const ppmBonuses = fundedDeals.filter(deal => {
+                const dealData = deal as any;
+                return (dealData.ppmProfit && dealData.ppmProfit > 0) || (deal.ppm_profit && deal.ppm_profit > 0);
+              }).length * payConfig.bonusThresholds.ppmBonus;
+
+              const totalBonuses = vscBonuses + gapBonuses + ppmBonuses;
+              const estimatedPay = baseEarnings + commissionEarnings + totalBonuses;
+
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-white rounded-lg border">
+                      <span className="text-sm font-medium">Base Pay</span>
+                      <span className="font-bold text-green-600">${baseEarnings.toLocaleString()}</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center p-3 bg-white rounded-lg border">
+                      <span className="text-sm font-medium">Commission ({payConfig.commissionRate}%)</span>
+                      <span className="font-bold text-green-600">${commissionEarnings.toLocaleString()}</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center p-3 bg-white rounded-lg border">
+                      <span className="text-sm font-medium">Product Bonuses</span>
+                      <span className="font-bold text-green-600">${totalBonuses.toLocaleString()}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="p-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg">
+                      <div className="text-sm font-medium">Estimated Monthly Pay</div>
+                      <div className="text-2xl font-bold">${estimatedPay.toLocaleString()}</div>
+                    </div>
+                    
+                    <div className="text-xs text-gray-600 p-3 bg-white rounded-lg border">
+                      <p className="font-medium mb-1">Bonus Breakdown:</p>
+                      <p>VSC Deals: {fundedDeals.filter(deal => {
+                        const dealData = deal as any;
+                        return (dealData.vscProfit && dealData.vscProfit > 0) || (deal.vsc_profit && deal.vsc_profit > 0);
+                      }).length} × ${payConfig.bonusThresholds.vscBonus} = ${vscBonuses}</p>
+                      <p>GAP Deals: {fundedDeals.filter(deal => {
+                        const dealData = deal as any;
+                        return (dealData.gapProfit && dealData.gapProfit > 0) || (deal.gap_profit && deal.gap_profit > 0);
+                      }).length} × ${payConfig.bonusThresholds.gapBonus} = ${gapBonuses}</p>
+                      <p>PPM Deals: {fundedDeals.filter(deal => {
+                        const dealData = deal as any;
+                        return (dealData.ppmProfit && dealData.ppmProfit > 0) || (deal.ppm_profit && deal.ppm_profit > 0);
+                      }).length} × ${payConfig.bonusThresholds.ppmBonus} = ${ppmBonuses}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="col-span-1 md:col-span-2 mt-2">
+                    <p className="text-xs text-gray-500 text-center">
+                      <strong>Disclaimer:</strong> This calculator is for informational purposes only. 
+                      Actual pay may differ based on final accounting, management review, and company policies. 
+                      Configure your pay settings in the Settings page.
+                    </p>
+                  </div>
+                </div>
+              );
+            })()}
           </CardContent>
         </Card>
       </div>
