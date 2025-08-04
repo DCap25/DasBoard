@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from '../contexts/TranslationContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import { supabase } from '../lib/supabase';
 
 export default function SimpleSignup() {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ export default function SimpleSignup() {
     agreeToTerms: false,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -65,21 +67,104 @@ export default function SimpleSignup() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (validateForm()) {
-      // Store signup date for profile completion check
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    setErrors({});
+
+    try {
+      console.log('[SimpleSignup] Starting Supabase user creation for:', formData.email);
+
+      // First, create signup request record (using existing schema)
+      const nameParts = formData.fullName.trim().split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+      
+      const { data: signupRequestData, error: signupRequestError } = await supabase
+        .from('signup_requests')
+        .insert({
+          email: formData.email,
+          first_name: firstName,
+          last_name: lastName,
+          full_name: formData.fullName,
+          dealership_name: `${formData.fullName} - Finance Manager`,
+          contact_person: formData.fullName,
+          company_name: `${formData.fullName} - Finance Manager`,
+          phone: '', // Phone not collected in simple signup
+          phone_number: '', // Alternative phone field
+          tier: 'finance_manager',
+          subscription_tier: 'finance_manager_free_promo',
+          account_type: 'single-finance',
+          dealer_count: 1,
+          add_ons: [],
+          promo_applied: true,
+          status: 'approved',
+          // Removed monthly_rate and setup_fee as they don't exist in schema
+        })
+        .select()
+        .single();
+
+      if (signupRequestError) {
+        console.error('Signup request creation error:', signupRequestError);
+        throw new Error('Failed to process signup request');
+      }
+
+      console.log('[SimpleSignup] Signup request created:', signupRequestData);
+
+      // Create Supabase auth user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.fullName,
+            role: 'single_finance_manager',
+          }
+        }
+      });
+
+      if (authError) {
+        console.error('Auth signup error:', authError);
+        throw new Error(authError.message || 'Failed to create account');
+      }
+
+      console.log('[SimpleSignup] Auth user created:', authData);
+
+      // Skip profile creation due to RLS policy recursion issue
+      // The auth user metadata already contains the necessary information
+      if (authData.user) {
+        console.log('[SimpleSignup] Auth user created successfully with metadata:', authData.user.user_metadata);
+        console.log('[SimpleSignup] Skipping profiles table due to RLS policy issue');
+        
+        // Note: User information is stored in auth.users.user_metadata and signup_requests table
+        // The AuthContext will handle user role and data retrieval
+      }
+
+      // Store signup date for tracking
       localStorage.setItem('singleFinanceSignupDate', new Date().toISOString());
       
-      // Navigate to success or dashboard
+      // Navigate to welcome page
       navigate('/welcome/single-finance', {
         state: {
           fullName: formData.fullName,
           email: formData.email,
-          accountType: 'single-finance'
+          accountType: 'single-finance',
+          justSignedUp: true
         }
       });
+
+    } catch (error: any) {
+      console.error('[SimpleSignup] Signup failed:', error);
+      setErrors({
+        general: error.message || 'Signup failed. Please try again.'
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -280,12 +365,28 @@ export default function SimpleSignup() {
               <p className="text-red-400 text-sm -mt-4">{errors.agreeToTerms}</p>
             )}
 
+            {errors.general && (
+              <div className="p-4 bg-red-500/10 border border-red-400/20 rounded-lg">
+                <p className="text-red-400 text-sm">{errors.general}</p>
+              </div>
+            )}
+
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-500 text-white py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/25 flex items-center justify-center"
+              disabled={isLoading}
+              className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 disabled:cursor-not-allowed text-white py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/25 flex items-center justify-center"
             >
-              {t('signup.simple.submitButton')}
-              <ArrowRight className="ml-2 w-5 h-5" />
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  Creating Account...
+                </>
+              ) : (
+                <>
+                  {t('signup.simple.submitButton')}
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </>
+              )}
             </button>
 
             <div className="text-center">

@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../ui/button';
-import { Home, BarChart2, Calendar, LogOut, User, Building2 } from 'lucide-react';
+import { Home, BarChart2, Calendar, LogOut, User, Building2, Settings } from 'lucide-react';
 
 interface DashboardLayoutProps {
   children?: React.ReactNode;
@@ -47,8 +47,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Th
               <User size={20} className="text-blue-100" />
             </div>
             <div>
-              <p className="text-sm font-medium text-white">{user?.email}</p>
-              <p className="text-xs text-blue-100">{userRole || 'User'}</p>
+              <p className="text-sm font-medium text-white">
+                {user?.user_metadata?.full_name || user?.email || 'User'}
+              </p>
+              <p className="text-xs text-blue-100">{user?.email}</p>
             </div>
           </div>
 
@@ -80,6 +82,19 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Th
                   >
                     <BarChart2 size={18} className="mr-2" />
                     Deals
+                  </button>
+                </Link>
+
+                <Link to="/dashboard/single-finance/settings">
+                  <button
+                    className={`flex items-center w-full px-4 py-2 text-left text-sm rounded-md ${
+                      isActive('/dashboard/single-finance/settings')
+                        ? 'bg-blue-700 text-white'
+                        : 'text-blue-100 hover:bg-blue-800 hover:text-white'
+                    }`}
+                  >
+                    <Settings size={18} className="mr-2" />
+                    Settings
                   </button>
                 </Link>
               </>

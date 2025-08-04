@@ -20,6 +20,8 @@ import {
   MoreVertical,
   PlusCircle,
   Car,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { DropdownMenu } from '../../components/ui/dropdown-menu';
 
@@ -140,6 +142,7 @@ export const SingleFinanceHomePage: React.FC = () => {
   });
   // State to control promotional banner visibility
   const [showPromoBanner, setShowPromoBanner] = useState(true);
+  const [showPayAmounts, setShowPayAmounts] = useState(true);
 
   // Check and handle monthly reset
   const checkMonthlyReset = () => {
@@ -522,7 +525,7 @@ export const SingleFinanceHomePage: React.FC = () => {
   };
 
   return (
-    <div className="w-full px-2 py-2 scale-90 origin-top">
+    <div className="w-full px-2 py-2">
       {/* Promotional Banner */}
       {showPromoBanner && (
         <div className="mb-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-lg shadow-sm relative">
@@ -796,9 +799,22 @@ export const SingleFinanceHomePage: React.FC = () => {
         {/* Pay Calculator Card */}
         <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg font-bold flex items-center text-green-800">
-              <DollarSign className="mr-2 h-5 w-5" />
-              Monthly Pay Calculator
+            <CardTitle className="text-lg font-bold flex items-center justify-between text-green-800">
+              <div className="flex items-center">
+                <DollarSign className="mr-2 h-5 w-5" />
+                Monthly Pay Estimator
+              </div>
+              <button
+                onClick={() => setShowPayAmounts(!showPayAmounts)}
+                className="p-1 hover:bg-green-200 rounded transition-colors"
+                title={showPayAmounts ? "Hide pay amounts" : "Show pay amounts"}
+              >
+                {showPayAmounts ? (
+                  <Eye className="h-4 w-4 text-green-700" />
+                ) : (
+                  <EyeOff className="h-4 w-4 text-green-700" />
+                )}
+              </button>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -858,29 +874,32 @@ export const SingleFinanceHomePage: React.FC = () => {
               const totalBonuses = vscBonuses + gapBonuses + ppmBonuses;
               const estimatedPay = baseEarnings + commissionEarnings + totalBonuses;
 
+              // Helper function to display amount or XXX
+              const displayAmount = (amount: number) => showPayAmounts ? `$${amount.toLocaleString()}` : 'XXX';
+
               return (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-3">
                     <div className="flex justify-between items-center p-3 bg-white rounded-lg border">
                       <span className="text-sm font-medium">Base Pay</span>
-                      <span className="font-bold text-green-600">${baseEarnings.toLocaleString()}</span>
+                      <span className="font-bold text-green-600">{displayAmount(baseEarnings)}</span>
                     </div>
                     
                     <div className="flex justify-between items-center p-3 bg-white rounded-lg border">
                       <span className="text-sm font-medium">Commission ({payConfig.commissionRate}%)</span>
-                      <span className="font-bold text-green-600">${commissionEarnings.toLocaleString()}</span>
+                      <span className="font-bold text-green-600">{displayAmount(commissionEarnings)}</span>
                     </div>
                     
                     <div className="flex justify-between items-center p-3 bg-white rounded-lg border">
                       <span className="text-sm font-medium">Product Bonuses</span>
-                      <span className="font-bold text-green-600">${totalBonuses.toLocaleString()}</span>
+                      <span className="font-bold text-green-600">{displayAmount(totalBonuses)}</span>
                     </div>
                   </div>
                   
                   <div className="space-y-3">
                     <div className="p-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg">
                       <div className="text-sm font-medium">Estimated Monthly Pay</div>
-                      <div className="text-2xl font-bold">${estimatedPay.toLocaleString()}</div>
+                      <div className="text-2xl font-bold">{showPayAmounts ? `$${estimatedPay.toLocaleString()}` : 'XXX'}</div>
                     </div>
                     
                     <div className="text-xs text-gray-600 p-3 bg-white rounded-lg border">
@@ -888,15 +907,15 @@ export const SingleFinanceHomePage: React.FC = () => {
                       <p>VSC Deals: {fundedDeals.filter(deal => {
                         const dealData = deal as any;
                         return (dealData.vscProfit && dealData.vscProfit > 0) || (deal.vsc_profit && deal.vsc_profit > 0);
-                      }).length} × ${payConfig.bonusThresholds.vscBonus} = ${vscBonuses}</p>
+                      }).length} × {showPayAmounts ? `$${payConfig.bonusThresholds.vscBonus}` : 'XXX'} = {showPayAmounts ? `$${vscBonuses}` : 'XXX'}</p>
                       <p>GAP Deals: {fundedDeals.filter(deal => {
                         const dealData = deal as any;
                         return (dealData.gapProfit && dealData.gapProfit > 0) || (deal.gap_profit && deal.gap_profit > 0);
-                      }).length} × ${payConfig.bonusThresholds.gapBonus} = ${gapBonuses}</p>
+                      }).length} × {showPayAmounts ? `$${payConfig.bonusThresholds.gapBonus}` : 'XXX'} = {showPayAmounts ? `$${gapBonuses}` : 'XXX'}</p>
                       <p>PPM Deals: {fundedDeals.filter(deal => {
                         const dealData = deal as any;
                         return (dealData.ppmProfit && dealData.ppmProfit > 0) || (deal.ppm_profit && deal.ppm_profit > 0);
-                      }).length} × ${payConfig.bonusThresholds.ppmBonus} = ${ppmBonuses}</p>
+                      }).length} × {showPayAmounts ? `$${payConfig.bonusThresholds.ppmBonus}` : 'XXX'} = {showPayAmounts ? `$${ppmBonuses}` : 'XXX'}</p>
                     </div>
                   </div>
                   
