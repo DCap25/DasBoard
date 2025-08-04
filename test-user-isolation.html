@@ -184,6 +184,26 @@
                 }
             }
 
+            static getPayPrivacyState(userId) {
+                try {
+                    const key = this.getUserKey('singleFinancePayPrivacy', userId);
+                    const data = localStorage.getItem(key);
+                    return data ? JSON.parse(data) : false;
+                } catch (error) {
+                    console.error('Error loading pay privacy state:', error);
+                    return false;
+                }
+            }
+
+            static setPayPrivacyState(userId, showPayAmounts) {
+                try {
+                    const key = this.getUserKey('singleFinancePayPrivacy', userId);
+                    localStorage.setItem(key, JSON.stringify(showPayAmounts));
+                } catch (error) {
+                    console.error('Error saving pay privacy state:', error);
+                }
+            }
+
             static clearAllUserData(userId) {
                 const keys = [];
                 const suffix = `_${userId}`;
@@ -258,6 +278,10 @@
             };
             SingleFinanceStorage.setPayConfig(userId, samplePayConfig);
 
+            // Set a random privacy state for testing
+            const randomPrivacyState = Math.random() > 0.5;
+            SingleFinanceStorage.setPayPrivacyState(userId, randomPrivacyState);
+
             showUserData(userId);
             alert(`✅ Sample data added for ${userName}!`);
         }
@@ -266,6 +290,7 @@
             const teamMembers = SingleFinanceStorage.getTeamMembers(userId);
             const deals = SingleFinanceStorage.getDeals(userId);
             const payConfig = SingleFinanceStorage.getPayConfig(userId);
+            const payPrivacyState = SingleFinanceStorage.getPayPrivacyState(userId);
 
             const output = `USER DATA FOR: ${userId}
 ===========================================
@@ -281,10 +306,14 @@ ${payConfig ? `• Commission Rate: ${payConfig.commissionRate}%
 • Base Rate: $${payConfig.baseRate}
 • VSC Bonus: $${payConfig.bonusThresholds?.vscBonus || 'N/A'}` : '  (No pay configuration)'}
 
+👁️ PAY PRIVACY STATE:
+• Pay amounts visible: ${payPrivacyState ? 'YES' : 'NO (hidden)'}
+
 🔑 STORAGE KEYS:
 • singleFinanceTeamMembers_${userId}
 • singleFinanceDeals_${userId}
-• singleFinancePayConfig_${userId}`;
+• singleFinancePayConfig_${userId}
+• singleFinancePayPrivacy_${userId}`;
 
             const displayElementId = userId === 'user-123' ? 'user1-data' : 
                                   userId === 'user-456' ? 'user2-data' : 'user3-data';

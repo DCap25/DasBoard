@@ -145,7 +145,7 @@ export const SingleFinanceHomePage: React.FC = () => {
   });
   // State to control promotional banner visibility
   const [showPromoBanner, setShowPromoBanner] = useState(true);
-  const [showPayAmounts, setShowPayAmounts] = useState(true);
+  const [showPayAmounts, setShowPayAmounts] = useState(false); // Default to hidden for privacy
 
   // Check and handle monthly reset
   const checkMonthlyReset = () => {
@@ -236,6 +236,24 @@ export const SingleFinanceHomePage: React.FC = () => {
       filterDealsByDateRange();
     }
   }, [timePeriod, customDateRange, deals]);
+
+  // Load and save pay privacy state from user-specific localStorage
+  useEffect(() => {
+    if (!user?.id) return;
+    
+    // Load privacy state on mount
+    const savedPrivacyState = SingleFinanceStorage.getPayPrivacyState(user.id);
+    setShowPayAmounts(savedPrivacyState);
+  }, [user?.id]);
+
+  // Save privacy state when it changes
+  const handleTogglePayVisibility = () => {
+    if (!user?.id) return;
+    
+    const newShowState = !showPayAmounts;
+    setShowPayAmounts(newShowState);
+    SingleFinanceStorage.setPayPrivacyState(user.id, newShowState);
+  };
 
   // Function to load deals from localStorage
   const loadDealsFromStorage = useCallback(() => {
@@ -811,7 +829,7 @@ export const SingleFinanceHomePage: React.FC = () => {
                 Monthly Pay Estimator
               </div>
               <button
-                onClick={() => setShowPayAmounts(!showPayAmounts)}
+                onClick={handleTogglePayVisibility}
                 className="p-2 hover:bg-green-200 rounded-lg transition-colors shadow-sm border border-green-300"
                 title={showPayAmounts ? "Hide pay amounts" : "Show pay amounts"}
               >

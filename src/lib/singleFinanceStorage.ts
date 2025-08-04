@@ -114,6 +114,27 @@ export class SingleFinanceStorage {
     return keys;
   }
 
+  // Pay Privacy State
+  static getPayPrivacyState(userId: string): boolean {
+    try {
+      const key = this.getUserKey('singleFinancePayPrivacy', userId);
+      const data = localStorage.getItem(key);
+      return data ? JSON.parse(data) : false; // Default to hidden for privacy
+    } catch (error) {
+      console.error('Error loading pay privacy state:', error);
+      return false;
+    }
+  }
+
+  static setPayPrivacyState(userId: string, showPayAmounts: boolean): void {
+    try {
+      const key = this.getUserKey('singleFinancePayPrivacy', userId);
+      localStorage.setItem(key, JSON.stringify(showPayAmounts));
+    } catch (error) {
+      console.error('Error saving pay privacy state:', error);
+    }
+  }
+
   // Clear all data for a user (useful for testing)
   static clearAllUserData(userId: string): void {
     const userKeys = this.getUserKeys(userId);
