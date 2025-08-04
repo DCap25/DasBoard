@@ -591,8 +591,7 @@ export const SingleFinanceHomePage: React.FC = () => {
       )}
 
       {/* Page Header */}
-      <div className="flex justify-between items-center mb-1">
-        <h1 className="text-2xl font-bold">Finance Manager Dashboard</h1>
+      <div className="flex justify-end items-center mb-1">
         <div className="space-x-2">
           <DropdownMenu>{/* ... existing dropdown menu code ... */}</DropdownMenu>
         </div>
