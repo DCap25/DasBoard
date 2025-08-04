@@ -50,35 +50,35 @@ export default function SignUp() {
     const newErrors: Record<string, string> = {};
 
     if (!formData.organizationName.trim()) {
-      newErrors.organizationName = 'Organization name is required';
+      newErrors.organizationName = t('signup.dealershipSignup.validation.organizationNameRequired');
     }
     if (!formData.address.trim()) {
-      newErrors.address = 'Address is required';
+      newErrors.address = t('signup.dealershipSignup.validation.addressRequired');
     }
     if (!formData.city.trim()) {
-      newErrors.city = 'City is required';
+      newErrors.city = t('signup.dealershipSignup.validation.cityRequired');
     }
     if (!formData.state.trim()) {
-      newErrors.state = 'State is required';
+      newErrors.state = t('signup.dealershipSignup.validation.stateRequired');
     }
     if (!formData.zipCode.trim()) {
-      newErrors.zipCode = 'ZIP code is required';
+      newErrors.zipCode = t('signup.dealershipSignup.validation.zipCodeRequired');
     }
     if (!formData.adminName.trim()) {
-      newErrors.adminName = 'Admin name is required';
+      newErrors.adminName = t('signup.dealershipSignup.validation.adminNameRequired');
     }
     if (!formData.adminEmail.trim()) {
-      newErrors.adminEmail = 'Email is required';
+      newErrors.adminEmail = t('signup.dealershipSignup.validation.emailRequired');
     } else if (!/\S+@\S+\.\S+/.test(formData.adminEmail)) {
-      newErrors.adminEmail = 'Please enter a valid email address';
+      newErrors.adminEmail = t('signup.dealershipSignup.validation.validEmailRequired');
     }
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = t('signup.dealershipSignup.validation.passwordRequired');
     } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
+      newErrors.password = t('signup.dealershipSignup.validation.passwordMinLength');
     }
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = t('signup.dealershipSignup.validation.passwordsDoNotMatch');
     }
 
     setErrors(newErrors);
@@ -128,7 +128,7 @@ export default function SignUp() {
             <div className="flex items-center">
               <h1 className="text-2xl font-bold text-white">The DAS Board</h1>
               <span className="ml-3 px-3 py-1 bg-blue-600 text-white text-sm rounded-full">
-                Sign Up
+                {t('nav.signup')}
               </span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
@@ -175,10 +175,10 @@ export default function SignUp() {
           <div>
             <div className="mb-8">
               <h1 className="text-4xl font-bold text-white mb-4">
-                Dealership Management
+                {t('signup.dealershipSignup.pricing.dealershipManagement')}
               </h1>
               <p className="text-xl text-gray-300">
-                Build your custom package with flexible pricing tailored to your dealership's needs.
+                {t('signup.dealershipSignup.pricing.buildCustomPackage')}
               </p>
             </div>
 
@@ -186,15 +186,15 @@ export default function SignUp() {
             <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-8">
               <div className="flex items-center mb-4">
                 <Calculator className="w-6 h-6 text-blue-400 mr-3" />
-                <h2 className="text-xl font-bold text-white">Dynamic Package Pricing</h2>
+                <h2 className="text-xl font-bold text-white">{t('signup.dealershipSignup.pricing.dynamicPackagePricing')}</h2>
               </div>
               
               {/* Base Price */}
               <div className="bg-blue-600/20 border border-blue-500 rounded-lg p-4 mb-4">
                 <div className="flex justify-between items-center mb-4">
                   <div>
-                    <h3 className="text-lg font-semibold text-white">Base Price per Dealership</h3>
-                    <p className="text-sm text-gray-400 mt-1">Includes dashboard access for standard team</p>
+                    <h3 className="text-lg font-semibold text-white">{t('signup.dealershipSignup.pricing.basePricePerDealership')}</h3>
+                    <p className="text-sm text-gray-400 mt-1">{t('signup.dealershipSignup.pricing.includesDashboardAccess')}</p>
                   </div>
                   <div className="text-right">
                     <span className="text-2xl font-bold text-blue-400">$250</span>
@@ -206,34 +206,34 @@ export default function SignUp() {
                 <div className="border-t border-blue-400/30 pt-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
-                      <h4 className="text-sm font-semibold text-blue-300 mb-2">Standard Team Access:</h4>
+                      <h4 className="text-sm font-semibold text-blue-300 mb-2">{t('signup.dealershipSignup.pricing.standardTeamAccess')}</h4>
                       <ul className="space-y-1 text-sm text-gray-300">
-                        <li>• Up to 10 Sales People</li>
-                        <li>• Up to 3 Finance Managers</li>
-                        <li>• Up to 3 Sales Managers</li>
-                        <li>• 1 General Manager</li>
+                        <li>• {t('signup.dealershipSignup.pricing.upToSalesPeople')}</li>
+                        <li>• {t('signup.dealershipSignup.pricing.upToFinanceManagers')}</li>
+                        <li>• {t('signup.dealershipSignup.pricing.upToSalesManagers')}</li>
+                        <li>• {t('signup.dealershipSignup.pricing.oneGeneralManager')}</li>
                       </ul>
                     </div>
                     <div>
-                      <h4 className="text-sm font-semibold text-blue-300 mb-2">Core Features:</h4>
+                      <h4 className="text-sm font-semibold text-blue-300 mb-2">{t('signup.dealershipSignup.pricing.coreFeatures')}</h4>
                       <ul className="space-y-1 text-sm text-gray-300">
-                        <li>• Real-time deal tracking</li>
-                        <li>• Performance analytics</li>
-                        <li>• Schedule management</li>
-                        <li>• Goal tracking</li>
+                        <li>• {t('signup.dealershipSignup.pricing.realTimeDealTracking')}</li>
+                        <li>• {t('signup.dealershipSignup.pricing.performanceAnalytics')}</li>
+                        <li>• {t('signup.dealershipSignup.pricing.scheduleManagement')}</li>
+                        <li>• {t('signup.dealershipSignup.pricing.goalTracking')}</li>
                       </ul>
                     </div>
                   </div>
                   <div>
-                    <h4 className="text-sm font-semibold text-blue-300 mb-2">What's Included:</h4>
+                    <h4 className="text-sm font-semibold text-blue-300 mb-2">{t('signup.dealershipSignup.pricing.whatsIncluded')}</h4>
                     <ul className="space-y-1 text-sm text-gray-300">
-                      <li>• Complete dashboard suite for all roles</li>
-                      <li>• Real-time deal tracking & analytics</li>
-                      <li>• Multi-location management</li>
-                      <li>• Flexible admin structure</li>
-                      <li>• Schedule & goal management</li>
-                      <li>• Performance reporting</li>
-                      <li>• Volume discounts available</li>
+                      <li>• {t('signup.dealershipSignup.pricing.completeDashboardSuite')}</li>
+                      <li>• {t('signup.dealershipSignup.pricing.realTimeDealTrackingAnalytics')}</li>
+                      <li>• {t('signup.dealershipSignup.pricing.multiLocationManagement')}</li>
+                      <li>• {t('signup.dealershipSignup.pricing.flexibleAdminStructure')}</li>
+                      <li>• {t('signup.dealershipSignup.pricing.scheduleGoalManagement')}</li>
+                      <li>• {t('signup.dealershipSignup.pricing.performanceReporting')}</li>
+                      <li>• {t('signup.dealershipSignup.pricing.volumeDiscountsAvailable')}</li>
                     </ul>
                   </div>
                 </div>
@@ -243,19 +243,19 @@ export default function SignUp() {
               <div className="bg-gray-700/30 rounded-lg p-4 mb-6">
                 <h3 className="text-base font-semibold text-white mb-3 flex items-center">
                   <Star className="w-4 h-4 text-yellow-400 mr-2" />
-                  Special Bundle Offers
+                  {t('signup.dealershipSignup.pricing.specialBundleOffers')}
                 </h3>
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-start">
                     <Check className="w-4 h-4 text-green-400 mr-2 mt-0.5 flex-shrink-0" />
                     <span className="text-gray-300">
-                      <strong className="text-white">Sell More Bundle (+$50/mo):</strong> 10 Additional Sales People, 2 Additional Finance Managers, 2 Additional Sales Managers
+                      <strong className="text-white">{t('signup.dealershipSignup.pricing.sellMoreBundle')}</strong> {t('signup.dealershipSignup.pricing.sellMoreBundleDesc')}
                     </span>
                   </li>
                   <li className="flex items-start">
                     <Check className="w-4 h-4 text-green-400 mr-2 mt-0.5 flex-shrink-0" />
                     <span className="text-gray-300">
-                      <strong className="text-white">Sell Most Bundle (+$100/mo):</strong> 20 Additional Sales People, 4 Sales Managers, 1 GSM, 1 Finance Director
+                      <strong className="text-white">{t('signup.dealershipSignup.pricing.sellMostBundle')}</strong> {t('signup.dealershipSignup.pricing.sellMostBundleDesc')}
                     </span>
                   </li>
                 </ul>
@@ -263,7 +263,7 @@ export default function SignUp() {
 
               {/* À La Carte Add-ons */}
               <div className="relative">
-                <h3 className="text-base font-semibold text-white mb-2">À La Carte Add-ons</h3>
+                <h3 className="text-base font-semibold text-white mb-2">{t('signup.dealershipSignup.pricing.aLaCarteAddons')}</h3>
                 <div className="space-y-2">
                   <div 
                     className="flex justify-between items-center p-2 bg-gray-700/50 rounded-lg hover:bg-gray-700/70 transition-colors cursor-pointer"
@@ -272,7 +272,7 @@ export default function SignUp() {
                   >
                     <div className="flex items-center">
                       <User className="w-3 h-3 text-blue-400 mr-2" />
-                      <span className="text-white text-sm">Additional Sales Person</span>
+                      <span className="text-white text-sm">{t('signup.dealershipSignup.pricing.additionalSalesPerson')}</span>
                     </div>
                     <div className="text-right">
                       <span className="text-base font-semibold text-white">$5</span>
@@ -287,7 +287,7 @@ export default function SignUp() {
                   >
                     <div className="flex items-center">
                       <Users className="w-3 h-3 text-blue-400 mr-2" />
-                      <span className="text-white text-sm">Additional Finance Manager</span>
+                      <span className="text-white text-sm">{t('signup.dealershipSignup.pricing.additionalFinanceManager')}</span>
                     </div>
                     <div className="text-right">
                       <span className="text-base font-semibold text-white">$20</span>
@@ -302,7 +302,7 @@ export default function SignUp() {
                   >
                     <div className="flex items-center">
                       <Shield className="w-3 h-3 text-blue-400 mr-2" />
-                      <span className="text-white text-sm">Additional Sales Manager</span>
+                      <span className="text-white text-sm">{t('signup.dealershipSignup.pricing.additionalSalesManager')}</span>
                     </div>
                     <div className="text-right">
                       <span className="text-base font-semibold text-white">$30</span>
@@ -317,7 +317,7 @@ export default function SignUp() {
                   >
                     <div className="flex items-center">
                       <Users className="w-3 h-3 text-blue-400 mr-2" />
-                      <span className="text-white text-sm">Finance Director</span>
+                      <span className="text-white text-sm">{t('signup.dealershipSignup.pricing.financeDirector')}</span>
                     </div>
                     <div className="text-right">
                       <span className="text-base font-semibold text-white">$25</span>
@@ -332,7 +332,7 @@ export default function SignUp() {
                   >
                     <div className="flex items-center">
                       <Shield className="w-3 h-3 text-blue-400 mr-2" />
-                      <span className="text-white text-sm">General Sales Manager (GSM)</span>
+                      <span className="text-white text-sm">{t('signup.dealershipSignup.pricing.generalSalesManager')}</span>
                     </div>
                     <div className="text-right">
                       <span className="text-base font-semibold text-white">$30</span>
@@ -347,7 +347,7 @@ export default function SignUp() {
                   >
                     <div className="flex items-center">
                       <TrendingUp className="w-3 h-3 text-blue-400 mr-2" />
-                      <span className="text-white text-sm">Area Vice President (AVP)</span>
+                      <span className="text-white text-sm">{t('signup.dealershipSignup.pricing.areaVicePresident')}</span>
                     </div>
                     <div className="text-right">
                       <span className="text-base font-semibold text-white">$50</span>
@@ -360,12 +360,12 @@ export default function SignUp() {
                 {hoveredRole && (
                   <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-80 bg-white rounded-lg shadow-2xl border border-gray-300 p-4">
                     <h4 className="text-gray-800 font-semibold mb-2 text-sm">
-                      {hoveredRole === 'salesperson' && 'Sales Person Dashboard'}
-                      {hoveredRole === 'financemanager' && 'Finance Manager Dashboard'}
-                      {hoveredRole === 'salesmanager' && 'Sales Manager Dashboard'}
-                      {hoveredRole === 'financedirector' && 'Finance Director Dashboard'}
-                      {hoveredRole === 'generalmanager' && 'General Manager Dashboard'}
-                      {hoveredRole === 'avp' && 'Area Vice President Dashboard'}
+                      {hoveredRole === 'salesperson' && t('signup.dealershipSignup.pricing.salesPersonDashboard')}
+                      {hoveredRole === 'financemanager' && t('signup.dealershipSignup.pricing.financeManagerDashboard')}
+                      {hoveredRole === 'salesmanager' && t('signup.dealershipSignup.pricing.salesManagerDashboard')}
+                      {hoveredRole === 'financedirector' && t('signup.dealershipSignup.pricing.financeDirectorDashboard')}
+                      {hoveredRole === 'generalmanager' && t('signup.dealershipSignup.pricing.generalManagerDashboard')}
+                      {hoveredRole === 'avp' && t('signup.dealershipSignup.pricing.areaVicePresidentDashboard')}
                     </h4>
                     <img 
                       src={`/images/${
@@ -394,21 +394,21 @@ export default function SignUp() {
                 <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Building2 className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-2">Get Started Today</h2>
+                <h2 className="text-2xl font-bold text-white mb-2">{t('signup.dealershipSignup.getStartedToday')}</h2>
                 <p className="text-gray-400">
-                  Create your account and configure your dealerships after signup
+                  {t('signup.dealershipSignup.createAccountConfigure')}
                 </p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Organization Information */}
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-4">Organization Information</h3>
+                  <h3 className="text-lg font-semibold text-white mb-4">{t('signup.dealershipSignup.organizationInfo')}</h3>
                   
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Organization Name *
+                        {t('signup.dealershipSignup.organizationName')}
                       </label>
                       <input
                         type="text"
@@ -418,7 +418,7 @@ export default function SignUp() {
                         className={`w-full p-3 bg-gray-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                           errors.organizationName ? 'border-red-500' : 'border-gray-600'
                         }`}
-                        placeholder="ABC Auto Group"
+                        placeholder={t('signup.dealershipSignup.organizationNamePlaceholder')}
                       />
                       {errors.organizationName && (
                         <p className="text-red-400 text-sm mt-1">{errors.organizationName}</p>
@@ -427,7 +427,7 @@ export default function SignUp() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Business Address *
+                        {t('signup.dealershipSignup.businessAddress')}
                       </label>
                       <input
                         type="text"
@@ -437,7 +437,7 @@ export default function SignUp() {
                         className={`w-full p-3 bg-gray-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                           errors.address ? 'border-red-500' : 'border-gray-600'
                         }`}
-                        placeholder="123 Main Street"
+                        placeholder={t('signup.dealershipSignup.businessAddressPlaceholder')}
                       />
                       {errors.address && (
                         <p className="text-red-400 text-sm mt-1">{errors.address}</p>
@@ -447,7 +447,7 @@ export default function SignUp() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                          City *
+                          {t('signup.dealershipSignup.city')}
                         </label>
                         <input
                           type="text"
@@ -457,7 +457,7 @@ export default function SignUp() {
                           className={`w-full p-3 bg-gray-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                             errors.city ? 'border-red-500' : 'border-gray-600'
                           }`}
-                          placeholder="Anytown"
+                          placeholder={t('signup.dealershipSignup.cityPlaceholder')}
                         />
                         {errors.city && (
                           <p className="text-red-400 text-sm mt-1">{errors.city}</p>
@@ -465,7 +465,7 @@ export default function SignUp() {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                          State *
+                          {t('signup.dealershipSignup.state')}
                         </label>
                         <input
                           type="text"
@@ -475,7 +475,7 @@ export default function SignUp() {
                           className={`w-full p-3 bg-gray-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                             errors.state ? 'border-red-500' : 'border-gray-600'
                           }`}
-                          placeholder="CA"
+                          placeholder={t('signup.dealershipSignup.statePlaceholder')}
                         />
                         {errors.state && (
                           <p className="text-red-400 text-sm mt-1">{errors.state}</p>
@@ -485,7 +485,7 @@ export default function SignUp() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">
-                        ZIP Code *
+                        {t('signup.dealershipSignup.zipCode')}
                       </label>
                       <input
                         type="text"
@@ -495,7 +495,7 @@ export default function SignUp() {
                         className={`w-full p-3 bg-gray-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                           errors.zipCode ? 'border-red-500' : 'border-gray-600'
                         }`}
-                        placeholder="12345"
+                        placeholder={t('signup.dealershipSignup.zipCodePlaceholder')}
                       />
                       {errors.zipCode && (
                         <p className="text-red-400 text-sm mt-1">{errors.zipCode}</p>
@@ -506,12 +506,12 @@ export default function SignUp() {
 
                 {/* Admin Contact Information */}
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-4">Admin Contact Information</h3>
+                  <h3 className="text-lg font-semibold text-white mb-4">{t('signup.dealershipSignup.adminContactInfo')}</h3>
                   
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Admin Name *
+                        {t('signup.dealershipSignup.adminName')}
                       </label>
                       <div className="relative">
                         <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -523,7 +523,7 @@ export default function SignUp() {
                           className={`w-full pl-10 pr-4 py-3 bg-gray-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                             errors.adminName ? 'border-red-500' : 'border-gray-600'
                           }`}
-                          placeholder="John Smith"
+                          placeholder={t('signup.dealershipSignup.adminNamePlaceholder')}
                         />
                       </div>
                       {errors.adminName && (
@@ -533,7 +533,7 @@ export default function SignUp() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Email Address *
+                        {t('signup.dealershipSignup.emailAddress')}
                       </label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -545,7 +545,7 @@ export default function SignUp() {
                           className={`w-full pl-10 pr-4 py-3 bg-gray-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                             errors.adminEmail ? 'border-red-500' : 'border-gray-600'
                           }`}
-                          placeholder="john@abcautogroup.com"
+                          placeholder={t('signup.dealershipSignup.emailPlaceholder')}
                         />
                       </div>
                       {errors.adminEmail && (
@@ -555,7 +555,7 @@ export default function SignUp() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Password *
+                        {t('signup.dealershipSignup.password')}
                       </label>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -567,7 +567,7 @@ export default function SignUp() {
                           className={`w-full pl-10 pr-12 py-3 bg-gray-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                             errors.password ? 'border-red-500' : 'border-gray-600'
                           }`}
-                          placeholder="At least 8 characters"
+                          placeholder={t('signup.dealershipSignup.passwordPlaceholder')}
                         />
                         <button
                           type="button"
@@ -584,7 +584,7 @@ export default function SignUp() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Confirm Password *
+                        {t('signup.dealershipSignup.confirmPassword')}
                       </label>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -596,7 +596,7 @@ export default function SignUp() {
                           className={`w-full pl-10 pr-4 py-3 bg-gray-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                             errors.confirmPassword ? 'border-red-500' : 'border-gray-600'
                           }`}
-                          placeholder="Confirm your password"
+                          placeholder={t('signup.dealershipSignup.confirmPasswordPlaceholder')}
                         />
                       </div>
                       {errors.confirmPassword && (
@@ -611,14 +611,14 @@ export default function SignUp() {
                   type="submit"
                   className="w-full bg-blue-600 hover:bg-blue-500 text-white py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/25"
                 >
-                  Create Account & Get Started
+                  {t('signup.dealershipSignup.createAccountButton')}
                 </button>
 
                 <div className="text-center">
                   <p className="text-gray-400 text-sm">
-                    Configure dealerships and team after signup
+                    {t('signup.dealershipSignup.configureAfterSignup')}
                     <br />
-                    <span className="text-white">Use code SAVE10 for 10% off first 3 months</span>
+                    <span className="text-white">{t('signup.dealershipSignup.useDiscountCode')}</span>
                   </p>
                 </div>
               </form>

@@ -37,11 +37,11 @@ export default function PricingPage() {
 
   const handleEmailSubmit = () => {
     if (!discountEmail.trim()) {
-      setEmailError('Email address is required');
+      setEmailError(t('pricing.discountPopup.emailRequired'));
       return;
     }
     if (!/\S+@\S+\.\S+/.test(discountEmail)) {
-      setEmailError('Please enter a valid email address');
+      setEmailError(t('pricing.discountPopup.validEmailRequired'));
       return;
     }
     
@@ -90,6 +90,12 @@ export default function PricingPage() {
                 className="text-gray-300 hover:text-white transition-colors"
               >
                 {t('nav.home')}
+              </button>
+              <button
+                onClick={() => navigate('/demo')}
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                Demo
               </button>
               <button
                 onClick={() => navigate('/screenshots')}
@@ -331,18 +337,18 @@ export default function PricingPage() {
               </div>
 
               <h3 className="text-3xl font-bold text-gray-800 mb-6">
-                {discountCodeRevealed ? 'Your Discount Code!' : 'Special Summer Savings!'}
+                {discountCodeRevealed ? t('pricing.discountPopup.yourDiscountCode') : t('pricing.discountPopup.specialSummerSavings')}
               </h3>
               
               {!discountCodeRevealed ? (
                 <>
                   <p className="text-lg text-gray-600 mb-6">
-                    Get <span className="text-blue-600 font-bold text-xl">10% off</span> your first 3 months with our dealership management solution.
+                    Get <span className="text-blue-600 font-bold text-xl">{t('pricing.discountPopup.tenPercentOff')}</span> {t('pricing.discountPopup.firstThreeMonths')}
                   </p>
 
                   <div className="mb-6">
                     <label className="block text-base font-medium text-gray-700 mb-3">
-                      Enter your email to receive the discount code:
+                      {t('pricing.discountPopup.enterEmailPrompt')}
                     </label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-6 h-6 text-blue-500" />
@@ -356,7 +362,7 @@ export default function PricingPage() {
                         className={`w-full pl-12 pr-4 py-4 bg-blue-50 border rounded-lg text-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white ${
                           emailError ? 'border-red-500' : 'border-blue-200'
                         }`}
-                        placeholder="your@email.com"
+                        placeholder={t('pricing.discountPopup.emailPlaceholder')}
                         onKeyPress={(e) => e.key === 'Enter' && handleEmailSubmit()}
                       />
                     </div>
@@ -370,24 +376,24 @@ export default function PricingPage() {
                       onClick={handleEmailSubmit}
                       className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-4 px-6 rounded-lg font-semibold text-lg transition-colors shadow-md hover:shadow-lg"
                     >
-                      Get Discount Code
+                      {t('pricing.discountPopup.getDiscountCode')}
                     </button>
                     <button
                       onClick={() => setShowDiscountPopup(false)}
                       className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 py-4 px-6 rounded-lg font-semibold text-lg transition-colors border border-blue-200"
                     >
-                      Maybe Later
+                      {t('pricing.discountPopup.maybeWater')}
                     </button>
                   </div>
                 </>
               ) : (
                 <>
                   <p className="text-lg text-gray-600 mb-6">
-                    Thank you! Here's your <span className="text-blue-600 font-bold text-xl">10% off</span> discount code:
+                    {t('pricing.discountPopup.thankYouMessage')} <span className="text-blue-600 font-bold text-xl">{t('pricing.discountPopup.tenPercentOff')}</span> discount code:
                   </p>
 
                   <div className="bg-blue-50 rounded-lg p-6 mb-6 border-2 border-blue-500">
-                    <p className="text-base text-gray-600 mb-3">Discount Code:</p>
+                    <p className="text-base text-gray-600 mb-3">{t('pricing.discountPopup.discountCodeLabel')}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-3xl font-bold text-blue-600 tracking-wider">SAVE10</span>
                       <button
@@ -395,7 +401,7 @@ export default function PricingPage() {
                         className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg text-base transition-colors shadow-sm hover:shadow-md"
                       >
                         <Copy className="w-5 h-5" />
-                        <span>{discountCopied ? 'Copied!' : 'Copy'}</span>
+                        <span>{discountCopied ? t('pricing.discountPopup.copied') : t('pricing.discountPopup.copy')}</span>
                       </button>
                     </div>
                   </div>
@@ -408,20 +414,20 @@ export default function PricingPage() {
                       }}
                       className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-4 px-6 rounded-lg font-semibold text-lg transition-colors shadow-md hover:shadow-lg"
                     >
-                      Claim Offer
+                      {t('pricing.discountPopup.claimOffer')}
                     </button>
                     <button
                       onClick={() => setShowDiscountPopup(false)}
                       className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 py-4 px-6 rounded-lg font-semibold text-lg transition-colors border border-blue-200"
                     >
-                      Use Later
+                      {t('pricing.discountPopup.useLater')}
                     </button>
                   </div>
                 </>
               )}
 
               <p className="text-sm text-gray-500 mt-4">
-                * Valid for new dealership subscriptions only. Expires in 30 days.
+                {t('pricing.discountPopup.validityNotice')}
               </p>
             </div>
           </div>
