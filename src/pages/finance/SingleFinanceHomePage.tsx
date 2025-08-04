@@ -806,13 +806,13 @@ export const SingleFinanceHomePage: React.FC = () => {
               </div>
               <button
                 onClick={() => setShowPayAmounts(!showPayAmounts)}
-                className="p-1 hover:bg-green-200 rounded transition-colors"
+                className="p-2 hover:bg-green-200 rounded-lg transition-colors shadow-sm border border-green-300"
                 title={showPayAmounts ? "Hide pay amounts" : "Show pay amounts"}
               >
                 {showPayAmounts ? (
-                  <Eye className="h-4 w-4 text-green-700" />
+                  <Eye className="h-6 w-6 text-green-700" />
                 ) : (
-                  <EyeOff className="h-4 w-4 text-green-700" />
+                  <EyeOff className="h-6 w-6 text-green-700" />
                 )}
               </button>
             </CardTitle>

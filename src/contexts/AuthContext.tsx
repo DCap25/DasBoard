@@ -123,6 +123,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userRole, setUserRole] = useState<string | null>(null);
   const [dealershipId, setDealershipId] = useState<number | null>(null);
   const [currentDealershipName, setCurrentDealershipName] = useState<string | null>(null);
+
+  // Session timeout management (18 hours = 64800000ms)
+  const SESSION_TIMEOUT_MS = 18 * 60 * 60 * 1000; // 18 hours in milliseconds
+
+  // Check if session has expired and auto sign out
+  const checkSessionTimeout = useCallback(() => {
+    const loginTimestamp = localStorage.getItem('session_login_time');
+    if (loginTimestamp && hasSession) {
+      const loginTime = parseInt(loginTimestamp);
+      const currentTime = Date.now();
+      const timeDifference = currentTime - loginTime;
+      
+      if (timeDifference > SESSION_TIMEOUT_MS) {
+        console.log('[AuthContext] Session expired after 18 hours, signing out automatically');
+        toast({
+          title: 'Session Expired',
+          description: 'You have been automatically signed out after 18 hours for security.',
+          variant: 'default'
+        });
+        signOut();
+        return true; // Session expired
+      }
+    }
+    return false; // Session still valid
+  }, [hasSession, SESSION_TIMEOUT_MS]);
   const [isGroupAdmin, setIsGroupAdmin] = useState<boolean>(false);
   const [authCheckComplete, setAuthCheckComplete] = useState<boolean>(false);
 
@@ -969,6 +994,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [handleAuthStateChange, initialized, fetchUserRole]);
 
+  // Check session timeout every 5 minutes
+  useEffect(() => {
+    const timeoutCheckInterval = setInterval(() => {
+      checkSessionTimeout();
+    }, 5 * 60 * 1000); // Check every 5 minutes
+
+    // Also check on page focus/visibility change
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        checkSessionTimeout();
+      }
+    };
+
+    const handleFocus = () => {
+      checkSessionTimeout();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      clearInterval(timeoutCheckInterval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [checkSessionTimeout]);
+
   // Sign in with email and password
   const signIn = async (email: string, password: string, rememberMe?: boolean) => {
     try {
@@ -1157,6 +1209,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(data.user);
       setHasSession(true);
 
+      // Set session login timestamp for 18-hour timeout
+      localStorage.setItem('session_login_time', Date.now().toString());
+      console.log('[AuthContext] Session timeout set for 18 hours from now');
+
       // Check group admin status
       console.warn('[DEBUG AUTH] Checking group admin status after login');
       const profileData = await fetchProfileData(data.user.id);
@@ -1318,6 +1374,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         userId: user?.id,
         timestamp: new Date().toISOString(),
       });
+
+      // Clear session timeout timestamp
+      localStorage.removeItem('session_login_time');
 
       // Check if this is a demo user and clear demo session
       try {
