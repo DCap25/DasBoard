@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test User Isolation - Single Finance Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .user-section {
+            border: 2px solid #007bff;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .user1 { border-color: #007bff; background-color: #f0f8ff; }
+        .user2 { border-color: #28a745; background-color: #f0fff0; }
+        .user3 { border-color: #dc3545; background-color: #fff5f5; }
+        
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .green { background: #28a745; }
+        .green:hover { background: #218838; }
+        .red { background: #dc3545; }
+        .red:hover { background: #c82333; }
+        
+        .data-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .actions {
+            margin: 10px 0;
+        }
+        .info {
+            background: #e7f3ff;
+            border: 1px solid #bee5eb;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Single Finance Manager - User Isolation Test</h1>
+        <div class="info">
+            <strong>Purpose:</strong> This tool tests that each Single Finance Manager user has completely isolated data.
+            <br><strong>What it tests:</strong> Team members, deals, and pay configuration are stored separately per user.
+        </div>
+
+        <!-- User 1 Section -->
+        <div class="user-section user1">
+            <h2>👤 User 1 (ID: user-123)</h2>
+            <div class="actions">
+                <button onclick="addSampleData('user-123', 'John Smith', 'Tech Sales Corp')">Add Sample Data</button>
+                <button onclick="showUserData('user-123')" class="green">Show Data</button>
+                <button onclick="clearUserData('user-123')" class="red">Clear Data</button>
+            </div>
+            <div id="user1-data" class="data-display">No data loaded...</div>
+        </div>
+
+        <!-- User 2 Section -->
+        <div class="user-section user2">
+            <h2>👤 User 2 (ID: user-456)</h2>
+            <div class="actions">
+                <button onclick="addSampleData('user-456', 'Sarah Johnson', 'Elite Auto Group')">Add Sample Data</button>
+                <button onclick="showUserData('user-456')" class="green">Show Data</button>
+                <button onclick="clearUserData('user-456')" class="red">Clear Data</button>
+            </div>
+            <div id="user2-data" class="data-display">No data loaded...</div>
+        </div>
+
+        <!-- User 3 Section -->
+        <div class="user-section user3">
+            <h2>👤 User 3 (ID: user-789)</h2>
+            <div class="actions">
+                <button onclick="addSampleData('user-789', 'Mike Chen', 'Premium Motors')">Add Sample Data</button>
+                <button onclick="showUserData('user-789')" class="green">Show Data</button>
+                <button onclick="clearUserData('user-789')" class="red">Clear Data</button>
+            </div>
+            <div id="user3-data" class="data-display">No data loaded...</div>
+        </div>
+
+        <div class="actions" style="text-align: center; margin-top: 30px;">
+            <button onclick="showAllData()" class="green">Show All Users Data</button>
+            <button onclick="clearAllTestData()" class="red">Clear All Test Data</button>
+            <button onclick="location.href='http://localhost:5173'" class="green">Go to DAS Board</button>
+        </div>
+    </div>
+
+    <script>
+        // Simulate the SingleFinanceStorage utility class
+        class SingleFinanceStorage {
+            static getUserKey(baseKey, userId) {
+                return `${baseKey}_${userId}`;
+            }
+
+            static getTeamMembers(userId) {
+                try {
+                    const key = this.getUserKey('singleFinanceTeamMembers', userId);
+                    const data = localStorage.getItem(key);
+                    return data ? JSON.parse(data) : [];
+                } catch (error) {
+                    console.error('Error loading team members:', error);
+                    return [];
+                }
+            }
+
+            static setTeamMembers(userId, teamMembers) {
+                try {
+                    const key = this.getUserKey('singleFinanceTeamMembers', userId);
+                    localStorage.setItem(key, JSON.stringify(teamMembers));
+                } catch (error) {
+                    console.error('Error saving team members:', error);
+                }
+            }
+
+            static getDeals(userId) {
+                try {
+                    const key = this.getUserKey('singleFinanceDeals', userId);
+                    const data = localStorage.getItem(key);
+                    return data ? JSON.parse(data) : [];
+                } catch (error) {
+                    console.error('Error loading deals:', error);
+                    return [];
+                }
+            }
+
+            static setDeals(userId, deals) {
+                try {
+                    const key = this.getUserKey('singleFinanceDeals', userId);
+                    localStorage.setItem(key, JSON.stringify(deals));
+                } catch (error) {
+                    console.error('Error saving deals:', error);
+                }
+            }
+
+            static getPayConfig(userId) {
+                try {
+                    const key = this.getUserKey('singleFinancePayConfig', userId);
+                    const data = localStorage.getItem(key);
+                    return data ? JSON.parse(data) : null;
+                } catch (error) {
+                    console.error('Error loading pay config:', error);
+                    return null;
+                }
+            }
+
+            static setPayConfig(userId, payConfig) {
+                try {
+                    const key = this.getUserKey('singleFinancePayConfig', userId);
+                    localStorage.setItem(key, JSON.stringify(payConfig));
+                } catch (error) {
+                    console.error('Error saving pay config:', error);
+                }
+            }
+
+            static clearAllUserData(userId) {
+                const keys = [];
+                const suffix = `_${userId}`;
+                
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.endsWith(suffix) && key.startsWith('singleFinance')) {
+                        keys.push(key);
+                    }
+                }
+                
+                keys.forEach(key => {
+                    localStorage.removeItem(key);
+                });
+                console.log(`Cleared ${keys.length} localStorage keys for user ${userId}`);
+                return keys.length;
+            }
+        }
+
+        function addSampleData(userId, userName, companyName) {
+            // Add sample team members
+            const sampleTeam = [
+                {
+                    id: `member_${Date.now()}_1`,
+                    firstName: 'Alex',
+                    lastName: 'Wilson',
+                    initials: 'AW',
+                    role: 'salesperson',
+                    active: true
+                },
+                {
+                    id: `member_${Date.now()}_2`,
+                    firstName: 'Emma',
+                    lastName: 'Davis',
+                    initials: 'ED',
+                    role: 'sales_manager',
+                    active: true
+                }
+            ];
+            SingleFinanceStorage.setTeamMembers(userId, sampleTeam);
+
+            // Add sample deal
+            const sampleDeal = {
+                id: `deal_${Date.now()}`,
+                dealNumber: `${userId.slice(-3)}-${Math.floor(Math.random() * 1000)}`,
+                customerName: `Customer for ${userName}`,
+                vehicleDescription: '2023 Honda Accord',
+                dealType: 'Finance',
+                saleDate: new Date().toISOString().split('T')[0],
+                frontEndGross: '2500',
+                backEndGross: '1800',
+                totalGross: '4300',
+                salespersonId: sampleTeam[0].id,
+                vscProfit: '800',
+                gapProfit: '400',
+                ppmProfit: '600',
+                status: 'funded',
+                notes: `Sample deal for ${userName} at ${companyName}`
+            };
+            SingleFinanceStorage.setDeals(userId, [sampleDeal]);
+
+            // Add sample pay config
+            const samplePayConfig = {
+                commissionRate: 25 + Math.floor(Math.random() * 10), // 25-35%
+                baseRate: 500 + Math.floor(Math.random() * 500), // $500-1000
+                bonusThresholds: {
+                    vscBonus: 100,
+                    gapBonus: 50,
+                    ppmBonus: 75,
+                    totalThreshold: 15000
+                }
+            };
+            SingleFinanceStorage.setPayConfig(userId, samplePayConfig);
+
+            showUserData(userId);
+            alert(`✅ Sample data added for ${userName}!`);
+        }
+
+        function showUserData(userId) {
+            const teamMembers = SingleFinanceStorage.getTeamMembers(userId);
+            const deals = SingleFinanceStorage.getDeals(userId);
+            const payConfig = SingleFinanceStorage.getPayConfig(userId);
+
+            const output = `USER DATA FOR: ${userId}
+===========================================
+
+📋 TEAM MEMBERS (${teamMembers.length}):
+${teamMembers.length > 0 ? teamMembers.map(m => `• ${m.firstName} ${m.lastName} (${m.initials}) - ${m.role}`).join('\n') : '  (No team members)'}
+
+💼 DEALS (${deals.length}):
+${deals.length > 0 ? deals.map(d => `• Deal #${d.dealNumber}: ${d.customerName} - $${d.totalGross || 'N/A'} total`).join('\n') : '  (No deals)'}
+
+💰 PAY CONFIG:
+${payConfig ? `• Commission Rate: ${payConfig.commissionRate}%
+• Base Rate: $${payConfig.baseRate}
+• VSC Bonus: $${payConfig.bonusThresholds?.vscBonus || 'N/A'}` : '  (No pay configuration)'}
+
+🔑 STORAGE KEYS:
+• singleFinanceTeamMembers_${userId}
+• singleFinanceDeals_${userId}
+• singleFinancePayConfig_${userId}`;
+
+            const displayElementId = userId === 'user-123' ? 'user1-data' : 
+                                  userId === 'user-456' ? 'user2-data' : 'user3-data';
+            document.getElementById(displayElementId).textContent = output;
+        }
+
+        function clearUserData(userId) {
+            const clearedCount = SingleFinanceStorage.clearAllUserData(userId);
+            showUserData(userId);
+            alert(`🗑️ Cleared ${clearedCount} data items for user ${userId}`);
+        }
+
+        function showAllData() {
+            showUserData('user-123');
+            showUserData('user-456');
+            showUserData('user-789');
+        }
+
+        function clearAllTestData() {
+            if (confirm('Are you sure you want to clear ALL test data for all users?')) {
+                clearUserData('user-123');
+                clearUserData('user-456');
+                clearUserData('user-789');
+                alert('🧹 All test data cleared!');
+            }
+        }
+
+        // Initial load
+        window.onload = function() {
+            showAllData();
+        };
+    </script>
+</body>
+</html>

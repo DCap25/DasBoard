@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Sample Data - DAS Board</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #c82333;
+        }
+        .success {
+            background: #28a745;
+        }
+        .success:hover {
+            background: #218838;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-line;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 Clear Sample Data from DAS Board</h1>
+        <p>This tool will clear all sample salespeople, managers, and test data from localStorage to ensure new Single Finance Manager users start with a clean dashboard.</p>
+        
+        <div id="log" class="log">Ready to clear sample data...</div>
+        
+        <button onclick="clearSampleData()">Clear Sample Data</button>
+        <button onclick="showCurrentData()">Show Current Data</button>
+        <button onclick="location.href='http://localhost:5173'" class="success">Go to DAS Board</button>
+    </div>
+
+    <script>
+        function clearSampleData() {
+            const log = document.getElementById('log');
+            let output = 'Clearing sample data from localStorage...\n\n';
+            
+            // Clear team members (this will force empty dropdowns for new users)
+            localStorage.removeItem('singleFinanceTeamMembers');
+            output += '✓ Cleared team members\n';
+            
+            // Clear any existing deals that might contain sample data
+            localStorage.removeItem('singleFinanceDeals');
+            output += '✓ Cleared deals data\n';
+            
+            // Clear any monthly data reset tracking
+            localStorage.removeItem('singleFinanceLastReset');
+            output += '✓ Cleared monthly reset tracking\n';
+            
+            // Clear pay configuration (user can reconfigure)
+            localStorage.removeItem('singleFinancePayConfig');
+            output += '✓ Cleared pay configuration\n';
+            
+            output += '\n✅ All sample data cleared!\n';
+            output += 'New users will now start with completely empty dropdowns.\n';
+            output += 'Refresh DAS Board to see the clean state.';
+            
+            log.textContent = output;
+        }
+        
+        function showCurrentData() {
+            const log = document.getElementById('log');
+            let output = 'Current localStorage data:\n\n';
+            
+            const teamMembers = localStorage.getItem('singleFinanceTeamMembers');
+            output += 'Team Members: ' + (teamMembers ? JSON.stringify(JSON.parse(teamMembers), null, 2) : 'None') + '\n\n';
+            
+            const deals = localStorage.getItem('singleFinanceDeals');
+            output += 'Deals: ' + (deals ? `${JSON.parse(deals).length} deals found` : 'None') + '\n\n';
+            
+            const payConfig = localStorage.getItem('singleFinancePayConfig');
+            output += 'Pay Config: ' + (payConfig ? 'Configured' : 'None') + '\n\n';
+            
+            const lastReset = localStorage.getItem('singleFinanceLastReset');
+            output += 'Last Reset: ' + (lastReset || 'None');
+            
+            log.textContent = output;
+        }
+    </script>
+</body>
+</html>
