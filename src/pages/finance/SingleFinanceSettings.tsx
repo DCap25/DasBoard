@@ -85,6 +85,13 @@ export default function SingleFinanceSettings() {
     try {
       localStorage.setItem('singleFinanceTeamMembers', JSON.stringify(members));
       setTeamMembers(members);
+      
+      // Dispatch custom event to notify other components
+      window.dispatchEvent(new CustomEvent('teamMembersUpdated', { 
+        detail: { teamMembers: members } 
+      }));
+      
+      console.log('[Settings] Team members updated and event dispatched:', members.length, 'members');
     } catch (error) {
       console.error('Error saving team members:', error);
       toast({

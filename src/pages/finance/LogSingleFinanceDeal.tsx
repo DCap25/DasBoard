@@ -174,6 +174,28 @@ export default function LogSingleFinanceDeal() {
       setIsEditMode(true);
       loadDealForEdit(dealId);
     }
+
+    // Listen for team member updates from Settings page
+    const handleTeamMembersUpdated = (e: any) => {
+      console.log('[LogSingleFinanceDeal] Team members updated event received:', e.detail);
+      loadTeamMembers(); // Reload team members from localStorage
+    };
+
+    // Listen for storage changes (fallback for cross-tab updates)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'singleFinanceTeamMembers') {
+        console.log('[LogSingleFinanceDeal] Team members storage changed, reloading');
+        loadTeamMembers();
+      }
+    };
+
+    window.addEventListener('teamMembersUpdated', handleTeamMembersUpdated);
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('teamMembersUpdated', handleTeamMembersUpdated);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, [dealId]);
 
   // Load team members from localStorage
