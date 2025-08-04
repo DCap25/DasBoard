@@ -72,7 +72,9 @@ import AboutPage from './pages/AboutPage';
 import ScreenshotsPage from './pages/ScreenshotsPage';
 import { TranslationProvider } from './contexts/TranslationContext';
 import ResetAuth from './pages/ResetPage';
+import CookieConsent from './components/CookieConsent';
 import TestUserMiddleware from './components/auth/TestUserMiddleware';
+import DemoPage from './pages/DemoPage';
 
 // Add global type declaration for app event tracking
 declare global {
@@ -703,9 +705,11 @@ function App() {
                 <DirectAuthProvider>
                   <TestUserMiddleware>
                     <RouteLogger />
+                    <CookieConsent />
                     <Routes>
                       {/* Marketing Pages - Public Access */}
                       <Route path="/" element={<HomePage />} />
+                      <Route path="/demo" element={<DemoPage />} />
                       <Route path="/about" element={<AboutPage />} />
                       <Route path="/screenshots" element={<ScreenshotsPage />} />
                       <Route path="/pricing" element={<PricingPage />} />

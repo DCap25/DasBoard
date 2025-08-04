@@ -82,6 +82,12 @@ export default function HomePage() {
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <button
+                onClick={() => navigate('/demo')}
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                Demo
+              </button>
+              <button
                 onClick={() => navigate('/screenshots')}
                 className="text-gray-300 hover:text-white transition-colors"
               >

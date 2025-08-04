@@ -25,6 +25,12 @@ export default function ScreenshotsPage() {
                 {t('nav.home')}
               </button>
               <button
+                onClick={() => navigate('/demo')}
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                Demo
+              </button>
+              <button
                 onClick={() => navigate('/screenshots')}
                 className="text-white border-b-2 border-blue-500"
               >
