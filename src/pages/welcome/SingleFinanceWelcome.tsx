@@ -25,6 +25,15 @@ export default function SingleFinanceWelcome() {
     const welcomeKey = user?.id ? `welcome_seen_${user.id}` : 'welcome_seen_current_user';
     localStorage.setItem(welcomeKey, 'true');
     
+    // Set up direct authentication for single finance manager to bypass auth issues
+    localStorage.setItem('directauth_user', JSON.stringify({
+      email: user?.email || 'finance@demo.com',
+      role: 'single_finance_manager',
+      dealershipId: 1,
+      name: user?.user_metadata?.full_name || 'Finance Manager'
+    }));
+    localStorage.setItem('directauth_timestamp', Date.now().toString());
+    
     // Navigate directly to dashboard - user is already authenticated if they're on welcome page
     navigate('/dashboard/single-finance');
   };
@@ -35,6 +44,15 @@ export default function SingleFinanceWelcome() {
     // Mark that this user has seen the welcome page (use a generic key if user.id not available yet)
     const welcomeKey = user?.id ? `welcome_seen_${user.id}` : 'welcome_seen_current_user';
     localStorage.setItem(welcomeKey, 'true');
+    
+    // Set up direct authentication for single finance manager to bypass auth issues
+    localStorage.setItem('directauth_user', JSON.stringify({
+      email: user?.email || 'finance@demo.com',
+      role: 'single_finance_manager',
+      dealershipId: 1,
+      name: user?.user_metadata?.full_name || 'Finance Manager'
+    }));
+    localStorage.setItem('directauth_timestamp', Date.now().toString());
     
     // Navigate directly to dashboard - user is already authenticated if they're on welcome page
     navigate('/dashboard/single-finance');
