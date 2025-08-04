@@ -982,6 +982,20 @@ function App() {
                         }
                       />
 
+                      {/* Single Finance Manager Deal Edit Route */}
+                      <Route
+                        path="/single-finance-deal-log/edit/:dealId"
+                        element={
+                          <ProtectedRoute
+                            requiredRoles={['finance_manager', 'single_finance_manager']}
+                          >
+                            <DashboardLayout>
+                              <LogSingleFinanceDeal />
+                            </DashboardLayout>
+                          </ProtectedRoute>
+                        }
+                      />
+
                       {/* Fallback - redirect to dashboard */}
                       <Route path="*" element={<RedirectLogger to="/dashboard" />} />
                     </Routes>
