@@ -10,7 +10,9 @@ import {
 } from 'react-router-dom';
 import { useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import SecurityHeadersManager from './lib/securityHeaders';
 import AuthPage from './pages/AuthPage';
+import StorageMigration from './lib/storageMigration';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import DashboardLayout from './components/layout/DashboardLayout';
 import { Toaster } from './components/ui/toaster';
@@ -565,6 +567,44 @@ function GroupAdminAccessCheck({ children }: { children: React.ReactNode }) {
 
 function App() {
   useEffect(() => {
+    // Initialize security features
+    const initializeSecurity = () => {
+      try {
+        // Set up CSP violation reporting
+        SecurityHeadersManager.setupCSPReporting();
+        
+        // Check secure context
+        if (!SecurityHeadersManager.isSecureContext() && process.env.NODE_ENV === 'production') {
+          console.warn('[Security] Application is not running in a secure context (HTTPS)');
+        }
+        
+        console.log('[Security] Security features initialized');
+      } catch (error) {
+        console.error('[Security] Failed to initialize security features:', error);
+      }
+    };
+
+    // Migrate sensitive data to encrypted storage on app load
+    const migrateStorageData = async () => {
+      try {
+        if (StorageMigration.needsMigration()) {
+          console.log('[App] Starting automatic storage migration...');
+          const result = await StorageMigration.migrateAllSensitiveData();
+          
+          if (result.success) {
+            console.log('[App] Storage migration completed successfully');
+          } else {
+            console.warn('[App] Storage migration completed with errors:', result.errors);
+          }
+        }
+      } catch (error) {
+        console.error('[App] Storage migration failed:', error);
+      }
+    };
+
+    // Initialize security first
+    initializeSecurity();
+
     // Add failsafe for group admin detection on app load
     const checkForAuthenticatedGroupAdmin = async () => {
       try {
@@ -619,6 +659,9 @@ function App() {
       typeof window !== 'undefined' && window.URLSearchParams
         ? new window.URLSearchParams(window.location.search)
         : null;
+    // Run migration first
+    migrateStorageData();
+    
     if (
       typeof window !== 'undefined' &&
       window.location.pathname !== '/logout' &&

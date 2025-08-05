@@ -9,6 +9,9 @@ import {
   isTestEmail,
 } from '../lib/supabaseClient';
 import SecureLogger from '../lib/secureLogger';
+import rateLimiter from '../lib/rateLimiter';
+import ServerRateLimiter from '../lib/serverRateLimiter';
+import KeyManagement from '../lib/keyManagement';
 import { Database } from '../lib/database.types';
 import { toast } from '../lib/use-toast';
 import { logSchemaOperation, testDealershipConnection } from '../lib/apiService';
@@ -624,9 +627,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Handle auth state changes (login/logout/session changes)
   const handleAuthStateChange = useCallback(
     async (session: Session | null) => {
-      console.log('[AuthContext] Auth state changed, session exists:', !!session, {
+      SecureLogger.info('[AuthContext] Auth state changed', {
+        hasSession: !!session,
         timestamp: new Date().toISOString(),
-        userId: session?.user?.id || 'none',
         event: 'auth_state_change',
       });
 
@@ -801,9 +804,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               setLoading(false);
               setAuthCheckComplete(true);
               setHasSession(true); // Direct auth counts as having a session
-              console.log('[AuthContext] Direct auth initialization completed with user data', {
-                email: directUser.email,
-                role: directUser.role,
+              SecureLogger.info('[AuthContext] Direct auth initialization completed', {
+                hasUser: !!directUser,
+                hasRole: !!directUser.role,
                 isGroupAdmin: directUser.isGroupAdmin,
               });
             }
@@ -859,8 +862,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Process initial session
         if (session?.user && mounted) {
-          console.log('[AuthContext] Found initial session for user:', session.user.email, {
-            userId: session.user.id,
+          SecureLogger.info('[AuthContext] Found initial session', {
+            hasUser: !!session.user,
             timestamp: new Date().toISOString(),
           });
 
@@ -1026,6 +1029,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Sign in with email and password
   const signIn = async (email: string, password: string, rememberMe?: boolean) => {
     try {
+      // Check server-side rate limiting first
+      const serverRateLimit = await ServerRateLimiter.enforceRateLimit('signIn', email);
+      if (!serverRateLimit.allowed) {
+        setError(new Error(serverRateLimit.message));
+        toast({
+          title: 'Rate Limited',
+          description: serverRateLimit.message,
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Also check client-side rate limiting as backup
+      const rateLimitCheck = rateLimiter.isLimited('signIn', email);
+      if (rateLimitCheck.limited) {
+        const waitTimeMinutes = Math.ceil((rateLimitCheck.retryAfterMs || 0) / 60000);
+        const errorMessage = `Too many sign in attempts. Please try again in ${waitTimeMinutes} minute${waitTimeMinutes !== 1 ? 's' : ''}.`;
+        
+        setError(new Error(errorMessage));
+        toast({
+          title: 'Rate Limited',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        return;
+      }
+
       logAuthEvent('Sign in attempt', {
         email,
         remember_me: !!rememberMe,
@@ -1035,9 +1065,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(true);
       setError(null);
 
-      console.log('[AuthContext] Signing in user:', email, {
+      SecureLogger.info('[AuthContext] User sign in attempt', {
         timestamp: new Date().toISOString(),
         rememberMe: !!rememberMe,
+        hasEmail: !!email,
       });
 
       // Check for demo user credentials first
@@ -1205,7 +1236,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('No user returned from authentication');
       }
 
-      console.log('[AuthContext] User authenticated successfully:', data.user.id);
+      SecureLogger.info('[AuthContext] User authenticated successfully');
+
+      // Record successful sign in attempt for rate limiting
+      rateLimiter.recordAttempt('signIn', true, email);
 
       // Update state with user data
       setUser(data.user);
@@ -1264,6 +1298,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ip_address: 'client-side', // Note: Real IP tracking should be done server-side
       });
 
+      // Record failed sign in attempt for rate limiting
+      rateLimiter.recordAttempt('signIn', false, email);
+
       setError(error instanceof Error ? error : new Error('Unknown error occurred during sign in'));
       showErrorToast(
         'Sign In Failed',
@@ -1281,6 +1318,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     if (!email || !password || !userData) {
+      return;
+    }
+
+    // Check server-side rate limiting first
+    const serverRateLimit = await ServerRateLimiter.enforceRateLimit('signUp', email);
+    if (!serverRateLimit.allowed) {
+      setError(new Error(serverRateLimit.message));
+      toast({
+        title: 'Rate Limited',
+        description: serverRateLimit.message,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Also check client-side rate limiting as backup
+    const rateLimitCheck = rateLimiter.isLimited('signUp', email);
+    if (rateLimitCheck.limited) {
+      const waitTimeMinutes = Math.ceil((rateLimitCheck.retryAfterMs || 0) / 60000);
+      const errorMessage = `Too many signup attempts. Please try again in ${waitTimeMinutes} minute${waitTimeMinutes !== 1 ? 's' : ''}.`;
+      
+      setError(new Error(errorMessage));
+      toast({
+        title: 'Rate Limited',
+        description: errorMessage,
+        variant: 'destructive',
+      });
       return;
     }
 
@@ -1302,6 +1366,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           code: error.name,
           timestamp: new Date().toISOString(),
         });
+        
+        // Record failed sign up attempt
+        rateLimiter.recordAttempt('signUp', false, email);
+        
         setError(error);
         showErrorToast('Sign up failed', error.message);
         return;
@@ -1349,6 +1417,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           userId: data.user.id,
           timestamp: new Date().toISOString(),
         });
+        
+        // Record successful sign up attempt
+        rateLimiter.recordAttempt('signUp', true, email);
+        
         showSuccessToast('Account created', 'Your account has been created successfully');
       }
     } catch (error) {
@@ -1379,6 +1451,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Clear session timeout timestamp
       localStorage.removeItem('session_login_time');
+      
+      // Clear encryption keys
+      KeyManagement.clearSessionKey();
 
       // Check if this is a demo user and clear demo session
       try {

@@ -15,7 +15,11 @@
     "test:build": "tsx src/buildTest.ts",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
     "preview": "vite preview",
-    "stop": "npx kill-port 5173 5174 5175 3001"
+    "stop": "npx kill-port 5173 5174 5175 3001",
+    "deploy:security": "node scripts/deploy-security.js",
+    "deploy:manual": "echo '📋 Manual deployment required. See DEPLOYMENT-GUIDE.md for instructions.' && echo '🎯 Dashboard: https://app.supabase.com/project/iugjtokydvbcvmrpeziv'",
+    "security:audit": "npm audit && npx audit-ci --config .audit-ci.json",
+    "security:validate": "node scripts/validate-security.js"
   },
   "keywords": [],
   "author": "",
@@ -51,13 +55,15 @@
     "@supabase/supabase-js": "^2.49.4",
     "@tanstack/react-query": "^5.74.11",
     "@tanstack/react-query-devtools": "^5.74.11",
+    "@types/crypto-js": "^4.2.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "crypto-js": "^4.2.0",
     "date-fns": "^3.6.0",
     "dotenv": "^17.2.0",
     "lucide-react": "^0.441.0",
     "next-themes": "^0.3.0",
-    "node-fetch": "^3.3.2",
+    "node-fetch": "^2.7.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
@@ -67,7 +73,7 @@
     "stripe": "^18.2.1",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.23.8"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",
