@@ -43,6 +43,11 @@ export default function SingleFinanceSettings() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'team' | 'pay'>('team');
+
+  // Helper function to get user ID consistently
+  const getUserId = () => {
+    return user?.id || user?.user?.id || user?.email;
+  };
   
   // Team management state
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
@@ -66,32 +71,64 @@ export default function SingleFinanceSettings() {
 
   // Load settings from localStorage on mount
   useEffect(() => {
-    if (!user?.id) return;
+    const userId = getUserId();
+    console.log('[Settings] Loading settings for user:', userId);
+    console.log('[Settings] Full user object:', user);
+    
+    if (!userId) {
+      console.log('[Settings] No userId, skipping load');
+      return;
+    }
+    
+    // Clear old format data to ensure clean state
+    SingleFinanceStorage.clearOldFormatData();
     
     try {
-      const savedTeamMembers = SingleFinanceStorage.getTeamMembers(user.id);
+      const storageKey = `singleFinanceTeamMembers_${userId}`;
+      const rawData = localStorage.getItem(storageKey);
+      console.log('[Settings] Raw localStorage data for key:', storageKey);
+      console.log('[Settings] Raw data:', rawData);
+      
+      const savedTeamMembers = SingleFinanceStorage.getTeamMembers(userId);
+      console.log('[Settings] Parsed team members:', savedTeamMembers);
+      console.log('[Settings] Team member count:', savedTeamMembers.length);
+      
       setTeamMembers(savedTeamMembers);
 
-      const savedPayConfig = SingleFinanceStorage.getPayConfig(user.id);
+      const savedPayConfig = SingleFinanceStorage.getPayConfig(userId);
       if (savedPayConfig) {
         setPayConfig(savedPayConfig);
       }
     } catch (error) {
       console.error('Error loading settings:', error);
     }
-  }, [user?.id]);
+  }, [user]);
 
   // Save team members to localStorage
   const saveTeamMembers = (members: TeamMember[]) => {
-    if (!user?.id) return;
+    const userId = getUserId();
+    console.log('[Settings] saveTeamMembers called with:', { userId, memberCount: members.length, members });
+    
+    if (!userId) {
+      console.error('[Settings] No userId found, cannot save team members');
+      return;
+    }
     
     try {
-      SingleFinanceStorage.setTeamMembers(user.id, members);
+      const storageKey = `singleFinanceTeamMembers_${userId}`;
+      console.log('[Settings] Saving to localStorage key:', storageKey);
+      
+      SingleFinanceStorage.setTeamMembers(userId, members);
+      
+      // Verify it was saved
+      const savedData = localStorage.getItem(storageKey);
+      console.log('[Settings] Verification - data saved to localStorage:', savedData);
+      
       setTeamMembers(members);
       
       // Dispatch custom event to notify other components
       window.dispatchEvent(new CustomEvent('teamMembersUpdated', { 
-        detail: { teamMembers: members, userId: user.id } 
+        detail: { teamMembers: members, userId: userId } 
       }));
       
       console.log('[Settings] Team members updated and event dispatched:', members.length, 'members');
@@ -107,10 +144,11 @@ export default function SingleFinanceSettings() {
 
   // Save pay configuration to localStorage
   const savePayConfig = (config: PayConfig) => {
-    if (!user?.id) return;
+    const userId = getUserId();
+    if (!userId) return;
     
     try {
-      SingleFinanceStorage.setPayConfig(user.id, config);
+      SingleFinanceStorage.setPayConfig(userId, config);
       setPayConfig(config);
       toast({
         title: 'Success',
@@ -128,7 +166,13 @@ export default function SingleFinanceSettings() {
 
   // Add new team member
   const handleAddTeamMember = () => {
+    const userId = getUserId();
+    console.log('[Settings] Add team member clicked:', { newMember, userId });
+    console.log('[Settings] Full user object:', user);
+    console.log('[Settings] Storage key will be:', `singleFinanceTeamMembers_${userId}`);
+    
     if (!newMember.firstName || !newMember.lastName) {
+      console.log('[Settings] Validation failed - missing name fields');
       toast({
         title: 'Validation Error',
         description: 'First name and last name are required',
@@ -149,6 +193,7 @@ export default function SingleFinanceSettings() {
     };
 
     const updatedMembers = [...teamMembers, member];
+    console.log('[Settings] About to save team members:', updatedMembers);
     saveTeamMembers(updatedMembers);
     
     // Reset form
@@ -158,6 +203,7 @@ export default function SingleFinanceSettings() {
       role: 'salesperson'
     });
 
+    console.log('[Settings] Team member added successfully:', member);
     toast({
       title: 'Success',
       description: `${member.firstName} ${member.lastName} added to team`
@@ -283,60 +329,126 @@ export default function SingleFinanceSettings() {
             </CardContent>
           </Card>
 
-          {/* Team Members List */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Users className="mr-2 h-5 w-5" />
-                Team Members ({teamMembers.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {teamMembers.length === 0 ? (
+          {/* Team Members List - Separated by Role */}
+          {teamMembers.length === 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Users className="mr-2 h-5 w-5" />
+                  Team Members (0)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
                 <p className="text-gray-500 text-center py-8">
                   No team members added yet. Add your first team member above.
                 </p>
-              ) : (
-                <div className="space-y-3">
-                  {teamMembers.map((member) => (
-                    <div
-                      key={member.id}
-                      className="flex items-center justify-between p-3 border rounded-lg bg-gray-50"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className="bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-medium">
-                          {member.initials}
-                        </div>
-                        <div>
-                          <p className="font-medium">{member.firstName} {member.lastName}</p>
-                          <p className="text-sm text-gray-600 capitalize">{member.role.replace('_', ' ')}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => handleToggleActive(member.id)}
-                          className={`px-3 py-1 rounded text-sm font-medium ${
-                            member.active
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-600'
-                          }`}
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-6">
+              {/* Salespeople Section */}
+              {teamMembers.filter(member => member.role === 'salesperson').length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Users className="mr-2 h-5 w-5" />
+                      Salespeople ({teamMembers.filter(member => member.role === 'salesperson').length})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {teamMembers.filter(member => member.role === 'salesperson').map((member) => (
+                        <div
+                          key={member.id}
+                          className="flex items-center justify-between p-3 border rounded-lg bg-blue-50"
                         >
-                          {member.active ? 'Active' : 'Inactive'}
-                        </button>
-                        <Button
-                          onClick={() => handleRemoveTeamMember(member.id)}
-                          variant="destructive"
-                          size="sm"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+                          <div className="flex items-center space-x-3">
+                            <div className="bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-medium">
+                              {member.initials}
+                            </div>
+                            <div>
+                              <p className="font-medium">{member.firstName} {member.lastName}</p>
+                              <p className="text-sm text-blue-600">Salesperson</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => handleToggleActive(member.id)}
+                              className={`px-3 py-1 rounded text-sm font-medium ${
+                                member.active
+                                  ? 'bg-green-100 text-green-800'
+                                  : 'bg-gray-100 text-gray-600'
+                              }`}
+                            >
+                              {member.active ? 'Active' : 'Inactive'}
+                            </button>
+                            <Button
+                              onClick={() => handleRemoveTeamMember(member.id)}
+                              variant="destructive"
+                              size="sm"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </CardContent>
+                </Card>
               )}
-            </CardContent>
-          </Card>
+
+              {/* Sales Managers Section */}
+              {teamMembers.filter(member => member.role === 'sales_manager').length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Users className="mr-2 h-5 w-5" />
+                      Sales Managers ({teamMembers.filter(member => member.role === 'sales_manager').length})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {teamMembers.filter(member => member.role === 'sales_manager').map((member) => (
+                        <div
+                          key={member.id}
+                          className="flex items-center justify-between p-3 border rounded-lg bg-purple-50"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="bg-purple-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-medium">
+                              {member.initials}
+                            </div>
+                            <div>
+                              <p className="font-medium">{member.firstName} {member.lastName}</p>
+                              <p className="text-sm text-purple-600">Sales Manager</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => handleToggleActive(member.id)}
+                              className={`px-3 py-1 rounded text-sm font-medium ${
+                                member.active
+                                  ? 'bg-green-100 text-green-800'
+                                  : 'bg-gray-100 text-gray-600'
+                              }`}
+                            >
+                              {member.active ? 'Active' : 'Inactive'}
+                            </button>
+                            <Button
+                              onClick={() => handleRemoveTeamMember(member.id)}
+                              variant="destructive"
+                              size="sm"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
         </div>
       )}
 

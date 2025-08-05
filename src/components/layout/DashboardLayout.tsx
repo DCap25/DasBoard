@@ -56,7 +56,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Th
 
           <nav className="space-y-1">
             {/* Role-specific navigation */}
-            {userRole === 'single_finance_manager' ? (
+            {(userRole === 'single_finance_manager' || 
+              (userRole === 'finance_manager' && location.pathname.startsWith('/dashboard/single-finance'))) ? (
               <>
                 {/* Single Finance Manager Navigation */}
                 <Link to="/dashboard/single-finance">

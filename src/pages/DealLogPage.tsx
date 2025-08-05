@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { SingleFinanceStorage } from '../lib/singleFinanceStorage';
 import {
   Car,
   Hash,
@@ -105,6 +107,35 @@ interface DealLogPageProps {
 
 const DealLogPage: React.FC<DealLogPageProps> = ({ dashboardType = 'finance' }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  // Team members state for Single Finance Manager
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  
+  // Helper function to get user ID consistently
+  const getUserId = () => {
+    return user?.id || user?.user?.id || user?.email;
+  };
+
+  // Load team members for Single Finance Manager
+  const loadTeamMembers = () => {
+    if (dashboardType === 'single-finance') {
+      const userId = getUserId();
+      if (userId) {
+        try {
+          // Clear old format data first
+          SingleFinanceStorage.clearOldFormatData();
+          
+          const savedTeamMembers = SingleFinanceStorage.getTeamMembers(userId);
+          console.log('[DealLogPage] Loaded team members for single-finance:', savedTeamMembers);
+          setTeamMembers(savedTeamMembers);
+        } catch (error) {
+          console.error('Error loading team members:', error);
+          setTeamMembers([]);
+        }
+      }
+    }
+  };
   const [formData, setFormData] = useState<DealLogFormData>({
     dealNumber: '',
     stockNumber: '',
@@ -131,6 +162,23 @@ const DealLogPage: React.FC<DealLogPageProps> = ({ dashboardType = 'finance' }) 
     outsideFunding: false,
     dealDate: new Date().toISOString().split('T')[0],
   });
+
+  // Load team members on component mount and when user changes
+  useEffect(() => {
+    loadTeamMembers();
+    
+    // Listen for team member updates from Settings page
+    const handleTeamMembersUpdated = () => {
+      console.log('[DealLogPage] Team members updated event received');
+      loadTeamMembers();
+    };
+
+    window.addEventListener('teamMembersUpdated', handleTeamMembersUpdated);
+    
+    return () => {
+      window.removeEventListener('teamMembersUpdated', handleTeamMembersUpdated);
+    };
+  }, [user, dashboardType]);
 
   const handleBackToDashboard = () => {
     if (dashboardType === 'single-finance') {
@@ -359,14 +407,25 @@ const DealLogPage: React.FC<DealLogPageProps> = ({ dashboardType = 'finance' }) 
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center">
-          <button
-            type="button"
-            onClick={handleBackToDashboard}
-            className="mr-4 flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-500 border border-blue-500 rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={handleBackToDashboard}
+              className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-500 border border-blue-500 rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Dashboard
+            </button>
+            {dashboardType === 'single-finance' && (
+              <button
+                type="button"
+                onClick={loadTeamMembers}
+                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-green-500 border border-green-500 rounded-md shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                Refresh Team ({teamMembers.length})
+              </button>
+            )}
+          </div>
           <h1 className="text-2xl font-bold text-gray-900">Log New Deal</h1>
         </div>
       </div>
@@ -572,7 +631,10 @@ const DealLogPage: React.FC<DealLogPageProps> = ({ dashboardType = 'finance' }) 
                       className="w-full h-10 px-4 rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base"
                     >
                       <option value="">Select</option>
-                      {SALESPEOPLE.map(person => (
+                      {(dashboardType === 'single-finance' ? 
+                        teamMembers.filter(member => member.role === 'salesperson' && member.active) : 
+                        SALESPEOPLE
+                      ).map(person => (
                         <option key={person.id} value={person.id}>
                           {person.firstName} {person.lastName}
                         </option>
@@ -590,7 +652,10 @@ const DealLogPage: React.FC<DealLogPageProps> = ({ dashboardType = 'finance' }) 
                       className="w-full h-10 px-2 text-sm rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     >
                       <option value="">Select Primary</option>
-                      {SALESPEOPLE.map(person => (
+                      {(dashboardType === 'single-finance' ? 
+                        teamMembers.filter(member => member.role === 'salesperson' && member.active) : 
+                        SALESPEOPLE
+                      ).map(person => (
                         <option key={person.id} value={person.id}>
                           {person.firstName} {person.lastName}
                         </option>
@@ -605,7 +670,10 @@ const DealLogPage: React.FC<DealLogPageProps> = ({ dashboardType = 'finance' }) 
                       className="w-full h-10 px-2 text-sm rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     >
                       <option value="">Select Secondary</option>
-                      {SALESPEOPLE.filter(p => p.id.toString() !== formData.salespersonId).map(
+                      {(dashboardType === 'single-finance' ? 
+                        teamMembers.filter(member => member.role === 'salesperson' && member.active && member.id !== formData.salespersonId) : 
+                        SALESPEOPLE.filter(p => p.id.toString() !== formData.salespersonId)
+                      ).map(
                         person => (
                           <option key={person.id} value={person.id}>
                             {person.firstName} {person.lastName}
@@ -703,7 +771,10 @@ const DealLogPage: React.FC<DealLogPageProps> = ({ dashboardType = 'finance' }) 
                   className="w-full h-10 px-4 rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base"
                 >
                   <option value="">Select</option>
-                  {SALESPEOPLE.map(person => (
+                  {(dashboardType === 'single-finance' ? 
+                    teamMembers.filter(member => member.role === 'sales_manager' && member.active) : 
+                    SALESPEOPLE
+                  ).map(person => (
                     <option key={person.id} value={person.id}>
                       {person.firstName} {person.lastName}
                     </option>

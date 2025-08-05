@@ -68,6 +68,11 @@ export default function LogSingleFinanceDeal() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { dealId } = useParams();
+
+  // Helper function to get user ID consistently
+  const getUserId = () => {
+    return user?.id || user?.user?.id || user?.email;
+  };
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [originalDeal, setOriginalDeal] = useState<any>(null);
@@ -167,6 +172,9 @@ export default function LogSingleFinanceDeal() {
   useEffect(() => {
     console.log('[LogSingleFinanceDeal] Component mounted');
     
+    // Clear old format data on first load to ensure clean state
+    SingleFinanceStorage.clearOldFormatData();
+    
     // Load team members from localStorage
     loadTeamMembers();
     
@@ -179,17 +187,22 @@ export default function LogSingleFinanceDeal() {
     // Listen for team member updates from Settings page
     const handleTeamMembersUpdated = (e: any) => {
       console.log('[LogSingleFinanceDeal] Team members updated event received:', e.detail);
+      console.log('[LogSingleFinanceDeal] Event user ID:', e.detail?.userId);
+      console.log('[LogSingleFinanceDeal] Current user ID:', getUserId());
       loadTeamMembers(); // Reload team members from localStorage
     };
 
     // Listen for storage changes (fallback for cross-tab updates)
     const handleStorageChange = (e: StorageEvent) => {
-      if (user?.id && e.key === `singleFinanceTeamMembers_${user.id}`) {
+      const userId = getUserId();
+      console.log('[LogSingleFinanceDeal] Storage change event:', e.key);
+      if (userId && e.key === `singleFinanceTeamMembers_${userId}`) {
         console.log('[LogSingleFinanceDeal] Team members storage changed, reloading');
         loadTeamMembers();
       }
     };
 
+    console.log('[LogSingleFinanceDeal] Setting up event listeners');
     window.addEventListener('teamMembersUpdated', handleTeamMembersUpdated);
     window.addEventListener('storage', handleStorageChange);
 
@@ -201,10 +214,32 @@ export default function LogSingleFinanceDeal() {
 
   // Load team members from localStorage
   const loadTeamMembers = () => {
-    if (!user?.id) return;
+    const userId = getUserId();
+    console.log('[LogDeal] Loading team members for user:', userId);
+    console.log('[LogDeal] Full user object:', user);
+    
+    if (!userId) {
+      console.log('[LogDeal] No user ID, cannot load team members');
+      return;
+    }
     
     try {
-      const savedTeamMembers = SingleFinanceStorage.getTeamMembers(user.id);
+      // Check what's actually in localStorage for this user
+      const storageKey = `singleFinanceTeamMembers_${userId}`;
+      const rawData = localStorage.getItem(storageKey);
+      console.log('[LogDeal] Raw localStorage data for key:', storageKey);
+      console.log('[LogDeal] Raw data:', rawData);
+      
+      const savedTeamMembers = SingleFinanceStorage.getTeamMembers(userId);
+      console.log('[LogDeal] Parsed team members:', savedTeamMembers);
+      console.log('[LogDeal] Team members count:', savedTeamMembers.length);
+      
+      if (savedTeamMembers.length > 0) {
+        savedTeamMembers.forEach((member, idx) => {
+          console.log(`[LogDeal] Member ${idx}:`, member.firstName, member.lastName, member.role, member.active);
+        });
+      }
+      
       setTeamMembers(savedTeamMembers);
     } catch (error) {
       console.error('Error loading team members:', error);
@@ -213,10 +248,11 @@ export default function LogSingleFinanceDeal() {
 
   // Save team members to localStorage
   const saveTeamMembers = (members: TeamMember[]) => {
-    if (!user?.id) return;
+    const userId = getUserId();
+    if (!userId) return;
     
     try {
-      SingleFinanceStorage.setTeamMembers(user.id, members);
+      SingleFinanceStorage.setTeamMembers(userId, members);
       setTeamMembers(members);
     } catch (error) {
       console.error('Error saving team members:', error);
@@ -287,10 +323,11 @@ export default function LogSingleFinanceDeal() {
 
   // Load existing deal data for editing
   const loadDealForEdit = (dealIdToEdit: string) => {
-    if (!user?.id) return;
+    const userId = getUserId();
+    if (!userId) return;
     
     try {
-      const existingDeals = SingleFinanceStorage.getDeals(user.id);
+      const existingDeals = SingleFinanceStorage.getDeals(userId);
       
       const dealToEdit = existingDeals.find((deal: any) => deal.id === dealIdToEdit);
       
@@ -525,12 +562,13 @@ export default function LogSingleFinanceDeal() {
       };
 
       // Save to user-specific localStorage key for Single Finance Dashboard
-      if (!user?.id) {
+      const userId = getUserId();
+      if (!userId) {
         throw new Error('User ID is required');
       }
       
       try {
-        const existingDeals = SingleFinanceStorage.getDeals(user.id);
+        const existingDeals = SingleFinanceStorage.getDeals(userId);
         
         let updatedDeals;
         if (isEditMode) {
@@ -545,7 +583,7 @@ export default function LogSingleFinanceDeal() {
           console.log('[LogSingleFinanceDeal] Deal saved to singleFinanceDeals storage:', dealData);
         }
         
-        SingleFinanceStorage.setDeals(user.id, updatedDeals);
+        SingleFinanceStorage.setDeals(userId, updatedDeals);
         
         // Dispatch custom event to notify dashboard of data change
         window.dispatchEvent(new CustomEvent('singleFinanceDealsUpdated', { 
@@ -581,13 +619,22 @@ export default function LogSingleFinanceDeal() {
         <h1 className="text-2xl font-bold">
           {isEditMode ? 'Edit Deal - Single Finance Dashboard' : 'Log New Deal - Single Finance Dashboard'}
         </h1>
-        <Button
-          onClick={() => navigate('/dashboard/single-finance')}
-          className="flex items-center bg-blue-500 text-white hover:bg-blue-600"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Dashboard
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            onClick={loadTeamMembers}
+            className="flex items-center bg-green-500 text-white hover:bg-green-600"
+          >
+            Refresh Team Members ({teamMembers.length})
+          </Button>
+          <Button
+            onClick={() => navigate('/dashboard/single-finance')}
+            className="flex items-center bg-blue-500 text-white hover:bg-blue-600"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Dashboard
+          </Button>
+        </div>
       </div>
 
       <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">

@@ -567,7 +567,7 @@ export const SingleFinanceHomePage: React.FC = () => {
   };
 
   return (
-    <div className="w-full px-2 py-2">
+    <div className="w-full px-2 pt-0 pb-2">
       {/* Promotional Banner */}
       {showPromoBanner && (
         <div className="mb-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-lg shadow-sm relative">
@@ -609,14 +609,14 @@ export const SingleFinanceHomePage: React.FC = () => {
       )}
 
       {/* Page Header */}
-      <div className="flex justify-end items-center mb-1">
+      <div className="flex justify-end items-center mb-0">
         <div className="space-x-2">
           <DropdownMenu>{/* ... existing dropdown menu code ... */}</DropdownMenu>
         </div>
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-2">
         <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-base font-semibold text-slate-700">F&I Gross</CardTitle>

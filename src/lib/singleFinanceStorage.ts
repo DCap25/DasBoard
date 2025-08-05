@@ -143,4 +143,50 @@ export class SingleFinanceStorage {
     });
     console.log(`Cleared ${userKeys.length} localStorage keys for user ${userId}`);
   }
+
+  // Clear old format localStorage keys that might have sample data
+  static clearOldFormatData(): void {
+    const oldKeys = [
+      'singleFinanceTeamMembers',  // Old format without user ID
+      'teamMembers',               // Generic team members  
+      'salespeople',               // Old salespeople data
+      'salesManagers',             // Old sales managers data
+      'sampleTeamMembers',         // Any sample data
+      'defaultTeamMembers'         // Any default data
+    ];
+
+    let clearedCount = 0;
+    oldKeys.forEach(key => {
+      if (localStorage.getItem(key)) {
+        localStorage.removeItem(key);
+        clearedCount++;
+        console.log(`[Storage] Cleared old format key: ${key}`);
+      }
+    });
+
+    // Also check for any keys that might contain sample names
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (key) {
+        try {
+          const value = localStorage.getItem(key);
+          if (value) {
+            // Check if it's team member data with sample names
+            if (value.includes('John') || value.includes('Jane') || value.includes('Mike') || value.includes('Sarah')) {
+              const parsed = JSON.parse(value);
+              if (Array.isArray(parsed) && parsed.some((item: any) => item.firstName && item.lastName)) {
+                localStorage.removeItem(key);
+                clearedCount++;
+                console.log(`[Storage] Cleared sample data from key: ${key}`);
+              }
+            }
+          }
+        } catch (e) {
+          // Not JSON, skip
+        }
+      }
+    }
+
+    console.log(`[Storage] Cleared ${clearedCount} old format/sample data keys`);
+  }
 }
