@@ -64,10 +64,23 @@ const GroupAdminBypass: React.FC = () => {
       // Wait a moment to ensure logout is complete
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Now login with the test group admin credentials
+      // SECURITY FIX: Only allow in development mode
+      if (process.env.NODE_ENV !== 'development') {
+        throw new Error('This bypass is only available in development mode');
+      }
+
+      // Use environment variables for test credentials
+      const testEmail = import.meta.env.VITE_TEST_ADMIN_EMAIL;
+      const testPassword = import.meta.env.VITE_TEST_ADMIN_PASSWORD;
+
+      if (!testEmail || !testPassword) {
+        throw new Error('Test credentials not configured. Please set VITE_TEST_ADMIN_EMAIL and VITE_TEST_ADMIN_PASSWORD in your .env file');
+      }
+
+      // Now login with the test group admin credentials from environment
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: 'group1.admin@exampletest.com',
-        password: 'password123', // Replace with the actual test password
+        email: testEmail,
+        password: testPassword,
       });
 
       if (error) {

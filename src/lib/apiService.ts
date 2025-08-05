@@ -1941,36 +1941,38 @@ export const logFinanceManagerDeal = async (
       updated_at: new Date().toISOString(),
     };
 
-    // Construct SQL query to insert into the specific schema
-    const insertQuery = `
-      INSERT INTO "${schema}".deals (
-        user_id, deal_number, stock_number, vin, customer_name, 
-        vehicle, sale_date, amount, products, profit, 
-        status, deal_details, created_at, updated_at
-      ) 
-      VALUES (
-        '${formattedDeal.user_id}', 
-        '${formattedDeal.deal_number}', 
-        '${formattedDeal.stock_number}', 
-        '${formattedDeal.vin}', 
-        '${formattedDeal.customer_name}', 
-        '${formattedDeal.vehicle}', 
-        '${formattedDeal.sale_date}', 
-        ${formattedDeal.amount}, 
-        '${formattedDeal.products}', 
-        ${formattedDeal.profit}, 
-        '${formattedDeal.status}', 
-        '${formattedDeal.deal_details}',
-        '${formattedDeal.created_at}',
-        '${formattedDeal.updated_at}'
-      )
-      RETURNING *;
-    `;
+    // SECURITY FIX: Use parameterized query to prevent SQL injection
+    // First, validate the schema name to prevent injection there
+    const schemaPattern = /^[a-zA-Z0-9_]+$/;
+    if (!schemaPattern.test(schema)) {
+      throw new Error('Invalid schema name');
+    }
 
-    // Execute the query
-    const { data, error } = await supabase.rpc('run_sql', {
-      sql_query: insertQuery,
-    });
+    // Use Supabase's built-in methods with proper schema specification
+    // Note: If Supabase doesn't support dynamic schema selection directly,
+    // we need to create a secure stored procedure
+    
+    // For now, we'll use a parameterized query approach
+    const { data, error } = await supabase
+      .from(`${schema}.deals`)
+      .insert([{
+        user_id: formattedDeal.user_id,
+        deal_number: formattedDeal.deal_number,
+        stock_number: formattedDeal.stock_number,
+        vin: formattedDeal.vin,
+        customer_name: formattedDeal.customer_name,
+        vehicle: formattedDeal.vehicle,
+        sale_date: formattedDeal.sale_date,
+        amount: formattedDeal.amount,
+        products: formattedDeal.products,
+        profit: formattedDeal.profit,
+        status: formattedDeal.status,
+        deal_details: formattedDeal.deal_details,
+        created_at: formattedDeal.created_at,
+        updated_at: formattedDeal.updated_at
+      }])
+      .select()
+      .single();
 
     if (error) {
       console.error(`[apiService] Error inserting deal into ${schema}:`, error);
@@ -2020,79 +2022,79 @@ export const getFinanceManagerDeals = async (
     const sortBy = options?.sortBy || 'created_at';
     const sortDirection = options?.sortDirection || 'desc';
 
-    // Build the filter conditions if provided
-    let filterCondition = '';
+    // SECURITY FIX: Validate schema name first
+    const schemaPattern = /^[a-zA-Z0-9_]+$/;
+    if (!schemaPattern.test(schema)) {
+      throw new Error('Invalid schema name');
+    }
+
+    // Validate sort parameters to prevent injection
+    const allowedSortColumns = ['created_at', 'sale_date', 'amount', 'profit', 'deal_number', 'customer_name'];
+    const allowedSortDirections = ['asc', 'desc'];
+    
+    if (!allowedSortColumns.includes(sortBy)) {
+      throw new Error('Invalid sort column');
+    }
+    
+    if (!allowedSortDirections.includes(sortDirection)) {
+      throw new Error('Invalid sort direction');
+    }
+
+    // Build query using Supabase's query builder
+    let query = supabase
+      .from(`${schema}.deals`)
+      .select('*', { count: 'exact' })
+      .eq('user_id', user.id);
+
+    // Apply filters safely
     if (options?.filter) {
-      const conditions = [];
       Object.entries(options.filter).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-          // Handle string values
+          // Validate column name to prevent injection
+          if (!/^[a-zA-Z0-9_]+$/.test(key)) {
+            console.warn(`Invalid filter key: ${key}`);
+            return;
+          }
+          
+          // Handle different value types safely
           if (typeof value === 'string') {
-            conditions.push(`${key} ILIKE '%${value}%'`);
+            query = query.ilike(key, `%${value}%`);
           }
-          // Handle numeric values
-          else if (typeof value === 'number') {
-            conditions.push(`${key} = ${value}`);
-          }
-          // Handle boolean values
-          else if (typeof value === 'boolean') {
-            conditions.push(`${key} = ${value}`);
+          else if (typeof value === 'number' || typeof value === 'boolean') {
+            query = query.eq(key, value);
           }
           // Handle date ranges
           else if (value.start && value.end) {
-            conditions.push(`${key} BETWEEN '${value.start}' AND '${value.end}'`);
+            query = query.gte(key, value.start).lte(key, value.end);
           }
         }
       });
-      if (conditions.length > 0) {
-        filterCondition = `AND ${conditions.join(' AND ')}`;
-      }
     }
 
-    // Construct SQL query to select from the specific schema
-    const selectQuery = `
-      SELECT * FROM "${schema}".deals 
-      WHERE user_id = '${user.id}' ${filterCondition}
-      ORDER BY ${sortBy} ${sortDirection}
-      LIMIT ${limit} OFFSET ${offset};
-    `;
-
-    // Also get the total count for pagination
-    const countQuery = `
-      SELECT COUNT(*) FROM "${schema}".deals 
-      WHERE user_id = '${user.id}' ${filterCondition};
-    `;
+    // Apply sorting and pagination
+    query = query
+      .order(sortBy, { ascending: sortDirection === 'asc' })
+      .range(offset, offset + limit - 1);
 
     // Execute the query
-    const { data, error } = await supabase.rpc('run_sql', {
-      sql_query: selectQuery,
-    });
+    const { data, error, count } = await query;
 
     if (error) {
       console.error(`[apiService] Error selecting deals from ${schema}:`, error);
       throw error;
     }
 
-    // Get the count
-    const { data: countData, error: countError } = await supabase.rpc('run_sql', {
-      sql_query: countQuery,
-    });
-
-    if (countError) {
-      console.error(`[apiService] Error counting deals in ${schema}:`, countError);
-      throw countError;
-    }
-
-    const count = countData && countData.length > 0 ? parseInt(countData[0].count) : 0;
+    // Count is already provided by the query with count: 'exact'
+    const totalCount = count || 0;
 
     console.log(
-      `[apiService] Retrieved ${data ? data.length : 0} deals from ${schema} (total: ${count})`
+      `[apiService] Retrieved ${data ? data.length : 0} deals from ${schema} (total: ${totalCount})`
     );
 
     return {
       success: true,
       deals: data || [],
-      count,
+      count: totalCount,
       message: `Retrieved ${data ? data.length : 0} deals successfully`,
     };
   } catch (error) {

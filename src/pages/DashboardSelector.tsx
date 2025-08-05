@@ -130,11 +130,19 @@ const DashboardSelector: React.FC = () => {
       // Use window.sessionStorage to fix linter error
       window.sessionStorage.clear();
 
+      // SECURITY FIX: Only allow in development mode
+      if (process.env.NODE_ENV !== 'development') {
+        throw new Error('Demo mode is only available in development');
+      }
+
+      // Use environment variable for test password
+      const testPassword = import.meta.env.VITE_TEST_USER_PASSWORD || 'defaultTestPassword123';
+
       // 2. Login with the test account for this role - with better error handling
       console.log(`[DashboardSelector] Signing in as ${dashboard.email}...`);
       const { data, error } = await supabase.auth.signInWithPassword({
         email: dashboard.email,
-        password: 'test123', // Default test password
+        password: testPassword,
       });
 
       if (error) {

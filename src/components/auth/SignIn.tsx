@@ -11,13 +11,13 @@ export default function SignIn() {
     await signIn(email, password);
   };
 
-  // Preset test users for easy access
-  const testUsers = [
-    { email: 'testfni@example.com', password: 'password', role: 'F&I' },
-    { email: 'testsales@example.com', password: 'password', role: 'Sales Manager' },
-    { email: 'testgm@example.com', password: 'password', role: 'General Manager' },
-    { email: 'testadmin@example.com', password: 'password', role: 'Admin' },
-  ];
+  // SECURITY FIX: Test users only in development mode
+  const testUsers = process.env.NODE_ENV === 'development' ? [
+    { email: 'testfni@example.com', password: import.meta.env.VITE_TEST_USER_PASSWORD || '', role: 'F&I' },
+    { email: 'testsales@example.com', password: import.meta.env.VITE_TEST_USER_PASSWORD || '', role: 'Sales Manager' },
+    { email: 'testgm@example.com', password: import.meta.env.VITE_TEST_USER_PASSWORD || '', role: 'General Manager' },
+    { email: 'testadmin@example.com', password: import.meta.env.VITE_TEST_USER_PASSWORD || '', role: 'Admin' },
+  ] : [];
 
   const selectTestUser = (email: string, password: string) => {
     setEmail(email);

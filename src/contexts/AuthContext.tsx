@@ -8,6 +8,7 @@ import {
   loginTestUser,
   isTestEmail,
 } from '../lib/supabaseClient';
+import SecureLogger from '../lib/secureLogger';
 import { Database } from '../lib/database.types';
 import { toast } from '../lib/use-toast';
 import { logSchemaOperation, testDealershipConnection } from '../lib/apiService';
@@ -636,7 +637,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (session?.user) {
           // Set user immediately to ensure we have user data regardless of profile operations
           setUser(session.user);
-          console.log('[AuthContext] User set from session:', session.user.email, {
+          SecureLogger.auth('User authenticated from session', {
+            email: session.user.email,
             userId: session.user.id,
             timestamp: new Date().toISOString(),
           });
