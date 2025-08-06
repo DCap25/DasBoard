@@ -8,6 +8,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../contexts/TranslationContext';
 import LanguageSwitcher from '../LanguageSwitcher';
+import CSRFProtection from '../../lib/csrfProtection';
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -27,6 +28,13 @@ export default function LoginForm() {
 
     if (!email || !password) {
       setError('Please enter both email and password');
+      return;
+    }
+
+    // CSRF Protection
+    const formData = new FormData(e.target as HTMLFormElement);
+    if (!CSRFProtection.validateFromRequest(formData)) {
+      setError('Security validation failed. Please refresh the page and try again.');
       return;
     }
 
@@ -166,6 +174,9 @@ export default function LoginForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* CSRF Protection */}
+        <input type="hidden" name="csrf_token" value={CSRFProtection.getToken()} />
+        
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <Input

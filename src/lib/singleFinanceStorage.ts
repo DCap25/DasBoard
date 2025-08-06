@@ -1,17 +1,18 @@
-// User-specific localStorage utility for Single Finance Manager
-// This ensures each user's data is isolated and doesn't conflict with other users
+// User-specific encrypted localStorage utility for Single Finance Manager
+// This ensures each user's data is isolated, encrypted, and doesn't conflict with other users
+
+import EncryptedStorage from './encryptedStorage';
 
 export class SingleFinanceStorage {
   private static getUserKey(baseKey: string, userId: string): string {
     return `${baseKey}_${userId}`;
   }
 
-  // Team Members
+  // Team Members (Encrypted)
   static getTeamMembers(userId: string): any[] {
     try {
       const key = this.getUserKey('singleFinanceTeamMembers', userId);
-      const data = localStorage.getItem(key);
-      return data ? JSON.parse(data) : [];
+      return EncryptedStorage.getItem(key, []);
     } catch (error) {
       console.error('Error loading team members:', error);
       return [];
@@ -21,18 +22,17 @@ export class SingleFinanceStorage {
   static setTeamMembers(userId: string, teamMembers: any[]): void {
     try {
       const key = this.getUserKey('singleFinanceTeamMembers', userId);
-      localStorage.setItem(key, JSON.stringify(teamMembers));
+      EncryptedStorage.setItem(key, teamMembers);
     } catch (error) {
       console.error('Error saving team members:', error);
     }
   }
 
-  // Deals
+  // Deals (Encrypted)
   static getDeals(userId: string): any[] {
     try {
       const key = this.getUserKey('singleFinanceDeals', userId);
-      const data = localStorage.getItem(key);
-      return data ? JSON.parse(data) : [];
+      return EncryptedStorage.getItem(key, []);
     } catch (error) {
       console.error('Error loading deals:', error);
       return [];
@@ -42,18 +42,17 @@ export class SingleFinanceStorage {
   static setDeals(userId: string, deals: any[]): void {
     try {
       const key = this.getUserKey('singleFinanceDeals', userId);
-      localStorage.setItem(key, JSON.stringify(deals));
+      EncryptedStorage.setItem(key, deals);
     } catch (error) {
       console.error('Error saving deals:', error);
     }
   }
 
-  // Pay Configuration
+  // Pay Configuration (Encrypted)
   static getPayConfig(userId: string): any | null {
     try {
       const key = this.getUserKey('singleFinancePayConfig', userId);
-      const data = localStorage.getItem(key);
-      return data ? JSON.parse(data) : null;
+      return EncryptedStorage.getItem(key, null);
     } catch (error) {
       console.error('Error loading pay config:', error);
       return null;
@@ -63,7 +62,7 @@ export class SingleFinanceStorage {
   static setPayConfig(userId: string, payConfig: any): void {
     try {
       const key = this.getUserKey('singleFinancePayConfig', userId);
-      localStorage.setItem(key, JSON.stringify(payConfig));
+      EncryptedStorage.setItem(key, payConfig);
     } catch (error) {
       console.error('Error saving pay config:', error);
     }
@@ -114,12 +113,11 @@ export class SingleFinanceStorage {
     return keys;
   }
 
-  // Pay Privacy State
+  // Pay Privacy State (Encrypted)
   static getPayPrivacyState(userId: string): boolean {
     try {
       const key = this.getUserKey('singleFinancePayPrivacy', userId);
-      const data = localStorage.getItem(key);
-      return data ? JSON.parse(data) : false; // Default to hidden for privacy
+      return EncryptedStorage.getItem(key, false); // Default to hidden for privacy
     } catch (error) {
       console.error('Error loading pay privacy state:', error);
       return false;
@@ -129,7 +127,7 @@ export class SingleFinanceStorage {
   static setPayPrivacyState(userId: string, showPayAmounts: boolean): void {
     try {
       const key = this.getUserKey('singleFinancePayPrivacy', userId);
-      localStorage.setItem(key, JSON.stringify(showPayAmounts));
+      EncryptedStorage.setItem(key, showPayAmounts);
     } catch (error) {
       console.error('Error saving pay privacy state:', error);
     }

@@ -10,6 +10,7 @@ import { Textarea } from '../../components/ui/textarea';
 import { toast } from '../../components/ui/use-toast';
 import { SingleFinanceStorage } from '../../lib/singleFinanceStorage';
 import { ArrowLeft, DollarSign, User, FileText, Calculator, Plus, Trash2 } from 'lucide-react';
+import CSRFProtection from '../../lib/csrfProtection';
 
 // Interface for team member
 interface TeamMember {
@@ -186,9 +187,7 @@ export default function LogSingleFinanceDeal() {
 
     // Listen for team member updates from Settings page
     const handleTeamMembersUpdated = (e: any) => {
-      console.log('[LogSingleFinanceDeal] Team members updated event received:', e.detail);
-      console.log('[LogSingleFinanceDeal] Event user ID:', e.detail?.userId);
-      console.log('[LogSingleFinanceDeal] Current user ID:', getUserId());
+      console.log('[LogSingleFinanceDeal] Team members updated event received');
       loadTeamMembers(); // Reload team members from localStorage
     };
 
@@ -215,8 +214,6 @@ export default function LogSingleFinanceDeal() {
   // Load team members from localStorage
   const loadTeamMembers = () => {
     const userId = getUserId();
-    console.log('[LogDeal] Loading team members for user:', userId);
-    console.log('[LogDeal] Full user object:', user);
     
     if (!userId) {
       console.log('[LogDeal] No user ID, cannot load team members');
@@ -227,18 +224,9 @@ export default function LogSingleFinanceDeal() {
       // Check what's actually in localStorage for this user
       const storageKey = `singleFinanceTeamMembers_${userId}`;
       const rawData = localStorage.getItem(storageKey);
-      console.log('[LogDeal] Raw localStorage data for key:', storageKey);
-      console.log('[LogDeal] Raw data:', rawData);
       
       const savedTeamMembers = SingleFinanceStorage.getTeamMembers(userId);
-      console.log('[LogDeal] Parsed team members:', savedTeamMembers);
       console.log('[LogDeal] Team members count:', savedTeamMembers.length);
-      
-      if (savedTeamMembers.length > 0) {
-        savedTeamMembers.forEach((member, idx) => {
-          console.log(`[LogDeal] Member ${idx}:`, member.firstName, member.lastName, member.role, member.active);
-        });
-      }
       
       setTeamMembers(savedTeamMembers);
     } catch (error) {
@@ -332,7 +320,7 @@ export default function LogSingleFinanceDeal() {
       const dealToEdit = existingDeals.find((deal: any) => deal.id === dealIdToEdit);
       
       if (dealToEdit) {
-        console.log('[LogSingleFinanceDeal] Loading deal for edit:', dealToEdit);
+        console.log('[LogSingleFinanceDeal] Loading deal for edit');
         setOriginalDeal(dealToEdit);
         
         // Map the deal data back to form data
@@ -447,6 +435,17 @@ export default function LogSingleFinanceDeal() {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // CSRF Protection
+    const form = new FormData(e.target as HTMLFormElement);
+    if (!CSRFProtection.validateFromRequest(form)) {
+      toast({
+        title: 'Security Error',
+        description: 'Security validation failed. Please refresh the page and try again.',
+        variant: 'destructive',
+      });
+      return;
+    }
 
     if (!formData.customerName || !formData.vehicleDescription) {
       toast({
@@ -576,11 +575,11 @@ export default function LogSingleFinanceDeal() {
           updatedDeals = existingDeals.map((deal: any) => 
             deal.id === dealIdToUse ? dealData : deal
           );
-          console.log('[LogSingleFinanceDeal] Deal updated in singleFinanceDeals storage:', dealData);
+          console.log('[LogSingleFinanceDeal] Deal updated in singleFinanceDeals storage');
         } else {
           // Add new deal
           updatedDeals = [dealData, ...existingDeals];
-          console.log('[LogSingleFinanceDeal] Deal saved to singleFinanceDeals storage:', dealData);
+          console.log('[LogSingleFinanceDeal] Deal saved to singleFinanceDeals storage');
         }
         
         SingleFinanceStorage.setDeals(userId, updatedDeals);
@@ -647,6 +646,9 @@ export default function LogSingleFinanceDeal() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* CSRF Protection */}
+        <input type="hidden" name="csrf_token" value={CSRFProtection.getToken()} />
+        
         {/* Deal Information Card */}
         <Card className="p-6 border-l-4 border-l-blue-500 shadow-lg hover:shadow-xl transition-shadow">
           <div className="space-y-4">
@@ -889,6 +891,9 @@ export default function LogSingleFinanceDeal() {
                       </option>
                     ))}
                   </select>
+                  {validationErrors.secondSalespersonId && (
+                    <p className="text-sm text-red-500 mt-1">{validationErrors.secondSalespersonId}</p>
+                  )}
                   <div className="flex gap-2">
                     <Button
                       type="button"

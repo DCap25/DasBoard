@@ -402,7 +402,7 @@ export function MasterAdminPanel() {
 
         safeToast({
           title: 'Success',
-          description: `User ${email} has been confirmed via SQL. They can now log in with Password123!`,
+          description: `User ${email} has been confirmed via SQL. They can now log in with the configured test password.`,
         });
 
         console.log(`[MasterAdminPanel] Successfully confirmed test account ${email}`);
@@ -1340,7 +1340,7 @@ export function MasterAdminPanel() {
 
           // Generate email unlikely to be rejected
           const email = generateSafeTestEmail(baseSuffix);
-          const password = 'Password123!';
+          const password = import.meta.env.VITE_TEST_USER_PASSWORD || 'defaultTestPassword123';
 
           // Create user
           const userData = {
@@ -1378,7 +1378,7 @@ export function MasterAdminPanel() {
 
       safeToast({
         title: 'Test Staff Created',
-        description: `Created ${generatedStaff.length} test staff members for the dealership. All use password: Password123!`,
+        description: `Created ${generatedStaff.length} test staff members for the dealership. All use the configured test password.`,
         duration: 8000,
       });
 
@@ -1560,7 +1560,7 @@ export function MasterAdminPanel() {
       const isTestAccount = isTestEmail(adminForm.email) || isTestEnvironment;
 
       // For test accounts, use a simpler password format
-      const finalPassword = isTestAccount ? 'Password123!' : password;
+      const finalPassword = isTestAccount ? (import.meta.env.VITE_TEST_USER_PASSWORD || 'defaultTestPassword123') : password;
 
       // User data to store - Use dealership_admin role for all dealer admins
       const userData = {

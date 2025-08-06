@@ -12,6 +12,7 @@ import {
   Home,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
+import rateLimiter from '../../lib/rateLimiter';
 
 export default function SingleFinanceSignup() {
   const navigate = useNavigate();
@@ -89,6 +90,14 @@ export default function SingleFinanceSignup() {
       return;
     }
 
+    // Check rate limiting
+    const rateLimitCheck = rateLimiter.isLimited('passwordReset', loginData.email);
+    if (rateLimitCheck.limited) {
+      const minutes = Math.ceil((rateLimitCheck.retryAfterMs || 0) / (1000 * 60));
+      setError(`Too many password reset attempts. Please try again in ${minutes} minute${minutes !== 1 ? 's' : ''}.`);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -99,9 +108,15 @@ export default function SingleFinanceSignup() {
 
       if (error) throw error;
 
+      // Record successful attempt
+      rateLimiter.recordAttempt('passwordReset', true, loginData.email);
+
       setPasswordResetSent(true);
       setError(null);
     } catch (err: any) {
+      // Record failed attempt
+      rateLimiter.recordAttempt('passwordReset', false, loginData.email);
+      
       console.error('Password reset error:', err);
       setError(err.message || 'Failed to send password reset email');
     } finally {

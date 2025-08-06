@@ -33,6 +33,13 @@ export default defineConfig(({ mode }) => {
       sourcemap: false,  // Disabled to fix Netlify build issues
       minify: 'terser',
       target: 'es2015',
+      terserOptions: {
+        compress: {
+          // Remove console.log statements in production
+          drop_console: true,
+          drop_debugger: true,
+        },
+      },
       rollupOptions: {
         output: {
           manualChunks: {

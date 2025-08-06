@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import EncryptedStorage from '../lib/encryptedStorage';
 
 // Define the deal interface
 interface Deal {
@@ -133,10 +134,9 @@ const INITIAL_DEALS: Deal[] = [
 
 // DealsProvider component
 export const DealsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Load deals from localStorage or use initial data
+  // Load deals from encrypted localStorage or use initial data
   const [deals, setDeals] = useState<Deal[]>(() => {
-    const savedDeals = localStorage.getItem('financeDeals');
-    return savedDeals ? JSON.parse(savedDeals) : INITIAL_DEALS;
+    return EncryptedStorage.getItem<Deal[]>('financeDeals', INITIAL_DEALS);
   });
 
   // Finance metrics state
@@ -154,9 +154,9 @@ export const DealsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     },
   });
 
-  // Save deals to localStorage when updated
+  // Save deals to encrypted localStorage when updated
   useEffect(() => {
-    localStorage.setItem('financeDeals', JSON.stringify(deals));
+    EncryptedStorage.setItem('financeDeals', deals);
   }, [deals]);
 
   // Add a new deal

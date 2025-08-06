@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import { useTranslation } from '../../contexts/TranslationContext';
 import LanguageSwitcher from '../LanguageSwitcher';
+import CSRFProtection from '../../lib/csrfProtection';
+import { signUpSchema, type SignUpData } from '../../lib/validation/authSchemas';
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -33,7 +35,13 @@ export default function SignUp() {
     adminName: '',
     adminEmail: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    firstName: '',
+    lastName: '',
+    companyName: '',
+    phone: '',
+    role: 'admin' as const,
+    agreeToTerms: false
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -47,46 +55,93 @@ export default function SignUp() {
   };
 
   const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.organizationName.trim()) {
-      newErrors.organizationName = t('signup.dealershipSignup.validation.organizationNameRequired');
+    // Parse the admin name into first and last name for validation
+    const nameParts = formData.adminName.trim().split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+    
+    // Prepare data for Zod validation
+    const validationData = {
+      email: formData.adminEmail,
+      password: formData.password,
+      confirmPassword: formData.confirmPassword,
+      firstName: firstName,
+      lastName: lastName,
+      companyName: formData.organizationName,
+      phone: '', // Optional field
+      role: 'admin' as const,
+      agreeToTerms: true // Assume terms are agreed to for dealership signup
+    };
+    
+    const validationResult = signUpSchema.safeParse(validationData);
+    
+    if (!validationResult.success) {
+      const newErrors: Record<string, string> = {};
+      validationResult.error.errors.forEach(err => {
+        const path = err.path.join('.');
+        // Map Zod field names back to our form field names
+        if (path === 'firstName' || path === 'lastName') {
+          newErrors.adminName = 'Please enter both first and last name';
+        } else if (path === 'email') {
+          newErrors.adminEmail = err.message;
+        } else if (path === 'companyName') {
+          newErrors.organizationName = err.message;
+        } else {
+          newErrors[path] = err.message;
+        }
+      });
+      
+      // Add custom validation for form-specific fields
+      if (!formData.address.trim()) {
+        newErrors.address = t('signup.dealershipSignup.validation.addressRequired');
+      }
+      if (!formData.city.trim()) {
+        newErrors.city = t('signup.dealershipSignup.validation.cityRequired');
+      }
+      if (!formData.state.trim()) {
+        newErrors.state = t('signup.dealershipSignup.validation.stateRequired');
+      }
+      if (!formData.zipCode.trim()) {
+        newErrors.zipCode = t('signup.dealershipSignup.validation.zipCodeRequired');
+      }
+      
+      setErrors(newErrors);
+      return false;
     }
+    
+    // Additional form-specific validation
+    const customErrors: Record<string, string> = {};
     if (!formData.address.trim()) {
-      newErrors.address = t('signup.dealershipSignup.validation.addressRequired');
+      customErrors.address = t('signup.dealershipSignup.validation.addressRequired');
     }
     if (!formData.city.trim()) {
-      newErrors.city = t('signup.dealershipSignup.validation.cityRequired');
+      customErrors.city = t('signup.dealershipSignup.validation.cityRequired');
     }
     if (!formData.state.trim()) {
-      newErrors.state = t('signup.dealershipSignup.validation.stateRequired');
+      customErrors.state = t('signup.dealershipSignup.validation.stateRequired');
     }
     if (!formData.zipCode.trim()) {
-      newErrors.zipCode = t('signup.dealershipSignup.validation.zipCodeRequired');
+      customErrors.zipCode = t('signup.dealershipSignup.validation.zipCodeRequired');
     }
-    if (!formData.adminName.trim()) {
-      newErrors.adminName = t('signup.dealershipSignup.validation.adminNameRequired');
+    
+    if (Object.keys(customErrors).length > 0) {
+      setErrors(customErrors);
+      return false;
     }
-    if (!formData.adminEmail.trim()) {
-      newErrors.adminEmail = t('signup.dealershipSignup.validation.emailRequired');
-    } else if (!/\S+@\S+\.\S+/.test(formData.adminEmail)) {
-      newErrors.adminEmail = t('signup.dealershipSignup.validation.validEmailRequired');
-    }
-    if (!formData.password) {
-      newErrors.password = t('signup.dealershipSignup.validation.passwordRequired');
-    } else if (formData.password.length < 8) {
-      newErrors.password = t('signup.dealershipSignup.validation.passwordMinLength');
-    }
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = t('signup.dealershipSignup.validation.passwordsDoNotMatch');
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    
+    setErrors({});
+    return true;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // CSRF Protection
+    const form = new FormData(e.target as HTMLFormElement);
+    if (!CSRFProtection.validateFromRequest(form)) {
+      setError('Security validation failed. Please refresh the page and try again.');
+      return;
+    }
     
     if (validateForm()) {
       // Navigate to success page or admin dashboard
@@ -401,6 +456,9 @@ export default function SignUp() {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* CSRF Protection */}
+                <input type="hidden" name="csrf_token" value={CSRFProtection.getToken()} />
+                
                 {/* Organization Information */}
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-4">{t('signup.dealershipSignup.organizationInfo')}</h3>

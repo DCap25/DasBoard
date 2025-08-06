@@ -7,6 +7,7 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { toast } from '../../components/ui/use-toast';
 import { SingleFinanceStorage } from '../../lib/singleFinanceStorage';
+import { teamMemberSchema, type TeamMemberData } from '../../lib/validation/dealSchemas';
 import { 
   Settings, 
   Users, 
@@ -56,6 +57,7 @@ export default function SingleFinanceSettings() {
     lastName: '',
     role: 'salesperson' as 'salesperson' | 'sales_manager'
   });
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   
   // Pay configuration state
   const [payConfig, setPayConfig] = useState<PayConfig>({
@@ -171,15 +173,33 @@ export default function SingleFinanceSettings() {
     console.log('[Settings] Full user object:', user);
     console.log('[Settings] Storage key will be:', `singleFinanceTeamMembers_${userId}`);
     
-    if (!newMember.firstName || !newMember.lastName) {
-      console.log('[Settings] Validation failed - missing name fields');
+    // Validate using Zod schema
+    const validationResult = teamMemberSchema.safeParse({
+      firstName: newMember.firstName,
+      lastName: newMember.lastName,
+      role: newMember.role
+    });
+    
+    if (!validationResult.success) {
+      const errors: Record<string, string> = {};
+      validationResult.error.errors.forEach(err => {
+        const path = err.path.join('.');
+        errors[path] = err.message;
+      });
+      
+      setValidationErrors(errors);
+      
+      const firstError = validationResult.error.errors[0];
       toast({
         title: 'Validation Error',
-        description: 'First name and last name are required',
+        description: firstError.message,
         variant: 'destructive'
       });
       return;
     }
+    
+    // Clear validation errors if validation passes
+    setValidationErrors({});
 
     const initials = `${newMember.firstName.charAt(0)}${newMember.lastName.charAt(0)}`.toUpperCase();
     
@@ -196,12 +216,13 @@ export default function SingleFinanceSettings() {
     console.log('[Settings] About to save team members:', updatedMembers);
     saveTeamMembers(updatedMembers);
     
-    // Reset form
+    // Reset form and clear validation errors
     setNewMember({
       firstName: '',
       lastName: '',
       role: 'salesperson'
     });
+    setValidationErrors({});
 
     console.log('[Settings] Team member added successfully:', member);
     toast({
@@ -298,7 +319,11 @@ export default function SingleFinanceSettings() {
                     value={newMember.firstName}
                     onChange={(e) => setNewMember(prev => ({ ...prev, firstName: e.target.value }))}
                     placeholder="First name"
+                    className={validationErrors.firstName ? 'border-red-500' : ''}
                   />
+                  {validationErrors.firstName && (
+                    <p className="text-sm text-red-500 mt-1">{validationErrors.firstName}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lastName">Last Name</Label>
@@ -307,7 +332,11 @@ export default function SingleFinanceSettings() {
                     value={newMember.lastName}
                     onChange={(e) => setNewMember(prev => ({ ...prev, lastName: e.target.value }))}
                     placeholder="Last name"
+                    className={validationErrors.lastName ? 'border-red-500' : ''}
                   />
+                  {validationErrors.lastName && (
+                    <p className="text-sm text-red-500 mt-1">{validationErrors.lastName}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="role">Role</Label>

@@ -82,7 +82,7 @@ export async function createTestUsers() {
       // Create user in Supabase Auth
       const { data, error } = await supabase.auth.signUp({
         email: user.email,
-        password: 'Password123!', // Default test password
+        password: import.meta.env.VITE_TEST_USER_PASSWORD || 'defaultTestPassword123', // Use environment variable
         options: {
           data: {
             name: user.name,

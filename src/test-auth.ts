@@ -3,9 +3,9 @@ const { supabase } = require('./lib/supabaseClient');
 async function testAuth() {
   console.log('Starting authentication test...');
 
-  // Test credentials - replace these with test user credentials
-  const testEmail = 'test@example.com';
-  const testPassword = 'testpassword123';
+  // Test credentials - use environment variables
+  const testEmail = process.env.VITE_TEST_USER_EMAIL || 'test@example.com';
+  const testPassword = process.env.VITE_TEST_USER_PASSWORD || 'defaultTestPassword123';
 
   try {
     // 1. Test sign in

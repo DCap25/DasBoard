@@ -4,6 +4,7 @@
  */
 
 import { supabase, getUserSession, getCurrentUser } from './supabaseClient';
+import SecureLogger from './secureLogger';
 import type { User } from '@supabase/supabase-js';
 
 // Types
@@ -200,7 +201,7 @@ export async function signIn(credentials: SignInCredentials): Promise<AuthRespon
     // Combine auth user with profile data
     const userWithProfile = profileData ? { ...data.user, ...profileData } : data.user;
 
-    console.log('Sign in successful:', { userId: data.user.id });
+    SecureLogger.info('Sign in successful');
 
     return {
       user: userWithProfile,
@@ -377,10 +378,10 @@ export const getDealershipGroups = async () => {
 
     // For debugging, log the structure of the first group if available
     if (data && data.length > 0) {
-      console.log('[apiService] First group structure:', data[0]);
+      SecureLogger.info('[apiService] First group structure retrieved');
     }
 
-    console.log(`[apiService] Fetched ${data?.length || 0} dealership groups`);
+    SecureLogger.info(`[apiService] Fetched ${data?.length || 0} dealership groups`);
     return data;
   } catch (error) {
     console.error('[apiService] Exception in getDealershipGroups:', error);
