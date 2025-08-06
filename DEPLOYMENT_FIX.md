@@ -15,11 +15,14 @@ The application works locally but shows signup errors on the deployed site (Netl
 Go to your Netlify dashboard → Site Settings → Environment Variables and add:
 
 ```
-VITE_SUPABASE_URL=https://iugjtokydvbcvmrpeziv.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1Z2p0b2t5ZHZiY3ZtcnBleml2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU3MTk3NjUsImV4cCI6MjA2MTI5NTc2NX0.XCNQoJbGQiXuyR_CFevro1Y8lqvh2_jmjrD181UYtY4
+VITE_SUPABASE_URL=(Get from your Supabase dashboard → Settings → API)
+VITE_SUPABASE_ANON_KEY=(Get from your Supabase dashboard → Settings → API → anon/public key)
+VITE_SUPABASE_PUBLISHABLE_KEY=(Get from your Supabase dashboard → Settings → API → publishable key)
 VITE_SKIP_EMAIL_VERIFICATION=false
-VITE_API_URL=https://iugjtokydvbcvmrpeziv.supabase.co
+VITE_API_URL=(Same as VITE_SUPABASE_URL for production)
 ```
+
+**Security Note:** Never expose these keys in public repositories. Get them from your Supabase dashboard.
 
 **Important:** Set `VITE_SKIP_EMAIL_VERIFICATION=false` for production to ensure proper email verification.
 

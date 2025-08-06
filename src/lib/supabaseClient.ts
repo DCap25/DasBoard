@@ -1,13 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
 import { Database } from './database.types';
+import { env, isConfigured, getSupabaseKey } from '../config/environment';
 
 // Main Supabase config (Das Board Master)
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl = env.supabase.url;
+const supabaseAnonKey = getSupabaseKey();
 
 // Validate main configuration
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase configuration. Please check your environment variables.');
+if (!isConfigured()) {
+  console.error('Missing Supabase configuration. Please check your environment variables.');
+  if (env.isProduction) {
+    throw new Error('Missing required Supabase configuration in production environment.');
+  }
 }
 
 // Create singleton instance with proper configuration
