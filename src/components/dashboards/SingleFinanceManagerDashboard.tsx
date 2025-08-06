@@ -22,6 +22,7 @@ import {
   CreditCard,
   PlusCircle,
   Lightbulb,
+  RefreshCw,
 } from 'lucide-react';
 
 import { SingleFinanceHomePage } from '../../pages/finance/SingleFinanceHomePage';
@@ -58,17 +59,23 @@ const SingleFinanceManagerDashboard = () => {
   const schemaName = user?.user_metadata?.schema_name || '';
 
   // Function to load deals from localStorage for Single Finance Dashboard
-  const loadDealsFromLocalStorage = () => {
+  const loadDealsFromLocalStorage = useCallback(() => {
     setLoading(true);
     setError(null);
 
     try {
       console.log('[SingleFinanceManagerDashboard] Loading deals from localStorage');
+      console.log('[SingleFinanceManagerDashboard] User ID:', user?.id);
+      console.log('[SingleFinanceManagerDashboard] User object:', user);
 
       // Load raw deals directly from user-specific storage to preserve all form data
-      if (!user?.id) return;
+      if (!user?.id) {
+        console.warn('[SingleFinanceManagerDashboard] No user ID available');
+        return;
+      }
       
       const singleFinanceDeals = SingleFinanceStorage.getDeals(user.id);
+      console.log('[SingleFinanceManagerDashboard] Storage key used:', `singleFinanceDeals_${user.id}`);
       console.log(
         '[SingleFinanceManagerDashboard] Raw singleFinanceDeals:',
         singleFinanceDeals
@@ -125,7 +132,7 @@ const SingleFinanceManagerDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   // Load deals from the schema if it exists
   useEffect(() => {
@@ -136,7 +143,22 @@ const SingleFinanceManagerDashboard = () => {
       console.log('[SingleFinanceManagerDashboard] No schema available, loading from localStorage');
       loadDealsFromLocalStorage();
     }
-  }, [schemaName, timePeriod]);
+  }, [schemaName, timePeriod, loadDealsFromLocalStorage]);
+
+  // Listen for deals updates from the deal log page
+  useEffect(() => {
+    const handleDealsUpdated = (event: CustomEvent) => {
+      console.log('[SingleFinanceManagerDashboard] Received deals update event', event.detail);
+      // Reload deals when they are updated from another page
+      loadDealsFromLocalStorage();
+    };
+
+    window.addEventListener('singleFinanceDealsUpdated', handleDealsUpdated as EventListener);
+    
+    return () => {
+      window.removeEventListener('singleFinanceDealsUpdated', handleDealsUpdated as EventListener);
+    };
+  }, [loadDealsFromLocalStorage]);
 
   // Function to fetch deals from the schema
   const fetchDealsFromSchema = async () => {
@@ -459,9 +481,19 @@ const SingleFinanceManagerDashboard = () => {
             <FileText className="mr-2 h-5 w-5 text-white" />
             Deals Log
           </CardTitle>
-          <Button variant="outline" size="sm" asChild>
-            <Link to="/dashboard/single-finance/deals">View All</Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => loadDealsFromLocalStorage()}
+              title="Refresh deals"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/dashboard/single-finance/deals">View All</Link>
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="p-4">
           {deals.length > 0 ? (

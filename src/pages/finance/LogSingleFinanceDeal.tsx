@@ -70,9 +70,10 @@ export default function LogSingleFinanceDeal() {
   const { user } = useAuth();
   const { dealId } = useParams();
 
-  // Helper function to get user ID consistently
+  // Helper function to get user ID consistently - must match dashboard
   const getUserId = () => {
-    return user?.id || user?.user?.id || user?.email;
+    // Use the same ID that the dashboard uses
+    return user?.id;
   };
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -562,12 +563,16 @@ export default function LogSingleFinanceDeal() {
 
       // Save to user-specific localStorage key for Single Finance Dashboard
       const userId = getUserId();
+      console.log('[LogSingleFinanceDeal] User ID for saving:', userId);
+      console.log('[LogSingleFinanceDeal] User object:', user);
+      
       if (!userId) {
-        throw new Error('User ID is required');
+        throw new Error('User ID is required - please ensure you are logged in');
       }
       
       try {
         const existingDeals = SingleFinanceStorage.getDeals(userId);
+        console.log('[LogSingleFinanceDeal] Existing deals count:', existingDeals.length);
         
         let updatedDeals;
         if (isEditMode) {
@@ -583,6 +588,8 @@ export default function LogSingleFinanceDeal() {
         }
         
         SingleFinanceStorage.setDeals(userId, updatedDeals);
+        console.log('[LogSingleFinanceDeal] Updated deals count:', updatedDeals.length);
+        console.log('[LogSingleFinanceDeal] Storage key used:', `singleFinanceDeals_${userId}`);
         
         // Dispatch custom event to notify dashboard of data change
         window.dispatchEvent(new CustomEvent('singleFinanceDealsUpdated', { 
