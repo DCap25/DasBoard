@@ -9,6 +9,7 @@ import { Checkbox } from '../../components/ui/checkbox';
 import { Textarea } from '../../components/ui/textarea';
 import { toast } from '../../components/ui/use-toast';
 import { SingleFinanceStorage } from '../../lib/singleFinanceStorage';
+import { getConsistentUserId, debugUserId } from '../../utils/userIdHelper';
 import { ArrowLeft, DollarSign, User, FileText, Calculator, Plus, Trash2 } from 'lucide-react';
 import CSRFProtection from '../../lib/csrfProtection';
 
@@ -72,8 +73,8 @@ export default function LogSingleFinanceDeal() {
 
   // Helper function to get user ID consistently - must match dashboard
   const getUserId = () => {
-    // Use the same ID that the dashboard uses
-    return user?.id;
+    // Use the consistent helper to get user ID
+    return getConsistentUserId(user);
   };
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -563,8 +564,8 @@ export default function LogSingleFinanceDeal() {
 
       // Save to user-specific localStorage key for Single Finance Dashboard
       const userId = getUserId();
-      console.log('[LogSingleFinanceDeal] User ID for saving:', userId);
-      console.log('[LogSingleFinanceDeal] User object:', user);
+      debugUserId('LogSingleFinanceDeal', user);
+      console.log('[LogSingleFinanceDeal] Resolved User ID for saving:', userId);
       
       if (!userId) {
         throw new Error('User ID is required - please ensure you are logged in');

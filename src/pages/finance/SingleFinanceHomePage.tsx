@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { SingleFinanceStorage } from '../../lib/singleFinanceStorage';
+import { getConsistentUserId } from '../../utils/userIdHelper';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 // Removed unused imports
@@ -110,7 +111,7 @@ export const SingleFinanceHomePage: React.FC = () => {
 
   // Helper function to get user ID consistently
   const getUserId = () => {
-    return user?.id || user?.user?.id || user?.email;
+    return getConsistentUserId(user);
   };
   const [deals, setDeals] = useState<Deal[]>([]);
   const [, setPendingDeals] = useState<Deal[]>([]);

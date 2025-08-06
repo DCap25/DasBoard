@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Link, useLocation, useNavigate, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { SingleFinanceStorage } from '../../lib/singleFinanceStorage';
+import { getConsistentUserId, debugUserId } from '../../utils/userIdHelper';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import {
@@ -65,17 +66,19 @@ const SingleFinanceManagerDashboard = () => {
 
     try {
       console.log('[SingleFinanceManagerDashboard] Loading deals from localStorage');
-      console.log('[SingleFinanceManagerDashboard] User ID:', user?.id);
-      console.log('[SingleFinanceManagerDashboard] User object:', user);
+      debugUserId('SingleFinanceManagerDashboard', user);
 
+      // Get consistent user ID
+      const userId = getConsistentUserId(user);
+      
       // Load raw deals directly from user-specific storage to preserve all form data
-      if (!user?.id) {
+      if (!userId) {
         console.warn('[SingleFinanceManagerDashboard] No user ID available');
         return;
       }
       
-      const singleFinanceDeals = SingleFinanceStorage.getDeals(user.id);
-      console.log('[SingleFinanceManagerDashboard] Storage key used:', `singleFinanceDeals_${user.id}`);
+      const singleFinanceDeals = SingleFinanceStorage.getDeals(userId);
+      console.log('[SingleFinanceManagerDashboard] Storage key used:', `singleFinanceDeals_${userId}`);
       console.log(
         '[SingleFinanceManagerDashboard] Raw singleFinanceDeals:',
         singleFinanceDeals
