@@ -814,16 +814,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         }
 
-        // Get initial session with timeout protection
+        // Get initial session with shorter timeout and better fallback
         const sessionPromise = supabase.auth.getSession();
         const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Session fetch timeout')), 10000); // Increased to 10 seconds
+          setTimeout(() => reject(new Error('Session fetch timeout')), 5000); // Reduced to 5 seconds
         });
         
-        const {
-          data: { session },
-          error: sessionError,
-        } = await Promise.race([sessionPromise, timeoutPromise]) as any;
+        let session: any = null;
+        let sessionError: any = null;
+        
+        try {
+          const result = await Promise.race([sessionPromise, timeoutPromise]) as any;
+          session = result.data?.session;
+          sessionError = result.error;
+        } catch (error) {
+          sessionError = error;
+        }
 
         if (sessionError) {
           console.error('[AuthContext] Error getting initial session:', sessionError, {
@@ -870,38 +876,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // Always set user data immediately
           setUser(session.user);
 
-          // Check if the user is a group admin
-          try {
-            console.warn('[DEBUG AUTH] Checking group admin status during initialization');
-            await fetchProfileData(session.user.id);
-          } catch (profileError) {
-            console.error('[DEBUG AUTH] Error checking group admin status:', profileError);
+          // Optimize: Try to get role from user metadata first to avoid database calls
+          const metadataRole = session.user.user_metadata?.role;
+          if (metadataRole) {
+            const normalizedMetadataRole = metadataRole.toLowerCase() as UserRole;
+            console.log('[AuthContext] Using role from user metadata:', normalizedMetadataRole);
+            setRole(normalizedMetadataRole);
+            setUserRole(normalizedMetadataRole);
+          } else {
+            // Fallback to database lookup with timeout
+            try {
+              const rolePromise = fetchUserRole(session.user.id);
+              const roleTimeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('Role fetch timeout')), 3000); // 3 second timeout for role fetch
+              });
+              
+              const initialRole = await Promise.race([rolePromise, roleTimeoutPromise]) as UserRole;
+              if (mounted) {
+                console.log('[AuthContext] Setting role from database:', initialRole);
+                setRole(initialRole);
+                setUserRole(initialRole);
+              }
+            } catch (error) {
+              console.warn('[AuthContext] Role fetch failed, using fallback:', error);
+              if (mounted) {
+                setRole(FALLBACK_ROLE);
+                setUserRole(FALLBACK_ROLE);
+              }
+            }
           }
 
-          try {
-            // Then try to get role
-            const initialRole = await fetchUserRole(session.user.id);
-            if (mounted) {
-              console.log('[AuthContext] Setting initial role:', initialRole, {
-                userId: session.user.id,
-                timestamp: new Date().toISOString(),
-              });
-              setRole(initialRole);
+          // Check group admin status asynchronously to not block initialization
+          setTimeout(async () => {
+            try {
+              if (mounted) {
+                await fetchProfileData(session.user.id);
+              }
+            } catch (profileError) {
+              console.error('[AuthContext] Background profile fetch error:', profileError);
             }
-          } catch (error) {
-            console.error('[AuthContext] Error fetching initial role, using fallback:', error, {
-              userId: session.user.id,
-              timestamp: new Date().toISOString(),
-            });
-            if (mounted) {
-              // Always set a role even on error
-              console.log('[AuthContext] Setting fallback role due to error', {
-                role: FALLBACK_ROLE,
-                timestamp: new Date().toISOString(),
-              });
-              setRole(FALLBACK_ROLE);
-            }
-          }
+          }, 100);
         }
 
         if (mounted) {
@@ -968,7 +982,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     initialize();
 
-    // Set a safety timeout to ensure loading state isn't stuck
+    // Set a shorter safety timeout to prevent slow renders
     const safetyTimer = setTimeout(() => {
       if (mounted && loading) {
         // Check if direct auth is active before forcing timeout
@@ -984,11 +998,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return;
         }
 
-        console.error('[AuthContext] Safety timeout reached - forcing loading state to false');
+        console.warn('[AuthContext] Safety timeout reached after 8s - forcing loading state to false');
         setLoading(false);
         setAuthCheckComplete(true); // Mark auth check as complete even on timeout
+        
+        // Show user-friendly message instead of error
+        toast({
+          title: 'Connection Slow',
+          description: 'Authentication is taking longer than expected. You can continue using the app.',
+          variant: 'default'
+        });
       }
-    }, 15000); // 15 second safety timeout
+    }, 8000); // Reduced to 8 second safety timeout
 
     return () => {
       mounted = false;
