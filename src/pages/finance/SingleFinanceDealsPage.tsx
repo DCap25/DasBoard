@@ -686,3 +686,4 @@ const SingleFinanceDealsPage: React.FC = () => {
 };
 
 export default SingleFinanceDealsPage;
+// Trigger Netlify rebuild - fix applied
