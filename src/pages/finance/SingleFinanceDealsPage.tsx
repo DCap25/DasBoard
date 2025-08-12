@@ -87,7 +87,8 @@ const SingleFinanceDealsPage: React.FC = () => {
   // Helper function to get user ID with fallback
   const getUserId = () => {
     // Use the same logic as dashboard
-    const userId = getConsistentUserId(user) || localUserId || localStorage.getItem('singleFinanceUserId');
+    const userId =
+      getConsistentUserId(user) || localUserId || localStorage.getItem('singleFinanceUserId');
     debugUserId('SingleFinanceDealsPage', user, localUserId);
     console.log('[SingleFinanceDealsPage] Final resolved user ID:', userId);
     return userId;
@@ -103,7 +104,7 @@ const SingleFinanceDealsPage: React.FC = () => {
       // Get existing deals from localStorage
       const userId = getUserId();
       if (!userId) return;
-      
+
       const existingDeals = SingleFinanceStorage.getDeals(userId);
 
       // Update the deal status
@@ -115,10 +116,8 @@ const SingleFinanceDealsPage: React.FC = () => {
       SingleFinanceStorage.setDeals(userId, updatedDeals);
 
       // Update state immediately to trigger re-render
-      setDeals(currentDeals => 
-        currentDeals.map(deal => 
-          deal.id === dealId ? { ...deal, status: newStatus } : deal
-        )
+      setDeals(currentDeals =>
+        currentDeals.map(deal => (deal.id === dealId ? { ...deal, status: newStatus } : deal))
       );
 
       // Also reload deals to keep consistency
@@ -126,7 +125,9 @@ const SingleFinanceDealsPage: React.FC = () => {
         const deal: Deal = {
           id: rawDeal.id,
           customer: rawDeal.customer || rawDeal.lastName || 'Unknown',
-          vehicle: rawDeal.vehicle || `${rawDeal.vehicleType === 'N' ? 'New' : rawDeal.vehicleType === 'U' ? 'Used' : 'CPO'} - Stock #${rawDeal.stockNumber}`,
+          vehicle:
+            rawDeal.vehicle ||
+            `${rawDeal.vehicleType === 'N' ? 'New' : rawDeal.vehicleType === 'U' ? 'Used' : 'CPO'} - Stock #${rawDeal.stockNumber}`,
           vin: rawDeal.vin || rawDeal.vinLast8 || '',
           saleDate: rawDeal.saleDate || rawDeal.dealDate || rawDeal.created_at,
           salesperson: rawDeal.salesperson || 'Self',
@@ -159,20 +160,20 @@ const SingleFinanceDealsPage: React.FC = () => {
     // Enhanced warning popup with better messaging
     const confirmed = confirm(
       '⚠️ DELETE CONFIRMATION\n\n' +
-      'Are you sure you want to delete this deal?\n\n' +
-      'This action will:\n' +
-      '• Permanently remove all deal data\n' +
-      '• Update your dashboard metrics\n' +
-      '• Cannot be undone\n\n' +
-      'Click OK to delete or Cancel to keep the deal.'
+        'Are you sure you want to delete this deal?\n\n' +
+        'This action will:\n' +
+        '• Permanently remove all deal data\n' +
+        '• Update your dashboard metrics\n' +
+        '• Cannot be undone\n\n' +
+        'Click OK to delete or Cancel to keep the deal.'
     );
 
     if (confirmed) {
       // Second confirmation for extra safety
       const finalConfirm = confirm(
         '🚨 FINAL CONFIRMATION\n\n' +
-        'This is your last chance!\n\n' +
-        'Click OK to permanently delete this deal, or Cancel to keep it.'
+          'This is your last chance!\n\n' +
+          'Click OK to permanently delete this deal, or Cancel to keep it.'
       );
 
       if (finalConfirm) {
@@ -180,7 +181,7 @@ const SingleFinanceDealsPage: React.FC = () => {
           // Get existing deals from localStorage
           const userId = getUserId();
           if (!userId) return;
-          
+
           const existingDeals = SingleFinanceStorage.getDeals(userId);
 
           // Remove the deal
@@ -194,7 +195,9 @@ const SingleFinanceDealsPage: React.FC = () => {
             const deal: Deal = {
               id: rawDeal.id,
               customer: rawDeal.customer || rawDeal.lastName || 'Unknown',
-              vehicle: rawDeal.vehicle || `${rawDeal.vehicleType === 'N' ? 'New' : rawDeal.vehicleType === 'U' ? 'Used' : 'CPO'} - Stock #${rawDeal.stockNumber}`,
+              vehicle:
+                rawDeal.vehicle ||
+                `${rawDeal.vehicleType === 'N' ? 'New' : rawDeal.vehicleType === 'U' ? 'Used' : 'CPO'} - Stock #${rawDeal.stockNumber}`,
               vin: rawDeal.vin || rawDeal.vinLast8 || '',
               saleDate: rawDeal.saleDate || rawDeal.dealDate || rawDeal.created_at,
               salesperson: rawDeal.salesperson || 'Self',
@@ -225,7 +228,7 @@ const SingleFinanceDealsPage: React.FC = () => {
         console.warn('[SingleFinanceDealsPage] No user ID available');
         return;
       }
-      
+
       const parsedDeals = SingleFinanceStorage.getDeals(userId);
       console.log('[SingleFinanceDealsPage] Loaded deals from storage:', parsedDeals.length);
       if (parsedDeals.length > 0) {
@@ -491,7 +494,9 @@ const SingleFinanceDealsPage: React.FC = () => {
                   </th>
                   <th className="py-3 px-4 text-center font-medium">Status</th>
                   <th className="py-3 px-4 text-center font-medium bg-blue-600 text-white">Edit</th>
-                  <th className="py-3 px-4 text-center font-medium bg-red-600 text-white">Delete</th>
+                  <th className="py-3 px-4 text-center font-medium bg-red-600 text-white">
+                    Delete
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -506,7 +511,7 @@ const SingleFinanceDealsPage: React.FC = () => {
                 ) : (
                   filteredDeals.map((deal, index) => {
                     const dealData = deal as any; // Access extended properties
-                    
+
                     // Extract last name from customer
                     const lastName = deal.customer.split(' ').pop() || '';
 
@@ -520,9 +525,13 @@ const SingleFinanceDealsPage: React.FC = () => {
                     });
 
                     // Determine if New, Used or CPO
-                    const vehicleType = dealData.vehicleType || 
-                      (deal.vehicle.toLowerCase().includes('new') ? 'N' : 
-                       deal.vehicle.toLowerCase().includes('cpo') ? 'C' : 'U');
+                    const vehicleType =
+                      dealData.vehicleType ||
+                      (deal.vehicle.toLowerCase().includes('new')
+                        ? 'N'
+                        : deal.vehicle.toLowerCase().includes('cpo')
+                          ? 'C'
+                          : 'U');
 
                     // Get individual product profits
                     const vscProfit = parseFloat(dealData.vscProfit) || 0;
@@ -541,18 +550,22 @@ const SingleFinanceDealsPage: React.FC = () => {
 
                     // Debug logging
                     if (deal.id === 'some-id') {
-                      console.log(`[ViewAllDeals] Deal ${deal.id} status: "${deal.status}", Should be red: ${deal.status === 'Held'}`);
+                      console.log(
+                        `[ViewAllDeals] Deal ${deal.id} status: "${deal.status}", Should be red: ${deal.status === 'Held'}`
+                      );
                     }
 
                     return (
-                      <tr 
-                        key={deal.id} 
+                      <tr
+                        key={deal.id}
                         className="border-b"
                         style={{
-                          backgroundColor: 
-                            deal.status === 'Funded' ? '#dcfce7' : 
-                            deal.status === 'Held' ? '#fecaca' : 
-                            'white'
+                          backgroundColor:
+                            deal.status === 'Funded'
+                              ? '#dcfce7'
+                              : deal.status === 'Held'
+                                ? '#fecaca'
+                                : 'white',
                         }}
                       >
                         <td className="py-3 px-4 text-center font-medium">
@@ -573,42 +586,28 @@ const SingleFinanceDealsPage: React.FC = () => {
                               vehicleType === 'N'
                                 ? 'bg-green-100 text-green-800'
                                 : vehicleType === 'C'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-amber-100 text-amber-800'
+                                  ? 'bg-blue-100 text-blue-800'
+                                  : 'bg-amber-100 text-amber-800'
                             }`}
                           >
                             {vehicleType}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-gray-600 text-xs">{dealData.lender || 'N/A'}</td>
+                        <td className="py-3 px-4 text-gray-600 text-xs">
+                          {dealData.lender || 'N/A'}
+                        </td>
                         <td className="py-3 px-4 text-right font-medium">
                           {formatCurrency(dealData.frontEndGross || 0)}
                         </td>
-                        <td className="py-3 px-4 text-right">
-                          {formatCurrency(vscProfit)}
-                        </td>
-                        <td className="py-3 px-4 text-right">
-                          {formatCurrency(ppmProfit)}
-                        </td>
-                        <td className="py-3 px-4 text-right">
-                          {formatCurrency(gapProfit)}
-                        </td>
-                        <td className="py-3 px-4 text-right">
-                          {formatCurrency(twProfit)}
-                        </td>
-                        <td className="py-3 px-4 text-right">
-                          {formatCurrency(appearanceProfit)}
-                        </td>
-                        <td className="py-3 px-4 text-right">
-                          {formatCurrency(theftProfit)}
-                        </td>
-                        <td className="py-3 px-4 text-right">
-                          {formatCurrency(bundledProfit)}
-                        </td>
+                        <td className="py-3 px-4 text-right">{formatCurrency(vscProfit)}</td>
+                        <td className="py-3 px-4 text-right">{formatCurrency(ppmProfit)}</td>
+                        <td className="py-3 px-4 text-right">{formatCurrency(gapProfit)}</td>
+                        <td className="py-3 px-4 text-right">{formatCurrency(twProfit)}</td>
+                        <td className="py-3 px-4 text-right">{formatCurrency(appearanceProfit)}</td>
+                        <td className="py-3 px-4 text-right">{formatCurrency(theftProfit)}</td>
+                        <td className="py-3 px-4 text-right">{formatCurrency(bundledProfit)}</td>
                         <td className="py-3 px-4 text-center font-medium">{ppd}</td>
-                        <td className="py-3 px-4 text-right">
-                          {formatCurrency(pvr)}
-                        </td>
+                        <td className="py-3 px-4 text-right">{formatCurrency(pvr)}</td>
                         <td className="py-3 px-4 text-right font-medium text-green-600">
                           {formatCurrency(deal.profit)}
                         </td>
@@ -617,15 +616,15 @@ const SingleFinanceDealsPage: React.FC = () => {
                             value={deal.status}
                             onChange={e => handleStatusChange(deal.id, e.target.value)}
                             className={`text-xs px-2 py-1 rounded border-0 focus:ring-1 focus:ring-blue-500 ${
-                              deal.status === 'Funded' 
+                              deal.status === 'Funded'
                                 ? 'bg-green-100 text-green-800'
                                 : deal.status === 'Held'
-                                ? 'bg-red-100 text-red-800'
-                                : deal.status === 'Pending'
-                                ? 'bg-blue-100 text-blue-800'
-                                : deal.status === 'Unwound'
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-gray-100 text-gray-800'
+                                  ? 'bg-red-100 text-red-800'
+                                  : deal.status === 'Pending'
+                                    ? 'bg-blue-100 text-blue-800'
+                                    : deal.status === 'Unwound'
+                                      ? 'bg-red-100 text-red-800'
+                                      : 'bg-gray-100 text-gray-800'
                             }`}
                           >
                             <option value="Pending">Pending</option>
