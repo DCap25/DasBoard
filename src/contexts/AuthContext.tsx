@@ -542,10 +542,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const metadataRole = userData.user?.user_metadata?.role;
           const userEmail = userData.user?.email?.toLowerCase() || '';
           
-          // Special check for Single Finance Manager users by email pattern
-          if (userEmail.includes('caplan') || userEmail.includes('sportdurst') || userEmail.includes('testfinance')) {
-            console.log('[AuthContext] Detected Single Finance Manager by email pattern:', userEmail, {
+          // Special check for Single Finance Manager users by email pattern or signup source
+          const signupEmail = localStorage.getItem('singleFinanceEmail');
+          const isFromSingleFinanceSignup = signupEmail === userEmail;
+          
+          if (userEmail.includes('caplan') || userEmail.includes('sportdurst') || userEmail.includes('testfinance') || isFromSingleFinanceSignup) {
+            console.log('[AuthContext] Detected Single Finance Manager by email pattern or signup source:', userEmail, {
               userId,
+              isFromSingleFinanceSignup,
               timestamp: new Date().toISOString(),
             });
             return 'single_finance_manager';

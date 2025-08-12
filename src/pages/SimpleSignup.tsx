@@ -80,23 +80,17 @@ export default function SimpleSignup() {
     try {
       console.log('[SimpleSignup] Starting Supabase user creation for:', formData.email);
 
-      // First, create signup request record (using existing schema)
-      const nameParts = formData.fullName.trim().split(' ');
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
+      // Try to create signup request directly, handle duplicate email error if it occurs
+      console.log('[SimpleSignup] Creating signup request...');
+      let signupRequestData;
       
-      const { data: signupRequestData, error: signupRequestError } = await supabase
+      const { data: newSignupData, error: signupRequestError } = await supabase
         .from('signup_requests')
         .insert({
           email: formData.email,
-          first_name: firstName,
-          last_name: lastName,
           full_name: formData.fullName,
           dealership_name: `${formData.fullName} - Finance Manager`,
           contact_person: formData.fullName,
-          company_name: `${formData.fullName} - Finance Manager`,
-          phone: '', // Phone not collected in simple signup
-          phone_number: '', // Alternative phone field
           tier: 'finance_manager',
           subscription_tier: 'finance_manager_free_promo',
           account_type: 'single-finance',
@@ -104,19 +98,46 @@ export default function SimpleSignup() {
           add_ons: [],
           promo_applied: true,
           status: 'approved',
-          // Removed monthly_rate and setup_fee as they don't exist in schema
+          stripe_payment_status: 'free_promotional',
         })
         .select()
         .single();
 
       if (signupRequestError) {
-        console.error('Signup request creation error:', signupRequestError);
-        throw new Error('Failed to process signup request');
+        // If it's a duplicate email error, fetch the existing record instead
+        if (signupRequestError.code === '23505' || signupRequestError.message?.includes('duplicate')) {
+          console.log('[SimpleSignup] Email already exists, fetching existing signup request...');
+          const { data: existingData, error: fetchError } = await supabase
+            .from('signup_requests')
+            .select('*')
+            .eq('email', formData.email)
+            .single();
+          
+          if (fetchError) {
+            console.error('[SimpleSignup] Failed to fetch existing signup:', fetchError);
+            throw new Error('Failed to process signup request');
+          }
+          
+          signupRequestData = existingData;
+          console.log('[SimpleSignup] Using existing signup request:', signupRequestData);
+        } else {
+          console.error('[SimpleSignup] Signup request creation error:', signupRequestError);
+          console.error('[SimpleSignup] Error details:', {
+            message: signupRequestError.message,
+            details: signupRequestError.details,
+            hint: signupRequestError.hint,
+            code: signupRequestError.code
+          });
+          throw new Error(`Failed to process signup request: ${signupRequestError.message}`);
+        }
+      } else {
+        signupRequestData = newSignupData;
       }
 
       console.log('[SimpleSignup] Signup request created:', signupRequestData);
 
-      // Create Supabase auth user
+      // Create auth user (or handle if already exists)
+      console.log('[SimpleSignup] Creating auth user...');
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -129,8 +150,43 @@ export default function SimpleSignup() {
       });
 
       if (authError) {
-        console.error('Auth signup error:', authError);
-        throw new Error(authError.message || 'Failed to create account');
+        console.error('[SimpleSignup] Auth signup error:', authError);
+        console.error('[SimpleSignup] Auth error details:', {
+          message: authError.message,
+          status: authError.status,
+        });
+        
+        // Handle specific error cases
+        if (authError.message?.includes('User already registered')) {
+          // Try to sign them in instead
+          console.log('[SimpleSignup] User exists, trying to sign them in...');
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            email: formData.email,
+            password: formData.password,
+          });
+          
+          if (signInError) {
+            throw new Error('An account with this email already exists but the password is incorrect. Please try signing in with the correct password.');
+          }
+          
+          console.log('[SimpleSignup] Successfully signed in existing user');
+          
+          // Update the existing user's metadata to ensure they have the Single Finance Manager role
+          const { error: updateError } = await supabase.auth.updateUser({
+            data: {
+              full_name: formData.fullName,
+              role: 'single_finance_manager',
+            }
+          });
+          
+          if (updateError) {
+            console.warn('[SimpleSignup] Failed to update user metadata:', updateError);
+          } else {
+            console.log('[SimpleSignup] Updated existing user metadata with Single Finance Manager role');
+          }
+        } else {
+          throw new Error(authError.message || 'Failed to create account');
+        }
       }
 
       console.log('[SimpleSignup] Auth user created:', authData);
@@ -145,8 +201,10 @@ export default function SimpleSignup() {
         // The AuthContext will handle user role and data retrieval
       }
 
-      // Store signup date for tracking
+      // Store signup date and user info for tracking and fallback authentication
       localStorage.setItem('singleFinanceSignupDate', new Date().toISOString());
+      localStorage.setItem('singleFinanceEmail', formData.email);
+      localStorage.setItem('singleFinanceName', formData.fullName);
       
       // Navigate to welcome page
       navigate('/welcome/single-finance', {
@@ -175,7 +233,12 @@ export default function SimpleSignup() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-white">The DAS Board</h1>
+              <button 
+                onClick={() => navigate('/')}
+                className="text-2xl font-bold text-white hover:text-blue-400 transition-colors"
+              >
+                The DAS Board
+              </button>
               <span className="ml-3 px-3 py-1 bg-blue-600 text-white text-sm rounded-full">
                 {t('signup.simple.title')}
               </span>
@@ -217,31 +280,31 @@ export default function SimpleSignup() {
         </div>
       </nav>
 
-      <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="bg-gray-800 rounded-xl p-8 border border-gray-700">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <User className="w-8 h-8 text-white" />
+      <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-19">
+        <div className="bg-gray-800 rounded-xl p-7 border border-gray-700">
+          <div className="text-center mb-7">
+            <div className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
+              <User className="w-7 h-7 text-white" />
             </div>
-            <h2 className="text-3xl font-bold text-white mb-2">{t('signup.simple.subtitle')}</h2>
+            <h2 className="text-2xl font-bold text-white mb-2">{t('signup.simple.subtitle')}</h2>
             <p className="text-gray-400">
               {t('signup.simple.description')}
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 {t('signup.form.fullName')} *
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleInputChange}
-                  className={`w-full pl-10 pr-4 py-3 bg-gray-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full pl-9 pr-4 py-3 bg-gray-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     errors.fullName ? 'border-red-500' : 'border-gray-600'
                   }`}
                   placeholder="John Doe"
@@ -257,13 +320,13 @@ export default function SimpleSignup() {
                 {t('signup.form.email')} *
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className={`w-full pl-10 pr-4 py-3 bg-gray-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full pl-9 pr-4 py-3 bg-gray-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     errors.email ? 'border-red-500' : 'border-gray-600'
                   }`}
                   placeholder="john@example.com"
@@ -280,13 +343,13 @@ export default function SimpleSignup() {
                 {t('signup.form.password')} *
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`w-full pl-10 pr-12 py-3 bg-gray-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full pl-9 pr-11 py-3 bg-gray-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     errors.password ? 'border-red-500' : 'border-gray-600'
                   }`}
                   placeholder="At least 8 characters"
@@ -296,7 +359,7 @@ export default function SimpleSignup() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               {errors.password && (
@@ -309,13 +372,13 @@ export default function SimpleSignup() {
                 {t('signup.form.confirmPassword')} *
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type={showConfirmPassword ? 'text' : 'password'}
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  className={`w-full pl-10 pr-12 py-3 bg-gray-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-full pl-9 pr-11 py-3 bg-gray-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     errors.confirmPassword ? 'border-red-500' : 'border-gray-600'
                   }`}
                   placeholder="Confirm your password"
@@ -325,7 +388,7 @@ export default function SimpleSignup() {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
                 >
-                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               {errors.confirmPassword && (
@@ -374,17 +437,17 @@ export default function SimpleSignup() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 disabled:cursor-not-allowed text-white py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/25 flex items-center justify-center"
+              className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 disabled:cursor-not-allowed text-white py-3 px-5 rounded-lg font-semibold text-base transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/25 flex items-center justify-center"
             >
               {isLoading ? (
                 <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Creating Account...
                 </>
               ) : (
                 <>
                   {t('signup.simple.submitButton')}
-                  <ArrowRight className="ml-2 w-5 h-5" />
+                  <ArrowRight className="ml-2 w-4 h-4" />
                 </>
               )}
             </button>
@@ -404,8 +467,8 @@ export default function SimpleSignup() {
           </form>
         </div>
 
-        <div className="mt-8 text-center">
-          <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+        <div className="mt-7 text-center">
+          <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
             <h3 className="text-white font-semibold mb-2">{t('signup.simple.whyTitle')}</h3>
             <ul className="text-gray-400 text-sm space-y-1">
               {(t('signup.simple.whyBenefits') as string[]).map((benefit, index) => (

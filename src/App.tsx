@@ -11,9 +11,7 @@ import {
 import { useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import SecurityHeadersManager from './lib/securityHeaders';
-import { quickHasSupabaseSessionToken } from './lib/supabaseClient';
 import AuthPage from './pages/AuthPage';
-import AuthSimple from './pages/AuthSimple';
 import StorageMigration from './lib/storageMigration';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import DashboardLayout from './components/layout/DashboardLayout';
@@ -267,21 +265,6 @@ function RoleBasedRedirect() {
     authCheckComplete,
   } = useAuth();
   const location = useLocation();
-  // If we have a fresh login flag and auth hasn't propagated, jump to a safe default
-  const recentSupabaseLogin =
-    typeof window !== 'undefined' && localStorage.getItem('recent_supabase_login') === 'true';
-  if (recentSupabaseLogin && (loading || !authCheckComplete || !user)) {
-    // Clear after using it to avoid loops
-    if (typeof window !== 'undefined') {
-      setTimeout(() => localStorage.removeItem('recent_supabase_login'), 5000);
-    }
-    return <Navigate to="/dashboard/sales" replace />;
-  }
-
-  // If token exists but context isn't ready, proceed to sales
-  if ((!user || !hasSession) && quickHasSupabaseSessionToken()) {
-    return <Navigate to="/dashboard/sales" replace />;
-  }
 
   // Add specific debugging for finance users
   useEffect(() => {
@@ -449,7 +432,8 @@ function RoleBasedRedirect() {
       (user?.email?.includes('finance') || user?.email?.includes('testfinance')))
   ) {
     // Check if this is a new user who should see the welcome page
-    const hasSeenWelcome = localStorage.getItem(`welcome_seen_${user.id}`) === 'true';
+    const welcomeKey = user?.id ? `welcome_seen_${user.id}` : 'welcome_seen_current_user';
+    const hasSeenWelcome = localStorage.getItem(welcomeKey) === 'true';
     const isNewSignup =
       window.location.search.includes('newuser=true') ||
       window.location.pathname.includes('/welcome/');
@@ -604,19 +588,36 @@ function App() {
     // Migrate sensitive data to encrypted storage on app load
     const migrateStorageData = async () => {
       try {
-        // Skip storage migration in development to avoid noisy local parse errors
-        if (APP_ENV === 'production' && StorageMigration.needsMigration()) {
+        if (StorageMigration.needsMigration()) {
           console.log('[App] Starting automatic storage migration...');
+
+          // First, clean up any malformed data to prevent migration errors
+          const clearedCount = StorageMigration.clearMalformedSensitiveData();
+          if (clearedCount > 0) {
+            console.log(`[App] Cleaned up ${clearedCount} malformed storage items`);
+          }
+
+          // Now attempt migration
           const result = await StorageMigration.migrateAllSensitiveData();
 
           if (result.success) {
             console.log('[App] Storage migration completed successfully');
+            if (result.migratedKeys.length > 0) {
+              console.log(
+                `[App] Migrated ${result.migratedKeys.length} keys:`,
+                result.migratedKeys
+              );
+            }
           } else {
             console.warn('[App] Storage migration completed with errors:', result.errors);
+            // Don't block app loading due to migration errors
           }
+        } else {
+          console.log('[App] No storage migration needed');
         }
       } catch (error) {
         console.error('[App] Storage migration failed:', error);
+        // Don't block app loading due to migration errors
       }
     };
 
@@ -679,6 +680,34 @@ function App() {
         : null;
     // Run migration first
     migrateStorageData();
+
+    // Add debug helper to window in development
+    if (import.meta.env.DEV) {
+      (window as any).debugStorage = {
+        inspect: () => StorageMigration.debugLocalStorage(),
+        clearMalformed: () => StorageMigration.clearMalformedSensitiveData(),
+        clearAll: () => StorageMigration.clearUnencryptedSensitiveData(),
+        status: () => StorageMigration.getMigrationStatus(),
+      };
+
+      // Add Supabase debug helper
+      (window as any).debugSupabase = {
+        testConnection: async () => {
+          const { testSupabaseConnection } = await import('./lib/supabaseClient');
+          return testSupabaseConnection();
+        },
+        getSession: async () => {
+          const { supabase } = await import('./lib/supabaseClient');
+          return supabase.auth.getSession();
+        },
+        getUser: async () => {
+          const { supabase } = await import('./lib/supabaseClient');
+          return supabase.auth.getUser();
+        },
+      };
+
+      console.log('[App] Debug helpers available: window.debugStorage, window.debugSupabase');
+    }
 
     if (
       typeof window !== 'undefined' &&
@@ -779,7 +808,6 @@ function App() {
                       <Route path="/signup/success" element={<SubscriptionSuccess />} />
                       <Route path="/subscription/success" element={<SubscriptionSuccess />} />
                       <Route path="/auth" element={<AuthPage />} />
-                      <Route path="/auth1" element={<AuthSimple />} />
 
                       {/* Legal Pages - Public Access */}
                       <Route path="/legal/terms" element={<TermsPage />} />
@@ -798,8 +826,6 @@ function App() {
 
                       {/* New Logout Route - accessible to everyone */}
                       <Route path="/logout" element={<LogoutPage />} />
-                      {/* Force default route to auth page to avoid auto-redirect loops when signed out */}
-                      <Route path="/login" element={<AuthPage />} />
 
                       {/* Password Reset Route - accessible to everyone */}
                       <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
@@ -969,6 +995,19 @@ function App() {
                         }
                       />
 
+                      {/* Single Finance Manager Dashboard specific deal log route */}
+                      <Route
+                        path="/single-finance-deal-log"
+                        element={
+                          <ProtectedRoute
+                            requiredRoles={['finance_manager', 'single_finance_manager']}
+                          >
+                            <DashboardLayout>
+                              <DealLogPage dashboardType="single-finance" />
+                            </DashboardLayout>
+                          </ProtectedRoute>
+                        }
+                      />
 
                       <Route
                         path="/dashboard/sales-manager/*"
@@ -1026,7 +1065,9 @@ function App() {
                           <ProtectedRoute
                             requiredRoles={['finance_manager', 'single_finance_manager']}
                           >
-                            <LogSingleFinanceDeal />
+                            <DashboardLayout>
+                              <LogSingleFinanceDeal />
+                            </DashboardLayout>
                           </ProtectedRoute>
                         }
                       />
@@ -1038,7 +1079,9 @@ function App() {
                           <ProtectedRoute
                             requiredRoles={['finance_manager', 'single_finance_manager']}
                           >
-                            <LogSingleFinanceDeal />
+                            <DashboardLayout>
+                              <LogSingleFinanceDeal />
+                            </DashboardLayout>
                           </ProtectedRoute>
                         }
                       />
