@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { getConsistentUserId, getUserIdSync, debugUserId } from '../../utils/userIdHelper';
+import { supabase, quickHasSupabaseSessionToken } from '../../lib/supabaseClient';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -8,15 +10,7 @@ import { Label } from '../../components/ui/label';
 import { toast } from '../../components/ui/use-toast';
 import { SingleFinanceStorage } from '../../lib/singleFinanceStorage';
 import { teamMemberSchema, type TeamMemberData } from '../../lib/validation/dealSchemas';
-import { 
-  Settings, 
-  Users, 
-  DollarSign, 
-  Plus, 
-  Trash2,
-  Save,
-  ArrowLeft
-} from 'lucide-react';
+import { Settings, Users, DollarSign, Plus, Trash2, Save, ArrowLeft } from 'lucide-react';
 
 // Interface for team member
 interface TeamMember {
@@ -44,21 +38,43 @@ export default function SingleFinanceSettings() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'team' | 'pay'>('team');
+  const [localUserId, setLocalUserId] = useState<string | null>(null);
 
-  // Helper function to get user ID consistently
-  const getUserId = () => {
-    return user?.id || user?.user?.id || user?.email;
+  // Helper to resolve a consistent user ID (context or token fallback)
+  const getUserId = (): string | null => {
+    const userId = getUserIdSync(user, localUserId);
+    debugUserId('SingleFinanceSettings', user, localUserId);
+    console.log('[Settings] Final resolved user ID:', userId);
+    return userId;
   };
-  
+
+  // Try to resolve user id from Supabase session if context not ready
+  useEffect(() => {
+    let cancelled = false;
+    const tryFetch = async () => {
+      if (localUserId || user?.id) return;
+      if (!quickHasSupabaseSessionToken()) return;
+      const { data } = await supabase.auth.getSession();
+      const uid = data?.session?.user?.id || null;
+      if (!cancelled && uid) setLocalUserId(uid);
+    };
+    tryFetch();
+    const t = setTimeout(tryFetch, 800);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [user, localUserId]);
+
   // Team management state
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [newMember, setNewMember] = useState({
     firstName: '',
     lastName: '',
-    role: 'salesperson' as 'salesperson' | 'sales_manager'
+    role: 'salesperson' as 'salesperson' | 'sales_manager',
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-  
+
   // Pay configuration state
   const [payConfig, setPayConfig] = useState<PayConfig>({
     commissionRate: 25,
@@ -67,34 +83,42 @@ export default function SingleFinanceSettings() {
       vscBonus: 100,
       gapBonus: 50,
       ppmBonus: 75,
-      totalThreshold: 15000
-    }
+      totalThreshold: 15000,
+    },
   });
+
+  // Make user available globally for encryption layer
+  useEffect(() => {
+    if (typeof window !== 'undefined' && user) {
+      (window as any).__authUser = user;
+      console.log('[Settings] Made user available globally for encryption');
+    }
+  }, [user]);
 
   // Load settings from localStorage on mount
   useEffect(() => {
     const userId = getUserId();
     console.log('[Settings] Loading settings for user:', userId);
     console.log('[Settings] Full user object:', user);
-    
+
     if (!userId) {
       console.log('[Settings] No userId, skipping load');
       return;
     }
-    
+
     // Clear old format data to ensure clean state
     SingleFinanceStorage.clearOldFormatData();
-    
+
     try {
       const storageKey = `singleFinanceTeamMembers_${userId}`;
       const rawData = localStorage.getItem(storageKey);
       console.log('[Settings] Raw localStorage data for key:', storageKey);
       console.log('[Settings] Raw data:', rawData);
-      
+
       const savedTeamMembers = SingleFinanceStorage.getTeamMembers(userId);
       console.log('[Settings] Parsed team members:', savedTeamMembers);
       console.log('[Settings] Team member count:', savedTeamMembers.length);
-      
+
       setTeamMembers(savedTeamMembers);
 
       const savedPayConfig = SingleFinanceStorage.getPayConfig(userId);
@@ -106,40 +130,83 @@ export default function SingleFinanceSettings() {
     }
   }, [user]);
 
-  // Save team members to localStorage
+  // Save team members to localStorage with enhanced verification
   const saveTeamMembers = (members: TeamMember[]) => {
     const userId = getUserId();
-    console.log('[Settings] saveTeamMembers called with:', { userId, memberCount: members.length, members });
-    
+    console.log('[Settings] saveTeamMembers called with:', {
+      userId,
+      memberCount: members.length,
+      members,
+    });
+
     if (!userId) {
       console.error('[Settings] No userId found, cannot save team members');
+      toast({
+        title: 'Error',
+        description: 'Unable to determine user identity. Please refresh the page.',
+        variant: 'destructive',
+      });
       return;
     }
-    
+
     try {
       const storageKey = `singleFinanceTeamMembers_${userId}`;
       console.log('[Settings] Saving to localStorage key:', storageKey);
-      
+
+      // Save to encrypted storage
       SingleFinanceStorage.setTeamMembers(userId, members);
-      
-      // Verify it was saved
-      const savedData = localStorage.getItem(storageKey);
-      console.log('[Settings] Verification - data saved to localStorage:', savedData);
-      
-      setTeamMembers(members);
-      
-      // Dispatch custom event to notify other components
-      window.dispatchEvent(new CustomEvent('teamMembersUpdated', { 
-        detail: { teamMembers: members, userId: userId } 
-      }));
-      
-      console.log('[Settings] Team members updated and event dispatched:', members.length, 'members');
+
+      // Immediate verification - check if data was actually saved
+      const verificationData = SingleFinanceStorage.getTeamMembers(userId);
+      console.log('[Settings] Immediate verification - retrieved team members:', {
+        saved: members.length,
+        retrieved: verificationData.length,
+        match: members.length === verificationData.length
+      });
+
+      // Update component state only after successful save verification
+      if (verificationData.length === members.length) {
+        setTeamMembers(members);
+
+        // Enhanced event dispatch with retry mechanism
+        const dispatchEvent = () => {
+          const event = new CustomEvent('teamMembersUpdated', {
+            detail: { 
+              teamMembers: members, 
+              userId: userId,
+              timestamp: new Date().toISOString(),
+              source: 'SingleFinanceSettings'
+            },
+          });
+          window.dispatchEvent(event);
+          console.log('[Settings] teamMembersUpdated event dispatched:', {
+            memberCount: members.length,
+            userId,
+            timestamp: new Date().toISOString()
+          });
+        };
+
+        // Dispatch immediately
+        dispatchEvent();
+
+        // Also dispatch after a small delay to catch any late listeners
+        setTimeout(dispatchEvent, 100);
+
+        console.log('[Settings] Team members saved and verified successfully:', members.length, 'members');
+        
+        toast({
+          title: 'Success',
+          description: `Team members updated successfully (${members.length} total)`,
+        });
+      } else {
+        throw new Error('Verification failed: saved data does not match expected data');
+      }
     } catch (error) {
-      console.error('Error saving team members:', error);
+      console.error('[Settings] Error saving team members:', error);
       toast({
         title: 'Error',
-        description: 'Failed to save team members',
-        variant: 'destructive'
+        description: 'Failed to save team members. Please try again.',
+        variant: 'destructive',
       });
     }
   };
@@ -148,20 +215,20 @@ export default function SingleFinanceSettings() {
   const savePayConfig = (config: PayConfig) => {
     const userId = getUserId();
     if (!userId) return;
-    
+
     try {
       SingleFinanceStorage.setPayConfig(userId, config);
       setPayConfig(config);
       toast({
         title: 'Success',
-        description: 'Pay configuration saved successfully'
+        description: 'Pay configuration saved successfully',
       });
     } catch (error) {
       console.error('Error saving pay configuration:', error);
       toast({
         title: 'Error',
         description: 'Failed to save pay configuration',
-        variant: 'destructive'
+        variant: 'destructive',
       });
     }
   };
@@ -172,75 +239,81 @@ export default function SingleFinanceSettings() {
     console.log('[Settings] Add team member clicked:', { newMember, userId });
     console.log('[Settings] Full user object:', user);
     console.log('[Settings] Storage key will be:', `singleFinanceTeamMembers_${userId}`);
-    
+
     // Validate using Zod schema
     const validationResult = teamMemberSchema.safeParse({
-      firstName: newMember.firstName,
-      lastName: newMember.lastName,
-      role: newMember.role
+      firstName: newMember.firstName.trim(),
+      lastName: newMember.lastName.trim(),
+      role: newMember.role,
     });
-    
+
     if (!validationResult.success) {
       const errors: Record<string, string> = {};
       validationResult.error.errors.forEach(err => {
         const path = err.path.join('.');
         errors[path] = err.message;
       });
-      
+
       setValidationErrors(errors);
-      
+
       const firstError = validationResult.error.errors[0];
       toast({
         title: 'Validation Error',
         description: firstError.message,
-        variant: 'destructive'
+        variant: 'destructive',
       });
       return;
     }
-    
+
     // Clear validation errors if validation passes
     setValidationErrors({});
 
-    const initials = `${newMember.firstName.charAt(0)}${newMember.lastName.charAt(0)}`.toUpperCase();
-    
+    const firstName = newMember.firstName.trim();
+    const lastName = newMember.lastName.trim();
+    const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+
     const member: TeamMember = {
       id: `member_${Date.now()}`,
-      firstName: newMember.firstName,
-      lastName: newMember.lastName,
+      firstName,
+      lastName,
       initials,
       role: newMember.role,
-      active: true
+      active: true,
     };
 
     const updatedMembers = [...teamMembers, member];
     console.log('[Settings] About to save team members:', updatedMembers);
     saveTeamMembers(updatedMembers);
-    
+
     // Reset form and clear validation errors
     setNewMember({
       firstName: '',
       lastName: '',
-      role: 'salesperson'
+      role: 'salesperson',
     });
     setValidationErrors({});
 
     console.log('[Settings] Team member added successfully:', member);
     toast({
       title: 'Success',
-      description: `${member.firstName} ${member.lastName} added to team`
+      description: `${member.firstName} ${member.lastName} added to team`,
     });
   };
 
   // Remove team member
   const handleRemoveTeamMember = (memberId: string) => {
     const member = teamMembers.find(m => m.id === memberId);
-    if (confirm(`Are you sure you want to remove ${member?.firstName} ${member?.lastName} from the team?`)) {
+    if (
+      confirm(
+        `Are you sure you want to remove ${member?.firstName} ${member?.lastName} from the team?`
+      )
+    ) {
       const updatedMembers = teamMembers.filter(m => m.id !== memberId);
       saveTeamMembers(updatedMembers);
-      
+
       toast({
         title: 'Success',
-        description: 'Team member removed'
+        description: 'Team member removed',
       });
     }
   };
@@ -268,8 +341,8 @@ export default function SingleFinanceSettings() {
 
       <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-blue-800 text-sm">
-          <strong>Note:</strong> These settings are specific to your Single Finance Manager Dashboard
-          and will be used for deal logging and pay calculations.
+          <strong>Note:</strong> These settings are specific to your Single Finance Manager
+          Dashboard and will be used for deal logging and pay calculations.
         </p>
       </div>
 
@@ -317,7 +390,7 @@ export default function SingleFinanceSettings() {
                   <Input
                     id="firstName"
                     value={newMember.firstName}
-                    onChange={(e) => setNewMember(prev => ({ ...prev, firstName: e.target.value }))}
+                    onChange={e => setNewMember(prev => ({ ...prev, firstName: e.target.value }))}
                     placeholder="First name"
                     className={validationErrors.firstName ? 'border-red-500' : ''}
                   />
@@ -330,7 +403,7 @@ export default function SingleFinanceSettings() {
                   <Input
                     id="lastName"
                     value={newMember.lastName}
-                    onChange={(e) => setNewMember(prev => ({ ...prev, lastName: e.target.value }))}
+                    onChange={e => setNewMember(prev => ({ ...prev, lastName: e.target.value }))}
                     placeholder="Last name"
                     className={validationErrors.lastName ? 'border-red-500' : ''}
                   />
@@ -343,7 +416,12 @@ export default function SingleFinanceSettings() {
                   <select
                     id="role"
                     value={newMember.role}
-                    onChange={(e) => setNewMember(prev => ({ ...prev, role: e.target.value as 'salesperson' | 'sales_manager' }))}
+                    onChange={e =>
+                      setNewMember(prev => ({
+                        ...prev,
+                        role: e.target.value as 'salesperson' | 'sales_manager',
+                      }))
+                    }
                     className="w-full p-2 border rounded-md"
                   >
                     <option value="salesperson">Salesperson</option>
@@ -381,46 +459,51 @@ export default function SingleFinanceSettings() {
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <Users className="mr-2 h-5 w-5" />
-                      Salespeople ({teamMembers.filter(member => member.role === 'salesperson').length})
+                      Salespeople (
+                      {teamMembers.filter(member => member.role === 'salesperson').length})
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {teamMembers.filter(member => member.role === 'salesperson').map((member) => (
-                        <div
-                          key={member.id}
-                          className="flex items-center justify-between p-3 border rounded-lg bg-blue-50"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <div className="bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-medium">
-                              {member.initials}
+                      {teamMembers
+                        .filter(member => member.role === 'salesperson')
+                        .map(member => (
+                          <div
+                            key={member.id}
+                            className="flex items-center justify-between p-3 border rounded-lg bg-blue-50"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className="bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-medium">
+                                {member.initials}
+                              </div>
+                              <div>
+                                <p className="font-medium">
+                                  {member.firstName} {member.lastName}
+                                </p>
+                                <p className="text-sm text-blue-600">Salesperson</p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="font-medium">{member.firstName} {member.lastName}</p>
-                              <p className="text-sm text-blue-600">Salesperson</p>
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={() => handleToggleActive(member.id)}
+                                className={`px-3 py-1 rounded text-sm font-medium ${
+                                  member.active
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-gray-100 text-gray-600'
+                                }`}
+                              >
+                                {member.active ? 'Active' : 'Inactive'}
+                              </button>
+                              <Button
+                                onClick={() => handleRemoveTeamMember(member.id)}
+                                variant="destructive"
+                                size="sm"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
                             </div>
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={() => handleToggleActive(member.id)}
-                              className={`px-3 py-1 rounded text-sm font-medium ${
-                                member.active
-                                  ? 'bg-green-100 text-green-800'
-                                  : 'bg-gray-100 text-gray-600'
-                              }`}
-                            >
-                              {member.active ? 'Active' : 'Inactive'}
-                            </button>
-                            <Button
-                              onClick={() => handleRemoveTeamMember(member.id)}
-                              variant="destructive"
-                              size="sm"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   </CardContent>
                 </Card>
@@ -432,46 +515,51 @@ export default function SingleFinanceSettings() {
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <Users className="mr-2 h-5 w-5" />
-                      Sales Managers ({teamMembers.filter(member => member.role === 'sales_manager').length})
+                      Sales Managers (
+                      {teamMembers.filter(member => member.role === 'sales_manager').length})
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {teamMembers.filter(member => member.role === 'sales_manager').map((member) => (
-                        <div
-                          key={member.id}
-                          className="flex items-center justify-between p-3 border rounded-lg bg-purple-50"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <div className="bg-purple-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-medium">
-                              {member.initials}
+                      {teamMembers
+                        .filter(member => member.role === 'sales_manager')
+                        .map(member => (
+                          <div
+                            key={member.id}
+                            className="flex items-center justify-between p-3 border rounded-lg bg-purple-50"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className="bg-purple-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-medium">
+                                {member.initials}
+                              </div>
+                              <div>
+                                <p className="font-medium">
+                                  {member.firstName} {member.lastName}
+                                </p>
+                                <p className="text-sm text-purple-600">Sales Manager</p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="font-medium">{member.firstName} {member.lastName}</p>
-                              <p className="text-sm text-purple-600">Sales Manager</p>
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={() => handleToggleActive(member.id)}
+                                className={`px-3 py-1 rounded text-sm font-medium ${
+                                  member.active
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-gray-100 text-gray-600'
+                                }`}
+                              >
+                                {member.active ? 'Active' : 'Inactive'}
+                              </button>
+                              <Button
+                                onClick={() => handleRemoveTeamMember(member.id)}
+                                variant="destructive"
+                                size="sm"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
                             </div>
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={() => handleToggleActive(member.id)}
-                              className={`px-3 py-1 rounded text-sm font-medium ${
-                                member.active
-                                  ? 'bg-green-100 text-green-800'
-                                  : 'bg-gray-100 text-gray-600'
-                              }`}
-                            >
-                              {member.active ? 'Active' : 'Inactive'}
-                            </button>
-                            <Button
-                              onClick={() => handleRemoveTeamMember(member.id)}
-                              variant="destructive"
-                              size="sm"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   </CardContent>
                 </Card>
@@ -502,10 +590,12 @@ export default function SingleFinanceSettings() {
                     max="100"
                     step="0.1"
                     value={payConfig.commissionRate}
-                    onChange={(e) => setPayConfig(prev => ({ 
-                      ...prev, 
-                      commissionRate: parseFloat(e.target.value) || 0 
-                    }))}
+                    onChange={e =>
+                      setPayConfig(prev => ({
+                        ...prev,
+                        commissionRate: parseFloat(e.target.value) || 0,
+                      }))
+                    }
                   />
                   <p className="text-xs text-gray-600">Percentage of back-end gross profit</p>
                 </div>
@@ -517,10 +607,12 @@ export default function SingleFinanceSettings() {
                     min="0"
                     step="50"
                     value={payConfig.baseRate}
-                    onChange={(e) => setPayConfig(prev => ({ 
-                      ...prev, 
-                      baseRate: parseFloat(e.target.value) || 0 
-                    }))}
+                    onChange={e =>
+                      setPayConfig(prev => ({
+                        ...prev,
+                        baseRate: parseFloat(e.target.value) || 0,
+                      }))
+                    }
                   />
                   <p className="text-xs text-gray-600">Fixed monthly base pay</p>
                 </div>
@@ -542,13 +634,15 @@ export default function SingleFinanceSettings() {
                     min="0"
                     step="25"
                     value={payConfig.bonusThresholds.vscBonus}
-                    onChange={(e) => setPayConfig(prev => ({ 
-                      ...prev, 
-                      bonusThresholds: {
-                        ...prev.bonusThresholds,
-                        vscBonus: parseFloat(e.target.value) || 0
-                      }
-                    }))}
+                    onChange={e =>
+                      setPayConfig(prev => ({
+                        ...prev,
+                        bonusThresholds: {
+                          ...prev.bonusThresholds,
+                          vscBonus: parseFloat(e.target.value) || 0,
+                        },
+                      }))
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -559,13 +653,15 @@ export default function SingleFinanceSettings() {
                     min="0"
                     step="25"
                     value={payConfig.bonusThresholds.gapBonus}
-                    onChange={(e) => setPayConfig(prev => ({ 
-                      ...prev, 
-                      bonusThresholds: {
-                        ...prev.bonusThresholds,
-                        gapBonus: parseFloat(e.target.value) || 0
-                      }
-                    }))}
+                    onChange={e =>
+                      setPayConfig(prev => ({
+                        ...prev,
+                        bonusThresholds: {
+                          ...prev.bonusThresholds,
+                          gapBonus: parseFloat(e.target.value) || 0,
+                        },
+                      }))
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -576,13 +672,15 @@ export default function SingleFinanceSettings() {
                     min="0"
                     step="25"
                     value={payConfig.bonusThresholds.ppmBonus}
-                    onChange={(e) => setPayConfig(prev => ({ 
-                      ...prev, 
-                      bonusThresholds: {
-                        ...prev.bonusThresholds,
-                        ppmBonus: parseFloat(e.target.value) || 0
-                      }
-                    }))}
+                    onChange={e =>
+                      setPayConfig(prev => ({
+                        ...prev,
+                        bonusThresholds: {
+                          ...prev.bonusThresholds,
+                          ppmBonus: parseFloat(e.target.value) || 0,
+                        },
+                      }))
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -593,13 +691,15 @@ export default function SingleFinanceSettings() {
                     min="0"
                     step="1000"
                     value={payConfig.bonusThresholds.totalThreshold}
-                    onChange={(e) => setPayConfig(prev => ({ 
-                      ...prev, 
-                      bonusThresholds: {
-                        ...prev.bonusThresholds,
-                        totalThreshold: parseFloat(e.target.value) || 0
-                      }
-                    }))}
+                    onChange={e =>
+                      setPayConfig(prev => ({
+                        ...prev,
+                        bonusThresholds: {
+                          ...prev.bonusThresholds,
+                          totalThreshold: parseFloat(e.target.value) || 0,
+                        },
+                      }))
+                    }
                   />
                   <p className="text-xs text-gray-600">Monthly gross threshold for full bonuses</p>
                 </div>

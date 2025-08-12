@@ -3,6 +3,12 @@ import { Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../components/ui/card';
 import LoginForm from '../components/auth/LoginForm';
+import {
+  testSupabaseConnection,
+  testSupabaseConnectionHttp,
+  quickHasSupabaseSessionToken,
+} from '../lib/supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 import { AlertCircle } from 'lucide-react';
 import AuthDebugButton from '../components/debug/AuthDebugButton';
 import { useTranslation } from '../contexts/TranslationContext';
@@ -14,6 +20,7 @@ const AuthPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loadingTimeout, setLoadingTimeout] = useState(false);
+  const [connectivity, setConnectivity] = useState<{ ok: boolean; message?: string } | null>(null);
 
   // Check for special query parameters
   const searchParams = new URLSearchParams(location.search);
@@ -37,6 +44,98 @@ const AuthPage: React.FC = () => {
       if (timeoutId) window.clearTimeout(timeoutId);
     };
   }, [loading]);
+
+  // Quick connectivity test to surface network/CORS issues
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [rpc, http] = await Promise.all([
+          testSupabaseConnection(),
+          testSupabaseConnectionHttp(4000),
+        ]);
+        const hasToken = quickHasSupabaseSessionToken();
+        if (!cancelled) setConnectivity({ ok: rpc.success && http.success && hasToken });
+      } catch (e) {
+        if (!cancelled) setConnectivity({ ok: false, message: 'Connection failed' });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Immediate redirect hook on direct auth event to avoid waiting for context propagation
+  useEffect(() => {
+    const computeDashboardPath = (
+      roleName?: string | null,
+      isGroupAdminFlag?: boolean,
+      email?: string | null
+    ): string => {
+      const rv = (roleName || '').toLowerCase();
+      const e = (email || '').toLowerCase();
+      if (isGroupAdminFlag) return '/group-admin';
+      if (rv === 'dealer_group_admin' || rv.includes('group')) return '/group-admin';
+      if (
+        rv === 'single_finance_manager' ||
+        (rv === 'finance_manager' && (e.includes('finance') || e.includes('testfinance')))
+      ) {
+        return '/dashboard/single-finance';
+      }
+      if (rv === 'finance_manager' || rv.includes('finance')) return '/dashboard/finance';
+      if (rv === 'sales_manager' || rv.includes('sales_manager')) return '/dashboard/sales-manager';
+      if (rv === 'general_manager' || rv.includes('general')) return '/dashboard/gm';
+      if (rv === 'area_vice_president' || rv.includes('vice_president'))
+        return '/avp-full-dashboard';
+      if (
+        rv === 'single_dealer_admin' ||
+        rv === 'dealership_admin' ||
+        rv.includes('dealership_admin') ||
+        rv === 'admin'
+      )
+        return '/dashboard/admin';
+      return '/dashboard/sales';
+    };
+
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      if (noRedirect || forceLogin) return;
+      if (event === 'SIGNED_IN' && session?.user) {
+        const metaRole = (session.user.user_metadata as any)?.role as string | undefined;
+        const isGA = !!(session.user.user_metadata as any)?.is_group_admin;
+        if (metaRole) {
+          window.location.href = computeDashboardPath(metaRole, isGA, session.user.email || null);
+        } else {
+          supabase
+            .from('profiles')
+            .select('role,is_group_admin')
+            .eq('id', session.user.id)
+            .maybeSingle()
+            .then(({ data }) => {
+              const role = data?.role || null;
+              const isGroupAdmin = !!data?.is_group_admin;
+              window.location.href = computeDashboardPath(
+                role,
+                isGroupAdmin,
+                session.user.email || null
+              );
+            })
+            .catch(() => {
+              window.location.href = '/dashboard/sales';
+            });
+        }
+      }
+    });
+    // As a safety, if a token already exists, redirect after short delay
+    const tokenCheck = setTimeout(() => {
+      if (!noRedirect && !forceLogin && quickHasSupabaseSessionToken()) {
+        window.location.href = '/dashboard';
+      }
+    }, 1500);
+    return () => {
+      data.subscription.unsubscribe();
+      clearTimeout(tokenCheck);
+    };
+  }, [noRedirect, forceLogin]);
 
   // Add direct redirection for group admin accounts
   useEffect(() => {
@@ -101,30 +200,7 @@ const AuthPage: React.FC = () => {
     }
   }, [user, hasSession, loading, navigate, isGroupAdmin, noRedirect, forceLogin]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center relative overflow-hidden">
-        {/* Ghosted background text */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="text-gray-300 text-[12rem] font-bold transform -rotate-12 select-none whitespace-nowrap opacity-60">
-            The DAS Board
-          </div>
-        </div>
-
-        <div className="flex flex-col items-center gap-3 relative z-10">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          {loadingTimeout && (
-            <div className="text-sm text-blue-800 max-w-md text-center mt-4 flex items-center gap-2 bg-blue-100 p-2 rounded border border-blue-300 shadow-lg">
-              <AlertCircle className="h-4 w-4 text-blue-600" />
-              <span>
-                Taking longer than expected. Please try refreshing the page if this continues.
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
+  // Do not block rendering while loading; show the form with a subtle notice instead
 
   // If forceLogin or noRedirect is true, always show the login form
   if (forceLogin || noRedirect) {
@@ -202,6 +278,17 @@ const AuthPage: React.FC = () => {
                 Welcome Back
               </CardTitle>
               <p className="text-gray-600 text-center text-sm">Sign in to your DAS Board account</p>
+              {loading && (
+                <p className="text-xs text-blue-700 text-center bg-blue-50 border border-blue-200 rounded p-2">
+                  Checking your session… You can still log in below.
+                </p>
+              )}
+              {connectivity && !connectivity.ok && (
+                <p className="text-xs text-red-700 text-center bg-red-50 border border-red-200 rounded p-2">
+                  Supabase connection check failed. Please verify network access and environment
+                  keys.
+                </p>
+              )}
               {(forceLogin || noRedirect) && (
                 <p className="text-sm text-center text-blue-600 bg-blue-50 p-2 rounded-lg">
                   Force login mode active - you can log in again

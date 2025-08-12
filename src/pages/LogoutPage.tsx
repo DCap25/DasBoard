@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logoutDirectAuth } from '../lib/directAuth';
+import { supabase } from '../lib/supabaseClient';
 
 export default function LogoutPage() {
   const navigate = useNavigate();
@@ -12,16 +13,24 @@ export default function LogoutPage() {
     // Clear only authentication-related localStorage keys (preserve user data like deals)
     const authKeys = [
       'supabase.auth.token',
-      'supabase.auth.expires_at', 
+      'supabase.auth.expires_at',
       'supabase.auth.expires_in',
       'directauth_user',
       'direct_auth_user',
       'force_redirect_after_login',
       'force_redirect_timestamp',
-      'logout_in_progress'
+      'logout_in_progress',
     ];
-    
+
     authKeys.forEach(key => localStorage.removeItem(key));
+
+    // Also remove any sb-*-auth-token keys created by Supabase
+    Object.keys(localStorage)
+      .filter(k => k.startsWith('sb-') && k.endsWith('-auth-token'))
+      .forEach(k => localStorage.removeItem(k));
+
+    // Explicitly call Supabase signOut to revoke refresh token
+    supabase.auth.signOut().catch(() => {});
 
     // Small delay then redirect to home
     setTimeout(() => {

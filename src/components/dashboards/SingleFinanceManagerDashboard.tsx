@@ -30,6 +30,8 @@ import { SingleFinanceHomePage } from '../../pages/finance/SingleFinanceHomePage
 import SingleFinanceDealsPage from '../../pages/finance/SingleFinanceDealsPage';
 import SingleFinanceSettings from '../../pages/finance/SingleFinanceSettings';
 import { getFinanceManagerDeals } from '../../lib/apiService';
+import { supabase } from '../../lib/supabaseClient';
+import { quickHasSupabaseSessionToken } from '../../lib/supabaseClient';
 
 // Interface for a deal
 interface Deal {
@@ -47,7 +49,8 @@ interface Deal {
 }
 
 const SingleFinanceManagerDashboard = () => {
-  const { user, role, dealershipId } = useAuth();
+  const { user, role, dealershipId, authCheckComplete, hasSession } = useAuth();
+  const [localUserId, setLocalUserId] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -55,6 +58,26 @@ const SingleFinanceManagerDashboard = () => {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Attempt to fetch user id directly if token exists but context not ready
+  useEffect(() => {
+    let cancelled = false;
+    const tryFetch = async () => {
+      if (localUserId || user?.id) return;
+      if (!quickHasSupabaseSessionToken()) return;
+      const { data } = await supabase.auth.getSession();
+      const uid = data?.session?.user?.id || null;
+      if (!cancelled && uid) setLocalUserId(uid);
+    };
+    tryFetch();
+    const t = setTimeout(tryFetch, 800);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [user, localUserId]);
+
+  // Do not block rendering; UI will show empty states until userId resolves
 
   // Get the schema name from user metadata
   const schemaName = user?.user_metadata?.schema_name || '';
@@ -68,21 +91,21 @@ const SingleFinanceManagerDashboard = () => {
       console.log('[SingleFinanceManagerDashboard] Loading deals from localStorage');
       debugUserId('SingleFinanceManagerDashboard', user);
 
-      // Get consistent user ID
-      const userId = getConsistentUserId(user);
-      
+      // Get consistent user ID (fallback to local user id if context not ready)
+      const userId = getConsistentUserId(user) || localUserId;
+
       // Load raw deals directly from user-specific storage to preserve all form data
       if (!userId) {
         console.warn('[SingleFinanceManagerDashboard] No user ID available');
         return;
       }
-      
+
       const singleFinanceDeals = SingleFinanceStorage.getDeals(userId);
-      console.log('[SingleFinanceManagerDashboard] Storage key used:', `singleFinanceDeals_${userId}`);
       console.log(
-        '[SingleFinanceManagerDashboard] Raw singleFinanceDeals:',
-        singleFinanceDeals
+        '[SingleFinanceManagerDashboard] Storage key used:',
+        `singleFinanceDeals_${userId}`
       );
+      console.log('[SingleFinanceManagerDashboard] Raw singleFinanceDeals:', singleFinanceDeals);
 
       if (!singleFinanceDeals || singleFinanceDeals.length === 0) {
         console.log('[SingleFinanceManagerDashboard] No deals found in user storage');
@@ -157,7 +180,7 @@ const SingleFinanceManagerDashboard = () => {
     };
 
     window.addEventListener('singleFinanceDealsUpdated', handleDealsUpdated as EventListener);
-    
+
     return () => {
       window.removeEventListener('singleFinanceDealsUpdated', handleDealsUpdated as EventListener);
     };
@@ -338,10 +361,8 @@ const SingleFinanceManagerDashboard = () => {
       localStorage.setItem(storageKey, JSON.stringify(updatedDeals));
 
       // Update state immediately to trigger re-render
-      setDeals(currentDeals => 
-        currentDeals.map(deal => 
-          deal.id === dealId ? { ...deal, status: newStatus } : deal
-        )
+      setDeals(currentDeals =>
+        currentDeals.map(deal => (deal.id === dealId ? { ...deal, status: newStatus } : deal))
       );
 
       // Also reload from storage to keep consistency
@@ -367,20 +388,20 @@ const SingleFinanceManagerDashboard = () => {
     // Enhanced warning popup with better messaging
     const confirmed = confirm(
       '⚠️ DELETE CONFIRMATION\n\n' +
-      'Are you sure you want to delete this deal?\n\n' +
-      'This action will:\n' +
-      '• Permanently remove all deal data\n' +
-      '• Update your dashboard metrics\n' +
-      '• Cannot be undone\n\n' +
-      'Click OK to delete or Cancel to keep the deal.'
+        'Are you sure you want to delete this deal?\n\n' +
+        'This action will:\n' +
+        '• Permanently remove all deal data\n' +
+        '• Update your dashboard metrics\n' +
+        '• Cannot be undone\n\n' +
+        'Click OK to delete or Cancel to keep the deal.'
     );
 
     if (confirmed) {
       // Second confirmation for extra safety
       const finalConfirm = confirm(
         '🚨 FINAL CONFIRMATION\n\n' +
-        'This is your last chance!\n\n' +
-        'Click OK to permanently delete this deal, or Cancel to keep it.'
+          'This is your last chance!\n\n' +
+          'Click OK to permanently delete this deal, or Cancel to keep it.'
       );
 
       if (finalConfirm) {
@@ -463,7 +484,11 @@ const SingleFinanceManagerDashboard = () => {
 
         {/* Right Column - Log New Deal Button */}
         <div className="flex justify-end">
-          <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={handleLogNewDealClick}>
+          <Button
+            size="lg"
+            className="bg-blue-600 hover:bg-blue-700"
+            onClick={handleLogNewDealClick}
+          >
             <span className="flex items-center">
               <PlusCircle className="mr-2 h-5 w-5" />
               Log New Deal
@@ -485,9 +510,9 @@ const SingleFinanceManagerDashboard = () => {
             Deals Log
           </CardTitle>
           <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => loadDealsFromLocalStorage()}
               title="Refresh deals"
             >
@@ -663,8 +688,8 @@ const SingleFinanceManagerDashboard = () => {
                         key={deal.id}
                         className="border-b"
                         style={{
-                          backgroundColor: status === 'Held' ? '#fef2f2' : 
-                            index % 2 === 1 ? '#f9fafb' : 'white'
+                          backgroundColor:
+                            status === 'Held' ? '#fef2f2' : index % 2 === 1 ? '#f9fafb' : 'white',
                         }}
                       >
                         <td className="py-2 px-2 text-center font-medium">

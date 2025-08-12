@@ -28,21 +28,24 @@ const createSupabaseClient = () => {
   });
 
   try {
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.error('[Supabase] Missing URL or anon key. Check environment configuration.');
+    }
     supabaseInstance = createClient<Database>(supabaseUrl, supabaseAnonKey, {
       auth: {
-        persistSession: true, // Enable session persistence
-        autoRefreshToken: true, // Enable auto-refresh
-      detectSessionInUrl: true, // Enable URL session detection for redirects
-      storage: window.localStorage, // Use localStorage for session storage
-    },
-    global: {
-      headers: {
-        'X-Client-Info': 'dasboard-app',
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage,
       },
-    },
-  });
+      global: {
+        headers: {
+          'X-Client-Info': 'dasboard-app',
+        },
+      },
+    });
 
-  return supabaseInstance;
+    return supabaseInstance;
   } catch (error) {
     console.error('[Supabase] Failed to create client:', error);
     // Return a minimal mock client that won't break the app
@@ -68,6 +71,22 @@ export const getDealershipSupabase = (dealershipId?: string | number) => {
 // Get the default Supabase client (Master project)
 export const getSupabase = () => {
   return supabase;
+};
+
+// Quick local check for presence of Supabase auth token in localStorage (non-blocking)
+export const quickHasSupabaseSessionToken = (): boolean => {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return false;
+    const keys = Object.keys(window.localStorage);
+    const tokenKey = keys.find(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
+    if (!tokenKey) return false;
+    const raw = window.localStorage.getItem(tokenKey);
+    if (!raw) return false;
+    // raw is JSON string with { currentSession, expiresAt, ... }
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 // Helper function to check if a session exists
@@ -351,5 +370,30 @@ export const testSupabaseConnection = async () => {
       success: false,
       error: err,
     };
+  }
+};
+
+// HTTP-based connectivity test with timeout to surface network/CORS issues quickly
+export const testSupabaseConnectionHttp = async (timeoutMs: number = 4000) => {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    const url = `${env.supabase.url}/rest/v1/roles?select=count`;
+    const resp = await fetch(url, {
+      method: 'GET',
+      headers: {
+        apikey: getSupabaseKey(),
+        Authorization: `Bearer ${getSupabaseKey()}`,
+        Prefer: 'count=exact',
+      },
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+    if (!resp.ok) {
+      return { success: false, status: resp.status };
+    }
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : String(e) };
   }
 };

@@ -11,7 +11,9 @@ import {
 import { useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import SecurityHeadersManager from './lib/securityHeaders';
+import { quickHasSupabaseSessionToken } from './lib/supabaseClient';
 import AuthPage from './pages/AuthPage';
+import AuthSimple from './pages/AuthSimple';
 import StorageMigration from './lib/storageMigration';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import DashboardLayout from './components/layout/DashboardLayout';
@@ -265,6 +267,21 @@ function RoleBasedRedirect() {
     authCheckComplete,
   } = useAuth();
   const location = useLocation();
+  // If we have a fresh login flag and auth hasn't propagated, jump to a safe default
+  const recentSupabaseLogin =
+    typeof window !== 'undefined' && localStorage.getItem('recent_supabase_login') === 'true';
+  if (recentSupabaseLogin && (loading || !authCheckComplete || !user)) {
+    // Clear after using it to avoid loops
+    if (typeof window !== 'undefined') {
+      setTimeout(() => localStorage.removeItem('recent_supabase_login'), 5000);
+    }
+    return <Navigate to="/dashboard/sales" replace />;
+  }
+
+  // If token exists but context isn't ready, proceed to sales
+  if ((!user || !hasSession) && quickHasSupabaseSessionToken()) {
+    return <Navigate to="/dashboard/sales" replace />;
+  }
 
   // Add specific debugging for finance users
   useEffect(() => {
@@ -433,9 +450,10 @@ function RoleBasedRedirect() {
   ) {
     // Check if this is a new user who should see the welcome page
     const hasSeenWelcome = localStorage.getItem(`welcome_seen_${user.id}`) === 'true';
-    const isNewSignup = window.location.search.includes('newuser=true') || 
-                       window.location.pathname.includes('/welcome/');
-    
+    const isNewSignup =
+      window.location.search.includes('newuser=true') ||
+      window.location.pathname.includes('/welcome/');
+
     if (!hasSeenWelcome && !isNewSignup) {
       // First-time user - show welcome page
       redirectPath = '/welcome/single-finance?newuser=true';
@@ -564,7 +582,6 @@ function GroupAdminAccessCheck({ children }: { children: React.ReactNode }) {
   );
 }
 
-
 function App() {
   useEffect(() => {
     // Initialize security features
@@ -572,12 +589,12 @@ function App() {
       try {
         // Set up CSP violation reporting
         SecurityHeadersManager.setupCSPReporting();
-        
+
         // Check secure context
         if (!SecurityHeadersManager.isSecureContext() && process.env.NODE_ENV === 'production') {
           console.warn('[Security] Application is not running in a secure context (HTTPS)');
         }
-        
+
         console.log('[Security] Security features initialized');
       } catch (error) {
         console.error('[Security] Failed to initialize security features:', error);
@@ -587,10 +604,11 @@ function App() {
     // Migrate sensitive data to encrypted storage on app load
     const migrateStorageData = async () => {
       try {
-        if (StorageMigration.needsMigration()) {
+        // Skip storage migration in development to avoid noisy local parse errors
+        if (APP_ENV === 'production' && StorageMigration.needsMigration()) {
           console.log('[App] Starting automatic storage migration...');
           const result = await StorageMigration.migrateAllSensitiveData();
-          
+
           if (result.success) {
             console.log('[App] Storage migration completed successfully');
           } else {
@@ -661,7 +679,7 @@ function App() {
         : null;
     // Run migration first
     migrateStorageData();
-    
+
     if (
       typeof window !== 'undefined' &&
       window.location.pathname !== '/logout' &&
@@ -761,6 +779,7 @@ function App() {
                       <Route path="/signup/success" element={<SubscriptionSuccess />} />
                       <Route path="/subscription/success" element={<SubscriptionSuccess />} />
                       <Route path="/auth" element={<AuthPage />} />
+                      <Route path="/auth1" element={<AuthSimple />} />
 
                       {/* Legal Pages - Public Access */}
                       <Route path="/legal/terms" element={<TermsPage />} />
@@ -779,6 +798,8 @@ function App() {
 
                       {/* New Logout Route - accessible to everyone */}
                       <Route path="/logout" element={<LogoutPage />} />
+                      {/* Force default route to auth page to avoid auto-redirect loops when signed out */}
+                      <Route path="/login" element={<AuthPage />} />
 
                       {/* Password Reset Route - accessible to everyone */}
                       <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
@@ -948,19 +969,6 @@ function App() {
                         }
                       />
 
-                      {/* Single Finance Manager Dashboard specific deal log route */}
-                      <Route
-                        path="/single-finance-deal-log"
-                        element={
-                          <ProtectedRoute
-                            requiredRoles={['finance_manager', 'single_finance_manager']}
-                          >
-                            <DashboardLayout>
-                              <DealLogPage dashboardType="single-finance" />
-                            </DashboardLayout>
-                          </ProtectedRoute>
-                        }
-                      />
 
                       <Route
                         path="/dashboard/sales-manager/*"
@@ -1018,9 +1026,7 @@ function App() {
                           <ProtectedRoute
                             requiredRoles={['finance_manager', 'single_finance_manager']}
                           >
-                            <DashboardLayout>
-                              <LogSingleFinanceDeal />
-                            </DashboardLayout>
+                            <LogSingleFinanceDeal />
                           </ProtectedRoute>
                         }
                       />
@@ -1032,9 +1038,7 @@ function App() {
                           <ProtectedRoute
                             requiredRoles={['finance_manager', 'single_finance_manager']}
                           >
-                            <DashboardLayout>
-                              <LogSingleFinanceDeal />
-                            </DashboardLayout>
+                            <LogSingleFinanceDeal />
                           </ProtectedRoute>
                         }
                       />

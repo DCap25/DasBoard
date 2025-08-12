@@ -69,6 +69,7 @@ import {
   TooltipTrigger,
 } from '../../components/ui/tooltip';
 import { isAuthenticated, getCurrentUser } from '../../lib/directAuth';
+import { adminApi } from '../../lib/adminApi';
 
 // Define interfaces for our data types
 interface DealershipGroup {
@@ -215,6 +216,7 @@ export function MasterAdminPanel() {
   const [creatingGroup, setCreatingGroup] = useState(false);
   const [creatingDealership, setCreatingDealership] = useState(false);
   const [creatingAdmin, setCreatingAdmin] = useState(false);
+  const [creatingGroupSchemasId, setCreatingGroupSchemasId] = useState<number | null>(null);
 
   // State for forms
   const [groupForm, setGroupForm] = useState({
@@ -684,6 +686,55 @@ export function MasterAdminPanel() {
       }
     } catch (err) {
       console.error('[MasterAdminPanel] Error displaying toast:', err);
+    }
+  };
+
+  // Create schemas for all dealerships in a group via secure server action
+  const handleCreateGroupSchemas = async (groupId: number) => {
+    try {
+      const group = groups.find(g => g.id === groupId);
+      const groupName = group?.name || `Group ${groupId}`;
+      const groupDealerships = dealerships.filter(d => d.group_id === groupId);
+
+      if (
+        !confirm(
+          `Create schemas for ${groupDealerships.length} dealership(s) in "${groupName}"? This may take a minute.`
+        )
+      ) {
+        return;
+      }
+
+      setCreatingGroupSchemasId(groupId);
+
+      const groupDealershipsCount = groupDealerships.length;
+      const sampleNames = groupDealerships.map(d => d.name).slice(0, 5);
+      const namesPreview = sampleNames.join(', ') + (groupDealershipsCount > 5 ? ', …' : '');
+      safeToast({
+        title: 'Creating Schemas',
+        description:
+          groupDealershipsCount > 0
+            ? `Starting schema creation for ${groupDealershipsCount} dealership(s): ${namesPreview}`
+            : 'Starting schema creation for dealerships in this group...',
+      });
+
+      const { error } = await adminApi.createGroupSchemas({ group_id: groupId });
+      if (error) throw new Error(error.message || 'Failed to start schema creation');
+
+      await fetchDealerships();
+      await fetchGroups();
+
+      safeToast({
+        title: 'Schemas Created',
+        description: `Requested schema creation for ${groupDealershipsCount} dealership(s) in "${groupName}"`,
+      });
+    } catch (err: any) {
+      safeToast({
+        title: 'Error',
+        description: err?.message || 'Failed to create schemas for the group',
+        variant: 'destructive',
+      });
+    } finally {
+      setCreatingGroupSchemasId(null);
     }
   };
 
@@ -1560,7 +1611,9 @@ export function MasterAdminPanel() {
       const isTestAccount = isTestEmail(adminForm.email) || isTestEnvironment;
 
       // For test accounts, use a simpler password format
-      const finalPassword = isTestAccount ? (import.meta.env.VITE_TEST_USER_PASSWORD || 'defaultTestPassword123') : password;
+      const finalPassword = isTestAccount
+        ? import.meta.env.VITE_TEST_USER_PASSWORD || 'defaultTestPassword123'
+        : password;
 
       // User data to store - Use dealership_admin role for all dealer admins
       const userData = {
@@ -2963,6 +3016,21 @@ export function MasterAdminPanel() {
                                 </TableCell>
                                 <TableCell>
                                   <div className="flex space-x-2">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      disabled={creatingGroupSchemasId === group.id}
+                                      onClick={() => handleCreateGroupSchemas(group.id)}
+                                    >
+                                      {creatingGroupSchemasId === group.id ? (
+                                        <>
+                                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                          Creating Schemas
+                                        </>
+                                      ) : (
+                                        'Create Schemas'
+                                      )}
+                                    </Button>
                                     <Button
                                       variant="destructive"
                                       size="sm"

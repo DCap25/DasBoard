@@ -26,14 +26,16 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    console.log('[LoginForm] Submit clicked', { email: email.trim() });
     if (!email || !password) {
       setError('Please enter both email and password');
       return;
     }
 
-    // CSRF Protection
+    // CSRF Protection (skip in development)
     const formData = new FormData(e.target as HTMLFormElement);
-    if (!CSRFProtection.validateFromRequest(formData)) {
+    const isProduction = import.meta.env.MODE === 'production';
+    if (isProduction && !CSRFProtection.validateFromRequest(formData)) {
       setError('Security validation failed. Please refresh the page and try again.');
       return;
     }
@@ -42,21 +44,40 @@ export default function LoginForm() {
     setError(null);
 
     try {
-      // Use AuthContext signIn which includes demo user detection
+      console.log('[LoginForm] Calling AuthContext.signIn');
       await signIn(email.trim(), password, rememberMe);
-
-      console.log('[LoginForm] Login successful, AuthContext handling redirect');
+      localStorage.setItem('recent_supabase_login', 'true');
+      console.log('[LoginForm] AuthContext.signIn resolved');
+      // Double-check session; if missing, try direct supabase sign-in fallback
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        console.warn(
+          '[LoginForm] No session after context signIn; attempting direct supabase signIn'
+        );
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
+        if (error) throw error;
+        if (!data.session) throw new Error('No session returned from fallback sign-in');
+      }
+      console.log('[LoginForm] Login successful; hard redirecting to /dashboard');
+      window.location.href = '/dashboard';
     } catch (error: any) {
       console.error('[LoginForm] Login error:', error);
       if (error.message?.includes('Invalid login credentials')) {
         const isDevelopment = import.meta.env.MODE === 'development';
         const skipEmailVerification = import.meta.env.VITE_SKIP_EMAIL_VERIFICATION === 'true';
-        
+
         if (isDevelopment || skipEmailVerification) {
           setError('Invalid email or password. Please check your credentials and try again.');
           setShowResendVerification(false);
         } else {
-          setError('Invalid email or password. If you just signed up, please check your email and verify your account first.');
+          setError(
+            'Invalid email or password. If you just signed up, please check your email and verify your account first.'
+          );
           setShowResendVerification(true);
         }
       } else if (error.message?.includes('Email not confirmed')) {
@@ -67,10 +88,17 @@ export default function LoginForm() {
         setShowResendVerification(true);
       } else if (error.message?.includes('Too many requests')) {
         setError('Too many login attempts. Please wait a few minutes and try again.');
-      } else if (error.message?.includes('401') || error.message?.toLowerCase().includes('unauthorized')) {
-        setError('Authentication system is currently disabled. Please use the Dashboard Selector for demo access.');
+      } else if (
+        error.message?.includes('401') ||
+        error.message?.toLowerCase().includes('unauthorized')
+      ) {
+        setError(
+          'Authentication system is currently disabled. Please use the Dashboard Selector for demo access.'
+        );
       } else {
-        setError(error.message || 'Login failed. Please use the Dashboard Selector for demo access.');
+        setError(
+          error.message || 'Login failed. Please use the Dashboard Selector for demo access.'
+        );
       }
     } finally {
       setLoading(false);
@@ -176,7 +204,7 @@ export default function LoginForm() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* CSRF Protection */}
         <input type="hidden" name="csrf_token" value={CSRFProtection.getToken()} />
-        
+
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <Input

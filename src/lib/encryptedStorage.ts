@@ -13,16 +13,52 @@ class EncryptedStorage {
    * Get the current user ID from auth context
    */
   private static getCurrentUserId(): string | undefined {
-    // Try to get user ID from various sources
-    const authData = localStorage.getItem('supabase.auth.token');
-    if (authData) {
-      try {
-        const parsed = JSON.parse(authData);
-        return parsed?.currentSession?.user?.id;
-      } catch {
-        // Ignore parsing errors
+    try {
+      // First try to get from window auth context (if available)
+      if (typeof window !== 'undefined' && (window as any).__authUser) {
+        const user = (window as any).__authUser;
+        // Try various user ID fields
+        if (user?.id) return user.id;
+        if (user?.user?.id) return user.user.id;
       }
+
+      // Try modern Supabase token format (sb-*-auth-token)
+      const tokenKey = Object.keys(localStorage).find(
+        k => k.startsWith('sb-') && k.endsWith('-auth-token')
+      );
+      
+      if (tokenKey) {
+        const tokenData = localStorage.getItem(tokenKey);
+        if (tokenData) {
+          try {
+            const parsed = JSON.parse(tokenData);
+            const userId = parsed?.currentSession?.user?.id || parsed?.user?.id;
+            if (userId) {
+              console.log('[EncryptedStorage] Found user ID from token:', userId);
+              return userId;
+            }
+          } catch (e) {
+            console.error('[EncryptedStorage] Error parsing token data:', e);
+          }
+        }
+      }
+
+      // Fallback: try legacy format
+      const authData = localStorage.getItem('supabase.auth.token');
+      if (authData) {
+        try {
+          const parsed = JSON.parse(authData);
+          return parsed?.currentSession?.user?.id;
+        } catch {
+          // Ignore parsing errors
+        }
+      }
+
+      console.warn('[EncryptedStorage] Could not determine user ID');
+    } catch (error) {
+      console.error('[EncryptedStorage] Error in getCurrentUserId:', error);
     }
+    
     return undefined;
   }
 

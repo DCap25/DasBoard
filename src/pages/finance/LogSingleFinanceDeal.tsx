@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { getConsistentUserId, getUserIdSync, debugUserId } from '../../utils/userIdHelper';
+import { supabase, quickHasSupabaseSessionToken } from '../../lib/supabaseClient';
 import { Card } from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
@@ -9,9 +11,7 @@ import { Checkbox } from '../../components/ui/checkbox';
 import { Textarea } from '../../components/ui/textarea';
 import { toast } from '../../components/ui/use-toast';
 import { SingleFinanceStorage } from '../../lib/singleFinanceStorage';
-import { getConsistentUserId, debugUserId } from '../../utils/userIdHelper';
 import { ArrowLeft, DollarSign, User, FileText, Calculator, Plus, Trash2 } from 'lucide-react';
-import CSRFProtection from '../../lib/csrfProtection';
 
 // Interface for team member
 interface TeamMember {
@@ -31,18 +31,54 @@ const STATUS_OPTIONS = [
   { id: 'deaddeal', name: 'Dead Deal' },
 ];
 
+const LENDERS = [
+  // Top 3 most used lenders
+  'Ford Motor Credit',
+  'Chase',
+  'Ally Bank',
+  // Alphabetical order for the rest
+  'American Credit Acceptance',
+  'Americredit',
+  'Bank of America',
+  'Capital One',
+  'Chrysler Capital',
+  'Crescent Bank',
+  'Exeter',
+  'First Help Financial',
+  'Global Lending Services',
+  'Huntington National Bank',
+  'Hyundai Financial',
+  'Navy Federal',
+  'Other',
+  'PNC Bank',
+  'Prestige Financial Services',
+  'Regional Acceptance',
+  'Santander',
+  'Stellantis',
+  'TD Auto',
+  'Tesla',
+  'Toyota Credit',
+  'Truist',
+  'US Bank',
+  'USAA',
+  'Wells Fargo',
+  'Westlake Financial Services',
+];
+
 // Interface for form data
 interface DealFormData {
   dealNumber: string;
   stockNumber: string;
   vinLast8: string;
   vehicleType: string;
+  manufacturer: string;
   customerName: string;
-  vehicleDescription: string;
   dealType: string;
+  status: string;
   saleDate: string;
   frontEndGross: string;
   salespersonId: string;
+  salesManagerId: string;
   isSplitDeal: boolean;
   secondSalespersonId: string;
   lender: string;
@@ -53,8 +89,9 @@ interface DealFormData {
   ppmProfit: string;
   tireWheelProfit: string;
   appearanceProfit: string;
-  keyReplacementProfit: string;
   theftProfit: string;
+  bundledProfit: string;
+  keyReplacementProfit: string;
   windshieldProfit: string;
   lojackProfit: string;
   extWarrantyProfit: string;
@@ -70,18 +107,40 @@ export default function LogSingleFinanceDeal() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { dealId } = useParams();
-
-  // Helper function to get user ID consistently - must match dashboard
-  const getUserId = () => {
-    // Use the consistent helper to get user ID
-    return getConsistentUserId(user);
-  };
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [originalDeal, setOriginalDeal] = useState<any>(null);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [showAddSalesperson, setShowAddSalesperson] = useState(false);
   const [newSalesperson, setNewSalesperson] = useState({ firstName: '', lastName: '' });
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [localUserId, setLocalUserId] = useState<string | null>(null);
+
+  // Helper to resolve a consistent user ID (context or token fallback)
+  const getUserId = (): string | null => {
+    const userId = getUserIdSync(user, localUserId);
+    debugUserId('LogSingleFinanceDeal', user, localUserId);
+    console.log('[LogSingleFinanceDeal] Final resolved user ID:', userId);
+    return userId;
+  };
+
+  // Try to resolve user id from Supabase session if context not ready
+  useEffect(() => {
+    let cancelled = false;
+    const tryFetch = async () => {
+      if (localUserId || user?.id) return;
+      if (!quickHasSupabaseSessionToken()) return;
+      const { data } = await supabase.auth.getSession();
+      const uid = data?.session?.user?.id || null;
+      if (!cancelled && uid) setLocalUserId(uid);
+    };
+    tryFetch();
+    const t = setTimeout(tryFetch, 800);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [user, localUserId]);
 
   // Initialize form data
   const [formData, setFormData] = useState<DealFormData>({
@@ -89,12 +148,14 @@ export default function LogSingleFinanceDeal() {
     stockNumber: '',
     vinLast8: '',
     vehicleType: 'N',
+    manufacturer: '',
     customerName: '',
-    vehicleDescription: '',
     dealType: 'Finance',
+    status: 'Pending',
     saleDate: new Date().toISOString().split('T')[0],
     frontEndGross: '',
     salespersonId: '',
+    salesManagerId: '',
     isSplitDeal: false,
     secondSalespersonId: '',
     lender: '',
@@ -104,8 +165,9 @@ export default function LogSingleFinanceDeal() {
     ppmProfit: '',
     tireWheelProfit: '',
     appearanceProfit: '',
-    keyReplacementProfit: '',
     theftProfit: '',
+    bundledProfit: '',
+    keyReplacementProfit: '',
     windshieldProfit: '',
     lojackProfit: '',
     extWarrantyProfit: '',
@@ -119,32 +181,21 @@ export default function LogSingleFinanceDeal() {
   // Calculate back end gross and total gross whenever profit fields change
   useEffect(() => {
     const calculateTotals = () => {
+      // Product profits (only the ones we have in the current form)
       const vsc = parseFloat(formData.vscProfit) || 0;
       const gap = parseFloat(formData.gapProfit) || 0;
       const ppm = parseFloat(formData.ppmProfit) || 0;
       const tireWheel = parseFloat(formData.tireWheelProfit) || 0;
       const appearance = parseFloat(formData.appearanceProfit) || 0;
-      const keyReplacement = parseFloat(formData.keyReplacementProfit) || 0;
       const theft = parseFloat(formData.theftProfit) || 0;
-      const windshield = parseFloat(formData.windshieldProfit) || 0;
-      const lojack = parseFloat(formData.lojackProfit) || 0;
-      const extWarranty = parseFloat(formData.extWarrantyProfit) || 0;
+      const bundled = parseFloat(formData.bundledProfit) || 0;
       const other = parseFloat(formData.otherProfit) || 0;
       const reserve = parseFloat(formData.reserveFlat) || 0;
 
-      const backEndGross =
-        vsc +
-        gap +
-        ppm +
-        tireWheel +
-        appearance +
-        keyReplacement +
-        theft +
-        windshield +
-        lojack +
-        extWarranty +
-        other +
-        reserve;
+      // Back End Gross = All product profits + Reserve/Flat
+      const backEndGross = vsc + gap + ppm + tireWheel + appearance + theft + bundled + other + reserve;
+      
+      // Total Gross = Front End Gross + Back End Gross
       const frontEnd = parseFloat(formData.frontEndGross) || 0;
       const totalGross = frontEnd + backEndGross;
 
@@ -162,11 +213,8 @@ export default function LogSingleFinanceDeal() {
     formData.ppmProfit,
     formData.tireWheelProfit,
     formData.appearanceProfit,
-    formData.keyReplacementProfit,
     formData.theftProfit,
-    formData.windshieldProfit,
-    formData.lojackProfit,
-    formData.extWarrantyProfit,
+    formData.bundledProfit,
     formData.otherProfit,
     formData.reserveFlat,
     formData.frontEndGross,
@@ -174,9 +222,6 @@ export default function LogSingleFinanceDeal() {
 
   useEffect(() => {
     console.log('[LogSingleFinanceDeal] Component mounted');
-    
-    // Clear old format data on first load to ensure clean state
-    SingleFinanceStorage.clearOldFormatData();
     
     // Load team members from localStorage
     loadTeamMembers();
@@ -189,21 +234,19 @@ export default function LogSingleFinanceDeal() {
 
     // Listen for team member updates from Settings page
     const handleTeamMembersUpdated = (e: any) => {
-      console.log('[LogSingleFinanceDeal] Team members updated event received');
+      console.log('[LogSingleFinanceDeal] Team members updated event received:', e.detail);
       loadTeamMembers(); // Reload team members from localStorage
     };
 
     // Listen for storage changes (fallback for cross-tab updates)
     const handleStorageChange = (e: StorageEvent) => {
       const userId = getUserId();
-      console.log('[LogSingleFinanceDeal] Storage change event:', e.key);
       if (userId && e.key === `singleFinanceTeamMembers_${userId}`) {
         console.log('[LogSingleFinanceDeal] Team members storage changed, reloading');
         loadTeamMembers();
       }
     };
 
-    console.log('[LogSingleFinanceDeal] Setting up event listeners');
     window.addEventListener('teamMembersUpdated', handleTeamMembersUpdated);
     window.addEventListener('storage', handleStorageChange);
 
@@ -213,23 +256,39 @@ export default function LogSingleFinanceDeal() {
     };
   }, [dealId]);
 
+  // Make user available globally for encryption layer and reload team members when user changes
+  useEffect(() => {
+    if (typeof window !== 'undefined' && user) {
+      (window as any).__authUser = user;
+      console.log('[LogSingleFinanceDeal] User changed, reloading team members');
+      loadTeamMembers();
+    }
+  }, [user]);
+
+  // Also reload team members when localUserId changes
+  useEffect(() => {
+    if (localUserId) {
+      console.log('[LogSingleFinanceDeal] LocalUserId changed, reloading team members');
+      loadTeamMembers();
+    }
+  }, [localUserId]);
+
   // Load team members from localStorage
   const loadTeamMembers = () => {
     const userId = getUserId();
+    console.log('[LogSingleFinanceDeal] loadTeamMembers called, resolved userId:', userId);
+    console.log('[LogSingleFinanceDeal] user context:', user);
+    console.log('[LogSingleFinanceDeal] localUserId:', localUserId);
     
     if (!userId) {
-      console.log('[LogDeal] No user ID, cannot load team members');
+      console.log('[LogSingleFinanceDeal] No user ID resolved, skipping load');
       return;
     }
     
     try {
-      // Check what's actually in localStorage for this user
-      const storageKey = `singleFinanceTeamMembers_${userId}`;
-      const rawData = localStorage.getItem(storageKey);
-      
+      console.log('[LogSingleFinanceDeal] Loading team members for userId:', userId);
       const savedTeamMembers = SingleFinanceStorage.getTeamMembers(userId);
-      console.log('[LogDeal] Team members count:', savedTeamMembers.length);
-      
+      console.log('[LogSingleFinanceDeal] Loaded team members:', savedTeamMembers);
       setTeamMembers(savedTeamMembers);
     } catch (error) {
       console.error('Error loading team members:', error);
@@ -322,7 +381,7 @@ export default function LogSingleFinanceDeal() {
       const dealToEdit = existingDeals.find((deal: any) => deal.id === dealIdToEdit);
       
       if (dealToEdit) {
-        console.log('[LogSingleFinanceDeal] Loading deal for edit');
+        console.log('[LogSingleFinanceDeal] Loading deal for edit:', dealToEdit);
         setOriginalDeal(dealToEdit);
         
         // Map the deal data back to form data
@@ -331,9 +390,10 @@ export default function LogSingleFinanceDeal() {
           stockNumber: dealToEdit.stockNumber || '',
           vinLast8: dealToEdit.vinLast8 || '',
           vehicleType: dealToEdit.vehicleType || 'N',
+          manufacturer: dealToEdit.manufacturer || '',
           customerName: dealToEdit.customer || dealToEdit.lastName || '',
-          vehicleDescription: dealToEdit.vehicleDescription || '',
           dealType: dealToEdit.dealType || 'Finance',
+          status: dealToEdit.status || 'Pending',
           saleDate: dealToEdit.dealDate || dealToEdit.saleDate || new Date().toISOString().split('T')[0],
           frontEndGross: dealToEdit.frontEndGross?.toString() || '',
           salespersonId: dealToEdit.salesperson_id?.toString() || '',
@@ -348,6 +408,7 @@ export default function LogSingleFinanceDeal() {
           appearanceProfit: dealToEdit.appearanceProfit?.toString() || '',
           keyReplacementProfit: dealToEdit.keyReplacementProfit?.toString() || '',
           theftProfit: dealToEdit.theftProfit?.toString() || '',
+          bundledProfit: dealToEdit.bundledProfit?.toString() || '',
           windshieldProfit: dealToEdit.windshieldProfit?.toString() || '',
           lojackProfit: dealToEdit.lojackProfit?.toString() || '',
           extWarrantyProfit: dealToEdit.extWarrantyProfit?.toString() || '',
@@ -411,7 +472,7 @@ export default function LogSingleFinanceDeal() {
     }
 
     // Convert certain fields to uppercase
-    if (name === 'stockNumber' || name === 'vinLast8') {
+    if (name === 'stockNumber' || name === 'vinLast8' || name === 'customerName') {
       setFormData(prev => ({
         ...prev,
         [name]: value.toUpperCase(),
@@ -438,21 +499,10 @@ export default function LogSingleFinanceDeal() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // CSRF Protection
-    const form = new FormData(e.target as HTMLFormElement);
-    if (!CSRFProtection.validateFromRequest(form)) {
-      toast({
-        title: 'Security Error',
-        description: 'Security validation failed. Please refresh the page and try again.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (!formData.customerName || !formData.vehicleDescription) {
+    if (!formData.customerName) {
       toast({
         title: 'Validation Error',
-        description: 'Customer name and vehicle description are required fields.',
+        description: 'Customer name is a required field.',
         variant: 'destructive',
       });
       return;
@@ -488,8 +538,9 @@ export default function LogSingleFinanceDeal() {
       if (parseFloat(formData.ppmProfit) > 0) productsSold.push('PrePaid Maintenance (PPM)');
       if (parseFloat(formData.tireWheelProfit) > 0) productsSold.push('Tire & Wheel Protection');
       if (parseFloat(formData.appearanceProfit) > 0) productsSold.push('Appearance Protection');
-      if (parseFloat(formData.keyReplacementProfit) > 0) productsSold.push('Key Replacement');
       if (parseFloat(formData.theftProfit) > 0) productsSold.push('Theft Protection');
+      if (parseFloat(formData.bundledProfit) > 0) productsSold.push('Bundled Product');
+      if (parseFloat(formData.keyReplacementProfit) > 0) productsSold.push('Key Replacement');
       if (parseFloat(formData.windshieldProfit) > 0) productsSold.push('Windshield Protection');
       if (parseFloat(formData.lojackProfit) > 0) productsSold.push('LoJack/Tracking System');
       if (parseFloat(formData.extWarrantyProfit) > 0) productsSold.push('Extended Warranty');
@@ -504,7 +555,7 @@ export default function LogSingleFinanceDeal() {
         lastName: formData.customerName, // For table display
         vehicle: `${
           formData.vehicleType === 'N' ? 'New' : formData.vehicleType === 'U' ? 'Used' : 'CPO'
-        } - ${formData.vehicleDescription}`,
+        } ${formData.manufacturer}`,
         vin: formData.vinLast8,
         vinLast8: formData.vinLast8,
         stock_number: formData.stockNumber,
@@ -514,7 +565,9 @@ export default function LogSingleFinanceDeal() {
         dealDate: formData.saleDate, // For form field mapping
         deal_type: formData.dealType,
         dealType: formData.dealType,
+        status: formData.status,
         vehicleType: formData.vehicleType,
+        manufacturer: formData.manufacturer,
         salesperson: salespersonDisplay,
         salesperson_id: formData.salespersonId,
         is_split_deal: formData.isSplitDeal,
@@ -543,6 +596,8 @@ export default function LogSingleFinanceDeal() {
         keyReplacementProfit: parseFloat(formData.keyReplacementProfit) || 0,
         theft_profit: parseFloat(formData.theftProfit) || 0,
         theftProfit: parseFloat(formData.theftProfit) || 0,
+        bundled_profit: parseFloat(formData.bundledProfit) || 0,
+        bundledProfit: parseFloat(formData.bundledProfit) || 0,
         windshield_profit: parseFloat(formData.windshieldProfit) || 0,
         windshieldProfit: parseFloat(formData.windshieldProfit) || 0,
         lojack_profit: parseFloat(formData.lojackProfit) || 0,
@@ -564,16 +619,12 @@ export default function LogSingleFinanceDeal() {
 
       // Save to user-specific localStorage key for Single Finance Dashboard
       const userId = getUserId();
-      debugUserId('LogSingleFinanceDeal', user);
-      console.log('[LogSingleFinanceDeal] Resolved User ID for saving:', userId);
-      
       if (!userId) {
-        throw new Error('User ID is required - please ensure you are logged in');
+        throw new Error('User ID is required');
       }
       
       try {
         const existingDeals = SingleFinanceStorage.getDeals(userId);
-        console.log('[LogSingleFinanceDeal] Existing deals count:', existingDeals.length);
         
         let updatedDeals;
         if (isEditMode) {
@@ -581,16 +632,14 @@ export default function LogSingleFinanceDeal() {
           updatedDeals = existingDeals.map((deal: any) => 
             deal.id === dealIdToUse ? dealData : deal
           );
-          console.log('[LogSingleFinanceDeal] Deal updated in singleFinanceDeals storage');
+          console.log('[LogSingleFinanceDeal] Deal updated in singleFinanceDeals storage:', dealData);
         } else {
           // Add new deal
           updatedDeals = [dealData, ...existingDeals];
-          console.log('[LogSingleFinanceDeal] Deal saved to singleFinanceDeals storage');
+          console.log('[LogSingleFinanceDeal] Deal saved to singleFinanceDeals storage:', dealData);
         }
         
         SingleFinanceStorage.setDeals(userId, updatedDeals);
-        console.log('[LogSingleFinanceDeal] Updated deals count:', updatedDeals.length);
-        console.log('[LogSingleFinanceDeal] Storage key used:', `singleFinanceDeals_${userId}`);
         
         // Dispatch custom event to notify dashboard of data change
         window.dispatchEvent(new CustomEvent('singleFinanceDealsUpdated', { 
@@ -626,22 +675,13 @@ export default function LogSingleFinanceDeal() {
         <h1 className="text-2xl font-bold">
           {isEditMode ? 'Edit Deal - Single Finance Dashboard' : 'Log New Deal - Single Finance Dashboard'}
         </h1>
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            onClick={loadTeamMembers}
-            className="flex items-center bg-green-500 text-white hover:bg-green-600"
-          >
-            Refresh Team Members ({teamMembers.length})
-          </Button>
-          <Button
-            onClick={() => navigate('/dashboard/single-finance')}
-            className="flex items-center bg-blue-500 text-white hover:bg-blue-600"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
-          </Button>
-        </div>
+        <Button
+          onClick={() => navigate('/dashboard/single-finance')}
+          className="flex items-center bg-blue-500 text-white hover:bg-blue-600"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Dashboard
+        </Button>
       </div>
 
       <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
@@ -654,10 +694,7 @@ export default function LogSingleFinanceDeal() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* CSRF Protection */}
-        <input type="hidden" name="csrf_token" value={CSRFProtection.getToken()} />
-        
-        {/* Deal Information Card */}
+        {/* Deal Information Card - Reorganized Layout */}
         <Card className="p-6 border-l-4 border-l-blue-500 shadow-lg hover:shadow-xl transition-shadow">
           <div className="space-y-4">
             <h2 className="text-xl font-semibold flex items-center border-b pb-2 mb-4">
@@ -665,21 +702,35 @@ export default function LogSingleFinanceDeal() {
               Deal Information
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* First Row: Deal#, Sale Date, Stock#, VIN#, Vehicle Type, Manufacturer */}
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="dealNumber">Deal Number</Label>
+                <Label htmlFor="dealNumber">Deal # *</Label>
                 <Input
                   id="dealNumber"
                   name="dealNumber"
                   value={formData.dealNumber}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
-                  placeholder="Auto-generated if empty"
+                  placeholder="Enter deal number"
+                  required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="stockNumber">Stock Number *</Label>
+                <Label htmlFor="saleDate">Sale Date</Label>
+                <Input
+                  type="date"
+                  id="saleDate"
+                  name="saleDate"
+                  value={formData.saleDate}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="stockNumber">Stock # *</Label>
                 <Input
                   id="stockNumber"
                   name="stockNumber"
@@ -692,7 +743,7 @@ export default function LogSingleFinanceDeal() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="vinLast8">VIN (Last 8) *</Label>
+                <Label htmlFor="vinLast8">VIN # (Last 8) *</Label>
                 <Input
                   id="vinLast8"
                   name="vinLast8"
@@ -704,9 +755,7 @@ export default function LogSingleFinanceDeal() {
                   required
                 />
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="vehicleType">Vehicle Type</Label>
                 <select
@@ -719,6 +768,172 @@ export default function LogSingleFinanceDeal() {
                   <option value="N">New</option>
                   <option value="U">Used</option>
                   <option value="C">CPO</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="manufacturer">Manufacturer</Label>
+                <select
+                  id="manufacturer"
+                  name="manufacturer"
+                  value={formData.manufacturer}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border rounded-md"
+                >
+                  <option value="">Select Manufacturer</option>
+                  {/* Top 3 most used manufacturers */}
+                  <option value="Ford">Ford</option>
+                  <option value="Chevrolet">Chevrolet</option>
+                  <option value="Toyota">Toyota</option>
+                  {/* Alphabetical order for the rest */}
+                  <option value="Acura">Acura</option>
+                  <option value="Audi">Audi</option>
+                  <option value="BMW">BMW</option>
+                  <option value="Buick">Buick</option>
+                  <option value="Cadillac">Cadillac</option>
+                  <option value="Chrysler">Chrysler</option>
+                  <option value="Dodge">Dodge</option>
+                  <option value="GMC">GMC</option>
+                  <option value="Honda">Honda</option>
+                  <option value="Hyundai">Hyundai</option>
+                  <option value="Infiniti">Infiniti</option>
+                  <option value="Jeep">Jeep</option>
+                  <option value="Kia">Kia</option>
+                  <option value="Lexus">Lexus</option>
+                  <option value="Lincoln">Lincoln</option>
+                  <option value="Mazda">Mazda</option>
+                  <option value="Mercedes-Benz">Mercedes-Benz</option>
+                  <option value="Nissan">Nissan</option>
+                  <option value="Ram">Ram</option>
+                  <option value="Subaru">Subaru</option>
+                  <option value="Tesla">Tesla</option>
+                  <option value="Volkswagen">Volkswagen</option>
+                  <option value="Volvo">Volvo</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Second Row: Customer Name, Salesperson, Sales Manager, Lender, Deal Type, Status */}
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="customerName">Customer Last Name</Label>
+                <Input
+                  id="customerName"
+                  name="customerName"
+                  value={formData.customerName}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Customer last name"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center space-x-3">
+                  <Label htmlFor="salespersonId">Salesperson</Label>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="isSplitDeal"
+                      checked={formData.isSplitDeal}
+                      onCheckedChange={checked =>
+                        setFormData(prev => ({ 
+                          ...prev, 
+                          isSplitDeal: checked as boolean,
+                          secondSalespersonId: checked ? prev.secondSalespersonId : ''
+                        }))
+                      }
+                    />
+                    <Label htmlFor="isSplitDeal" className="text-xs">Split Deal</Label>
+                  </div>
+                </div>
+                {formData.isSplitDeal ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    <select
+                      id="salespersonId"
+                      name="salespersonId"
+                      value={formData.salespersonId}
+                      onChange={handleInputChange}
+                      className="w-full p-2 border rounded-md text-sm"
+                    >
+                      <option value="">Select Salesperson</option>
+                      {teamMembers.filter(member => member.role === 'salesperson' && member.active).map(person => (
+                        <option key={person.id} value={person.id}>
+                          {person.firstName} {person.lastName}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      id="secondSalespersonId"
+                      name="secondSalespersonId"
+                      value={formData.secondSalespersonId}
+                      onChange={handleInputChange}
+                      className="w-full p-2 border rounded-md text-sm"
+                    >
+                      <option value="">Select Second Salesperson</option>
+                      {teamMembers.filter(member => 
+                        member.role === 'salesperson' && 
+                        member.active && 
+                        member.id !== formData.salespersonId
+                      ).map(person => (
+                        <option key={person.id} value={person.id}>
+                          {person.firstName} {person.lastName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  <select
+                    id="salespersonId"
+                    name="salespersonId"
+                    value={formData.salespersonId}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded-md"
+                  >
+                    <option value="">Select Salesperson</option>
+                    {teamMembers.filter(member => member.role === 'salesperson' && member.active).map(person => (
+                      <option key={person.id} value={person.id}>
+                        {person.firstName} {person.lastName}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="salesManagerId">Sales Manager</Label>
+                <select
+                  id="salesManagerId"
+                  name="salesManagerId"
+                  value={formData.salesManagerId}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border rounded-md"
+                >
+                  <option value="">Select Manager</option>
+                  {teamMembers.filter(member => member.role === 'sales_manager' && member.active).map(manager => (
+                    <option key={manager.id} value={manager.id}>
+                      {manager.firstName} {manager.lastName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="lender">Lender</Label>
+                <select
+                  id="lender"
+                  name="lender"
+                  value={formData.lender}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border rounded-md"
+                  disabled={formData.dealType === 'Cash'}
+                >
+                  <option value="">Select Lender</option>
+                  {LENDERS.map(lender => (
+                    <option key={lender} value={lender}>
+                      {lender}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -738,347 +953,7 @@ export default function LogSingleFinanceDeal() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="saleDate">Sale Date</Label>
-                <Input
-                  type="date"
-                  id="saleDate"
-                  name="saleDate"
-                  value={formData.saleDate}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                />
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Customer & Vehicle Information */}
-        <Card className="p-6 border-l-4 border-l-blue-500 shadow-lg hover:shadow-xl transition-shadow">
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold flex items-center border-b pb-2 mb-4">
-              <User className="mr-2 h-5 w-5 text-green-500" />
-              Customer & Vehicle
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="customerName">Customer Name *</Label>
-                <Input
-                  id="customerName"
-                  name="customerName"
-                  value={formData.customerName}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Customer last name"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="vehicleDescription">Vehicle Description *</Label>
-                <Input
-                  id="vehicleDescription"
-                  name="vehicleDescription"
-                  value={formData.vehicleDescription}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  placeholder="e.g., 2023 Toyota Camry XLE"
-                  required
-                />
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Sales Information */}
-        <Card className="p-6 border-l-4 border-l-blue-500 shadow-lg hover:shadow-xl transition-shadow">
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold flex items-center border-b pb-2 mb-4">
-              <User className="mr-2 h-5 w-5 text-purple-500" />
-              Sales Information
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="salespersonId">Salesperson</Label>
-                <div className="space-y-2">
-                  <select
-                    id="salespersonId"
-                    name="salespersonId"
-                    value={formData.salespersonId}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded-md"
-                  >
-                    <option value="">Select Salesperson</option>
-                    {teamMembers.filter(member => member.role === 'salesperson' && member.active).map(person => (
-                      <option key={person.id} value={person.id}>
-                        {person.initials} - {person.firstName} {person.lastName}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      onClick={() => setShowAddSalesperson(true)}
-                      className="flex items-center text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1"
-                      size="sm"
-                    >
-                      <Plus className="mr-1 h-3 w-3" />
-                      Add
-                    </Button>
-                    {formData.salespersonId && (
-                      <Button
-                        type="button"
-                        onClick={() => handleRemoveSalesperson(formData.salespersonId)}
-                        className="flex items-center text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-1"
-                        size="sm"
-                      >
-                        <Trash2 className="mr-1 h-3 w-3" />
-                        Remove
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="frontEndGross">Front End Gross</Label>
-                <Input
-                  id="frontEndGross"
-                  name="frontEndGross"
-                  value={formData.frontEndGross}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  placeholder="0.00"
-                  type="number"
-                  step="0.01"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="lender">Lender</Label>
-                <Input
-                  id="lender"
-                  name="lender"
-                  value={formData.lender}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Lender name"
-                  disabled={formData.dealType === 'Cash'}
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="isSplitDeal"
-                name="isSplitDeal"
-                checked={formData.isSplitDeal}
-                onCheckedChange={checked =>
-                  setFormData(prev => ({ ...prev, isSplitDeal: checked as boolean }))
-                }
-              />
-              <Label htmlFor="isSplitDeal">Split Deal</Label>
-            </div>
-
-            {formData.isSplitDeal && (
-              <div className="space-y-2">
-                <Label htmlFor="secondSalespersonId">Second Salesperson</Label>
-                <div className="space-y-2">
-                  <select
-                    id="secondSalespersonId"
-                    name="secondSalespersonId"
-                    value={formData.secondSalespersonId}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded-md"
-                  >
-                    <option value="">Select Second Salesperson</option>
-                    {teamMembers.filter(member => member.role === 'salesperson' && member.active && member.id !== formData.salespersonId).map(person => (
-                      <option key={person.id} value={person.id}>
-                        {person.initials} - {person.firstName} {person.lastName}
-                      </option>
-                    ))}
-                  </select>
-                  {validationErrors.secondSalespersonId && (
-                    <p className="text-sm text-red-500 mt-1">{validationErrors.secondSalespersonId}</p>
-                  )}
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      onClick={() => setShowAddSalesperson(true)}
-                      className="flex items-center text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1"
-                      size="sm"
-                    >
-                      <Plus className="mr-1 h-3 w-3" />
-                      Add
-                    </Button>
-                    {formData.secondSalespersonId && (
-                      <Button
-                        type="button"
-                        onClick={() => handleRemoveSalesperson(formData.secondSalespersonId)}
-                        className="flex items-center text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-1"
-                        size="sm"
-                      >
-                        <Trash2 className="mr-1 h-3 w-3" />
-                        Remove
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </Card>
-
-        {/* F&I Products */}
-        <Card className="p-6 border-l-4 border-l-blue-500 shadow-lg hover:shadow-xl transition-shadow">
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold flex items-center border-b pb-2 mb-4">
-              <DollarSign className="mr-2 h-5 w-5 text-green-500" />
-              F&I Products & Profits
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="reserveFlat">Reserve/Flat</Label>
-                <Input
-                  id="reserveFlat"
-                  name="reserveFlat"
-                  value={formData.reserveFlat}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  placeholder="0.00"
-                  type="number"
-                  step="0.01"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="vscProfit">VSC Profit</Label>
-                <Input
-                  id="vscProfit"
-                  name="vscProfit"
-                  value={formData.vscProfit}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  placeholder="0.00"
-                  type="number"
-                  step="0.01"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="gapProfit">GAP Profit</Label>
-                <Input
-                  id="gapProfit"
-                  name="gapProfit"
-                  value={formData.gapProfit}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  placeholder="0.00"
-                  type="number"
-                  step="0.01"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="ppmProfit">PPM Profit</Label>
-                <Input
-                  id="ppmProfit"
-                  name="ppmProfit"
-                  value={formData.ppmProfit}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  placeholder="0.00"
-                  type="number"
-                  step="0.01"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="tireWheelProfit">Tire & Wheel Profit</Label>
-                <Input
-                  id="tireWheelProfit"
-                  name="tireWheelProfit"
-                  value={formData.tireWheelProfit}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  placeholder="0.00"
-                  type="number"
-                  step="0.01"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="appearanceProfit">Appearance Profit</Label>
-                <Input
-                  id="appearanceProfit"
-                  name="appearanceProfit"
-                  value={formData.appearanceProfit}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  placeholder="0.00"
-                  type="number"
-                  step="0.01"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="extWarrantyProfit">Extended Warranty Profit</Label>
-                <Input
-                  id="extWarrantyProfit"
-                  name="extWarrantyProfit"
-                  value={formData.extWarrantyProfit}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  placeholder="0.00"
-                  type="number"
-                  step="0.01"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="otherProfit">Other Profit</Label>
-                <Input
-                  id="otherProfit"
-                  name="otherProfit"
-                  value={formData.otherProfit}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  placeholder="0.00"
-                  type="number"
-                  step="0.01"
-                />
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Totals & Status */}
-        <Card className="p-6 border-l-4 border-l-blue-500 shadow-lg hover:shadow-xl transition-shadow">
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold flex items-center border-b pb-2 mb-4">
-              <Calculator className="mr-2 h-5 w-5 text-amber-500" />
-              Totals & Status
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label>Back End Gross</Label>
-                <div className="p-2 bg-gray-100 border rounded-md">
-                  ${parseFloat(formData.backEndGross || '0').toLocaleString()}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Total Gross</Label>
-                <div className="p-2 bg-gray-100 border rounded-md font-bold">
-                  ${parseFloat(formData.totalGross || '0').toLocaleString()}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="status">Deal Status</Label>
+                <Label htmlFor="status">Status</Label>
                 <select
                   id="status"
                   name="status"
@@ -1086,29 +961,217 @@ export default function LogSingleFinanceDeal() {
                   onChange={handleInputChange}
                   className="w-full p-2 border rounded-md"
                 >
-                  {STATUS_OPTIONS.map(status => (
-                    <option key={status.id} value={status.id}>
-                      {status.name}
-                    </option>
-                  ))}
+                  <option value="Pending">Pending</option>
+                  <option value="Funded">Funded</option>
                 </select>
               </div>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="notes">Notes</Label>
-              <Textarea
-                id="notes"
-                name="notes"
-                value={formData.notes}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-                placeholder="Any additional notes about this deal..."
-                className="min-h-[100px]"
-              />
-            </div>
           </div>
         </Card>
+
+        {/* Two-column layout: Products & Profit on left, Financial Summary on right */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Column: Products and Profit */}
+          <Card className="p-2 border-l-4 border-l-blue-500 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="space-y-2">
+              <h2 className="text-sm font-semibold flex items-center border-b pb-1 mb-2">
+                <DollarSign className="mr-1 h-3 w-3 text-blue-500" />
+                Products and Profit
+              </h2>
+
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="vscProfit">VSC Profit</Label>
+                    <Input
+                      id="vscProfit"
+                      name="vscProfit"
+                      value={formData.vscProfit}
+                      onChange={handleInputChange}
+                      onKeyDown={handleKeyDown}
+                      placeholder="0.00"
+                      type="number"
+                      step="0.01"
+                      className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="gapProfit">GAP Profit</Label>
+                    <Input
+                      id="gapProfit"
+                      name="gapProfit"
+                      value={formData.gapProfit}
+                      onChange={handleInputChange}
+                      onKeyDown={handleKeyDown}
+                      placeholder="0.00"
+                      type="number"
+                      step="0.01"
+                      className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="ppmProfit">PPM Profit</Label>
+                    <Input
+                      id="ppmProfit"
+                      name="ppmProfit"
+                      value={formData.ppmProfit}
+                      onChange={handleInputChange}
+                      onKeyDown={handleKeyDown}
+                      placeholder="0.00"
+                      type="number"
+                      step="0.01"
+                      className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="tireWheelProfit">Tire & Wheel Profit</Label>
+                    <Input
+                      id="tireWheelProfit"
+                      name="tireWheelProfit"
+                      value={formData.tireWheelProfit}
+                      onChange={handleInputChange}
+                      onKeyDown={handleKeyDown}
+                      placeholder="0.00"
+                      type="number"
+                      step="0.01"
+                      className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="appearanceProfit">Appearance</Label>
+                    <Input
+                      id="appearanceProfit"
+                      name="appearanceProfit"
+                      value={formData.appearanceProfit}
+                      onChange={handleInputChange}
+                      onKeyDown={handleKeyDown}
+                      placeholder="0.00"
+                      type="number"
+                      step="0.01"
+                      className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="theftProfit">Theft</Label>
+                    <Input
+                      id="theftProfit"
+                      name="theftProfit"
+                      value={formData.theftProfit}
+                      onChange={handleInputChange}
+                      onKeyDown={handleKeyDown}
+                      placeholder="0.00"
+                      type="number"
+                      step="0.01"
+                      className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="bundledProfit">Bundled</Label>
+                    <Input
+                      id="bundledProfit"
+                      name="bundledProfit"
+                      value={formData.bundledProfit}
+                      onChange={handleInputChange}
+                      onKeyDown={handleKeyDown}
+                      placeholder="0.00"
+                      type="number"
+                      step="0.01"
+                      className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="otherProfit">Other Profit</Label>
+                    <Input
+                      id="otherProfit"
+                      name="otherProfit"
+                      value={formData.otherProfit}
+                      onChange={handleInputChange}
+                      onKeyDown={handleKeyDown}
+                      placeholder="0.00"
+                      type="number"
+                      step="0.01"
+                      className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Right Column: Financial Summary - Very Compact */}
+          <Card className="p-2 border-l-4 border-l-blue-500 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="space-y-2">
+              <h2 className="text-sm font-semibold flex items-center border-b pb-1 mb-2">
+                <Calculator className="mr-1 h-3 w-3 text-blue-500" />
+                Financial Summary
+              </h2>
+
+              <div className="space-y-2">
+                {/* Front End Gross */}
+                <div className="p-2 bg-gray-50 rounded">
+                  <Label htmlFor="frontEndGross" className="text-xs font-medium">Front End Gross</Label>
+                  <Input
+                    id="frontEndGross"
+                    name="frontEndGross"
+                    value={formData.frontEndGross}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    placeholder="0.00"
+                    type="number"
+                    step="0.01"
+                    className="mt-1 text-xs h-7 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+
+                {/* Reserve/Flat */}
+                <div className="p-2 bg-gray-50 rounded">
+                  <Label htmlFor="reserveFlat" className="text-xs font-medium">Reserve/Flat</Label>
+                  <Input
+                    id="reserveFlat"
+                    name="reserveFlat"
+                    value={formData.reserveFlat}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    placeholder="0.00"
+                    type="number"
+                    step="0.01"
+                    className="mt-1 text-xs h-7 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+
+                {/* Back End Gross - Calculated */}
+                <div className="p-2 bg-green-50 rounded border border-green-200">
+                  <Label className="text-xs font-medium text-green-900">Back End Gross</Label>
+                  <div className="mt-1 text-xs font-semibold text-green-900">
+                    ${formData.backEndGross || '0.00'}
+                  </div>
+                </div>
+
+                {/* Total Gross - Calculated */}
+                <div className="p-2 bg-blue-50 rounded border border-blue-200">
+                  <div className="flex items-center gap-2">
+                    <Label className="text-xs font-medium text-black">Total Gross</Label>
+                    <span className="text-[10px] text-black">(Auto-Calculated)</span>
+                  </div>
+                  <div className="mt-1 text-lg font-bold text-blue-900">
+                    ${formData.totalGross || '0.00'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+
 
         {/* Submit Button */}
         <div className="flex justify-end space-x-4">

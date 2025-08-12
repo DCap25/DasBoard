@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { supabase, quickHasSupabaseSessionToken } from '../../lib/supabaseClient';
 import { SingleFinanceStorage } from '../../lib/singleFinanceStorage';
 import { getConsistentUserId } from '../../utils/userIdHelper';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
@@ -27,6 +28,7 @@ import {
   EyeOff,
 } from 'lucide-react';
 import { DropdownMenu } from '../../components/ui/dropdown-menu';
+import MonthYearPicker from '../../components/ui/month-year-picker';
 
 // Interface for a deal
 interface Deal {
@@ -72,6 +74,8 @@ interface Metrics {
     paintProtection: number;
     tireWheel: number;
     ppm: number;
+    theft: number;
+    bundled: number;
     other: number;
   };
   avgProfits: {
@@ -80,12 +84,14 @@ interface Metrics {
     paintProtection: number;
     tireWheel: number;
     ppm: number;
+    theft: number;
+    bundled: number;
     other: number;
   };
 }
 
-// Time period options
-type TimePeriod = 'this-month' | 'last-month' | 'last-quarter' | 'ytd' | 'last-year' | 'custom';
+// Time period options - now includes specific YYYY-MM format for archived months
+type TimePeriod = 'this-month' | 'last-month' | 'last-quarter' | 'ytd' | 'last-year' | 'custom' | string;
 
 // Add schedule data
 // Mock schedule data
@@ -107,15 +113,35 @@ const MOCK_DEALS: Deal[] = [];
 
 export const SingleFinanceHomePage: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, authCheckComplete, hasSession } = useAuth();
+  const [localUserId, setLocalUserId] = useState<string | null>(null);
 
   // Helper function to get user ID consistently
   const getUserId = () => {
-    return getConsistentUserId(user);
+    return getConsistentUserId(user) || localUserId;
   };
+  useEffect(() => {
+    let cancelled = false;
+    const tryFetch = async () => {
+      if (localUserId || user?.id) return;
+      if (!quickHasSupabaseSessionToken()) return;
+      const { data } = await supabase.auth.getSession();
+      const uid = data?.session?.user?.id || null;
+      if (!cancelled && uid) setLocalUserId(uid);
+    };
+    tryFetch();
+    const t = setTimeout(tryFetch, 800);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [user, localUserId]);
+
+  // Do not block rendering; UI will show empty states until userId resolves
   const [deals, setDeals] = useState<Deal[]>([]);
   const [, setPendingDeals] = useState<Deal[]>([]);
-  const [timePeriod] = useState<TimePeriod>('this-month');
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>('this-month');
+  const [availableArchiveMonths, setAvailableArchiveMonths] = useState<string[]>([]);
   const [customDateRange] = useState({
     start: '',
     end: '',
@@ -138,6 +164,8 @@ export const SingleFinanceHomePage: React.FC = () => {
       paintProtection: 0,
       tireWheel: 0,
       ppm: 0,
+      theft: 0,
+      bundled: 0,
       other: 0,
     },
     avgProfits: {
@@ -146,6 +174,8 @@ export const SingleFinanceHomePage: React.FC = () => {
       paintProtection: 0,
       tireWheel: 0,
       ppm: 0,
+      theft: 0,
+      bundled: 0,
       other: 0,
     },
   });
@@ -158,38 +188,84 @@ export const SingleFinanceHomePage: React.FC = () => {
     try {
       const userId = getUserId();
       if (!userId) return;
-      
+
       const lastResetMonth = SingleFinanceStorage.getLastResetMonth(userId);
-      const currentMonth = new Date().getMonth();
+      const currentMonth = new Date().getMonth() + 1; // Convert from 0-based to 1-based
       const currentYear = new Date().getFullYear();
-      const currentMonthYear = `${currentYear}-${currentMonth}`;
+      const currentMonthYear = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
 
       if (!lastResetMonth || lastResetMonth !== currentMonthYear) {
-        console.log('[SingleFinanceHomePage] New month detected, resetting data...');
-        
+        console.log('[SingleFinanceHomePage] New month detected, archiving and resetting data...');
+
+        // Archive current month's deals before clearing
+        SingleFinanceStorage.archiveCurrentMonth(userId);
+
         // Clear deals but preserve team members and settings
         SingleFinanceStorage.clearDeals(userId);
-        
+
         // Update the last reset month
         SingleFinanceStorage.setLastResetMonth(userId, currentMonthYear);
-        
-        console.log('[SingleFinanceHomePage] Monthly reset completed');
+
+        console.log('[SingleFinanceHomePage] Monthly reset completed with archiving');
       }
     } catch (error) {
       console.error('[SingleFinanceHomePage] Error during monthly reset:', error);
     }
   };
 
+  // Function to load deals from localStorage based on selected time period
+  const loadDealsFromStorage = useCallback(() => {
+    try {
+      // Load from user-specific storage for Single Finance Dashboard
+      const userId = getUserId();
+      if (!userId) return;
+
+      // Load available archive months
+      const archiveMonths = SingleFinanceStorage.getAvailableArchiveMonths(userId);
+      setAvailableArchiveMonths(archiveMonths);
+
+      let parsedDeals: any[] = [];
+
+      // Check if it's an archived month (YYYY-MM format)
+      if (timePeriod.match(/^\d{4}-\d{2}$/)) {
+        // Load archived deals for specific month
+        parsedDeals = SingleFinanceStorage.getArchivedDeals(userId, timePeriod);
+        console.log(`[SingleFinanceHomePage] Loaded archived deals for ${timePeriod}:`, parsedDeals.length);
+      } else {
+        // Load current deals
+        parsedDeals = SingleFinanceStorage.getDeals(userId);
+        console.log('[SingleFinanceHomePage] Loaded current deals:', parsedDeals.length);
+      }
+
+      if (parsedDeals.length > 0) {
+        setDeals(parsedDeals);
+        setPendingDeals(
+          parsedDeals.filter((deal: Deal) => deal.status === 'Pending' || deal.status === 'pending')
+        );
+      } else {
+        // Fallback to mock data if no stored deals
+        console.log('[SingleFinanceHomePage] No stored deals found, using mock data');
+        setDeals(MOCK_DEALS);
+        setPendingDeals(MOCK_DEALS.filter(deal => deal.status === 'Pending'));
+      }
+    } catch (error) {
+      console.error('[SingleFinanceHomePage] Error loading deals from localStorage:', error);
+      // Fallback to mock data
+      setDeals(MOCK_DEALS);
+      setPendingDeals(MOCK_DEALS.filter(deal => deal.status === 'Pending'));
+    }
+  }, [timePeriod]);
+
   // Load deals from localStorage and recalculate when component mounts or data changes
   useEffect(() => {
     // Check for monthly reset first
     checkMonthlyReset();
-    
+
     // Force immediate reload on component mount
     setTimeout(() => {
       loadDealsFromStorage();
     }, 100);
-    
+
     loadDealsFromStorage();
 
     // Listen for storage changes from other tabs/windows
@@ -221,7 +297,12 @@ export const SingleFinanceHomePage: React.FC = () => {
       window.removeEventListener('focus', handleWindowFocus);
       window.removeEventListener('singleFinanceDealsUpdated', handleDealsUpdated);
     };
-  }, []);
+  }, [loadDealsFromStorage]);
+
+  // Reload deals when time period changes
+  useEffect(() => {
+    loadDealsFromStorage();
+  }, [timePeriod, loadDealsFromStorage]);
 
   // Function to manually refresh deals (can be called by buttons)
   const refreshDeals = () => {
@@ -248,7 +329,7 @@ export const SingleFinanceHomePage: React.FC = () => {
   useEffect(() => {
     const userId = getUserId();
     if (!userId) return;
-    
+
     // Load privacy state on mount
     const savedPrivacyState = SingleFinanceStorage.getPayPrivacyState(userId);
     setShowPayAmounts(savedPrivacyState);
@@ -267,43 +348,12 @@ export const SingleFinanceHomePage: React.FC = () => {
   const handleTogglePayVisibility = () => {
     const userId = getUserId();
     if (!userId) return;
-    
+
     const newShowState = !showPayAmounts;
     setShowPayAmounts(newShowState);
     SingleFinanceStorage.setPayPrivacyState(userId, newShowState);
   };
 
-  // Function to load deals from localStorage
-  const loadDealsFromStorage = useCallback(() => {
-    try {
-      // Load from user-specific storage for Single Finance Dashboard
-      const userId = getUserId();
-      if (!userId) return;
-      
-      const parsedDeals = SingleFinanceStorage.getDeals(userId);
-      if (parsedDeals.length > 0) {
-        console.log(
-          '[SingleFinanceHomePage] Loaded deals from singleFinanceDeals storage:',
-          parsedDeals
-        );
-        console.log('[SingleFinanceHomePage] Number of deals loaded:', parsedDeals.length);
-        setDeals(parsedDeals);
-        setPendingDeals(
-          parsedDeals.filter((deal: Deal) => deal.status === 'Pending' || deal.status === 'pending')
-        );
-      } else {
-        // Fallback to mock data if no stored deals
-        console.log('[SingleFinanceHomePage] No stored deals found, using mock data');
-        setDeals(MOCK_DEALS);
-        setPendingDeals(MOCK_DEALS.filter(deal => deal.status === 'Pending'));
-      }
-    } catch (error) {
-      console.error('[SingleFinanceHomePage] Error loading deals from localStorage:', error);
-      // Fallback to mock data
-      setDeals(MOCK_DEALS);
-      setPendingDeals(MOCK_DEALS.filter(deal => deal.status === 'Pending'));
-    }
-  }, []);
 
   // Filter deals based on selected time period
   const filterDealsByDateRange = useCallback(() => {
@@ -337,6 +387,8 @@ export const SingleFinanceHomePage: React.FC = () => {
           paintProtection: 0,
           tireWheel: 0,
           ppm: 0,
+          theft: 0,
+          bundled: 0,
           other: 0,
         },
         avgProfits: {
@@ -345,6 +397,8 @@ export const SingleFinanceHomePage: React.FC = () => {
           paintProtection: 0,
           tireWheel: 0,
           ppm: 0,
+          theft: 0,
+          bundled: 0,
           other: 0,
         },
       });
@@ -371,6 +425,10 @@ export const SingleFinanceHomePage: React.FC = () => {
     let tireWheelCount = 0;
     let ppmTotal = 0;
     let ppmCount = 0;
+    let theftTotal = 0;
+    let theftCount = 0;
+    let bundledTotal = 0;
+    let bundledCount = 0;
     let otherTotal = 0;
     let otherCount = 0;
 
@@ -423,11 +481,28 @@ export const SingleFinanceHomePage: React.FC = () => {
         ppmCount++;
       }
 
+      // Theft Protection
+      if (dealData.theftProfit && dealData.theftProfit > 0) {
+        theftTotal += dealData.theftProfit;
+        theftCount++;
+      } else if (deal.theft_profit && deal.theft_profit > 0) {
+        theftTotal += deal.theft_profit;
+        theftCount++;
+      }
+
+      // Bundled Products
+      if (dealData.bundledProfit && dealData.bundledProfit > 0) {
+        bundledTotal += dealData.bundledProfit;
+        bundledCount++;
+      } else if (deal.bundled_profit && deal.bundled_profit > 0) {
+        bundledTotal += deal.bundled_profit;
+        bundledCount++;
+      }
+
       // Other products
       const otherProfit =
         (dealData.extWarrantyProfit || deal.ext_warranty_profit || 0) +
         (dealData.keyReplacementProfit || deal.key_replacement_profit || 0) +
-        (dealData.theftProfit || deal.theft_profit || 0) +
         (dealData.windshieldProfit || deal.windshield_profit || 0) +
         (dealData.lojackProfit || deal.lojack_profit || 0) +
         (dealData.otherProfit || deal.other_profit || 0);
@@ -477,6 +552,8 @@ export const SingleFinanceHomePage: React.FC = () => {
               paintProtectionCount +
               tireWheelCount +
               ppmCount +
+              theftCount +
+              bundledCount +
               otherCount) /
             totalDeals
           : 0,
@@ -492,6 +569,8 @@ export const SingleFinanceHomePage: React.FC = () => {
         paintProtection: calculatePenetration(paintProtectionCount),
         tireWheel: calculatePenetration(tireWheelCount),
         ppm: calculatePenetration(ppmCount),
+        theft: calculatePenetration(theftCount),
+        bundled: calculatePenetration(bundledCount),
         other: calculatePenetration(otherCount),
       },
       // Add average profits as a separate property
@@ -501,6 +580,8 @@ export const SingleFinanceHomePage: React.FC = () => {
         paintProtection: calculateAverage(paintProtectionTotal, paintProtectionCount),
         tireWheel: calculateAverage(tireWheelTotal, tireWheelCount),
         ppm: calculateAverage(ppmTotal, ppmCount),
+        theft: calculateAverage(theftTotal, theftCount),
+        bundled: calculateAverage(bundledTotal, bundledCount),
         other: calculateAverage(otherTotal, otherCount),
       },
     });
@@ -610,7 +691,15 @@ export const SingleFinanceHomePage: React.FC = () => {
       )}
 
       {/* Page Header */}
-      <div className="flex justify-end items-center mb-0">
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-4">
+          <h1 className="text-2xl font-bold text-gray-900">Single Finance Manager</h1>
+          <MonthYearPicker
+            selectedMonth={timePeriod}
+            onMonthChange={setTimePeriod}
+            availableMonths={availableArchiveMonths}
+          />
+        </div>
         <div className="space-x-2">
           <DropdownMenu>{/* ... existing dropdown menu code ... */}</DropdownMenu>
         </div>
@@ -743,27 +832,33 @@ export const SingleFinanceHomePage: React.FC = () => {
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
         {/* F&I Product Mix - Condensed */}
         <Card className="border hover:shadow-md transition-shadow">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center text-lg font-medium">
-              <BarChart4 className="mr-2 h-5 w-5 text-blue-500" />
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center text-sm font-medium">
+              <BarChart4 className="mr-1 h-4 w-4 text-blue-500" />
               F&I Product Mix
             </CardTitle>
           </CardHeader>
-          <CardContent className="px-4 pb-4">
+          <CardContent className="px-2 pb-2">
             {/* Header Row */}
-            <div className="flex items-center py-2 px-3 mb-3 border-b border-gray-200">
+            <div className="flex items-center py-1 px-2 mb-2 border-b border-gray-200">
               <div className="flex-1">
-                <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">Product</span>
+                <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+                  Product
+                </span>
               </div>
               <div className="flex-1 text-center">
-                <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">Avg Profit $</span>
+                <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+                  Avg Profit $
+                </span>
               </div>
               <div className="flex-1 text-right">
-                <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">Avg Per Deal %</span>
+                <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+                  Avg Per Deal %
+                </span>
               </div>
             </div>
-            
-            <div className="space-y-2">
+
+            <div className="space-y-1">
               {[
                 {
                   name: 'VSC',
@@ -784,7 +879,7 @@ export const SingleFinanceHomePage: React.FC = () => {
                   color: 'bg-purple-500',
                 },
                 {
-                  name: 'Paint/Fabric',
+                  name: 'Appearance',
                   percent: metrics.productMix.paintProtection,
                   value: `${metrics.avgProfits.paintProtection.toLocaleString()}`,
                   color: 'bg-orange-500',
@@ -796,66 +891,79 @@ export const SingleFinanceHomePage: React.FC = () => {
                   color: 'bg-red-500',
                 },
                 {
+                  name: 'Theft',
+                  percent: metrics.productMix.theft,
+                  value: `${metrics.avgProfits.theft.toLocaleString()}`,
+                  color: 'bg-yellow-500',
+                },
+                {
+                  name: 'Bundled Product',
+                  percent: metrics.productMix.bundled,
+                  value: `${metrics.avgProfits.bundled.toLocaleString()}`,
+                  color: 'bg-indigo-500',
+                },
+                {
                   name: 'Other',
                   percent: metrics.productMix.other,
                   value: `${metrics.avgProfits.other.toLocaleString()}`,
                   color: 'bg-gray-500',
                 },
-                ].map((product, index) => (
-                  <div key={index} className="flex items-center py-2 px-3 bg-gray-50 rounded-md">
-                    <div className="flex items-center flex-1">
-                      <div className={`w-3 h-3 ${product.color} rounded-full mr-3 flex-shrink-0`}></div>
-                      <span className="font-medium text-sm">{product.name}</span>
-                    </div>
-                    <div className="flex-1 text-center">
-                      <div className="font-bold text-base">
-                        <span className="text-xs">$</span>{product.value}
-                      </div>
-                    </div>
-                    <div className="flex-1 text-right">
-                      <div className="font-bold text-sm text-blue-600">{product.percent}%</div>
+              ].map((product, index) => (
+                <div key={index} className="flex items-center py-1 px-2 bg-gray-50 rounded-md">
+                  <div className="flex items-center flex-1">
+                    <div
+                      className={`w-2 h-2 ${product.color} rounded-full mr-2 flex-shrink-0`}
+                    ></div>
+                    <span className="font-medium text-xs">{product.name}</span>
+                  </div>
+                  <div className="flex-1 text-center">
+                    <div className="font-bold text-sm">
+                      <span className="text-xs">$</span>
+                      {product.value}
                     </div>
                   </div>
-                ))}
-
-                {/* PPD metric */}
-                <div className="mt-4 pt-3 border-t border-gray-200">
-                  <div className="flex items-center py-2 px-3 bg-blue-50 rounded-md">
-                    <div className="flex-1">
-                      <span className="font-medium text-sm">Products Per Deal (PPD)</span>
-                    </div>
-                    <div className="flex-1 text-center">
-                      <div className="font-bold text-lg text-blue-600">
-                        {metrics.productsPerDeal.toFixed(1)}
-                      </div>
-                    </div>
-                    <div className="flex-1 text-right">
-                      {/* Empty space to maintain alignment */}
-                    </div>
+                  <div className="flex-1 text-right">
+                    <div className="font-bold text-xs text-blue-600">{product.percent}%</div>
                   </div>
                 </div>
+              ))}
+
+              {/* PPD metric */}
+              <div className="mt-2 pt-2 border-t border-gray-200">
+                <div className="flex items-center py-1 px-2 bg-blue-50 rounded-md">
+                  <div className="flex-1">
+                    <span className="font-medium text-xs">Products Per Deal (PPD)</span>
+                  </div>
+                  <div className="flex-1 text-center">
+                    <div className="font-bold text-sm text-blue-600">
+                      {metrics.productsPerDeal.toFixed(1)}
+                    </div>
+                  </div>
+                  <div className="flex-1 text-right">{/* Empty space to maintain alignment */}</div>
+                </div>
               </div>
+            </div>
           </CardContent>
         </Card>
 
         {/* Pay Calculator Card */}
         <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg font-bold flex items-center justify-between text-green-800">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-bold flex items-center justify-between text-green-800">
               <div className="flex items-center">
-                <DollarSign className="mr-2 h-5 w-5" />
+                <DollarSign className="mr-1 h-4 w-4" />
                 Monthly Pay Estimator
               </div>
               <button
                 onClick={handleTogglePayVisibility}
-                className="p-2 hover:bg-green-200 rounded-lg transition-colors shadow-sm border border-green-300"
-                title={showPayAmounts ? "Hide pay amounts" : "Show pay amounts"}
+                className="p-1 hover:bg-green-200 rounded-lg transition-colors shadow-sm border border-green-300"
+                title={showPayAmounts ? 'Hide pay amounts' : 'Show pay amounts'}
                 type="button"
               >
                 {showPayAmounts ? (
-                  <Eye className="h-6 w-6 text-green-700" />
+                  <Eye className="h-4 w-4 text-green-700" />
                 ) : (
-                  <EyeOff className="h-6 w-6 text-green-700" />
+                  <EyeOff className="h-4 w-4 text-green-700" />
                 )}
               </button>
             </CardTitle>
@@ -874,8 +982,8 @@ export const SingleFinanceHomePage: React.FC = () => {
                     vscBonus: 100,
                     gapBonus: 50,
                     ppmBonus: 75,
-                    totalThreshold: 15000
-                  }
+                    totalThreshold: 15000,
+                  },
                 };
               } catch (error) {
                 payConfig = {
@@ -885,8 +993,8 @@ export const SingleFinanceHomePage: React.FC = () => {
                     vscBonus: 100,
                     gapBonus: 50,
                     ppmBonus: 75,
-                    totalThreshold: 15000
-                  }
+                    totalThreshold: 15000,
+                  },
                 };
               }
 
@@ -897,77 +1005,132 @@ export const SingleFinanceHomePage: React.FC = () => {
               }, 0);
               const commissionEarnings = (totalProfit * payConfig.commissionRate) / 100;
               const baseEarnings = payConfig.baseRate;
-              
+
               // Calculate product bonuses (only for funded deals)
-              const fundedDeals = filteredDeals.filter(deal => deal.status === 'Funded' || deal.status === 'Complete');
-              const vscBonuses = fundedDeals.filter(deal => {
-                const dealData = deal as any;
-                return (dealData.vscProfit && dealData.vscProfit > 0) || (deal.vsc_profit && deal.vsc_profit > 0);
-              }).length * payConfig.bonusThresholds.vscBonus;
-              
-              const gapBonuses = fundedDeals.filter(deal => {
-                const dealData = deal as any;
-                return (dealData.gapProfit && dealData.gapProfit > 0) || (deal.gap_profit && deal.gap_profit > 0);
-              }).length * payConfig.bonusThresholds.gapBonus;
-              
-              const ppmBonuses = fundedDeals.filter(deal => {
-                const dealData = deal as any;
-                return (dealData.ppmProfit && dealData.ppmProfit > 0) || (deal.ppm_profit && deal.ppm_profit > 0);
-              }).length * payConfig.bonusThresholds.ppmBonus;
+              const fundedDeals = filteredDeals.filter(
+                deal => deal.status === 'Funded' || deal.status === 'Complete'
+              );
+              const vscBonuses =
+                fundedDeals.filter(deal => {
+                  const dealData = deal as any;
+                  return (
+                    (dealData.vscProfit && dealData.vscProfit > 0) ||
+                    (deal.vsc_profit && deal.vsc_profit > 0)
+                  );
+                }).length * payConfig.bonusThresholds.vscBonus;
+
+              const gapBonuses =
+                fundedDeals.filter(deal => {
+                  const dealData = deal as any;
+                  return (
+                    (dealData.gapProfit && dealData.gapProfit > 0) ||
+                    (deal.gap_profit && deal.gap_profit > 0)
+                  );
+                }).length * payConfig.bonusThresholds.gapBonus;
+
+              const ppmBonuses =
+                fundedDeals.filter(deal => {
+                  const dealData = deal as any;
+                  return (
+                    (dealData.ppmProfit && dealData.ppmProfit > 0) ||
+                    (deal.ppm_profit && deal.ppm_profit > 0)
+                  );
+                }).length * payConfig.bonusThresholds.ppmBonus;
 
               const totalBonuses = vscBonuses + gapBonuses + ppmBonuses;
               const estimatedPay = baseEarnings + commissionEarnings + totalBonuses;
 
               // Helper function to display amount or XXX
-              const displayAmount = (amount: number) => showPayAmounts ? `$${amount.toLocaleString()}` : 'XXX';
+              const displayAmount = (amount: number) =>
+                showPayAmounts ? `$${amount.toLocaleString()}` : 'XXX';
 
               return (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center p-3 bg-white rounded-lg border">
-                      <span className="text-sm font-medium">Base Pay</span>
-                      <span className="font-bold text-green-600">{displayAmount(baseEarnings)}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center p-2 bg-white rounded-lg border">
+                      <span className="text-xs font-medium">Base Pay</span>
+                      <span className="font-bold text-green-600 text-sm">
+                        {displayAmount(baseEarnings)}
+                      </span>
                     </div>
-                    
-                    <div className="flex justify-between items-center p-3 bg-white rounded-lg border">
-                      <span className="text-sm font-medium">Commission ({payConfig.commissionRate}%)</span>
-                      <span className="font-bold text-green-600">{displayAmount(commissionEarnings)}</span>
+
+                    <div className="flex justify-between items-center p-2 bg-white rounded-lg border">
+                      <span className="text-xs font-medium">
+                        Commission ({payConfig.commissionRate}%)
+                      </span>
+                      <span className="font-bold text-green-600 text-sm">
+                        {displayAmount(commissionEarnings)}
+                      </span>
                     </div>
-                    
-                    <div className="flex justify-between items-center p-3 bg-white rounded-lg border">
-                      <span className="text-sm font-medium">Product Bonuses</span>
-                      <span className="font-bold text-green-600">{displayAmount(totalBonuses)}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <div className="p-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg">
-                      <div className="text-sm font-medium">Estimated Monthly Pay</div>
-                      <div className="text-2xl font-bold">{showPayAmounts ? `$${estimatedPay.toLocaleString()}` : 'XXX'}</div>
-                    </div>
-                    
-                    <div className="text-xs text-gray-600 p-3 bg-white rounded-lg border">
-                      <p className="font-medium mb-1">Bonus Breakdown:</p>
-                      <p>VSC Deals: {fundedDeals.filter(deal => {
-                        const dealData = deal as any;
-                        return (dealData.vscProfit && dealData.vscProfit > 0) || (deal.vsc_profit && deal.vsc_profit > 0);
-                      }).length} × {showPayAmounts ? `$${payConfig.bonusThresholds.vscBonus}` : 'XXX'} = {showPayAmounts ? `$${vscBonuses}` : 'XXX'}</p>
-                      <p>GAP Deals: {fundedDeals.filter(deal => {
-                        const dealData = deal as any;
-                        return (dealData.gapProfit && dealData.gapProfit > 0) || (deal.gap_profit && deal.gap_profit > 0);
-                      }).length} × {showPayAmounts ? `$${payConfig.bonusThresholds.gapBonus}` : 'XXX'} = {showPayAmounts ? `$${gapBonuses}` : 'XXX'}</p>
-                      <p>PPM Deals: {fundedDeals.filter(deal => {
-                        const dealData = deal as any;
-                        return (dealData.ppmProfit && dealData.ppmProfit > 0) || (deal.ppm_profit && deal.ppm_profit > 0);
-                      }).length} × {showPayAmounts ? `$${payConfig.bonusThresholds.ppmBonus}` : 'XXX'} = {showPayAmounts ? `$${ppmBonuses}` : 'XXX'}</p>
+
+                    <div className="flex justify-between items-center p-2 bg-white rounded-lg border">
+                      <span className="text-xs font-medium">Product Bonuses</span>
+                      <span className="font-bold text-green-600 text-sm">
+                        {displayAmount(totalBonuses)}
+                      </span>
                     </div>
                   </div>
-                  
-                  <div className="col-span-1 md:col-span-2 mt-2">
+
+                  <div className="space-y-1">
+                    <div className="p-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg">
+                      <div className="text-xs font-medium">Estimated Monthly Pay</div>
+                      <div className="text-lg font-bold">
+                        {showPayAmounts ? `$${estimatedPay.toLocaleString()}` : 'XXX'}
+                      </div>
+                    </div>
+
+                    <div className="text-xs text-gray-600 p-2 bg-white rounded-lg border">
+                      <p className="font-medium mb-0.5">Bonus Breakdown:</p>
+                      <p>
+                        VSC Deals:{' '}
+                        {
+                          fundedDeals.filter(deal => {
+                            const dealData = deal as any;
+                            return (
+                              (dealData.vscProfit && dealData.vscProfit > 0) ||
+                              (deal.vsc_profit && deal.vsc_profit > 0)
+                            );
+                          }).length
+                        }{' '}
+                        × {showPayAmounts ? `$${payConfig.bonusThresholds.vscBonus}` : 'XXX'} ={' '}
+                        {showPayAmounts ? `$${vscBonuses}` : 'XXX'}
+                      </p>
+                      <p>
+                        GAP Deals:{' '}
+                        {
+                          fundedDeals.filter(deal => {
+                            const dealData = deal as any;
+                            return (
+                              (dealData.gapProfit && dealData.gapProfit > 0) ||
+                              (deal.gap_profit && deal.gap_profit > 0)
+                            );
+                          }).length
+                        }{' '}
+                        × {showPayAmounts ? `$${payConfig.bonusThresholds.gapBonus}` : 'XXX'} ={' '}
+                        {showPayAmounts ? `$${gapBonuses}` : 'XXX'}
+                      </p>
+                      <p>
+                        PPM Deals:{' '}
+                        {
+                          fundedDeals.filter(deal => {
+                            const dealData = deal as any;
+                            return (
+                              (dealData.ppmProfit && dealData.ppmProfit > 0) ||
+                              (deal.ppm_profit && deal.ppm_profit > 0)
+                            );
+                          }).length
+                        }{' '}
+                        × {showPayAmounts ? `$${payConfig.bonusThresholds.ppmBonus}` : 'XXX'} ={' '}
+                        {showPayAmounts ? `$${ppmBonuses}` : 'XXX'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="col-span-1 md:col-span-2 mt-1">
                     <p className="text-xs text-gray-500 text-center">
-                      <strong>Disclaimer:</strong> This calculator is for informational purposes only. 
-                      Actual pay may differ based on final accounting, management review, and company policies. 
-                      Configure your pay settings in the Settings page.
+                      <strong>Disclaimer:</strong> This calculator is for informational purposes
+                      only. Actual pay may differ based on final accounting, management review, and
+                      company policies. Configure your pay settings in the Settings page.
                     </p>
                   </div>
                 </div>
@@ -976,8 +1139,6 @@ export const SingleFinanceHomePage: React.FC = () => {
           </CardContent>
         </Card>
       </div>
-
-
     </div>
   );
 };

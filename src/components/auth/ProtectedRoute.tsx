@@ -3,6 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { quickHasSupabaseSessionToken } from '../../lib/supabaseClient';
 import { isTestEmail } from '../../lib/supabaseClient';
 import {
   isDirectAuthAuthenticated,
@@ -25,6 +26,16 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { user, loading, hasSession, userRole, dealershipId, logAccessAttempt, authCheckComplete } =
     useAuth();
   const location = useLocation();
+  // If Supabase token exists locally but context isn't ready yet, allow dashboard routes immediately
+  if (
+    (!user || !hasSession) &&
+    quickHasSupabaseSessionToken() &&
+    (location.pathname.startsWith('/dashboard') ||
+      location.pathname.startsWith('/single-finance-deal-log'))
+  ) {
+    console.log('[ProtectedRoute] Token present but context not ready; allowing dashboard route');
+    return <>{children}</>;
+  }
   const deploymentEnv = import.meta.env.MODE || 'development';
   const isProduction = deploymentEnv === 'production';
 
@@ -124,10 +135,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     isDemoUser: isDemoUserAuthenticated,
   });
 
-  // If we have a fresh login flag, give auth state time to propagate
+  // If we have a fresh login flag, optimistically allow dashboard access while auth propagates
   if (recentSupabaseLogin && (!user || !hasSession)) {
     console.log(
-      '[ProtectedRoute] Recent Supabase login detected, waiting for auth state to propagate...'
+      '[ProtectedRoute] Recent Supabase login detected, allowing temporary access while auth propagates...'
     );
 
     // Check direct Supabase auth as fallback to bypass context issues
@@ -158,40 +169,21 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       });
     }
 
-    // Set timeout start time if not already set
+    // Allow protected content temporarily for dashboard routes so user isn't blocked
+    // Clear the flag after a short grace period
     if (!extraLoadingStartTime) {
       setExtraLoadingStartTime(Date.now());
+      setTimeout(() => localStorage.removeItem('recent_supabase_login'), 15000);
     }
-
-    // Clear the flag and give auth state time to propagate (max 8 seconds)
-    const timeElapsed = extraLoadingStartTime ? Date.now() - extraLoadingStartTime : 0;
-
-    if (timeElapsed > 8000) {
-      console.warn(
-        '[ProtectedRoute] Auth state timeout reached, clearing flags and redirecting to login'
-      );
-      localStorage.removeItem('recent_supabase_login');
-      setExtraLoadingStartTime(null);
-      return <Navigate to="/" replace state={{ from: location }} />;
-    }
-
-    // Add debugging for auth state
-    console.log('[ProtectedRoute] Waiting for auth state...', {
-      timeElapsed: timeElapsed,
-      user: user?.email || 'none',
-      hasSession: hasSession,
-      loading: loading,
-      authCheckComplete: authCheckComplete,
-    });
-
+    // If route is clearly a dashboard route, allow access, else fallback to loading UI
+    const isDashboardRoute =
+      location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/dealership/');
+    if (isDashboardRoute) return <>{children}</>;
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
           <p className="text-sm text-gray-500">Completing authentication...</p>
-          <p className="text-xs text-gray-400 mt-1">
-            Please wait ({Math.round((8000 - timeElapsed) / 1000)}s)
-          </p>
         </div>
       </div>
     );
@@ -251,6 +243,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       authCheckComplete,
       path: location.pathname,
     });
+    // During loading, allow content for dashboard and single finance deal log to avoid blank screens
+    if (
+      location.pathname.startsWith('/dashboard') ||
+      location.pathname.startsWith('/single-finance-deal-log')
+    ) {
+      return <>{children}</>;
+    }
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
@@ -269,6 +268,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     console.log(
       '[ProtectedRoute] Detected navigation from login without auth state, adding delay...'
     );
+    // Instead of delay, redirect root dashboard to sales immediately
+    if (location.pathname === '/dashboard') {
+      return <Navigate to="/dashboard/sales" replace />;
+    }
     setExtraLoadingStartTime(Date.now());
   }
 
@@ -429,6 +432,54 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       });
 
       return <Navigate to="/dashboard" replace />;
+    }
+  }
+
+  // Role-based dashboard redirection once auth is ready
+  const computeDashboardPath = (
+    roleName?: string | null,
+    isGroupAdminFlag?: boolean,
+    email?: string | null
+  ): string => {
+    const rv = (roleName || '').toLowerCase();
+    const e = (email || '').toLowerCase();
+    if (isGroupAdminFlag) return '/group-admin';
+    if (rv === 'dealer_group_admin' || rv.includes('group')) return '/group-admin';
+    if (
+      rv === 'single_finance_manager' ||
+      (rv === 'finance_manager' && (e.includes('finance') || e.includes('testfinance')))
+    ) {
+      return '/dashboard/single-finance';
+    }
+    if (rv === 'finance_manager' || rv.includes('finance')) return '/dashboard/finance';
+    if (rv === 'sales_manager' || rv.includes('sales_manager')) return '/dashboard/sales-manager';
+    if (rv === 'general_manager' || rv.includes('general')) return '/dashboard/gm';
+    if (rv === 'area_vice_president' || rv.includes('vice_president')) return '/avp-full-dashboard';
+    if (
+      rv === 'single_dealer_admin' ||
+      rv === 'dealership_admin' ||
+      rv.includes('dealership_admin') ||
+      rv === 'admin'
+    )
+      return '/dashboard/admin';
+    return '/dashboard/sales';
+  };
+
+  if (user && hasSession && authCheckComplete) {
+    const target = computeDashboardPath(
+      userRole,
+      (user as any)?.user_metadata?.is_group_admin,
+      user.email
+    );
+    const onDashboard =
+      location.pathname.startsWith('/dashboard') || location.pathname === '/group-admin';
+    if (onDashboard && !location.pathname.startsWith(target)) {
+      console.log('[ProtectedRoute] Redirecting to role dashboard:', {
+        target,
+        current: location.pathname,
+        role: userRole,
+      });
+      return <Navigate to={target} replace />;
     }
   }
 

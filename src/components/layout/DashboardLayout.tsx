@@ -13,7 +13,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Th
   const { signOut, user, userRole, dealershipId, currentDealershipName } = useAuth();
   const location = useLocation();
 
-
   const handleSignOut = () => {
     // Navigate to the dedicated logout page instead of calling signOut
     window.location.href = '/logout';
@@ -55,15 +54,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Th
           </div>
 
           <nav className="space-y-1">
-            {/* Role-specific navigation */}
-            {(userRole === 'single_finance_manager' || 
-              (userRole === 'finance_manager' && location.pathname.startsWith('/dashboard/single-finance'))) ? (
+            {/* Route-specific navigation: use Single Finance nav on dashboard and log routes */}
+            {location.pathname.startsWith('/dashboard/single-finance') ||
+            location.pathname.startsWith('/single-finance-deal-log') ? (
               <>
                 {/* Single Finance Manager Navigation */}
                 <Link to="/dashboard/single-finance">
                   <button
                     className={`flex items-center w-full px-4 py-2 text-left text-sm rounded-md ${
-                      isActive('/dashboard/single-finance') && !isActive('/dashboard/single-finance/deals')
+                      isActive('/dashboard/single-finance') &&
+                      !isActive('/dashboard/single-finance/deals')
                         ? 'bg-blue-700 text-white'
                         : 'text-blue-100 hover:bg-blue-800 hover:text-white'
                     }`}
@@ -122,7 +122,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Th
 
                 <Link
                   to={
-                    isDealershipPath ? `/dealership/${dealershipIdFromPath}/deals` : '/dashboard/deals'
+                    isDealershipPath
+                      ? `/dealership/${dealershipIdFromPath}/deals`
+                      : '/dashboard/deals'
                   }
                 >
                   <button

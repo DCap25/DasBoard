@@ -138,13 +138,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const loginTime = parseInt(loginTimestamp);
       const currentTime = Date.now();
       const timeDifference = currentTime - loginTime;
-      
+
       if (timeDifference > SESSION_TIMEOUT_MS) {
         console.log('[AuthContext] Session expired after 18 hours, signing out automatically');
         toast({
           title: 'Session Expired',
           description: 'You have been automatically signed out after 18 hours for security.',
-          variant: 'default'
+          variant: 'default',
         });
         signOut();
         return true; // Session expired
@@ -814,113 +814,79 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         }
 
-        // Get initial session with shorter timeout and better fallback
-        const sessionPromise = supabase.auth.getSession();
-        const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Session fetch timeout')), 5000); // Reduced to 5 seconds
-        });
-        
-        let session: any = null;
-        let sessionError: any = null;
-        
-        try {
-          const result = await Promise.race([sessionPromise, timeoutPromise]) as any;
-          session = result.data?.session;
-          sessionError = result.error;
-        } catch (error) {
-          sessionError = error;
+        // Attach auth state listener early to avoid missing SIGNED_IN/INITIAL_SESSION events
+        if (mounted && !authListener) {
+          authListener = await supabase.auth.onAuthStateChange(async (event, newSession) => {
+            if (!mounted) return;
+            console.log('[AuthContext] Auth event (early listener):', event, {
+              userId: newSession?.user?.id || 'none',
+              email: newSession?.user?.email || 'none',
+              timestamp: new Date().toISOString(),
+            });
+
+            setHasSession(!!newSession);
+            await handleAuthStateChange(newSession);
+          });
         }
 
-        if (sessionError) {
-          console.error('[AuthContext] Error getting initial session:', sessionError, {
-            timestamp: new Date().toISOString(),
-          });
-          
-          // If it's a timeout or network error, continue without session
-          if (sessionError.message?.includes('timeout') || sessionError.message?.includes('network')) {
-            console.log('[AuthContext] Network/timeout error - continuing without session');
-            if (mounted) {
-              setLoading(false);
-              setAuthCheckComplete(true);
+        // Fire a non-blocking initial session fetch
+        supabase.auth
+          .getSession()
+          .then(async ({ data, error }) => {
+            if (!mounted) return;
+            if (error) {
+              console.warn('[AuthContext] getSession error (background):', error);
               setHasSession(false);
-              setUser(null);
-              setRole(null);
+              return;
             }
-            return;
-          }
-          
-          if (mounted) {
-            setLoading(false); // Make sure to set loading to false even on error
-            setAuthCheckComplete(true); // Mark auth check as complete
-            setError(sessionError);
-          }
-          return;
-        }
-
-        // Update session state
-        if (mounted) {
-          console.log('[AuthContext] Initial session exists:', !!session, {
-            userId: session?.user?.id || 'none',
-            timestamp: new Date().toISOString(),
+            const session = data?.session;
+            console.log('[AuthContext] Initial session exists (background):', !!session, {
+              userId: session?.user?.id || 'none',
+              timestamp: new Date().toISOString(),
+            });
+            setHasSession(!!session);
+            if (session?.user) {
+              setUser(session.user);
+              const metadataRole = session.user.user_metadata?.role;
+              if (metadataRole) {
+                const normalizedMetadataRole = metadataRole.toLowerCase() as UserRole;
+                setRole(normalizedMetadataRole);
+                setUserRole(normalizedMetadataRole);
+              } else {
+                try {
+                  const rolePromise = fetchUserRole(session.user.id);
+                  const roleTimeoutPromise = new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error('Role fetch timeout')), 3000);
+                  });
+                  const initialRole = (await Promise.race([
+                    rolePromise,
+                    roleTimeoutPromise,
+                  ])) as UserRole;
+                  setRole(initialRole);
+                  setUserRole(initialRole);
+                } catch {
+                  setRole(FALLBACK_ROLE);
+                  setUserRole(FALLBACK_ROLE);
+                }
+              }
+              setTimeout(async () => {
+                try {
+                  if (mounted) await fetchProfileData(session.user.id);
+                } catch (profileError) {
+                  console.error('[AuthContext] Background profile fetch error:', profileError);
+                }
+              }, 100);
+            }
+          })
+          .catch(err => {
+            if (!mounted) return;
+            console.warn('[AuthContext] getSession exception (background):', err);
           });
-          setHasSession(!!session);
-        }
 
-        // Process initial session
-        if (session?.user && mounted) {
-          SecureLogger.info('[AuthContext] Found initial session', {
-            hasUser: !!session.user,
-            timestamp: new Date().toISOString(),
-          });
-
-          // Always set user data immediately
-          setUser(session.user);
-
-          // Optimize: Try to get role from user metadata first to avoid database calls
-          const metadataRole = session.user.user_metadata?.role;
-          if (metadataRole) {
-            const normalizedMetadataRole = metadataRole.toLowerCase() as UserRole;
-            console.log('[AuthContext] Using role from user metadata:', normalizedMetadataRole);
-            setRole(normalizedMetadataRole);
-            setUserRole(normalizedMetadataRole);
-          } else {
-            // Fallback to database lookup with timeout
-            try {
-              const rolePromise = fetchUserRole(session.user.id);
-              const roleTimeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error('Role fetch timeout')), 3000); // 3 second timeout for role fetch
-              });
-              
-              const initialRole = await Promise.race([rolePromise, roleTimeoutPromise]) as UserRole;
-              if (mounted) {
-                console.log('[AuthContext] Setting role from database:', initialRole);
-                setRole(initialRole);
-                setUserRole(initialRole);
-              }
-            } catch (error) {
-              console.warn('[AuthContext] Role fetch failed, using fallback:', error);
-              if (mounted) {
-                setRole(FALLBACK_ROLE);
-                setUserRole(FALLBACK_ROLE);
-              }
-            }
-          }
-
-          // Check group admin status asynchronously to not block initialization
-          setTimeout(async () => {
-            try {
-              if (mounted) {
-                await fetchProfileData(session.user.id);
-              }
-            } catch (profileError) {
-              console.error('[AuthContext] Background profile fetch error:', profileError);
-            }
-          }, 100);
-        }
-
+        // Do not block UI on initial session; mark as ready now
         if (mounted) {
           setLoading(false);
-          setAuthCheckComplete(true); // Mark auth check as complete
+          setAuthCheckComplete(true);
         }
 
         // Set up auth state change listener
@@ -958,10 +924,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('[AuthContext] Error in initialization:', error, {
           timestamp: new Date().toISOString(),
         });
-        
+
         // For timeout or network errors, don't show error toast - just continue
-        if (error instanceof Error && (error.message.includes('timeout') || error.message.includes('network'))) {
-          console.log('[AuthContext] Network/timeout during initialization - continuing without auth');
+        if (
+          error instanceof Error &&
+          (error.message.includes('timeout') || error.message.includes('network'))
+        ) {
+          console.log(
+            '[AuthContext] Network/timeout during initialization - continuing without auth'
+          );
           if (mounted) {
             setLoading(false);
             setAuthCheckComplete(true);
@@ -971,7 +942,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
           return;
         }
-        
+
         if (mounted) {
           setLoading(false); // Ensure loading is set to false on any error
           setAuthCheckComplete(true); // Mark auth check as complete
@@ -998,18 +969,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return;
         }
 
-        console.warn('[AuthContext] Safety timeout reached after 8s - forcing loading state to false');
+        console.warn(
+          '[AuthContext] Safety timeout reached after 12s - forcing loading state to false'
+        );
         setLoading(false);
         setAuthCheckComplete(true); // Mark auth check as complete even on timeout
-        
+
         // Show user-friendly message instead of error
         toast({
           title: 'Connection Slow',
-          description: 'Authentication is taking longer than expected. You can continue using the app.',
-          variant: 'default'
+          description:
+            'Authentication is taking longer than expected. You can continue using the app.',
+          variant: 'default',
         });
       }
-    }, 8000); // Reduced to 8 second safety timeout
+    }, 12000); // 12 second safety timeout to allow slower networks
 
     return () => {
       mounted = false;
@@ -1050,8 +1024,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Sign in with email and password
   const signIn = async (email: string, password: string, rememberMe?: boolean) => {
     try {
-      // Check server-side rate limiting first
-      const serverRateLimit = await ServerRateLimiter.enforceRateLimit('signIn', email);
+      // Check server-side rate limiting first (with fast timeout fallback)
+      console.log('[AuthContext] Checking server rate limit...');
+      const rateLimitTimeout = new Promise<{ allowed: boolean; message?: string }>(resolve =>
+        setTimeout(() => resolve({ allowed: true }), 1500)
+      );
+      const serverRateLimit = await Promise.race([
+        ServerRateLimiter.enforceRateLimit('signIn', email),
+        rateLimitTimeout,
+      ]);
+      console.log('[AuthContext] Server rate limit result:', serverRateLimit);
       if (!serverRateLimit.allowed) {
         setError(new Error(serverRateLimit.message));
         toast({
@@ -1066,8 +1048,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const rateLimitCheck = rateLimiter.isLimited('signIn', email);
       if (rateLimitCheck.limited) {
         const waitTimeMinutes = Math.ceil((rateLimitCheck.retryAfterMs || 0) / 60000);
-        const errorMessage = `Too many sign in attempts. Please try again in ${waitTimeMinutes} minute${waitTimeMinutes !== 1 ? 's' : ''}.`;
-        
+        const errorMessage = `Too many sign in attempts. Please try again in ${waitTimeMinutes} minute${
+          waitTimeMinutes !== 1 ? 's' : ''
+        }.`;
+
         setError(new Error(errorMessage));
         toast({
           title: 'Rate Limited',
@@ -1358,8 +1342,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const rateLimitCheck = rateLimiter.isLimited('signUp', email);
     if (rateLimitCheck.limited) {
       const waitTimeMinutes = Math.ceil((rateLimitCheck.retryAfterMs || 0) / 60000);
-      const errorMessage = `Too many signup attempts. Please try again in ${waitTimeMinutes} minute${waitTimeMinutes !== 1 ? 's' : ''}.`;
-      
+      const errorMessage = `Too many signup attempts. Please try again in ${waitTimeMinutes} minute${
+        waitTimeMinutes !== 1 ? 's' : ''
+      }.`;
+
       setError(new Error(errorMessage));
       toast({
         title: 'Rate Limited',
@@ -1387,10 +1373,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           code: error.name,
           timestamp: new Date().toISOString(),
         });
-        
+
         // Record failed sign up attempt
         rateLimiter.recordAttempt('signUp', false, email);
-        
+
         setError(error);
         showErrorToast('Sign up failed', error.message);
         return;
@@ -1438,10 +1424,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           userId: data.user.id,
           timestamp: new Date().toISOString(),
         });
-        
+
         // Record successful sign up attempt
         rateLimiter.recordAttempt('signUp', true, email);
-        
+
         showSuccessToast('Account created', 'Your account has been created successfully');
       }
     } catch (error) {
@@ -1472,7 +1458,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Clear session timeout timestamp
       localStorage.removeItem('session_login_time');
-      
+
       // Clear encryption keys
       KeyManagement.clearSessionKey();
 
@@ -1503,7 +1489,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Redirect to the dedicated logout page to handle the complete logout process
       console.log('[AuthContext] Redirecting to logout page');
-      window.location.href = '/logout';
+      // Use hard navigation to ensure full reload
+      window.location.assign('/logout');
 
       return; // Early return to skip the rest of the function
 

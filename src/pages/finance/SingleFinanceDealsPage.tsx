@@ -46,6 +46,8 @@ interface Deal {
   tireAndWheelProfit?: number;
   appearanceProfit?: number;
   otherProfit?: number;
+  theftProfit?: number;
+  bundledProfit?: number;
   lender?: string;
   dealStatus?: string;
 }
@@ -180,8 +182,8 @@ const SingleFinanceDealsPage: React.FC = () => {
     }
   };
 
-  // Load deals from localStorage - using singleFinanceDeals storage key
-  useEffect(() => {
+  // Function to load deals from localStorage
+  const loadDealsFromStorage = () => {
     try {
       if (!user?.id) return;
       
@@ -210,11 +212,30 @@ const SingleFinanceDealsPage: React.FC = () => {
           return Object.assign(deal, rawDeal);
         });
         setDeals(formattedDeals);
+      } else {
+        setDeals([]);
       }
     } catch (error) {
       console.error('Error loading deals from localStorage:', error);
     }
-  }, []);
+  };
+
+  // Load deals from localStorage - using singleFinanceDeals storage key
+  useEffect(() => {
+    loadDealsFromStorage();
+
+    // Listen for deals updates from the deal log page
+    const handleDealsUpdated = (event: CustomEvent) => {
+      console.log('[SingleFinanceDealsPage] Received deals update event', event.detail);
+      loadDealsFromStorage();
+    };
+
+    window.addEventListener('singleFinanceDealsUpdated', handleDealsUpdated as EventListener);
+
+    return () => {
+      window.removeEventListener('singleFinanceDealsUpdated', handleDealsUpdated as EventListener);
+    };
+  }, [user?.id]);
 
   // Filter and sort deals
   const filteredDeals = deals
@@ -404,7 +425,10 @@ const SingleFinanceDealsPage: React.FC = () => {
                   <th className="py-3 px-4 text-right font-medium">VSC</th>
                   <th className="py-3 px-4 text-right font-medium">PPM</th>
                   <th className="py-3 px-4 text-right font-medium">GAP</th>
-                  <th className="py-3 px-4 text-right font-medium">T&W/Bundle</th>
+                  <th className="py-3 px-4 text-right font-medium">T&W</th>
+                  <th className="py-3 px-4 text-right font-medium">Appearance</th>
+                  <th className="py-3 px-4 text-right font-medium">Theft</th>
+                  <th className="py-3 px-4 text-right font-medium">Bundled</th>
                   <th className="py-3 px-4 text-center font-medium">PPD</th>
                   <th className="py-3 px-4 text-right font-medium">PVR</th>
                   <th className="py-3 px-4 text-right font-medium">
@@ -426,7 +450,7 @@ const SingleFinanceDealsPage: React.FC = () => {
               <tbody>
                 {filteredDeals.length === 0 ? (
                   <tr>
-                    <td colSpan={18} className="py-8 text-center text-gray-500">
+                    <td colSpan={21} className="py-8 text-center text-gray-500">
                       {deals.length === 0
                         ? "No deals logged yet. Use the 'Log New Deal' button to add deals."
                         : 'No deals match your search criteria.'}
@@ -458,6 +482,9 @@ const SingleFinanceDealsPage: React.FC = () => {
                     const ppmProfit = parseFloat(dealData.ppmProfit) || 0;
                     const gapProfit = parseFloat(dealData.gapProfit) || 0;
                     const twProfit = parseFloat(dealData.tireAndWheelProfit) || 0;
+                    const appearanceProfit = parseFloat(dealData.appearanceProfit) || 0;
+                    const theftProfit = parseFloat(dealData.theftProfit) || 0;
+                    const bundledProfit = parseFloat(dealData.bundledProfit) || 0;
 
                     // Products per deal
                     const ppd = deal.products.length;
@@ -518,6 +545,15 @@ const SingleFinanceDealsPage: React.FC = () => {
                         </td>
                         <td className="py-3 px-4 text-right">
                           {formatCurrency(twProfit)}
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          {formatCurrency(appearanceProfit)}
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          {formatCurrency(theftProfit)}
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          {formatCurrency(bundledProfit)}
                         </td>
                         <td className="py-3 px-4 text-center font-medium">{ppd}</td>
                         <td className="py-3 px-4 text-right">
