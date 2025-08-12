@@ -238,9 +238,7 @@ const SingleFinanceDealsPage: React.FC = () => {
             customer: rawDeal.customer || rawDeal.lastName || 'Unknown',
             vehicle:
               rawDeal.vehicle ||
-              `${
-                rawDeal.vehicleType === 'N' ? 'New' : rawDeal.vehicleType === 'U' ? 'Used' : 'CPO'
-              } - Stock #${rawDeal.stockNumber}`,
+              `${rawDeal.vehicleType === 'N' ? 'New' : rawDeal.vehicleType === 'U' ? 'Used' : 'CPO'} - Stock #${rawDeal.stockNumber}`,
             vin: rawDeal.vin || rawDeal.vinLast8 || '',
             saleDate: rawDeal.saleDate || rawDeal.dealDate || rawDeal.created_at,
             salesperson: rawDeal.salesperson || 'Self',
