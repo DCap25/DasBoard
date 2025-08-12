@@ -48,8 +48,6 @@ interface Deal {
   tireAndWheelProfit?: number;
   appearanceProfit?: number;
   otherProfit?: number;
-  theftProfit?: number;
-  bundledProfit?: number;
   lender?: string;
   dealStatus?: string;
 }
