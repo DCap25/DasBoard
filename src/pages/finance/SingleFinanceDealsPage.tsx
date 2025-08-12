@@ -3,6 +3,8 @@ import { Card, CardContent } from '../../components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { SingleFinanceStorage } from '../../lib/singleFinanceStorage';
+import { getConsistentUserId, debugUserId } from '../../utils/userIdHelper';
+import { supabase } from '../../lib/supabaseClient';
 import {
   Search,
   Filter,
@@ -60,6 +62,38 @@ const SingleFinanceDealsPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('All');
   const [sortField, setSortField] = useState('saleDate');
   const [sortDirection, setSortDirection] = useState('desc');
+  const [localUserId, setLocalUserId] = useState<string | null>(null);
+
+  // Attempt to fetch user id directly if token exists but context not ready
+  useEffect(() => {
+    let cancelled = false;
+    const tryFetch = async () => {
+      if (localUserId || user?.id) return;
+      const { data } = await supabase.auth.getSession();
+      const uid = data?.session?.user?.id || null;
+      if (!cancelled && uid) {
+        console.log('[SingleFinanceDealsPage] Got user ID from session:', uid);
+        setLocalUserId(uid);
+        // Also store it for future use
+        localStorage.setItem('singleFinanceUserId', uid);
+      }
+    };
+    tryFetch();
+    const t = setTimeout(tryFetch, 800);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [user, localUserId]);
+
+  // Helper function to get user ID with fallback
+  const getUserId = () => {
+    // Use the same logic as dashboard
+    const userId = getConsistentUserId(user) || localUserId || localStorage.getItem('singleFinanceUserId');
+    debugUserId('SingleFinanceDealsPage', user, localUserId);
+    console.log('[SingleFinanceDealsPage] Final resolved user ID:', userId);
+    return userId;
+  };
 
   const handleBackToDashboard = () => {
     navigate('/dashboard/single-finance');
@@ -69,9 +103,10 @@ const SingleFinanceDealsPage: React.FC = () => {
   const handleStatusChange = (dealId: string, newStatus: string) => {
     try {
       // Get existing deals from localStorage
-      if (!user?.id) return;
+      const userId = getUserId();
+      if (!userId) return;
       
-      const existingDeals = SingleFinanceStorage.getDeals(user.id);
+      const existingDeals = SingleFinanceStorage.getDeals(userId);
 
       // Update the deal status
       const updatedDeals = existingDeals.map((deal: any) =>
@@ -79,7 +114,7 @@ const SingleFinanceDealsPage: React.FC = () => {
       );
 
       // Save back to localStorage
-      SingleFinanceStorage.setDeals(user.id, updatedDeals);
+      SingleFinanceStorage.setDeals(userId, updatedDeals);
 
       // Update state immediately to trigger re-render
       setDeals(currentDeals => 
@@ -145,15 +180,16 @@ const SingleFinanceDealsPage: React.FC = () => {
       if (finalConfirm) {
         try {
           // Get existing deals from localStorage
-          if (!user?.id) return;
+          const userId = getUserId();
+          if (!userId) return;
           
-          const existingDeals = SingleFinanceStorage.getDeals(user.id);
+          const existingDeals = SingleFinanceStorage.getDeals(userId);
 
           // Remove the deal
           const updatedDeals = existingDeals.filter((deal: any) => deal.id !== dealId);
 
           // Save back to localStorage
-          SingleFinanceStorage.setDeals(user.id, updatedDeals);
+          SingleFinanceStorage.setDeals(userId, updatedDeals);
 
           // Reload deals to reflect the change
           const formattedDeals: Deal[] = updatedDeals.map((rawDeal: any) => {
@@ -185,9 +221,15 @@ const SingleFinanceDealsPage: React.FC = () => {
   // Function to load deals from localStorage
   const loadDealsFromStorage = () => {
     try {
-      if (!user?.id) return;
+      const userId = getUserId();
+      console.log('[SingleFinanceDealsPage] Loading deals, userId:', userId);
+      if (!userId) {
+        console.warn('[SingleFinanceDealsPage] No user ID available');
+        return;
+      }
       
-      const parsedDeals = SingleFinanceStorage.getDeals(user.id);
+      const parsedDeals = SingleFinanceStorage.getDeals(userId);
+      console.log('[SingleFinanceDealsPage] Loaded deals from storage:', parsedDeals.length);
       if (parsedDeals.length > 0) {
         // Map raw deal data to component interface while preserving extended properties
         const formattedDeals: Deal[] = parsedDeals.map((rawDeal: any) => {
@@ -222,12 +264,21 @@ const SingleFinanceDealsPage: React.FC = () => {
 
   // Load deals from localStorage - using singleFinanceDeals storage key
   useEffect(() => {
-    loadDealsFromStorage();
+    const userId = getUserId();
+    if (userId) {
+      console.log('[SingleFinanceDealsPage] User available, loading deals with userId:', userId);
+      loadDealsFromStorage();
+    } else {
+      console.log('[SingleFinanceDealsPage] Waiting for user...');
+    }
 
     // Listen for deals updates from the deal log page
     const handleDealsUpdated = (event: CustomEvent) => {
       console.log('[SingleFinanceDealsPage] Received deals update event', event.detail);
-      loadDealsFromStorage();
+      const currentUserId = getUserId();
+      if (currentUserId) {
+        loadDealsFromStorage();
+      }
     };
 
     window.addEventListener('singleFinanceDealsUpdated', handleDealsUpdated as EventListener);
@@ -235,7 +286,7 @@ const SingleFinanceDealsPage: React.FC = () => {
     return () => {
       window.removeEventListener('singleFinanceDealsUpdated', handleDealsUpdated as EventListener);
     };
-  }, [user?.id]);
+  }, [user?.id, localUserId]); // Added localUserId as dependency
 
   // Filter and sort deals
   const filteredDeals = deals
@@ -426,7 +477,7 @@ const SingleFinanceDealsPage: React.FC = () => {
                   <th className="py-3 px-4 text-right font-medium">PPM</th>
                   <th className="py-3 px-4 text-right font-medium">GAP</th>
                   <th className="py-3 px-4 text-right font-medium">T&W</th>
-                  <th className="py-3 px-4 text-right font-medium">Appearance</th>
+                  <th className="py-3 px-4 text-right font-medium">App</th>
                   <th className="py-3 px-4 text-right font-medium">Theft</th>
                   <th className="py-3 px-4 text-right font-medium">Bundled</th>
                   <th className="py-3 px-4 text-center font-medium">PPD</th>
@@ -502,7 +553,10 @@ const SingleFinanceDealsPage: React.FC = () => {
                         key={deal.id} 
                         className="border-b"
                         style={{
-                          backgroundColor: deal.status === 'Held' ? '#fef2f2' : 'white'
+                          backgroundColor: 
+                            deal.status === 'Funded' ? '#dcfce7' : 
+                            deal.status === 'Held' ? '#fecaca' : 
+                            'white'
                         }}
                       >
                         <td className="py-3 px-4 text-center font-medium">

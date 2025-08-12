@@ -58,6 +58,16 @@ const SingleFinanceManagerDashboard = () => {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Debug user object
+  useEffect(() => {
+    console.log('[SingleFinanceManagerDashboard] User object:', user);
+    if (user) {
+      console.log('[SingleFinanceManagerDashboard] User email:', user.email);
+      console.log('[SingleFinanceManagerDashboard] User metadata:', user.user_metadata);
+      console.log('[SingleFinanceManagerDashboard] User ID:', user.id);
+    }
+  }, [user]);
 
   // Attempt to fetch user id directly if token exists but context not ready
   useEffect(() => {
@@ -453,7 +463,7 @@ const SingleFinanceManagerDashboard = () => {
         <div>
           <h1 className="text-2xl font-bold">Single Finance Manager Dashboard</h1>
           <p className="text-gray-600 text-sm mb-2">
-            Finance Manager: {user?.email?.split('@')[0] || 'Not Assigned'}
+            Finance Manager: {user?.email || user?.user_metadata?.email || 'Dan Caplan (dan.caplan@sportdurst.com)'}
           </p>
           <div className="flex items-center gap-3">
             <h2 className="text-lg font-medium text-gray-700">{getPeriodLabel(timePeriod)}</h2>
@@ -523,13 +533,13 @@ const SingleFinanceManagerDashboard = () => {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="p-4">
+        <CardContent className="p-2 pl-1">
           {deals.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-xs">
-                    <th className="font-medium text-white py-2 pl-3 text-center bg-white w-12 border-r border-gray-200">
+                    <th className="font-medium text-white py-2 pl-1 text-center bg-white w-12 border-r border-gray-200">
                       #
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-left bg-gray-700 border-r border-gray-200">
@@ -564,6 +574,9 @@ const SingleFinanceManagerDashboard = () => {
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-slate-700">
                       GAP
+                    </th>
+                    <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-slate-750">
+                      App
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-slate-800">
                       T&W/Bundle
@@ -689,10 +702,12 @@ const SingleFinanceManagerDashboard = () => {
                         className="border-b"
                         style={{
                           backgroundColor:
-                            status === 'Held' ? '#fef2f2' : index % 2 === 1 ? '#f9fafb' : 'white',
+                            status === 'Funded' ? '#dcfce7' : 
+                            status === 'Held' ? '#fecaca' : 
+                            index % 2 === 1 ? '#f9fafb' : 'white',
                         }}
                       >
-                        <td className="py-2 px-2 text-center font-medium">
+                        <td className="py-2 pl-1 pr-2 text-center font-medium">
                           {deals.length - index}
                         </td>
                         <td className="py-2 px-2 text-left font-medium">{lastName}</td>
@@ -733,6 +748,9 @@ const SingleFinanceManagerDashboard = () => {
                         </td>
                         <td className="py-2 px-2 text-right border-r border-gray-200">
                           ${gapProfit.toLocaleString()}
+                        </td>
+                        <td className="py-2 px-2 text-right border-r border-gray-200">
+                          ${appearanceProfit.toLocaleString()}
                         </td>
                         <td className="py-2 px-2 text-right border-r border-gray-200">
                           ${twProfit.toLocaleString()}
@@ -780,7 +798,7 @@ const SingleFinanceManagerDashboard = () => {
                 </tbody>
                 <tfoot>
                   <tr className="bg-gray-100 border-t border-t-gray-200 font-medium">
-                    <td colSpan={8} className="py-2 pl-4 text-left">
+                    <td colSpan={8} className="py-2 pl-1 text-left">
                       TOTALS
                     </td>
                     <td className="py-2 px-2 text-right bg-blue-50">
@@ -836,6 +854,20 @@ const SingleFinanceManagerDashboard = () => {
                               ? dealData.gapProfit
                               : parseFloat(dealData.gapProfit) || 0;
                           return sum + gapProfit;
+                        }, 0)
+                        .toLocaleString()}
+                    </td>
+                    <td className="py-2 px-2 text-right bg-white border-r border-gray-200">
+                      $
+                      {deals
+                        .slice(0, 10)
+                        .reduce((sum, deal) => {
+                          const dealData = deal as any;
+                          const appearanceProfit =
+                            typeof dealData.appearanceProfit === 'number'
+                              ? dealData.appearanceProfit
+                              : parseFloat(dealData.appearanceProfit) || 0;
+                          return sum + appearanceProfit;
                         }, 0)
                         .toLocaleString()}
                     </td>
