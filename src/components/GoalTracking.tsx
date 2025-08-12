@@ -98,6 +98,15 @@ const GoalTracking: React.FC = () => {
       console.log('[GoalTracking] Goal data loaded:', data);
     } catch (error) {
       console.error('[GoalTracking] Error fetching goal data:', error);
+      
+      // Check if it's a database column error (user might be on wrong dashboard)
+      if (error && typeof error === 'object' && 'code' in error && error.code === '42703') {
+        console.warn('[GoalTracking] Database schema mismatch - user may be on wrong dashboard');
+        // Set empty data to prevent further errors
+        setSalesData([]);
+        setDaysOff(0);
+        setGoalProgress({ percentage: 0, salesMade: 0, remainingToGoal: 0 });
+      }
     } finally {
       setIsLoading(false);
     }
