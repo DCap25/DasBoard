@@ -706,7 +706,7 @@ export const SingleFinanceHomePage: React.FC = () => {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mb-2">
         <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-base font-semibold text-slate-700">F&I Gross</CardTitle>

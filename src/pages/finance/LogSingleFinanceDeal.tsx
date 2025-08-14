@@ -705,7 +705,7 @@ export default function LogSingleFinanceDeal() {
             {/* First Row: Deal#, Sale Date, Stock#, VIN#, Vehicle Type, Manufacturer */}
             <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="dealNumber">Deal # *</Label>
+                <Label htmlFor="dealNumber">Deal #</Label>
                 <Input
                   id="dealNumber"
                   name="dealNumber"
@@ -730,7 +730,7 @@ export default function LogSingleFinanceDeal() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="stockNumber">Stock # *</Label>
+                <Label htmlFor="stockNumber">Stock #</Label>
                 <Input
                   id="stockNumber"
                   name="stockNumber"
@@ -743,7 +743,7 @@ export default function LogSingleFinanceDeal() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="vinLast8">VIN # (Last 8) *</Label>
+                <Label htmlFor="vinLast8">VIN # (Last 8)</Label>
                 <Input
                   id="vinLast8"
                   name="vinLast8"
@@ -763,7 +763,7 @@ export default function LogSingleFinanceDeal() {
                   name="vehicleType"
                   value={formData.vehicleType}
                   onChange={handleInputChange}
-                  className="w-full p-2 border rounded-md"
+                  className="w-full p-2 border-2 border-gray-400 rounded-md"
                 >
                   <option value="N">New</option>
                   <option value="U">Used</option>
@@ -778,7 +778,7 @@ export default function LogSingleFinanceDeal() {
                   name="manufacturer"
                   value={formData.manufacturer}
                   onChange={handleInputChange}
-                  className="w-full p-2 border rounded-md"
+                  className="w-full p-2 border-2 border-gray-400 rounded-md"
                 >
                   <option value="">Select Manufacturer</option>
                   {/* Top 3 most used manufacturers */}
@@ -854,7 +854,7 @@ export default function LogSingleFinanceDeal() {
                       name="salespersonId"
                       value={formData.salespersonId}
                       onChange={handleInputChange}
-                      className="w-full p-2 border rounded-md text-sm"
+                      className="w-full p-2 border-2 border-gray-400 rounded-md text-sm"
                     >
                       <option value="">Select Salesperson</option>
                       {teamMembers.filter(member => member.role === 'salesperson' && member.active).map(person => (
@@ -868,7 +868,7 @@ export default function LogSingleFinanceDeal() {
                       name="secondSalespersonId"
                       value={formData.secondSalespersonId}
                       onChange={handleInputChange}
-                      className="w-full p-2 border rounded-md text-sm"
+                      className="w-full p-2 border-2 border-gray-400 rounded-md text-sm"
                     >
                       <option value="">Select Second Salesperson</option>
                       {teamMembers.filter(member => 
@@ -888,7 +888,7 @@ export default function LogSingleFinanceDeal() {
                     name="salespersonId"
                     value={formData.salespersonId}
                     onChange={handleInputChange}
-                    className="w-full p-2 border rounded-md"
+                    className="w-full p-2 border-2 border-gray-400 rounded-md"
                   >
                     <option value="">Select Salesperson</option>
                     {teamMembers.filter(member => member.role === 'salesperson' && member.active).map(person => (
@@ -907,7 +907,7 @@ export default function LogSingleFinanceDeal() {
                   name="salesManagerId"
                   value={formData.salesManagerId}
                   onChange={handleInputChange}
-                  className="w-full p-2 border rounded-md"
+                  className="w-full p-2 border-2 border-gray-400 rounded-md"
                 >
                   <option value="">Select Manager</option>
                   {teamMembers.filter(member => member.role === 'sales_manager' && member.active).map(manager => (
@@ -925,7 +925,7 @@ export default function LogSingleFinanceDeal() {
                   name="lender"
                   value={formData.lender}
                   onChange={handleInputChange}
-                  className="w-full p-2 border rounded-md"
+                  className="w-full p-2 border-2 border-gray-400 rounded-md"
                   disabled={formData.dealType === 'Cash'}
                 >
                   <option value="">Select Lender</option>
@@ -944,7 +944,7 @@ export default function LogSingleFinanceDeal() {
                   name="dealType"
                   value={formData.dealType}
                   onChange={handleInputChange}
-                  className="w-full p-2 border rounded-md"
+                  className="w-full p-2 border-2 border-gray-400 rounded-md"
                 >
                   <option value="Cash">Cash</option>
                   <option value="Finance">Finance</option>
@@ -959,7 +959,7 @@ export default function LogSingleFinanceDeal() {
                   name="status"
                   value={formData.status}
                   onChange={handleInputChange}
-                  className="w-full p-2 border rounded-md"
+                  className="w-full p-2 border-2 border-gray-400 rounded-md"
                 >
                   <option value="Pending">Pending</option>
                   <option value="Funded">Funded</option>
@@ -1150,7 +1150,7 @@ export default function LogSingleFinanceDeal() {
 
                 {/* Back End Gross - Calculated */}
                 <div className="p-2 bg-green-50 rounded border border-green-200">
-                  <Label className="text-xs font-medium text-green-900">Back End Gross</Label>
+                  <Label className="text-xs font-medium text-green-900">Back End Gross <span className="text-[10px] font-normal">(Auto-Calculated)</span></Label>
                   <div className="mt-1 text-xs font-semibold text-green-900">
                     ${formData.backEndGross || '0.00'}
                   </div>
@@ -1174,7 +1174,9 @@ export default function LogSingleFinanceDeal() {
 
 
         {/* Submit Button */}
-        <div className="flex justify-end space-x-4">
+        <div className="flex justify-between items-center">
+          <p className="text-sm text-gray-600 ml-10">All fields must be completed.</p>
+          <div className="flex space-x-4">
           <Button
             type="button"
             variant="outline"
@@ -1188,6 +1190,7 @@ export default function LogSingleFinanceDeal() {
               : (isEditMode ? 'Update Deal' : 'Save Deal')
             }
           </Button>
+          </div>
         </div>
       </form>
 
