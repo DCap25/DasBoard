@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTranslation } from '../../contexts/TranslationContext';
 import { getConsistentUserId, getUserIdSync, debugUserId } from '../../utils/userIdHelper';
 import { supabase, quickHasSupabaseSessionToken } from '../../lib/supabaseClient';
 import { Card } from '../../components/ui/card';
@@ -99,13 +100,13 @@ interface DealFormData {
   // Calculated fields
   backEndGross: string;
   totalGross: string;
-  status: string;
   notes: string;
 }
 
 export default function LogSingleFinanceDeal() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const { dealId } = useParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -174,7 +175,6 @@ export default function LogSingleFinanceDeal() {
     otherProfit: '',
     backEndGross: '',
     totalGross: '',
-    status: 'pending',
     notes: '',
   });
 
@@ -673,22 +673,22 @@ export default function LogSingleFinanceDeal() {
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">
-          {isEditMode ? 'Edit Deal - Single Finance Dashboard' : 'Log New Deal - Single Finance Dashboard'}
+          {isEditMode ? t('dashboard.dealLog.editDeal') : t('dashboard.dealLog.title')}
         </h1>
         <Button
           onClick={() => navigate('/dashboard/single-finance')}
           className="flex items-center bg-blue-500 text-white hover:bg-blue-600"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Dashboard
+          {t('dashboard.dealLog.backToDashboard')}
         </Button>
       </div>
 
       <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-blue-800 text-sm">
-          <strong>Note:</strong> {isEditMode 
-            ? 'You are editing an existing deal. Changes will be reflected immediately on your dashboard.'
-            : 'This deal will only appear on your Single Finance Manager Dashboard and will not affect other dashboards in the system.'
+          <strong>{t('dashboard.dealLog.note')}:</strong> {isEditMode 
+            ? t('dashboard.dealLog.editingNote')
+            : t('dashboard.dealLog.dashboardNote')
           }
         </p>
       </div>
@@ -699,26 +699,26 @@ export default function LogSingleFinanceDeal() {
           <div className="space-y-4">
             <h2 className="text-xl font-semibold flex items-center border-b pb-2 mb-4">
               <FileText className="mr-2 h-5 w-5 text-blue-500" />
-              Deal Information
+              {t('dashboard.dealLog.dealInformation')}
             </h2>
 
             {/* First Row: Deal#, Sale Date, Stock#, VIN#, Vehicle Type, Manufacturer */}
             <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="dealNumber">Deal #</Label>
+                <Label htmlFor="dealNumber">{t('dashboard.dealLog.dealNumber')}</Label>
                 <Input
                   id="dealNumber"
                   name="dealNumber"
                   value={formData.dealNumber}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
-                  placeholder="Enter deal number"
+                  placeholder={t('dashboard.dealLog.enterDealNumber')}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="saleDate">Sale Date</Label>
+                <Label htmlFor="saleDate">{t('dashboard.dealLog.saleDate')}</Label>
                 <Input
                   type="date"
                   id="saleDate"
@@ -730,34 +730,34 @@ export default function LogSingleFinanceDeal() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="stockNumber">Stock #</Label>
+                <Label htmlFor="stockNumber">{t('dashboard.dealLog.stockNumber')}</Label>
                 <Input
                   id="stockNumber"
                   name="stockNumber"
                   value={formData.stockNumber}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
-                  placeholder="Stock Number"
+                  placeholder={t('dashboard.dealLog.stockNumber')}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="vinLast8">VIN # (Last 8)</Label>
+                <Label htmlFor="vinLast8">{t('dashboard.dealLog.vinLast8')}</Label>
                 <Input
                   id="vinLast8"
                   name="vinLast8"
                   value={formData.vinLast8}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
-                  placeholder="Last 8 of VIN"
+                  placeholder={t('dashboard.dealLog.vinPlaceholder')}
                   maxLength={8}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="vehicleType">Vehicle Type</Label>
+                <Label htmlFor="vehicleType">{t('dashboard.dealLog.vehicleType')}</Label>
                 <select
                   id="vehicleType"
                   name="vehicleType"
@@ -765,14 +765,14 @@ export default function LogSingleFinanceDeal() {
                   onChange={handleInputChange}
                   className="w-full p-2 border-2 border-gray-400 rounded-md"
                 >
-                  <option value="N">New</option>
-                  <option value="U">Used</option>
-                  <option value="C">CPO</option>
+                  <option value="N">{t('dashboard.dealLog.vehicleTypes.new')}</option>
+                  <option value="U">{t('dashboard.dealLog.vehicleTypes.used')}</option>
+                  <option value="C">{t('dashboard.dealLog.vehicleTypes.cpo')}</option>
                 </select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="manufacturer">Manufacturer</Label>
+                <Label htmlFor="manufacturer">{t('dashboard.dealLog.manufacturer')}</Label>
                 <select
                   id="manufacturer"
                   name="manufacturer"
@@ -780,7 +780,7 @@ export default function LogSingleFinanceDeal() {
                   onChange={handleInputChange}
                   className="w-full p-2 border-2 border-gray-400 rounded-md"
                 >
-                  <option value="">Select Manufacturer</option>
+                  <option value="">{t('dashboard.dealLog.selectManufacturer')}</option>
                   {/* Top 3 most used manufacturers */}
                   <option value="Ford">Ford</option>
                   <option value="Chevrolet">Chevrolet</option>
@@ -817,21 +817,21 @@ export default function LogSingleFinanceDeal() {
             {/* Second Row: Customer Name, Salesperson, Sales Manager, Lender, Deal Type, Status */}
             <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="customerName">Customer Last Name</Label>
+                <Label htmlFor="customerName">{t('dashboard.dealLog.customerName')}</Label>
                 <Input
                   id="customerName"
                   name="customerName"
                   value={formData.customerName}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
-                  placeholder="Customer last name"
+                  placeholder={t('dashboard.dealLog.customerPlaceholder')}
                   required
                 />
               </div>
 
               <div className="space-y-2">
                 <div className="flex items-center space-x-3">
-                  <Label htmlFor="salespersonId">Salesperson</Label>
+                  <Label htmlFor="salespersonId">{t('dashboard.dealLog.salesperson')}</Label>
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       id="isSplitDeal"
@@ -844,7 +844,7 @@ export default function LogSingleFinanceDeal() {
                         }))
                       }
                     />
-                    <Label htmlFor="isSplitDeal" className="text-xs">Split Deal</Label>
+                    <Label htmlFor="isSplitDeal" className="text-xs">{t('dashboard.dealLog.splitDeal')}</Label>
                   </div>
                 </div>
                 {formData.isSplitDeal ? (
@@ -856,7 +856,7 @@ export default function LogSingleFinanceDeal() {
                       onChange={handleInputChange}
                       className="w-full p-2 border-2 border-gray-400 rounded-md text-sm"
                     >
-                      <option value="">Select Salesperson</option>
+                      <option value="">{t('dashboard.dealLog.selectSalesperson')}</option>
                       {teamMembers.filter(member => member.role === 'salesperson' && member.active).map(person => (
                         <option key={person.id} value={person.id}>
                           {person.firstName} {person.lastName}
@@ -870,7 +870,7 @@ export default function LogSingleFinanceDeal() {
                       onChange={handleInputChange}
                       className="w-full p-2 border-2 border-gray-400 rounded-md text-sm"
                     >
-                      <option value="">Select Second Salesperson</option>
+                      <option value="">{t('dashboard.dealLog.selectSecondSalesperson')}</option>
                       {teamMembers.filter(member => 
                         member.role === 'salesperson' && 
                         member.active && 
@@ -890,7 +890,7 @@ export default function LogSingleFinanceDeal() {
                     onChange={handleInputChange}
                     className="w-full p-2 border-2 border-gray-400 rounded-md"
                   >
-                    <option value="">Select Salesperson</option>
+                    <option value="">{t('dashboard.dealLog.selectSalesperson')}</option>
                     {teamMembers.filter(member => member.role === 'salesperson' && member.active).map(person => (
                       <option key={person.id} value={person.id}>
                         {person.firstName} {person.lastName}
@@ -901,7 +901,7 @@ export default function LogSingleFinanceDeal() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="salesManagerId">Sales Manager</Label>
+                <Label htmlFor="salesManagerId">{t('dashboard.dealLog.salesManager')}</Label>
                 <select
                   id="salesManagerId"
                   name="salesManagerId"
@@ -909,7 +909,7 @@ export default function LogSingleFinanceDeal() {
                   onChange={handleInputChange}
                   className="w-full p-2 border-2 border-gray-400 rounded-md"
                 >
-                  <option value="">Select Manager</option>
+                  <option value="">{t('dashboard.dealLog.selectManager')}</option>
                   {teamMembers.filter(member => member.role === 'sales_manager' && member.active).map(manager => (
                     <option key={manager.id} value={manager.id}>
                       {manager.firstName} {manager.lastName}
@@ -919,7 +919,7 @@ export default function LogSingleFinanceDeal() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="lender">Lender</Label>
+                <Label htmlFor="lender">{t('dashboard.dealLog.lender')}</Label>
                 <select
                   id="lender"
                   name="lender"
@@ -928,7 +928,7 @@ export default function LogSingleFinanceDeal() {
                   className="w-full p-2 border-2 border-gray-400 rounded-md"
                   disabled={formData.dealType === 'Cash'}
                 >
-                  <option value="">Select Lender</option>
+                  <option value="">{t('dashboard.dealLog.selectLender')}</option>
                   {LENDERS.map(lender => (
                     <option key={lender} value={lender}>
                       {lender}
@@ -938,7 +938,7 @@ export default function LogSingleFinanceDeal() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="dealType">Deal Type</Label>
+                <Label htmlFor="dealType">{t('dashboard.dealLog.dealType')}</Label>
                 <select
                   id="dealType"
                   name="dealType"
@@ -946,14 +946,14 @@ export default function LogSingleFinanceDeal() {
                   onChange={handleInputChange}
                   className="w-full p-2 border-2 border-gray-400 rounded-md"
                 >
-                  <option value="Cash">Cash</option>
-                  <option value="Finance">Finance</option>
-                  <option value="Lease">Lease</option>
+                  <option value="Cash">{t('dashboard.dealLog.dealTypes.cash')}</option>
+                  <option value="Finance">{t('dashboard.dealLog.dealTypes.finance')}</option>
+                  <option value="Lease">{t('dashboard.dealLog.dealTypes.lease')}</option>
                 </select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
+                <Label htmlFor="status">{t('dashboard.dealLog.status')}</Label>
                 <select
                   id="status"
                   name="status"
@@ -961,8 +961,8 @@ export default function LogSingleFinanceDeal() {
                   onChange={handleInputChange}
                   className="w-full p-2 border-2 border-gray-400 rounded-md"
                 >
-                  <option value="Pending">Pending</option>
-                  <option value="Funded">Funded</option>
+                  <option value="Pending">{t('dashboard.dealLog.statusOptions.pending')}</option>
+                  <option value="Funded">{t('dashboard.dealLog.statusOptions.funded')}</option>
                 </select>
               </div>
             </div>
@@ -976,13 +976,13 @@ export default function LogSingleFinanceDeal() {
             <div className="space-y-2">
               <h2 className="text-sm font-semibold flex items-center border-b pb-1 mb-2">
                 <DollarSign className="mr-1 h-3 w-3 text-blue-500" />
-                Products and Profit
+                {t('dashboard.dealLog.productsAndProfit')}
               </h2>
 
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <Label htmlFor="vscProfit">VSC Profit</Label>
+                    <Label htmlFor="vscProfit">{t('dashboard.dealLog.products.vscProfit')}</Label>
                     <Input
                       id="vscProfit"
                       name="vscProfit"
@@ -996,7 +996,7 @@ export default function LogSingleFinanceDeal() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="gapProfit">GAP Profit</Label>
+                    <Label htmlFor="gapProfit">{t('dashboard.dealLog.products.gapProfit')}</Label>
                     <Input
                       id="gapProfit"
                       name="gapProfit"
@@ -1013,7 +1013,7 @@ export default function LogSingleFinanceDeal() {
 
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <Label htmlFor="ppmProfit">PPM Profit</Label>
+                    <Label htmlFor="ppmProfit">{t('dashboard.dealLog.products.ppmProfit')}</Label>
                     <Input
                       id="ppmProfit"
                       name="ppmProfit"
@@ -1027,7 +1027,7 @@ export default function LogSingleFinanceDeal() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="tireWheelProfit">Tire & Wheel Profit</Label>
+                    <Label htmlFor="tireWheelProfit">{t('dashboard.dealLog.products.tireWheelProfit')}</Label>
                     <Input
                       id="tireWheelProfit"
                       name="tireWheelProfit"
@@ -1044,7 +1044,7 @@ export default function LogSingleFinanceDeal() {
 
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <Label htmlFor="appearanceProfit">Appearance</Label>
+                    <Label htmlFor="appearanceProfit">{t('dashboard.dealLog.products.appearanceProfit')}</Label>
                     <Input
                       id="appearanceProfit"
                       name="appearanceProfit"
@@ -1058,7 +1058,7 @@ export default function LogSingleFinanceDeal() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="theftProfit">Theft</Label>
+                    <Label htmlFor="theftProfit">{t('dashboard.dealLog.products.theftProfit')}</Label>
                     <Input
                       id="theftProfit"
                       name="theftProfit"
@@ -1075,7 +1075,7 @@ export default function LogSingleFinanceDeal() {
 
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <Label htmlFor="bundledProfit">Bundled</Label>
+                    <Label htmlFor="bundledProfit">{t('dashboard.dealLog.products.bundledProfit')}</Label>
                     <Input
                       id="bundledProfit"
                       name="bundledProfit"
@@ -1089,7 +1089,7 @@ export default function LogSingleFinanceDeal() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="otherProfit">Other Profit</Label>
+                    <Label htmlFor="otherProfit">{t('dashboard.dealLog.products.otherProfit')}</Label>
                     <Input
                       id="otherProfit"
                       name="otherProfit"
@@ -1112,13 +1112,13 @@ export default function LogSingleFinanceDeal() {
             <div className="space-y-2">
               <h2 className="text-sm font-semibold flex items-center border-b pb-1 mb-2">
                 <Calculator className="mr-1 h-3 w-3 text-blue-500" />
-                Financial Summary
+                {t('dashboard.dealLog.financialSummary')}
               </h2>
 
               <div className="space-y-2">
                 {/* Front End Gross */}
                 <div className="p-2 bg-gray-50 rounded">
-                  <Label htmlFor="frontEndGross" className="text-xs font-medium">Front End Gross</Label>
+                  <Label htmlFor="frontEndGross" className="text-xs font-medium">{t('dashboard.dealLog.frontEndGross')}</Label>
                   <Input
                     id="frontEndGross"
                     name="frontEndGross"
@@ -1134,7 +1134,7 @@ export default function LogSingleFinanceDeal() {
 
                 {/* Reserve/Flat */}
                 <div className="p-2 bg-gray-50 rounded">
-                  <Label htmlFor="reserveFlat" className="text-xs font-medium">Reserve/Flat</Label>
+                  <Label htmlFor="reserveFlat" className="text-xs font-medium">{t('dashboard.dealLog.reserveFlat')}</Label>
                   <Input
                     id="reserveFlat"
                     name="reserveFlat"
@@ -1150,7 +1150,7 @@ export default function LogSingleFinanceDeal() {
 
                 {/* Back End Gross - Calculated */}
                 <div className="p-2 bg-green-50 rounded border border-green-200">
-                  <Label className="text-xs font-medium text-green-900">Back End Gross <span className="text-[10px] font-normal">(Auto-Calculated)</span></Label>
+                  <Label className="text-xs font-medium text-green-900">{t('dashboard.dealLog.backEndGross')} <span className="text-[10px] font-normal">({t('dashboard.dealLog.autoCalculated')})</span></Label>
                   <div className="mt-1 text-xs font-semibold text-green-900">
                     ${formData.backEndGross || '0.00'}
                   </div>
@@ -1159,8 +1159,8 @@ export default function LogSingleFinanceDeal() {
                 {/* Total Gross - Calculated */}
                 <div className="p-2 bg-blue-50 rounded border border-blue-200">
                   <div className="flex items-center gap-2">
-                    <Label className="text-xs font-medium text-black">Total Gross</Label>
-                    <span className="text-[10px] text-black">(Auto-Calculated)</span>
+                    <Label className="text-xs font-medium text-black">{t('dashboard.dealLog.totalGross')}</Label>
+                    <span className="text-[10px] text-black">({t('dashboard.dealLog.autoCalculated')})</span>
                   </div>
                   <div className="mt-1 text-lg font-bold text-blue-900">
                     ${formData.totalGross || '0.00'}
@@ -1175,19 +1175,19 @@ export default function LogSingleFinanceDeal() {
 
         {/* Submit Button */}
         <div className="flex justify-between items-center">
-          <p className="text-sm text-gray-600 ml-10">All fields must be completed.</p>
+          <p className="text-sm text-gray-600 ml-10">{t('dashboard.dealLog.allFieldsRequired')}</p>
           <div className="flex space-x-4">
           <Button
             type="button"
             variant="outline"
             onClick={() => navigate('/dashboard/single-finance')}
           >
-            Cancel
+            {t('dashboard.dealLog.cancel')}
           </Button>
           <Button type="submit" disabled={isSubmitting} className="px-8 bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-400">
             {isSubmitting 
-              ? (isEditMode ? 'Updating Deal...' : 'Saving Deal...') 
-              : (isEditMode ? 'Update Deal' : 'Save Deal')
+              ? (isEditMode ? t('dashboard.dealLog.updatingDeal') : t('dashboard.dealLog.savingDeal')) 
+              : (isEditMode ? t('dashboard.dealLog.updateDeal') : t('dashboard.dealLog.saveDeal'))
             }
           </Button>
           </div>
@@ -1198,24 +1198,24 @@ export default function LogSingleFinanceDeal() {
       {showAddSalesperson && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4">Add New Salesperson</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('dashboard.dealLog.addNewSalesperson')}</h3>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="newFirstName">First Name</Label>
+                <Label htmlFor="newFirstName">{t('dashboard.dealLog.firstName')}</Label>
                 <Input
                   id="newFirstName"
                   value={newSalesperson.firstName}
                   onChange={(e) => setNewSalesperson(prev => ({ ...prev, firstName: e.target.value }))}
-                  placeholder="First name"
+                  placeholder={t('dashboard.dealLog.firstName')}
                 />
               </div>
               <div>
-                <Label htmlFor="newLastName">Last Name</Label>
+                <Label htmlFor="newLastName">{t('dashboard.dealLog.lastName')}</Label>
                 <Input
                   id="newLastName"
                   value={newSalesperson.lastName}
                   onChange={(e) => setNewSalesperson(prev => ({ ...prev, lastName: e.target.value }))}
-                  placeholder="Last name"
+                  placeholder={t('dashboard.dealLog.lastName')}
                 />
               </div>
             </div>
@@ -1228,14 +1228,14 @@ export default function LogSingleFinanceDeal() {
                   setNewSalesperson({ firstName: '', lastName: '' });
                 }}
               >
-                Cancel
+                {t('dashboard.dealLog.cancel')}
               </Button>
               <Button
                 type="button"
                 onClick={handleAddSalesperson}
                 className="bg-green-500 hover:bg-green-600"
               >
-                Add Salesperson
+                {t('dashboard.dealLog.addSalesperson')}
               </Button>
             </div>
           </div>

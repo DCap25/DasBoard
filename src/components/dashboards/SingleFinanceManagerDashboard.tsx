@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link, useLocation, useNavigate, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTranslation } from '../../contexts/TranslationContext';
 import { SingleFinanceStorage } from '../../lib/singleFinanceStorage';
 import { getConsistentUserId, debugUserId } from '../../utils/userIdHelper';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../../components/ui/card';
@@ -50,6 +51,7 @@ interface Deal {
 
 const SingleFinanceManagerDashboard = () => {
   const { user, role, dealershipId, authCheckComplete, hasSession } = useAuth();
+  const { t } = useTranslation();
   const [localUserId, setLocalUserId] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
@@ -163,7 +165,7 @@ const SingleFinanceManagerDashboard = () => {
         '[SingleFinanceManagerDashboard] Error loading deals from localStorage:',
         error
       );
-      setError('Failed to load deals from local storage.');
+      setError(t('dashboard.singleFinance.errors.failedToLoadLocal'));
       setDeals([]);
     } finally {
       setLoading(false);
@@ -283,11 +285,11 @@ const SingleFinanceManagerDashboard = () => {
         setDeals(formattedDeals);
       } else {
         console.error('[SingleFinanceManagerDashboard] Error fetching deals:', result.error);
-        setError('Failed to load deals. Please try again later.');
+        setError(t('dashboard.singleFinance.errors.failedToLoad'));
       }
     } catch (err) {
       console.error('[SingleFinanceManagerDashboard] Exception fetching deals:', err);
-      setError('An unexpected error occurred while loading deals.');
+      setError(t('dashboard.singleFinance.errors.unexpectedError'));
     } finally {
       setLoading(false);
     }
@@ -381,7 +383,7 @@ const SingleFinanceManagerDashboard = () => {
       console.log(`[SingleFinanceManagerDashboard] Updated deal ${dealId} status to ${newStatus}`);
     } catch (error) {
       console.error('[SingleFinanceManagerDashboard] Error updating deal status:', error);
-      setError('Failed to update deal status');
+      setError(t('dashboard.singleFinance.errors.failedToUpdate'));
     }
   };
 
@@ -397,21 +399,13 @@ const SingleFinanceManagerDashboard = () => {
 
     // Enhanced warning popup with better messaging
     const confirmed = confirm(
-      '⚠️ DELETE CONFIRMATION\n\n' +
-        'Are you sure you want to delete this deal?\n\n' +
-        'This action will:\n' +
-        '• Permanently remove all deal data\n' +
-        '• Update your dashboard metrics\n' +
-        '• Cannot be undone\n\n' +
-        'Click OK to delete or Cancel to keep the deal.'
+      t('dashboard.singleFinance.confirmations.deleteWarning')
     );
 
     if (confirmed) {
       // Second confirmation for extra safety
       const finalConfirm = confirm(
-        '🚨 FINAL CONFIRMATION\n\n' +
-          'This is your last chance!\n\n' +
-          'Click OK to permanently delete this deal, or Cancel to keep it.'
+        t('dashboard.singleFinance.confirmations.finalConfirmation')
       );
 
       if (finalConfirm) {
@@ -435,7 +429,7 @@ const SingleFinanceManagerDashboard = () => {
           console.log(`[SingleFinanceManagerDashboard] Deleted deal ${dealId}`);
         } catch (error) {
           console.error('[SingleFinanceManagerDashboard] Error deleting deal:', error);
-          setError('Failed to delete deal');
+          setError(t('dashboard.singleFinance.errors.failedToDelete'));
         }
       }
     }
@@ -461,7 +455,7 @@ const SingleFinanceManagerDashboard = () => {
       <div className="grid grid-cols-3 gap-4 items-center mb-4">
         {/* Left Column - Title and Controls */}
         <div>
-          <h1 className="text-2xl font-bold">Single Finance Manager Dashboard</h1>
+          <h1 className="text-2xl font-bold">{t('dashboard.singleFinance.title')}</h1>
           <p className="text-gray-600 text-sm mb-2">
             Finance Manager: {user?.email || user?.user_metadata?.email || 'Dan Caplan (dan.caplan@sportdurst.com)'}
           </p>
@@ -472,11 +466,11 @@ const SingleFinanceManagerDashboard = () => {
               onChange={e => setTimePeriod(e.target.value)}
               className="p-1 border rounded-md shadow-sm text-sm"
             >
-              <option value="this-month">This Month</option>
-              <option value="last-month">Last Month</option>
-              <option value="last-quarter">Last Quarter</option>
-              <option value="ytd">Year to Date</option>
-              <option value="last-year">Last Year</option>
+              <option value="this-month">{t('dashboard.singleFinance.periods.thisMonth')}</option>
+              <option value="last-month">{t('dashboard.singleFinance.periods.lastMonth')}</option>
+              <option value="last-quarter">{t('dashboard.singleFinance.periods.lastQuarter')}</option>
+              <option value="ytd">{t('dashboard.singleFinance.periods.ytd')}</option>
+              <option value="last-year">{t('dashboard.singleFinance.periods.lastYear')}</option>
             </select>
           </div>
         </div>
@@ -486,7 +480,7 @@ const SingleFinanceManagerDashboard = () => {
           <div className="bg-white p-3 rounded-md border border-orange-100 w-full">
             <p className="text-sm text-orange-800 text-center">
               <Lightbulb className="h-4 w-4 inline-block mr-2" />
-              <strong>F&I Best Practice:</strong>{' '}
+              <strong>{t('dashboard.singleFinance.bestPractice.title')}:</strong>{' '}
               {bestPractices[new Date().getDay() % bestPractices.length]}
             </p>
           </div>
@@ -501,7 +495,7 @@ const SingleFinanceManagerDashboard = () => {
           >
             <span className="flex items-center">
               <PlusCircle className="mr-2 h-5 w-5" />
-              Log New Deal
+              {t('dashboard.singleFinance.deals.addNew')}
             </span>
           </Button>
         </div>
@@ -517,19 +511,19 @@ const SingleFinanceManagerDashboard = () => {
         <CardHeader className="bg-blue-500 border-b border-gray-300 py-2 px-4 flex flex-row items-center justify-between space-y-0 rounded-t-lg">
           <CardTitle className="text-lg font-medium flex items-center text-white">
             <FileText className="mr-2 h-5 w-5 text-white" />
-            Deals Log
+            {t('dashboard.singleFinance.deals.recentDeals')}
           </CardTitle>
           <div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => loadDealsFromLocalStorage()}
-              title="Refresh deals"
+              title={t('dashboard.singleFinance.deals.refreshTooltip')}
             >
               <RefreshCw className="h-4 w-4" />
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <Link to="/dashboard/single-finance/deals">View All</Link>
+              <Link to="/dashboard/single-finance/deals">{t('dashboard.singleFinance.deals.viewAll')}</Link>
             </Button>
           </div>
         </CardHeader>
@@ -540,64 +534,64 @@ const SingleFinanceManagerDashboard = () => {
                 <thead>
                   <tr className="text-xs">
                     <th className="font-medium text-white py-2 pl-1 text-center bg-white w-12 border-r border-gray-200">
-                      #
+                      {t('dashboard.singleFinance.deals.tableHeaders.number')}
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-left bg-gray-700 border-r border-gray-200">
-                      Last Name
+                      {t('dashboard.singleFinance.deals.tableHeaders.lastName')}
                     </th>
                     <th className="font-medium text-white py-2 pl-4 pr-2 text-left bg-gray-700 border-r border-blue-200">
-                      Deal #
+                      {t('dashboard.singleFinance.deals.tableHeaders.dealNumber')}
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-left bg-gray-700 border-r border-blue-300">
-                      Stock #
+                      {t('dashboard.singleFinance.deals.tableHeaders.stockNumber')}
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 border-r border-blue-400">
-                      Date
+                      {t('dashboard.singleFinance.deals.tableHeaders.date')}
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-left bg-gray-700 border-r border-blue-500">
-                      VIN
+                      {t('dashboard.singleFinance.deals.tableHeaders.vin')}
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 border-r border-blue-600">
-                      N/U/CPO
+                      {t('dashboard.singleFinance.deals.tableHeaders.vehicleType')}
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-left bg-gray-700 border-r border-blue-700">
-                      Lender
+                      {t('dashboard.singleFinance.deals.tableHeaders.lender')}
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-blue-800">
-                      Front End
+                      {t('dashboard.singleFinance.deals.tableHeaders.frontEnd')}
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-blue-900">
-                      VSC
+                      {t('dashboard.singleFinance.deals.tableHeaders.vsc')}
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-slate-100">
-                      PPM
+                      {t('dashboard.singleFinance.deals.tableHeaders.ppm')}
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-slate-700">
-                      GAP
+                      {t('dashboard.singleFinance.deals.tableHeaders.gap')}
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-slate-750">
-                      App
+                      {t('dashboard.singleFinance.deals.tableHeaders.appearance')}
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-slate-800">
-                      T&W/Bundle
+                      {t('dashboard.singleFinance.deals.tableHeaders.tireWheel')}
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 border-r border-slate-900">
-                      PPD
+                      {t('dashboard.singleFinance.deals.tableHeaders.ppd')}
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-gray-700">
-                      PVR
+                      {t('dashboard.singleFinance.deals.tableHeaders.pvr')}
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-right bg-gray-700 border-r border-gray-800">
-                      Total
+                      {t('dashboard.singleFinance.deals.tableHeaders.total')}
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-center bg-gray-700 border-r border-gray-900 w-20">
-                      Status
+                      {t('dashboard.singleFinance.deals.tableHeaders.status')}
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-center bg-blue-600 w-16">
-                      Edit
+                      {t('dashboard.singleFinance.deals.tableHeaders.edit')}
                     </th>
                     <th className="font-medium text-white py-2 px-2 text-center bg-red-600 rounded-tr-md w-16">
-                      Delete
+                      {t('dashboard.singleFinance.deals.tableHeaders.delete')}
                     </th>
                   </tr>
                 </thead>
@@ -771,10 +765,10 @@ const SingleFinanceManagerDashboard = () => {
                             onClick={e => e.stopPropagation()}
                             className={`text-xs px-2 py-1 rounded border-0 focus:ring-1 focus:ring-blue-500 ${statusColor}`}
                           >
-                            <option value="Pending">Pending</option>
-                            <option value="Funded">Funded</option>
-                            <option value="Held">Held</option>
-                            <option value="Unwound">Unwound</option>
+                            <option value="Pending">{t('dashboard.singleFinance.deals.statusOptions.pending')}</option>
+                            <option value="Funded">{t('dashboard.singleFinance.deals.statusOptions.funded')}</option>
+                            <option value="Held">{t('dashboard.singleFinance.deals.statusOptions.held')}</option>
+                            <option value="Unwound">{t('dashboard.singleFinance.deals.statusOptions.unwound')}</option>
                           </select>
                         </td>
                         <td className="py-2 px-2 text-center">
@@ -782,7 +776,7 @@ const SingleFinanceManagerDashboard = () => {
                             onClick={() => handleEditDeal(deal.id)}
                             className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs"
                           >
-                            Edit
+                            {t('dashboard.singleFinance.deals.actions.edit')}
                           </button>
                         </td>
                         <td className="py-2 px-2 text-center">
@@ -799,7 +793,7 @@ const SingleFinanceManagerDashboard = () => {
                 <tfoot>
                   <tr className="bg-gray-100 border-t border-t-gray-200 font-medium">
                     <td colSpan={8} className="py-2 pl-1 text-left">
-                      TOTALS
+                      {t('dashboard.singleFinance.deals.tableHeaders.totals')}
                     </td>
                     <td className="py-2 px-2 text-right bg-blue-50">
                       $
@@ -914,7 +908,7 @@ const SingleFinanceManagerDashboard = () => {
             </div>
           ) : (
             <div className="py-8 text-center text-gray-500">
-              No deals logged yet. Use the "Log New Deal" button to add deals.
+              {t('dashboard.singleFinance.deals.noDealsYet')}
             </div>
           )}
         </CardContent>

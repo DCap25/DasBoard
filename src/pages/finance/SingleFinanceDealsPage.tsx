@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '../../components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTranslation } from '../../contexts/TranslationContext';
 import { SingleFinanceStorage } from '../../lib/singleFinanceStorage';
 import { getConsistentUserId, debugUserId } from '../../utils/userIdHelper';
 import { supabase } from '../../lib/supabaseClient';
@@ -55,6 +56,7 @@ interface Deal {
 const SingleFinanceDealsPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [deals, setDeals] = useState<Deal[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -158,23 +160,11 @@ const SingleFinanceDealsPage: React.FC = () => {
     if (!shouldDelete) return;
 
     // Enhanced warning popup with better messaging
-    const confirmed = confirm(
-      '⚠️ DELETE CONFIRMATION\n\n' +
-        'Are you sure you want to delete this deal?\n\n' +
-        'This action will:\n' +
-        '• Permanently remove all deal data\n' +
-        '• Update your dashboard metrics\n' +
-        '• Cannot be undone\n\n' +
-        'Click OK to delete or Cancel to keep the deal.'
-    );
+    const confirmed = confirm(t('dashboard.deals.confirmDelete'));
 
     if (confirmed) {
       // Second confirmation for extra safety
-      const finalConfirm = confirm(
-        '🚨 FINAL CONFIRMATION\n\n' +
-          'This is your last chance!\n\n' +
-          'Click OK to permanently delete this deal, or Cancel to keep it.'
-      );
+      const finalConfirm = confirm(t('dashboard.deals.finalConfirmDelete'));
 
       if (finalConfirm) {
         try {
@@ -197,7 +187,7 @@ const SingleFinanceDealsPage: React.FC = () => {
               customer: rawDeal.customer || rawDeal.lastName || 'Unknown',
               vehicle:
                 rawDeal.vehicle ||
-                `${rawDeal.vehicleType === 'N' ? 'New' : rawDeal.vehicleType === 'U' ? 'Used' : 'CPO'} - Stock #${rawDeal.stockNumber}`,
+                `${rawDeal.vehicleType === 'N' ? t('dashboard.dealLog.vehicleTypes.new') : rawDeal.vehicleType === 'U' ? t('dashboard.dealLog.vehicleTypes.used') : t('dashboard.dealLog.vehicleTypes.cpo')} - Stock #${rawDeal.stockNumber}`,
               vin: rawDeal.vin || rawDeal.vinLast8 || '',
               saleDate: rawDeal.saleDate || rawDeal.dealDate || rawDeal.created_at,
               salesperson: rawDeal.salesperson || 'Self',
@@ -392,15 +382,14 @@ const SingleFinanceDealsPage: React.FC = () => {
           className="mr-4 flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-500 border border-blue-500 rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Dashboard
+          {t('dashboard.deals.backToDashboard')}
         </button>
-        <h1 className="text-2xl font-bold text-gray-900">Single Finance Manager - Deals</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('dashboard.deals.title')}</h1>
       </div>
 
       <div className="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
         <p className="text-orange-800 text-sm">
-          <strong>Note:</strong> These deals are specific to your Single Finance Manager Dashboard
-          and are stored separately from the main finance deals.
+          <strong>{t('dashboard.dealLog.note')}:</strong> {t('dashboard.deals.note')}
         </p>
       </div>
 
@@ -411,7 +400,7 @@ const SingleFinanceDealsPage: React.FC = () => {
             size={16}
           />
           <Input
-            placeholder="Search deals by customer, vehicle, deal #, or VIN"
+            placeholder={t('dashboard.deals.searchPlaceholder')}
             className="pl-9 border-gray-300"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
@@ -425,12 +414,12 @@ const SingleFinanceDealsPage: React.FC = () => {
               value={statusFilter}
               onChange={e => setStatusFilter(e.target.value)}
             >
-              <option value="All">All Statuses</option>
-              <option value="Pending">Pending</option>
-              <option value="Funded">Funded</option>
-              <option value="Held">Held</option>
-              <option value="Unwound">Unwound</option>
-              <option value="Dead Deal">Dead Deal</option>
+              <option value="All">{t('dashboard.deals.allStatuses')}</option>
+              <option value="Pending">{t('dashboard.deals.statusOptions.pending')}</option>
+              <option value="Funded">{t('dashboard.deals.statusOptions.funded')}</option>
+              <option value="Held">{t('dashboard.deals.statusOptions.held')}</option>
+              <option value="Unwound">{t('dashboard.deals.statusOptions.unwound')}</option>
+              <option value="Dead Deal">{t('dashboard.deals.statusOptions.deadDeal')}</option>
             </select>
           </div>
         </div>
@@ -442,10 +431,10 @@ const SingleFinanceDealsPage: React.FC = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-50 border-b text-xs">
-                  <th className="py-3 px-4 text-center font-medium">#</th>
+                  <th className="py-3 px-4 text-center font-medium">{t('dashboard.deals.tableHeaders.number')}</th>
                   <th className="py-3 px-4 text-left font-medium">
                     <button className="flex items-center" onClick={() => toggleSort('customer')}>
-                      Last Name
+                      {t('dashboard.deals.tableHeaders.lastName')}
                       {sortField === 'customer' && (
                         <ArrowUpDown size={14} className="ml-1 text-gray-500" />
                       )}
@@ -453,49 +442,49 @@ const SingleFinanceDealsPage: React.FC = () => {
                   </th>
                   <th className="py-3 px-4 text-left font-medium">
                     <button className="flex items-center" onClick={() => toggleSort('dealNumber')}>
-                      Deal #
+                      {t('dashboard.deals.tableHeaders.dealNumber')}
                       {sortField === 'dealNumber' && (
                         <ArrowUpDown size={14} className="ml-1 text-gray-500" />
                       )}
                     </button>
                   </th>
-                  <th className="py-3 px-4 text-left font-medium">Stock #</th>
+                  <th className="py-3 px-4 text-left font-medium">{t('dashboard.deals.tableHeaders.stockNumber')}</th>
                   <th className="py-3 px-4 text-center font-medium">
                     <button className="flex items-center" onClick={() => toggleSort('saleDate')}>
-                      Date
+                      {t('dashboard.deals.tableHeaders.date')}
                       {sortField === 'saleDate' && (
                         <ArrowUpDown size={14} className="ml-1 text-gray-500" />
                       )}
                     </button>
                   </th>
-                  <th className="py-3 px-4 text-left font-medium">VIN</th>
-                  <th className="py-3 px-4 text-center font-medium">N/U/CPO</th>
-                  <th className="py-3 px-4 text-left font-medium">Lender</th>
-                  <th className="py-3 px-4 text-right font-medium">Front End</th>
-                  <th className="py-3 px-4 text-right font-medium">VSC</th>
-                  <th className="py-3 px-4 text-right font-medium">PPM</th>
-                  <th className="py-3 px-4 text-right font-medium">GAP</th>
-                  <th className="py-3 px-4 text-right font-medium">T&W</th>
-                  <th className="py-3 px-4 text-right font-medium">App</th>
-                  <th className="py-3 px-4 text-right font-medium">Theft</th>
-                  <th className="py-3 px-4 text-right font-medium">Bundled</th>
-                  <th className="py-3 px-4 text-center font-medium">PPD</th>
-                  <th className="py-3 px-4 text-right font-medium">PVR</th>
+                  <th className="py-3 px-4 text-left font-medium">{t('dashboard.deals.tableHeaders.vin')}</th>
+                  <th className="py-3 px-4 text-center font-medium">{t('dashboard.deals.tableHeaders.vehicleType')}</th>
+                  <th className="py-3 px-4 text-left font-medium">{t('dashboard.deals.tableHeaders.lender')}</th>
+                  <th className="py-3 px-4 text-right font-medium">{t('dashboard.deals.tableHeaders.frontEnd')}</th>
+                  <th className="py-3 px-4 text-right font-medium">{t('dashboard.deals.tableHeaders.vsc')}</th>
+                  <th className="py-3 px-4 text-right font-medium">{t('dashboard.deals.tableHeaders.ppm')}</th>
+                  <th className="py-3 px-4 text-right font-medium">{t('dashboard.deals.tableHeaders.gap')}</th>
+                  <th className="py-3 px-4 text-right font-medium">{t('dashboard.deals.tableHeaders.tireWheel')}</th>
+                  <th className="py-3 px-4 text-right font-medium">{t('dashboard.deals.tableHeaders.appearance')}</th>
+                  <th className="py-3 px-4 text-right font-medium">{t('dashboard.deals.tableHeaders.theft')}</th>
+                  <th className="py-3 px-4 text-right font-medium">{t('dashboard.deals.tableHeaders.bundled')}</th>
+                  <th className="py-3 px-4 text-center font-medium">{t('dashboard.deals.tableHeaders.ppd')}</th>
+                  <th className="py-3 px-4 text-right font-medium">{t('dashboard.deals.tableHeaders.pvr')}</th>
                   <th className="py-3 px-4 text-right font-medium">
                     <button
                       className="flex items-center ml-auto"
                       onClick={() => toggleSort('profit')}
                     >
-                      Total
+                      {t('dashboard.deals.tableHeaders.total')}
                       {sortField === 'profit' && (
                         <ArrowUpDown size={14} className="ml-1 text-gray-500" />
                       )}
                     </button>
                   </th>
-                  <th className="py-3 px-4 text-center font-medium">Status</th>
-                  <th className="py-3 px-4 text-center font-medium bg-blue-600 text-white">Edit</th>
+                  <th className="py-3 px-4 text-center font-medium">{t('dashboard.deals.tableHeaders.status')}</th>
+                  <th className="py-3 px-4 text-center font-medium bg-blue-600 text-white">{t('dashboard.deals.tableHeaders.edit')}</th>
                   <th className="py-3 px-4 text-center font-medium bg-red-600 text-white">
-                    Delete
+                    {t('dashboard.deals.tableHeaders.delete')}
                   </th>
                 </tr>
               </thead>
@@ -504,8 +493,8 @@ const SingleFinanceDealsPage: React.FC = () => {
                   <tr>
                     <td colSpan={21} className="py-8 text-center text-gray-500">
                       {deals.length === 0
-                        ? "No deals logged yet. Use the 'Log New Deal' button to add deals."
-                        : 'No deals match your search criteria.'}
+                        ? t('dashboard.deals.noDealsYet')
+                        : t('dashboard.deals.noDealsFound')}
                     </td>
                   </tr>
                 ) : (
@@ -627,11 +616,11 @@ const SingleFinanceDealsPage: React.FC = () => {
                                       : 'bg-gray-100 text-gray-800'
                             }`}
                           >
-                            <option value="Pending">Pending</option>
-                            <option value="Funded">Funded</option>
-                            <option value="Held">Held</option>
-                            <option value="Unwound">Unwound</option>
-                            <option value="Dead Deal">Dead Deal</option>
+                            <option value="Pending">{t('dashboard.deals.statusOptions.pending')}</option>
+                            <option value="Funded">{t('dashboard.deals.statusOptions.funded')}</option>
+                            <option value="Held">{t('dashboard.deals.statusOptions.held')}</option>
+                            <option value="Unwound">{t('dashboard.deals.statusOptions.unwound')}</option>
+                            <option value="Dead Deal">{t('dashboard.deals.statusOptions.deadDeal')}</option>
                           </select>
                         </td>
                         <td className="py-3 px-4 text-center">
@@ -639,7 +628,7 @@ const SingleFinanceDealsPage: React.FC = () => {
                             onClick={() => handleEditDeal(deal.id)}
                             className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
                           >
-                            Edit
+                            {t('dashboard.deals.editButton')}
                           </button>
                         </td>
                         <td className="py-3 px-4 text-center">
@@ -662,19 +651,19 @@ const SingleFinanceDealsPage: React.FC = () => {
       {filteredDeals.length > 0 && (
         <div className="flex justify-between items-center text-sm text-gray-600">
           <div>
-            Showing {filteredDeals.length} of {deals.length} deals
+            {t('dashboard.deals.showingDeals').replace('{count}', filteredDeals.length.toString()).replace('{total}', deals.length.toString())}
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <DollarSign size={16} />
               <span>
-                Total Gross:{' '}
+                {t('dashboard.deals.totalGross')}{' '}
                 {formatCurrency(filteredDeals.reduce((sum, deal) => sum + deal.amount, 0))}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <span>
-                Back End Total:{' '}
+                {t('dashboard.deals.backEndTotal')}{' '}
                 {formatCurrency(filteredDeals.reduce((sum, deal) => sum + deal.profit, 0))}
               </span>
             </div>

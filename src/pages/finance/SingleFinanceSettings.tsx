@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTranslation } from '../../contexts/TranslationContext';
 import { getConsistentUserId, getUserIdSync, debugUserId } from '../../utils/userIdHelper';
 import { supabase, quickHasSupabaseSessionToken } from '../../lib/supabaseClient';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
@@ -10,7 +11,8 @@ import { Label } from '../../components/ui/label';
 import { toast } from '../../components/ui/use-toast';
 import { SingleFinanceStorage } from '../../lib/singleFinanceStorage';
 import { teamMemberSchema, type TeamMemberData } from '../../lib/validation/dealSchemas';
-import { Settings, Users, DollarSign, Plus, Trash2, Save, ArrowLeft } from 'lucide-react';
+import LanguageSelector from '../../components/auth/LanguageSelector';
+import { Settings, Users, DollarSign, Plus, Trash2, Save, ArrowLeft, Globe } from 'lucide-react';
 
 // Interface for team member
 interface TeamMember {
@@ -37,7 +39,8 @@ interface PayConfig {
 export default function SingleFinanceSettings() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'team' | 'pay'>('team');
+  const { t, language, setLanguage } = useTranslation();
+  const [activeTab, setActiveTab] = useState<'team' | 'pay' | 'language'>('team');
   const [localUserId, setLocalUserId] = useState<string | null>(null);
 
   // Helper to resolve a consistent user ID (context or token fallback)
@@ -295,8 +298,8 @@ export default function SingleFinanceSettings() {
 
     console.log('[Settings] Team member added successfully:', member);
     toast({
-      title: 'Success',
-      description: `${member.firstName} ${member.lastName} added to team`,
+      title: t('common.success'),
+      description: t('dashboard.settings.memberAdded', { firstName: member.firstName, lastName: member.lastName }),
     });
   };
 
@@ -305,15 +308,15 @@ export default function SingleFinanceSettings() {
     const member = teamMembers.find(m => m.id === memberId);
     if (
       confirm(
-        `Are you sure you want to remove ${member?.firstName} ${member?.lastName} from the team?`
+        t('dashboard.settings.confirmRemove', { firstName: member?.firstName, lastName: member?.lastName })
       )
     ) {
       const updatedMembers = teamMembers.filter(m => m.id !== memberId);
       saveTeamMembers(updatedMembers);
 
       toast({
-        title: 'Success',
-        description: 'Team member removed',
+        title: t('common.success'),
+        description: t('dashboard.settings.memberRemoved'),
       });
     }
   };
@@ -334,15 +337,14 @@ export default function SingleFinanceSettings() {
           className="mr-4 flex items-center bg-blue-500 text-white hover:bg-blue-600"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Dashboard
+          {t('dashboard.settings.backToDashboard')}
         </Button>
-        <h1 className="text-2xl font-bold">Single Finance Manager Settings</h1>
+        <h1 className="text-2xl font-bold">{t('dashboard.settings.title')}</h1>
       </div>
 
       <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-blue-800 text-sm">
-          <strong>Note:</strong> These settings are specific to your Single Finance Manager
-          Dashboard and will be used for deal logging and pay calculations.
+          <strong>{t('dashboard.settings.note.title')}:</strong> {t('dashboard.settings.note.description')}
         </p>
       </div>
 
@@ -357,7 +359,7 @@ export default function SingleFinanceSettings() {
           }`}
         >
           <Users className="inline mr-2 h-4 w-4" />
-          Team Management
+          {t('dashboard.settings.teamManagement')}
         </button>
         <button
           onClick={() => setActiveTab('pay')}
@@ -368,7 +370,18 @@ export default function SingleFinanceSettings() {
           }`}
         >
           <DollarSign className="inline mr-2 h-4 w-4" />
-          Pay Configuration
+          {t('dashboard.settings.payConfiguration')}
+        </button>
+        <button
+          onClick={() => setActiveTab('language')}
+          className={`px-4 py-2 rounded-md font-medium ${
+            activeTab === 'language'
+              ? 'bg-blue-500 text-white'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          }`}
+        >
+          <Globe className="inline mr-2 h-4 w-4" />
+          {t('dashboard.settings.languageSettings')}
         </button>
       </div>
 
@@ -380,18 +393,18 @@ export default function SingleFinanceSettings() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Plus className="mr-2 h-5 w-5" />
-                Add Team Member
+                {t('dashboard.settings.addNewMember')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
+                  <Label htmlFor="firstName">{t('dashboard.settings.firstName')}</Label>
                   <Input
                     id="firstName"
                     value={newMember.firstName}
                     onChange={e => setNewMember(prev => ({ ...prev, firstName: e.target.value }))}
-                    placeholder="First name"
+                    placeholder={t('dashboard.settings.firstNamePlaceholder')}
                     className={validationErrors.firstName ? 'border-red-500' : ''}
                   />
                   {validationErrors.firstName && (
@@ -399,12 +412,12 @@ export default function SingleFinanceSettings() {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
+                  <Label htmlFor="lastName">{t('dashboard.settings.lastName')}</Label>
                   <Input
                     id="lastName"
                     value={newMember.lastName}
                     onChange={e => setNewMember(prev => ({ ...prev, lastName: e.target.value }))}
-                    placeholder="Last name"
+                    placeholder={t('dashboard.settings.lastNamePlaceholder')}
                     className={validationErrors.lastName ? 'border-red-500' : ''}
                   />
                   {validationErrors.lastName && (
@@ -412,7 +425,7 @@ export default function SingleFinanceSettings() {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="role">Role</Label>
+                  <Label htmlFor="role">{t('dashboard.settings.role')}</Label>
                   <select
                     id="role"
                     value={newMember.role}
@@ -424,13 +437,13 @@ export default function SingleFinanceSettings() {
                     }
                     className="w-full p-2 border rounded-md"
                   >
-                    <option value="salesperson">Salesperson</option>
-                    <option value="sales_manager">Sales Manager</option>
+                    <option value="salesperson">{t('dashboard.settings.roles.salesperson')}</option>
+                    <option value="sales_manager">{t('dashboard.settings.roles.salesManager')}</option>
                   </select>
                 </div>
                 <Button onClick={handleAddTeamMember} className="bg-green-500 hover:bg-green-600">
                   <Plus className="mr-2 h-4 w-4" />
-                  Add Member
+                  {t('dashboard.settings.addMember')}
                 </Button>
               </div>
             </CardContent>
@@ -442,12 +455,12 @@ export default function SingleFinanceSettings() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Users className="mr-2 h-5 w-5" />
-                  Team Members (0)
+                  {t('dashboard.settings.teamMembers')} (0)
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-500 text-center py-8">
-                  No team members added yet. Add your first team member above.
+                  {t('dashboard.settings.noMembers')}
                 </p>
               </CardContent>
             </Card>
@@ -459,7 +472,7 @@ export default function SingleFinanceSettings() {
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <Users className="mr-2 h-5 w-5" />
-                      Salespeople (
+                      {t('dashboard.settings.salespeople')} (
                       {teamMembers.filter(member => member.role === 'salesperson').length})
                     </CardTitle>
                   </CardHeader>
@@ -480,7 +493,7 @@ export default function SingleFinanceSettings() {
                                 <p className="font-medium">
                                   {member.firstName} {member.lastName}
                                 </p>
-                                <p className="text-sm text-blue-600">Salesperson</p>
+                                <p className="text-sm text-blue-600">{t('dashboard.settings.roles.salesperson')}</p>
                               </div>
                             </div>
                             <div className="flex items-center space-x-2">
@@ -492,7 +505,7 @@ export default function SingleFinanceSettings() {
                                     : 'bg-gray-100 text-gray-600'
                                 }`}
                               >
-                                {member.active ? 'Active' : 'Inactive'}
+                                {member.active ? t('dashboard.settings.active') : t('dashboard.settings.inactive')}
                               </button>
                               <Button
                                 onClick={() => handleRemoveTeamMember(member.id)}
@@ -515,7 +528,7 @@ export default function SingleFinanceSettings() {
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <Users className="mr-2 h-5 w-5" />
-                      Sales Managers (
+                      {t('dashboard.settings.salesManagers')} (
                       {teamMembers.filter(member => member.role === 'sales_manager').length})
                     </CardTitle>
                   </CardHeader>
@@ -536,7 +549,7 @@ export default function SingleFinanceSettings() {
                                 <p className="font-medium">
                                   {member.firstName} {member.lastName}
                                 </p>
-                                <p className="text-sm text-purple-600">Sales Manager</p>
+                                <p className="text-sm text-purple-600">{t('dashboard.settings.roles.salesManager')}</p>
                               </div>
                             </div>
                             <div className="flex items-center space-x-2">
@@ -548,7 +561,7 @@ export default function SingleFinanceSettings() {
                                     : 'bg-gray-100 text-gray-600'
                                 }`}
                               >
-                                {member.active ? 'Active' : 'Inactive'}
+                                {member.active ? t('dashboard.settings.active') : t('dashboard.settings.inactive')}
                               </button>
                               <Button
                                 onClick={() => handleRemoveTeamMember(member.id)}
@@ -576,13 +589,13 @@ export default function SingleFinanceSettings() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <DollarSign className="mr-2 h-5 w-5" />
-                Commission & Base Pay
+                {t('dashboard.settings.commissionBasePay')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="commissionRate">Commission Rate (%)</Label>
+                  <Label htmlFor="commissionRate">{t('dashboard.settings.commissionRate')}</Label>
                   <Input
                     id="commissionRate"
                     type="number"
@@ -597,10 +610,10 @@ export default function SingleFinanceSettings() {
                       }))
                     }
                   />
-                  <p className="text-xs text-gray-600">Percentage of back-end gross profit</p>
+                  <p className="text-xs text-gray-600">{t('dashboard.settings.commissionRateDescription')}</p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="baseRate">Base Monthly Rate ($)</Label>
+                  <Label htmlFor="baseRate">{t('dashboard.settings.baseRate')}</Label>
                   <Input
                     id="baseRate"
                     type="number"
@@ -614,7 +627,7 @@ export default function SingleFinanceSettings() {
                       }))
                     }
                   />
-                  <p className="text-xs text-gray-600">Fixed monthly base pay</p>
+                  <p className="text-xs text-gray-600">{t('dashboard.settings.baseRateDescription')}</p>
                 </div>
               </div>
             </CardContent>
@@ -622,12 +635,12 @@ export default function SingleFinanceSettings() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Product Bonuses</CardTitle>
+              <CardTitle>{t('dashboard.settings.bonusThresholds')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="vscBonus">VSC Bonus ($)</Label>
+                  <Label htmlFor="vscBonus">{t('dashboard.settings.vscBonus')}</Label>
                   <Input
                     id="vscBonus"
                     type="number"
@@ -646,7 +659,7 @@ export default function SingleFinanceSettings() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="gapBonus">GAP Bonus ($)</Label>
+                  <Label htmlFor="gapBonus">{t('dashboard.settings.gapBonus')}</Label>
                   <Input
                     id="gapBonus"
                     type="number"
@@ -665,7 +678,7 @@ export default function SingleFinanceSettings() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="ppmBonus">PPM Bonus ($)</Label>
+                  <Label htmlFor="ppmBonus">{t('dashboard.settings.ppmBonus')}</Label>
                   <Input
                     id="ppmBonus"
                     type="number"
@@ -684,7 +697,7 @@ export default function SingleFinanceSettings() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="totalThreshold">Monthly Threshold ($)</Label>
+                  <Label htmlFor="totalThreshold">{t('dashboard.settings.totalThreshold')}</Label>
                   <Input
                     id="totalThreshold"
                     type="number"
@@ -701,7 +714,7 @@ export default function SingleFinanceSettings() {
                       }))
                     }
                   />
-                  <p className="text-xs text-gray-600">Monthly gross threshold for full bonuses</p>
+                  <p className="text-xs text-gray-600">{t('dashboard.settings.totalThresholdDescription')}</p>
                 </div>
               </div>
             </CardContent>
@@ -713,9 +726,54 @@ export default function SingleFinanceSettings() {
               className="bg-green-500 hover:bg-green-600"
             >
               <Save className="mr-2 h-4 w-4" />
-              Save Pay Configuration
+              {t('dashboard.settings.saveConfiguration')}
             </Button>
           </div>
+        </div>
+      )}
+
+      {/* Language Settings Tab */}
+      {activeTab === 'language' && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Globe className="mr-2 h-5 w-5" />
+                {t('dashboard.settings.languageSettings')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="currentLanguage">{t('dashboard.settings.currentLanguage')}</Label>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {language === 'en' && 'English'}
+                    {language === 'es' && 'Español'}
+                    {language === 'fr' && 'Français'}
+                    {language === 'de' && 'Deutsch'}
+                    {language === 'cs' && 'Čeština'}
+                    {language === 'it' && 'Italiano'}
+                    {language === 'pl' && 'Polski'}
+                    {language === 'pt' && 'Português'}
+                    {language === 'gr' && 'Ελληνικά'}
+                  </p>
+                </div>
+                
+                <div>
+                  <Label htmlFor="languageSelector">{t('dashboard.settings.selectLanguage')}</Label>
+                  <div className="mt-2">
+                    <LanguageSelector variant="form" />
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t">
+                  <p className="text-sm text-gray-500">
+                    {t('dashboard.settings.languageUpdated')}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>

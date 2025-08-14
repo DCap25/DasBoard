@@ -194,6 +194,214 @@ interface Translations {
       emailNote: string;
     };
   };
+  dashboard: {
+    singleFinance: {
+      title: string;
+      kpi: {
+        fiGross: string;
+        dealsProcessed: string;
+        dealTypes: string;
+        productsPerDeal: string;
+        pvr: string;
+        pvrFull: string;
+      };
+      dealTypes: {
+        finance: string;
+        cash: string;
+        lease: string;
+      };
+      productMix: {
+        title: string;
+        product: string;
+        avgProfit: string;
+        penetration: string;
+        extendedWarranty: string;
+        gapInsurance: string;
+        paintProtection: string;
+        tireWheel: string;
+        ppm: string;
+        theft: string;
+        bundled: string;
+        other: string;
+      };
+      payCalculator: {
+        title: string;
+        grossProfit: string;
+        payPlan: string;
+        estimatedPay: string;
+        baseAmount: string;
+        bonusAmount: string;
+        totalPay: string;
+      };
+      dealsLog: {
+        title: string;
+        refresh: string;
+        viewAll: string;
+        number: string;
+        lastName: string;
+        date: string;
+        gross: string;
+        products: string;
+        status: string;
+      };
+      timePeriod: {
+        thisMonth: string;
+        lastMonth: string;
+        lastQuarter: string;
+        ytd: string;
+        lastYear: string;
+        custom: string;
+      };
+      status: {
+        pending: string;
+        funded: string;
+        unwound: string;
+        deadDeal: string;
+      };
+    };
+    deals: {
+      title: string;
+      backToDashboard: string;
+      note: string;
+      searchPlaceholder: string;
+      allStatuses: string;
+      tableHeaders: {
+        number: string;
+        lastName: string;
+        dealNumber: string;
+        stockNumber: string;
+        date: string;
+        vin: string;
+        vehicleType: string;
+        lender: string;
+        frontEnd: string;
+        vsc: string;
+        ppm: string;
+        gap: string;
+        tireWheel: string;
+        appearance: string;
+        theft: string;
+        bundled: string;
+        ppd: string;
+        pvr: string;
+        total: string;
+        status: string;
+        edit: string;
+        delete: string;
+      };
+      vehicleTypes: {
+        new: string;
+        used: string;
+        cpo: string;
+      };
+      statusOptions: {
+        pending: string;
+        funded: string;
+        held: string;
+        unwound: string;
+        deadDeal: string;
+      };
+      noDealsFound: string;
+      noDealsYet: string;
+      showingDeals: string;
+      totalGross: string;
+      backEndTotal: string;
+      confirmDelete: string;
+      finalConfirmDelete: string;
+      editButton: string;
+    };
+    dealLog: {
+      title: string;
+      dealInformation: string;
+      customerInformation: string;
+      teamInformation: string;
+      financialInformation: string;
+      productProfits: string;
+      financialSummary: string;
+      dealNumber: string;
+      stockNumber: string;
+      vinNumber: string;
+      saleDate: string;
+      vehicleType: string;
+      manufacturer: string;
+      customerName: string;
+      dealType: string;
+      status: string;
+      salesperson: string;
+      salesManager: string;
+      lender: string;
+      splitDeal: string;
+      secondSalesperson: string;
+      frontEndGross: string;
+      reserveFlat: string;
+      backEndGross: string;
+      autoCalculated: string;
+      totalGross: string;
+      allFieldsCompleted: string;
+      saveDeal: string;
+      updateDeal: string;
+      cancel: string;
+      vehicleTypes: {
+        new: string;
+        used: string;
+        certified: string;
+      };
+      dealTypes: {
+        cash: string;
+        finance: string;
+        lease: string;
+      };
+      products: {
+        vsc: string;
+        gap: string;
+        ppm: string;
+        tireWheel: string;
+        appearance: string;
+        theft: string;
+        bundled: string;
+        keyReplacement: string;
+        windshield: string;
+        lojack: string;
+        extWarranty: string;
+        other: string;
+      };
+    };
+    settings: {
+      title: string;
+      teamManagement: string;
+      payConfiguration: string;
+      languageSettings: string;
+      teamMembers: string;
+      addNewMember: string;
+      firstName: string;
+      lastName: string;
+      role: string;
+      addMember: string;
+      noMembers: string;
+      salespeople: string;
+      salesManagers: string;
+      active: string;
+      inactive: string;
+      remove: string;
+      commissionBasePay: string;
+      commissionRate: string;
+      baseRate: string;
+      bonusThresholds: string;
+      vscBonus: string;
+      gapBonus: string;
+      ppmBonus: string;
+      totalThreshold: string;
+      saveConfiguration: string;
+      currentLanguage: string;
+      changeLanguage: string;
+      selectLanguage: string;
+      languageUpdated: string;
+      roles: {
+        salesperson: string;
+        salesManager: string;
+      };
+    };
+  };
   common: {
     language: string;
     login: string;
@@ -556,6 +764,315 @@ export const translations: Record<Language, Translations | Partial<Translations>
         },
       },
     },
+    dashboard: {
+      singleFinance: {
+        title: 'Single Finance Manager Dashboard',
+        homeTitle: 'Single Finance Manager',
+        promo: {
+          title: 'Special Promotion Active!',
+          description: 'Your Finance Manager subscription is currently',
+          free: 'FREE',
+          limited: 'for a limited time',
+        },
+        trends: {
+          up12: '+12% from last month',
+          down8: '-8% from last month',
+          up3: '+3% from last month',
+          upPoint2: '+0.2 from last month',
+          downPoint3: '-0.3 from last month',
+          up125: '+$125 from last month',
+          down89: '-$89 from last month',
+        },
+        kpi: {
+          fiGross: 'F&I Gross',
+          dealsProcessed: 'Deals Processed',
+          dealTypes: 'Deal Types',
+          productsPerDeal: 'Products Per Deal',
+          pvr: 'PVR',
+          pvrFull: 'PVR (Per Vehicle Retailed)',
+        },
+        periods: {
+          thisMonth: 'This Month',
+          lastMonth: 'Last Month',
+          lastQuarter: 'Last Quarter',
+          ytd: 'Year to Date',
+          lastYear: 'Last Year',
+        },
+        bestPractice: {
+          title: 'F&I Best Practice',
+        },
+        errors: {
+          failedToLoadLocal: 'Failed to load deals from local storage.',
+          failedToLoad: 'Failed to load deals. Please try again later.',
+          unexpectedError: 'An unexpected error occurred while loading deals.',
+          failedToUpdate: 'Failed to update deal status',
+          failedToDelete: 'Failed to delete deal',
+        },
+        confirmations: {
+          deleteWarning: '⚠️ DELETE CONFIRMATION\n\nAre you sure you want to delete this deal?\n\nThis action will:\n• Permanently remove all deal data\n• Update your dashboard metrics\n• Cannot be undone\n\nClick OK to delete or Cancel to keep the deal.',
+          finalConfirmation: '🚨 FINAL CONFIRMATION\n\nThis is your last chance!\n\nClick OK to permanently delete this deal, or Cancel to keep it.',
+        },
+        dealTypes: {
+          finance: 'Finance',
+          cash: 'Cash',
+          lease: 'Lease',
+        },
+        productMix: {
+          title: 'Product Mix & Performance',
+          product: 'Product',
+          avgProfit: 'Avg Profit',
+          penetration: 'Penetration',
+          extendedWarranty: 'Extended Warranty',
+          gapInsurance: 'GAP Insurance',
+          paintProtection: 'Paint & Protection',
+          tireWheel: 'Tire & Wheel',
+          ppm: 'PPM',
+          theft: 'Theft Protection',
+          bundled: 'Bundled',
+          other: 'Other',
+        },
+        payCalculator: {
+          title: 'Monthly Pay Estimator',
+          hideAmounts: 'Hide pay amounts',
+          showAmounts: 'Show pay amounts',
+          grossProfit: 'Gross Profit',
+          payPlan: 'Pay Plan',
+          estimatedPay: 'Estimated Monthly Pay',
+          baseAmount: 'Base Pay',
+          commission: 'Commission ({rate}%)',
+          bonuses: 'Product Bonuses',
+          bonusAmount: 'Bonus Amount',
+          totalPay: 'Total Pay',
+          bonusBreakdown: 'Bonus Breakdown',
+          vscDeals: 'VSC Deals',
+          gapDeals: 'GAP Deals',
+          ppmDeals: 'PPM Deals',
+          disclaimer: {
+            title: 'Disclaimer',
+            text: 'This calculator is for informational purposes only. Actual pay may differ based on final accounting, management review, and company policies. Configure your pay settings in the Settings page.',
+          },
+        },
+        dealsLog: {
+          title: 'Recent Deals Log',
+          refresh: 'Refresh',
+          viewAll: 'View All',
+          number: '#',
+          lastName: 'Last Name',
+          date: 'Date',
+          gross: 'Gross',
+          products: 'Products',
+          status: 'Status',
+        },
+        deals: {
+          recentDeals: 'Recent Deals',
+          viewAll: 'View All',
+          addNew: 'Log New Deal',
+          noDealsYet: 'No deals logged yet.',
+          refreshTooltip: 'Refresh deals',
+          tableHeaders: {
+            number: '#',
+            lastName: 'Last Name',
+            dealNumber: 'Deal #',
+            stockNumber: 'Stock #',
+            date: 'Date',
+            vin: 'VIN',
+            vehicleType: 'N/U/CPO',
+            lender: 'Lender',
+            frontEnd: 'Front End',
+            vsc: 'VSC',
+            ppm: 'PPM',
+            gap: 'GAP',
+            appearance: 'App',
+            tireWheel: 'T&W',
+            ppd: 'PPD',
+            pvr: 'PVR',
+            total: 'Total',
+            status: 'Status',
+            edit: 'Edit',
+            delete: 'Delete',
+            totals: 'TOTALS',
+          },
+          statusOptions: {
+            pending: 'Pending',
+            funded: 'Funded',
+            held: 'Held',
+            unwound: 'Unwound',
+          },
+          actions: {
+            edit: 'Edit',
+          },
+        },
+        timePeriod: {
+          thisMonth: 'This Month',
+          lastMonth: 'Last Month',
+          lastQuarter: 'Last Quarter',
+          ytd: 'YTD',
+          lastYear: 'Last Year',
+          custom: 'Custom',
+        },
+        status: {
+          pending: 'Pending',
+          funded: 'Funded',
+          unwound: 'Unwound',
+          deadDeal: 'Dead Deal',
+        },
+      },
+      deals: {
+        title: 'Single Finance Manager - Deals',
+        backToDashboard: 'Back to Dashboard',
+        note: 'These deals are specific to your Single Finance Manager Dashboard and are stored separately from the main finance deals.',
+        searchPlaceholder: 'Search deals by customer, vehicle, deal #, or VIN',
+        allStatuses: 'All Statuses',
+        tableHeaders: {
+          number: '#',
+          lastName: 'Last Name',
+          dealNumber: 'Deal #',
+          stockNumber: 'Stock #',
+          date: 'Date',
+          vin: 'VIN',
+          vehicleType: 'N/U/CPO',
+          lender: 'Lender',
+          frontEnd: 'Front End',
+          vsc: 'VSC',
+          ppm: 'PPM',
+          gap: 'GAP',
+          tireWheel: 'T&W',
+          appearance: 'App',
+          theft: 'Theft',
+          bundled: 'Bundled',
+          ppd: 'PPD',
+          pvr: 'PVR',
+          total: 'Total',
+          status: 'Status',
+          edit: 'Edit',
+          delete: 'Delete',
+        },
+        vehicleTypes: {
+          new: 'N',
+          used: 'U',
+          cpo: 'C',
+        },
+        statusOptions: {
+          pending: 'Pending',
+          funded: 'Funded',
+          held: 'Held',
+          unwound: 'Unwound',
+          deadDeal: 'Dead Deal',
+        },
+        noDealsFound: 'No deals match your search criteria.',
+        noDealsYet: "No deals logged yet. Use the 'Log New Deal' button to add deals.",
+        showingDeals: 'Showing {count} of {total} deals',
+        totalGross: 'Total Gross:',
+        backEndTotal: 'Back End Total:',
+        confirmDelete: '⚠️ DELETE CONFIRMATION\n\nAre you sure you want to delete this deal?\n\nThis action will:\n• Permanently remove all deal data\n• Update your dashboard metrics\n• Cannot be undone\n\nClick OK to delete or Cancel to keep the deal.',
+        finalConfirmDelete: '🚨 FINAL CONFIRMATION\n\nThis is your last chance!\n\nClick OK to permanently delete this deal, or Cancel to keep it.',
+        editButton: 'Edit',
+      },
+      dealLog: {
+        title: 'Log New Deal',
+        dealInformation: 'Deal Information',
+        customerInformation: 'Customer Information',
+        teamInformation: 'Team Information',
+        financialInformation: 'Financial Information',
+        productProfits: 'Product Profits',
+        financialSummary: 'Financial Summary',
+        dealNumber: 'Deal #',
+        stockNumber: 'Stock #',
+        vinNumber: 'VIN # (Last 8)',
+        saleDate: 'Sale Date',
+        vehicleType: 'Vehicle Type',
+        manufacturer: 'Manufacturer',
+        customerName: 'Customer Name',
+        dealType: 'Deal Type',
+        status: 'Status',
+        salesperson: 'Salesperson',
+        salesManager: 'Sales Manager',
+        lender: 'Lender',
+        splitDeal: 'Split Deal',
+        secondSalesperson: 'Second Salesperson',
+        frontEndGross: 'Front End Gross',
+        reserveFlat: 'Reserve (Flat)',
+        backEndGross: 'Back End Gross',
+        autoCalculated: 'Auto-Calculated',
+        totalGross: 'Total Gross',
+        allFieldsCompleted: 'All fields must be completed.',
+        saveDeal: 'Save Deal',
+        updateDeal: 'Update Deal',
+        cancel: 'Cancel',
+        vehicleTypes: {
+          new: 'New',
+          used: 'Used',
+          certified: 'Certified',
+        },
+        dealTypes: {
+          cash: 'Cash',
+          finance: 'Finance',
+          lease: 'Lease',
+        },
+        products: {
+          vsc: 'VSC',
+          gap: 'GAP',
+          ppm: 'PPM',
+          tireWheel: 'Tire & Wheel',
+          appearance: 'Appearance',
+          theft: 'Theft',
+          bundled: 'Bundled',
+          keyReplacement: 'Key Replacement',
+          windshield: 'Windshield',
+          lojack: 'LoJack',
+          extWarranty: 'Ext Warranty',
+          other: 'Other',
+        },
+      },
+      settings: {
+        title: 'Single Finance Manager Settings',
+        backToDashboard: 'Back to Dashboard',
+        teamManagement: 'Team Members',
+        payConfiguration: 'Pay Configurator',
+        languageSettings: 'Language Settings',
+        teamMembers: 'Team Members',
+        addNewMember: 'Add New Team Member',
+        firstName: 'First Name',
+        lastName: 'Last Name',
+        role: 'Role',
+        addMember: 'Add Member',
+        noMembers: 'No team members added yet. Add your first team member above.',
+        salespeople: 'Salespeople',
+        salesManagers: 'Sales Managers',
+        active: 'Active',
+        inactive: 'Inactive',
+        remove: 'Remove',
+        commissionBasePay: 'Commission & Base Pay',
+        commissionRate: 'Commission Rate (%)',
+        commissionRateDescription: 'Percentage of back-end gross profit',
+        baseRate: 'Base Monthly Rate ($)',
+        baseRateDescription: 'Fixed monthly base pay',
+        bonusThresholds: 'Product Bonuses',
+        vscBonus: 'VSC Bonus ($)',
+        gapBonus: 'GAP Bonus ($)',
+        ppmBonus: 'PPM Bonus ($)',
+        totalThreshold: 'Monthly Threshold ($)',
+        totalThresholdDescription: 'Monthly gross threshold for full bonuses',
+        saveConfiguration: 'Save Configuration',
+        currentLanguage: 'Current Language',
+        changeLanguage: 'Change Language',
+        selectLanguage: 'Select Language',
+        languageUpdated: 'Language updated successfully',
+        firstNamePlaceholder: 'First name',
+        lastNamePlaceholder: 'Last name',
+        confirmRemove: 'Are you sure you want to remove {firstName} {lastName} from the team?',
+        memberAdded: '{firstName} {lastName} added to team',
+        memberRemoved: 'Team member removed',
+        note: {
+          title: 'Note',
+          description: 'These settings are specific to your Single Finance Manager Dashboard and will be used for deal logging and pay calculations.',
+        },
+        roles: {
+          salesperson: 'Salesperson',
+          salesManager: 'Sales Manager',
+        },
+      },
+    },
     common: {
       language: 'Language',
       login: 'Login',
@@ -568,6 +1085,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
       next: 'Next',
       submit: 'Submit',
       close: 'Close',
+      success: 'Success',
     },
     footer: {
       tagline: 'Modern dealership management software with real-time insights.',
@@ -815,6 +1333,220 @@ export const translations: Record<Language, Translations | Partial<Translations>
         emailNote: 'Debe ser una dirección de email verificada del concesionario',
       },
     },
+    dashboard: {
+      singleFinance: {
+        title: 'Panel de Control del Gerente Financiero Individual',
+        kpi: {
+          fiGross: 'F&I Bruto',
+          dealsProcessed: 'Ofertas Procesadas',
+          dealTypes: 'Tipos de Ofertas',
+          productsPerDeal: 'Productos por Oferta',
+          pvr: 'PVR',
+          pvrFull: 'PVR (Por Vehículo Comercializado)',
+        },
+        dealTypes: {
+          finance: 'Financiado',
+          cash: 'Contado',
+          lease: 'Arrendamiento',
+        },
+        productMix: {
+          title: 'Mezcla y Rendimiento de Productos',
+          product: 'Producto',
+          avgProfit: 'Ganancia Promedio',
+          penetration: 'Penetración',
+          extendedWarranty: 'Garantía Extendida',
+          gapInsurance: 'Seguro GAP',
+          paintProtection: 'Protección de Pintura',
+          tireWheel: 'Ruedas y Neumáticos',
+          ppm: 'PPM',
+          theft: 'Protección contra Robo',
+          bundled: 'Empaquetado',
+          other: 'Otros',
+        },
+        payCalculator: {
+          title: 'Calculadora de Pago',
+          grossProfit: 'Ganancia Bruta',
+          payPlan: 'Plan de Pago',
+          estimatedPay: 'Pago Estimado',
+          baseAmount: 'Cantidad Base',
+          bonusAmount: 'Cantidad de Bono',
+          totalPay: 'Pago Total',
+        },
+        dealsLog: {
+          title: 'Registro de Ofertas Recientes',
+          refresh: 'Actualizar',
+          viewAll: 'Ver Todo',
+          number: '#',
+          lastName: 'Apellido',
+          date: 'Fecha',
+          gross: 'Bruto',
+          products: 'Productos',
+          status: 'Estado',
+        },
+        timePeriod: {
+          thisMonth: 'Este Mes',
+          lastMonth: 'Mes Pasado',
+          lastQuarter: 'Último Trimestre',
+          ytd: 'Acumulado del Año',
+          lastYear: 'Año Pasado',
+          custom: 'Personalizado',
+        },
+        status: {
+          pending: 'Pendiente',
+          funded: 'Financiado',
+          unwound: 'Cancelado',
+          deadDeal: 'Oferta Muerta',
+        },
+      },
+      deals: {
+        title: 'Gerente Financiero Individual - Ofertas',
+        backToDashboard: 'Volver al Panel',
+        note: 'Estas ofertas son específicas de su Panel de Control del Gerente Financiero Individual y se almacenan por separado de las ofertas financieras principales.',
+        searchPlaceholder: 'Buscar ofertas por cliente, vehículo, # de oferta o VIN',
+        allStatuses: 'Todos los Estados',
+        tableHeaders: {
+          number: '#',
+          lastName: 'Apellido',
+          dealNumber: '# de Oferta',
+          stockNumber: '# de Stock',
+          date: 'Fecha',
+          vin: 'VIN',
+          vehicleType: 'N/U/CPO',
+          lender: 'Prestamista',
+          frontEnd: 'Front End',
+          vsc: 'VSC',
+          ppm: 'PPM',
+          gap: 'GAP',
+          tireWheel: 'R&N',
+          appearance: 'App',
+          theft: 'Robo',
+          bundled: 'Empaquetado',
+          ppd: 'PPD',
+          pvr: 'PVR',
+          total: 'Total',
+          status: 'Estado',
+          edit: 'Editar',
+          delete: 'Eliminar',
+        },
+        vehicleTypes: {
+          new: 'N',
+          used: 'U',
+          cpo: 'C',
+        },
+        statusOptions: {
+          pending: 'Pendiente',
+          funded: 'Financiado',
+          held: 'Retenido',
+          unwound: 'Cancelado',
+          deadDeal: 'Oferta Muerta',
+        },
+        noDealsFound: 'No se encontraron ofertas que coincidan con sus criterios de búsqueda.',
+        noDealsYet: "Aún no se han registrado ofertas. Use el botón 'Registrar Nueva Oferta' para agregar ofertas.",
+        showingDeals: 'Mostrando {count} de {total} ofertas',
+        totalGross: 'Total Bruto:',
+        backEndTotal: 'Total Back End:',
+        confirmDelete: '⚠️ CONFIRMACIÓN DE ELIMINACIÓN\n\n¿Está seguro de que desea eliminar esta oferta?\n\nEsta acción:\n• Eliminará permanentemente todos los datos de la oferta\n• Actualizará las métricas de su panel de control\n• No se puede deshacer\n\nHaga clic en Aceptar para eliminar o Cancelar para mantener la oferta.',
+        finalConfirmDelete: '🚨 CONFIRMACIÓN FINAL\n\n¡Esta es su última oportunidad!\n\nHaga clic en Aceptar para eliminar permanentemente esta oferta, o Cancelar para mantenerla.',
+        editButton: 'Editar',
+      },
+      dealLog: {
+        title: 'Registrar Nueva Oferta',
+        editDeal: 'Editar Oferta - Panel Financiero Individual',
+        backToDashboard: 'Volver al Panel',
+        note: 'Nota',
+        editingNote: 'Está editando una oferta existente. Los cambios se reflejarán inmediatamente en su panel de control.',
+        dashboardNote: 'Esta oferta solo aparecerá en su Panel de Control del Gerente Financiero Individual y no afectará otros paneles en el sistema.',
+        dealInformation: 'Información de la Oferta',
+        dealNumber: '# de Oferta',
+        enterDealNumber: 'Ingrese el número de oferta',
+        saleDate: 'Fecha de Venta',
+        stockNumber: '# de Stock',
+        vinLast8: 'VIN # (Últimos 8)',
+        vinPlaceholder: 'Últimos 8 del VIN',
+        vehicleType: 'Tipo de Vehículo',
+        vehicleTypes: {
+          new: 'Nuevo',
+          used: 'Usado',
+          cpo: 'CPO',
+        },
+        manufacturer: 'Fabricante',
+        selectManufacturer: 'Seleccionar Fabricante',
+        customerName: 'Apellido del Cliente',
+        customerPlaceholder: 'Apellido del cliente',
+        salesperson: 'Vendedor',
+        selectSalesperson: 'Seleccionar Vendedor',
+        splitDeal: 'Oferta Dividida',
+        selectSecondSalesperson: 'Seleccionar Segundo Vendedor',
+        salesManager: 'Gerente de Ventas',
+        selectManager: 'Seleccionar Gerente',
+        lender: 'Prestamista',
+        selectLender: 'Seleccionar Prestamista',
+        dealType: 'Tipo de Oferta',
+        dealTypes: {
+          cash: 'Contado',
+          finance: 'Financiado',
+          lease: 'Arrendamiento',
+        },
+        status: 'Estado',
+        statusOptions: {
+          pending: 'Pendiente',
+          funded: 'Financiado',
+        },
+        productsAndProfit: 'Productos y Ganancia',
+        products: {
+          vscProfit: 'Ganancia VSC',
+          gapProfit: 'Ganancia GAP',
+          ppmProfit: 'Ganancia PPM',
+          tireWheelProfit: 'Ganancia Ruedas y Neumáticos',
+          appearanceProfit: 'Ganancia Apariencia',
+          theftProfit: 'Ganancia Robo',
+          bundledProfit: 'Ganancia Empaquetado',
+          otherProfit: 'Otras Ganancias',
+        },
+        financialSummary: 'Resumen Financiero',
+        frontEndGross: 'Front End Bruto',
+        reserveFlat: 'Reserva/Plano',
+        backEndGross: 'Back End Bruto',
+        autoCalculated: 'Auto-Calculado',
+        totalGross: 'Total Bruto',
+        allFieldsRequired: 'Todos los campos deben completarse.',
+        cancel: 'Cancelar',
+        saveDeal: 'Guardar Oferta',
+        updateDeal: 'Actualizar Oferta',
+        savingDeal: 'Guardando Oferta...',
+        updatingDeal: 'Actualizando Oferta...',
+        addNewSalesperson: 'Agregar Nuevo Vendedor',
+        firstName: 'Nombre',
+        lastName: 'Apellido',
+        addSalesperson: 'Agregar Vendedor',
+      },
+      settings: {
+        title: 'Configuraciones',
+        teamManagement: 'Miembros del Equipo',
+        payConfiguration: 'Configurador de Pago',
+        languageSettings: 'Configuración de Idioma',
+        addNewMember: 'Agregar Nuevo Miembro del Equipo',
+        firstName: 'Nombre',
+        lastName: 'Apellido',
+        role: 'Rol',
+        addMember: 'Agregar Miembro',
+        roles: {
+          salesperson: 'Vendedor',
+          salesManager: 'Gerente de Ventas',
+        },
+        commissionBasePay: 'Comisión y Pago Base',
+        commissionRate: 'Tasa de Comisión (%)',
+        baseRate: 'Tasa Base ($)',
+        vscBonus: 'Bono VSC ($)',
+        gapBonus: 'Bono GAP ($)',
+        ppmBonus: 'Bono PPM ($)',
+        totalThreshold: 'Umbral Total ($)',
+        saveConfiguration: 'Guardar Configuración',
+        currentLanguage: 'Idioma Actual',
+        selectLanguage: 'Seleccionar Idioma',
+        languageUpdated: 'Idioma actualizado con éxito',
+      },
+    },
     common: {
       language: 'Idioma',
       login: 'Iniciar Sesión',
@@ -1058,6 +1790,220 @@ export const translations: Record<Language, Translations | Partial<Translations>
         terms: "J'accepte les conditions de service et la politique de confidentialité",
       },
     },
+    dashboard: {
+      singleFinance: {
+        title: 'Tableau de Bord du Gestionnaire Financier Individuel',
+        kpi: {
+          fiGross: 'Brut F&I',
+          dealsProcessed: 'Affaires Traitées',
+          dealTypes: 'Types d\'Affaires',
+          productsPerDeal: 'Produits par Affaire',
+          pvr: 'PVR',
+          pvrFull: 'PVR (Par Véhicule Vendu)',
+        },
+        dealTypes: {
+          finance: 'Financement',
+          cash: 'Comptant',
+          lease: 'Location',
+        },
+        productMix: {
+          title: 'Mix de Produits et Performance',
+          product: 'Produit',
+          avgProfit: 'Profit Moyen',
+          penetration: 'Pénétration',
+          extendedWarranty: 'Garantie Étendue',
+          gapInsurance: 'Assurance GAP',
+          paintProtection: 'Protection Peinture',
+          tireWheel: 'Pneus et Roues',
+          ppm: 'PPM',
+          theft: 'Protection Vol',
+          bundled: 'Groupé',
+          other: 'Autres',
+        },
+        payCalculator: {
+          title: 'Calculateur de Paie',
+          grossProfit: 'Profit Brut',
+          payPlan: 'Plan de Paie',
+          estimatedPay: 'Paie Estimée',
+          baseAmount: 'Montant de Base',
+          bonusAmount: 'Montant Bonus',
+          totalPay: 'Paie Totale',
+        },
+        dealsLog: {
+          title: 'Journal des Affaires Récentes',
+          refresh: 'Actualiser',
+          viewAll: 'Voir Tout',
+          number: '#',
+          lastName: 'Nom de Famille',
+          date: 'Date',
+          gross: 'Brut',
+          products: 'Produits',
+          status: 'Statut',
+        },
+        timePeriod: {
+          thisMonth: 'Ce Mois',
+          lastMonth: 'Mois Dernier',
+          lastQuarter: 'Dernier Trimestre',
+          ytd: 'Cumul Annuel',
+          lastYear: 'Année Dernière',
+          custom: 'Personnalisé',
+        },
+        status: {
+          pending: 'En Attente',
+          funded: 'Financé',
+          unwound: 'Annulé',
+          deadDeal: 'Affaire Morte',
+        },
+      },
+      deals: {
+        title: 'Gestionnaire Financier Individuel - Affaires',
+        backToDashboard: 'Retour au Tableau de Bord',
+        note: 'Ces affaires sont spécifiques à votre Tableau de Bord du Gestionnaire Financier Individuel et sont stockées séparément des affaires financières principales.',
+        searchPlaceholder: 'Rechercher des affaires par client, véhicule, # affaire ou VIN',
+        allStatuses: 'Tous les Statuts',
+        tableHeaders: {
+          number: '#',
+          lastName: 'Nom de Famille',
+          dealNumber: '# Affaire',
+          stockNumber: '# Stock',
+          date: 'Date',
+          vin: 'VIN',
+          vehicleType: 'N/O/CPO',
+          lender: 'Prêteur',
+          frontEnd: 'Front End',
+          vsc: 'VSC',
+          ppm: 'PPM',
+          gap: 'GAP',
+          tireWheel: 'P&R',
+          appearance: 'App',
+          theft: 'Vol',
+          bundled: 'Groupé',
+          ppd: 'PPD',
+          pvr: 'PVR',
+          total: 'Total',
+          status: 'Statut',
+          edit: 'Modifier',
+          delete: 'Supprimer',
+        },
+        vehicleTypes: {
+          new: 'N',
+          used: 'O',
+          cpo: 'C',
+        },
+        statusOptions: {
+          pending: 'En Attente',
+          funded: 'Financé',
+          held: 'Retenu',
+          unwound: 'Annulé',
+          deadDeal: 'Affaire Morte',
+        },
+        noDealsFound: 'Aucune affaire ne correspond à vos critères de recherche.',
+        noDealsYet: "Aucune affaire enregistrée encore. Utilisez le bouton 'Enregistrer Nouvelle Affaire' pour ajouter des affaires.",
+        showingDeals: 'Affichage de {count} sur {total} affaires',
+        totalGross: 'Brut Total:',
+        backEndTotal: 'Total Back End:',
+        confirmDelete: '⚠️ CONFIRMATION DE SUPPRESSION\n\nÊtes-vous sûr de vouloir supprimer cette affaire?\n\nCette action va:\n• Supprimer définitivement toutes les données de l\'affaire\n• Mettre à jour vos métriques du tableau de bord\n• Ne peut pas être annulée\n\nCliquez OK pour supprimer ou Annuler pour garder l\'affaire.',
+        finalConfirmDelete: '🚨 CONFIRMATION FINALE\n\nC\'est votre dernière chance!\n\nCliquez OK pour supprimer définitivement cette affaire, ou Annuler pour la garder.',
+        editButton: 'Modifier',
+      },
+      dealLog: {
+        title: 'Enregistrer Nouvelle Affaire',
+        editDeal: 'Modifier Affaire - Tableau de Bord Financier Individuel',
+        backToDashboard: 'Retour au Tableau de Bord',
+        note: 'Note',
+        editingNote: 'Vous modifiez une affaire existante. Les changements seront reflétés immédiatement sur votre tableau de bord.',
+        dashboardNote: 'Cette affaire apparaîtra seulement sur votre Tableau de Bord du Gestionnaire Financier Individuel et n\'affectera pas les autres tableaux de bord du système.',
+        dealInformation: 'Informations de l\'Affaire',
+        dealNumber: '# Affaire',
+        enterDealNumber: 'Entrez le numéro d\'affaire',
+        saleDate: 'Date de Vente',
+        stockNumber: '# Stock',
+        vinLast8: 'VIN # (8 Derniers)',
+        vinPlaceholder: '8 derniers du VIN',
+        vehicleType: 'Type de Véhicule',
+        vehicleTypes: {
+          new: 'Neuf',
+          used: 'Occasion',
+          cpo: 'CPO',
+        },
+        manufacturer: 'Fabricant',
+        selectManufacturer: 'Sélectionner Fabricant',
+        customerName: 'Nom de Famille du Client',
+        customerPlaceholder: 'Nom de famille du client',
+        salesperson: 'Vendeur',
+        selectSalesperson: 'Sélectionner Vendeur',
+        splitDeal: 'Affaire Partagée',
+        selectSecondSalesperson: 'Sélectionner Deuxième Vendeur',
+        salesManager: 'Directeur des Ventes',
+        selectManager: 'Sélectionner Directeur',
+        lender: 'Prêteur',
+        selectLender: 'Sélectionner Prêteur',
+        dealType: 'Type d\'Affaire',
+        dealTypes: {
+          cash: 'Comptant',
+          finance: 'Financement',
+          lease: 'Location',
+        },
+        status: 'Statut',
+        statusOptions: {
+          pending: 'En Attente',
+          funded: 'Financé',
+        },
+        productsAndProfit: 'Produits et Profit',
+        products: {
+          vscProfit: 'Profit VSC',
+          gapProfit: 'Profit GAP',
+          ppmProfit: 'Profit PPM',
+          tireWheelProfit: 'Profit Pneus et Roues',
+          appearanceProfit: 'Profit Apparence',
+          theftProfit: 'Profit Vol',
+          bundledProfit: 'Profit Groupé',
+          otherProfit: 'Autres Profits',
+        },
+        financialSummary: 'Résumé Financier',
+        frontEndGross: 'Front End Brut',
+        reserveFlat: 'Réserve/Fixe',
+        backEndGross: 'Back End Brut',
+        autoCalculated: 'Auto-Calculé',
+        totalGross: 'Brut Total',
+        allFieldsRequired: 'Tous les champs doivent être complétés.',
+        cancel: 'Annuler',
+        saveDeal: 'Sauvegarder Affaire',
+        updateDeal: 'Mettre à jour Affaire',
+        savingDeal: 'Sauvegarde Affaire...',
+        updatingDeal: 'Mise à jour Affaire...',
+        addNewSalesperson: 'Ajouter Nouveau Vendeur',
+        firstName: 'Prénom',
+        lastName: 'Nom de Famille',
+        addSalesperson: 'Ajouter Vendeur',
+      },
+      settings: {
+        title: 'Paramètres',
+        teamManagement: 'Membres de l\'Équipe',
+        payConfiguration: 'Configurateur de Paie',
+        languageSettings: 'Paramètres de Langue',
+        addNewMember: 'Ajouter Nouveau Membre d\'Équipe',
+        firstName: 'Prénom',
+        lastName: 'Nom de Famille',
+        role: 'Rôle',
+        addMember: 'Ajouter Membre',
+        roles: {
+          salesperson: 'Vendeur',
+          salesManager: 'Directeur des Ventes',
+        },
+        commissionBasePay: 'Commission et Paie de Base',
+        commissionRate: 'Taux de Commission (%)',
+        baseRate: 'Taux de Base ($)',
+        vscBonus: 'Bonus VSC ($)',
+        gapBonus: 'Bonus GAP ($)',
+        ppmBonus: 'Bonus PPM ($)',
+        totalThreshold: 'Seuil Total ($)',
+        saveConfiguration: 'Sauvegarder Configuration',
+        currentLanguage: 'Langue Actuelle',
+        selectLanguage: 'Sélectionner Langue',
+        languageUpdated: 'Langue mise à jour avec succès',
+      },
+    },
     common: {
       language: 'Langue',
       login: 'Connexion',
@@ -1270,6 +2216,220 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'Wir verfeinern unerbittlich unsere Tools, um Autohäusern zu helfen, die Leistung zu optimieren, sich an Branchentrends anzupassen und nachhaltiges Wachstum zu erreichen.',
         },
       },
+      dashboard: {
+        singleFinance: {
+          title: 'Einzel-Finanzmanager-Dashboard',
+          kpi: {
+            fiGross: 'F&I Brutto',
+            dealsProcessed: 'Verarbeitete Geschäfte',
+            dealTypes: 'Geschäftsarten',
+            productsPerDeal: 'Produkte pro Geschäft',
+            pvr: 'PVR',
+            pvrFull: 'PVR (Pro Verkauftem Fahrzeug)',
+          },
+          dealTypes: {
+            finance: 'Finanzierung',
+            cash: 'Bar',
+            lease: 'Leasing',
+          },
+          productMix: {
+            title: 'Produktmix & Leistung',
+            product: 'Produkt',
+            avgProfit: 'Durchschnittlicher Gewinn',
+            penetration: 'Penetration',
+            extendedWarranty: 'Erweiterte Garantie',
+            gapInsurance: 'GAP-Versicherung',
+            paintProtection: 'Lackschutz',
+            tireWheel: 'Reifen & Räder',
+            ppm: 'PPM',
+            theft: 'Diebstahlschutz',
+            bundled: 'Gebündelt',
+            other: 'Andere',
+          },
+          payCalculator: {
+            title: 'Gehaltsrechner',
+            grossProfit: 'Bruttogewinn',
+            payPlan: 'Gehaltsplan',
+            estimatedPay: 'Geschätztes Gehalt',
+            baseAmount: 'Grundbetrag',
+            bonusAmount: 'Bonusbetrag',
+            totalPay: 'Gesamtgehalt',
+          },
+          dealsLog: {
+            title: 'Aktuelle Geschäfte-Protokoll',
+            refresh: 'Aktualisieren',
+            viewAll: 'Alle anzeigen',
+            number: '#',
+            lastName: 'Nachname',
+            date: 'Datum',
+            gross: 'Brutto',
+            products: 'Produkte',
+            status: 'Status',
+          },
+          timePeriod: {
+            thisMonth: 'Dieser Monat',
+            lastMonth: 'Letzter Monat',
+            lastQuarter: 'Letztes Quartal',
+            ytd: 'Jahr bis heute',
+            lastYear: 'Letztes Jahr',
+            custom: 'Benutzerdefiniert',
+          },
+          status: {
+            pending: 'Ausstehend',
+            funded: 'Finanziert',
+            unwound: 'Storniert',
+            deadDeal: 'Totes Geschäft',
+          },
+        },
+        deals: {
+          title: 'Einzel-Finanzmanager - Geschäfte',
+          backToDashboard: 'Zurück zum Dashboard',
+          note: 'Diese Geschäfte sind spezifisch für Ihr Einzel-Finanzmanager-Dashboard und werden getrennt von den Hauptfinanzgeschäften gespeichert.',
+          searchPlaceholder: 'Geschäfte suchen nach Kunde, Fahrzeug, Geschäfts# oder VIN',
+          allStatuses: 'Alle Status',
+          tableHeaders: {
+            number: '#',
+            lastName: 'Nachname',
+            dealNumber: 'Geschäfts#',
+            stockNumber: 'Lager#',
+            date: 'Datum',
+            vin: 'VIN',
+            vehicleType: 'N/G/CPO',
+            lender: 'Kreditgeber',
+            frontEnd: 'Frontend',
+            vsc: 'VSC',
+            ppm: 'PPM',
+            gap: 'GAP',
+            tireWheel: 'R&R',
+            appearance: 'Aufbereitung',
+            theft: 'Diebstahl',
+            bundled: 'Gebündelt',
+            ppd: 'PPD',
+            pvr: 'PVR',
+            total: 'Gesamt',
+            status: 'Status',
+            edit: 'Bearbeiten',
+            delete: 'Löschen',
+          },
+          vehicleTypes: {
+            new: 'N',
+            used: 'G',
+            cpo: 'C',
+          },
+          statusOptions: {
+            pending: 'Ausstehend',
+            funded: 'Finanziert',
+            held: 'Gehalten',
+            unwound: 'Storniert',
+            deadDeal: 'Totes Geschäft',
+          },
+          noDealsFound: 'Keine Geschäfte entsprechen Ihren Suchkriterien.',
+          noDealsYet: "Noch keine Geschäfte protokolliert. Verwenden Sie die Schaltfläche 'Neues Geschäft protokollieren', um Geschäfte hinzuzufügen.",
+          showingDeals: 'Zeige {count} von {total} Geschäften',
+          totalGross: 'Gesamtbrutto:',
+          backEndTotal: 'Backend-Gesamt:',
+          confirmDelete: '⚠️ LÖSCHBESTÄTIGUNG\n\nSind Sie sicher, dass Sie dieses Geschäft löschen möchten?\n\nDiese Aktion wird:\n• Alle Geschäftsdaten dauerhaft entfernen\n• Ihre Dashboard-Metriken aktualisieren\n• Kann nicht rückgängig gemacht werden\n\nKlicken Sie OK zum Löschen oder Abbrechen zum Behalten des Geschäfts.',
+          finalConfirmDelete: '🚨 ENDGÜLTIGE BESTÄTIGUNG\n\nDies ist Ihre letzte Chance!\n\nKlicken Sie OK, um dieses Geschäft dauerhaft zu löschen, oder Abbrechen, um es zu behalten.',
+          editButton: 'Bearbeiten',
+        },
+        dealLog: {
+          title: 'Neues Geschäft Protokollieren',
+          editDeal: 'Geschäft Bearbeiten - Einzel-Finanz-Dashboard',
+          backToDashboard: 'Zurück zum Dashboard',
+          note: 'Hinweis',
+          editingNote: 'Sie bearbeiten ein bestehendes Geschäft. Änderungen werden sofort in Ihrem Dashboard angezeigt.',
+          dashboardNote: 'Dieses Geschäft erscheint nur auf Ihrem Einzel-Finanzmanager-Dashboard und beeinflusst keine anderen Dashboards im System.',
+          dealInformation: 'Geschäftsinformationen',
+          dealNumber: 'Geschäfts#',
+          enterDealNumber: 'Geschäftsnummer eingeben',
+          saleDate: 'Verkaufsdatum',
+          stockNumber: 'Lager#',
+          vinLast8: 'VIN# (Letzte 8)',
+          vinPlaceholder: 'Letzte 8 der VIN',
+          vehicleType: 'Fahrzeugtyp',
+          vehicleTypes: {
+            new: 'Neu',
+            used: 'Gebraucht',
+            cpo: 'CPO',
+          },
+          manufacturer: 'Hersteller',
+          selectManufacturer: 'Hersteller auswählen',
+          customerName: 'Kundenname',
+          customerPlaceholder: 'Nachname des Kunden',
+          salesperson: 'Verkäufer',
+          selectSalesperson: 'Verkäufer auswählen',
+          splitDeal: 'Geteiltes Geschäft',
+          selectSecondSalesperson: 'Zweiten Verkäufer auswählen',
+          salesManager: 'Verkaufsleiter',
+          selectManager: 'Manager auswählen',
+          lender: 'Kreditgeber',
+          selectLender: 'Kreditgeber auswählen',
+          dealType: 'Geschäftsart',
+          dealTypes: {
+            cash: 'Bar',
+            finance: 'Finanzierung',
+            lease: 'Leasing',
+          },
+          status: 'Status',
+          statusOptions: {
+            pending: 'Ausstehend',
+            funded: 'Finanziert',
+          },
+          productsAndProfit: 'Produkte und Gewinn',
+          products: {
+            vscProfit: 'VSC-Gewinn',
+            gapProfit: 'GAP-Gewinn',
+            ppmProfit: 'PPM-Gewinn',
+            tireWheelProfit: 'Reifen & Räder Gewinn',
+            appearanceProfit: 'Aufbereitungs-Gewinn',
+            theftProfit: 'Diebstahl-Gewinn',
+            bundledProfit: 'Gebündelter Gewinn',
+            otherProfit: 'Anderer Gewinn',
+          },
+          financialSummary: 'Finanzzusammenfassung',
+          frontEndGross: 'Frontend Brutto',
+          reserveFlat: 'Reserve/Pauschale',
+          backEndGross: 'Backend Brutto',
+          autoCalculated: 'Automatisch Berechnet',
+          totalGross: 'Gesamtbrutto',
+          allFieldsRequired: 'Alle Felder müssen ausgefüllt werden.',
+          cancel: 'Abbrechen',
+          saveDeal: 'Geschäft Speichern',
+          updateDeal: 'Geschäft Aktualisieren',
+          savingDeal: 'Geschäft Speichern...',
+          updatingDeal: 'Geschäft Aktualisieren...',
+          addNewSalesperson: 'Neuen Verkäufer Hinzufügen',
+          firstName: 'Vorname',
+          lastName: 'Nachname',
+          addSalesperson: 'Verkäufer Hinzufügen',
+        },
+        settings: {
+          title: 'Einstellungen',
+          teamManagement: 'Team-Mitglieder',
+          payConfiguration: 'Gehalts-Konfigurator',
+          languageSettings: 'Spracheinstellungen',
+          addNewMember: 'Neues Team-Mitglied Hinzufügen',
+          firstName: 'Vorname',
+          lastName: 'Nachname',
+          role: 'Rolle',
+          addMember: 'Mitglied Hinzufügen',
+          roles: {
+            salesperson: 'Verkäufer',
+            salesManager: 'Verkaufsleiter',
+          },
+          commissionBasePay: 'Provision & Grundgehalt',
+          commissionRate: 'Provisionssatz (%)',
+          baseRate: 'Grundsatz ($)',
+          vscBonus: 'VSC-Bonus ($)',
+          gapBonus: 'GAP-Bonus ($)',
+          ppmBonus: 'PPM-Bonus ($)',
+          totalThreshold: 'Gesamtschwelle ($)',
+          saveConfiguration: 'Konfiguration Speichern',
+          currentLanguage: 'Aktuelle Sprache',
+          selectLanguage: 'Sprache Auswählen',
+          languageUpdated: 'Sprache erfolgreich aktualisiert',
+        },
+      },
       contact: {
         title: 'Kontaktieren Sie uns',
         subtitle: 'Máte otázky? Rádi vám pomůžeme.',
@@ -1341,6 +2501,142 @@ export const translations: Record<Language, Translations | Partial<Translations>
       },
       subscription: {
         title: 'Dohoda o předplatném',
+      },
+    },
+    dashboard: {
+      singleFinance: {
+        title: 'Dashboard jednoduchého finančního manažera',
+        kpi: {
+          fiGross: 'F&I Hrubý',
+          dealsProcessed: 'Zpracované obchody',
+          avgDealSize: 'Průměrná velikost obchodu',
+          vscs: 'VSCs',
+          gaps: 'GAPs',
+          ppms: 'PPMs',
+        },
+        deals: {
+          title: 'Správa obchodů',
+          recentDeals: 'Nedávné obchody',
+          allDeals: 'Všechny obchody',
+          viewAll: 'Zobrazit všechny obchody',
+          addNew: 'Přidat nový obchod',
+          searchPlaceholder: 'Hledat podle jména zákazníka, VIN nebo čísla obchodu...',
+          allStatuses: 'Všechny statusy',
+          backToDashboard: 'Zpět na dashboard',
+          noDealsYet: 'Zatím žádné obchody. Začněte přidáním prvního obchodu.',
+          noDealsFound: 'Nebyl nalezen žádný obchod odpovídající vašim kritériím.',
+          showingDeals: 'Zobrazuje se {count} z {total} obchodů',
+          totalGross: 'Celkový hrubý zisk:',
+          backEndTotal: 'Celkem back-end:',
+          confirmDelete: 'Opravdu chcete smazat tento obchod? Tato akce je nevratná.',
+          finalConfirmDelete: 'Toto je vaše finální potvrzení. Obchod bude trvale smazán. Pokračovat?',
+          editButton: 'Upravit',
+          note: 'Toto jsou vaše zpracované obchody. Můžete je upravovat, mazat nebo měnit jejich stav.',
+          statusOptions: {
+            pending: 'Nevyřízený',
+            funded: 'Financovaný',
+            held: 'Pozastavený',
+            unwound: 'Zrušený',
+            deadDeal: 'Mrtvý obchod',
+          },
+          tableHeaders: {
+            number: '#',
+            lastName: 'Příjmení',
+            dealNumber: 'Číslo obchodu',
+            stockNumber: 'Skladové číslo',
+            date: 'Datum',
+            vin: 'VIN',
+            vehicleType: 'Typ',
+            lender: 'Věřitel',
+            frontEnd: 'Front-End',
+            vsc: 'VSC',
+            ppm: 'PPM',
+            gap: 'GAP',
+            tireWheel: 'T&W',
+            appearance: 'Vzhled',
+            theft: 'Krádež',
+            bundled: 'Balíček',
+            ppd: 'PPD',
+            pvr: 'PVR',
+            total: 'Celkem',
+            status: 'Stav',
+            edit: 'Upravit',
+            delete: 'Smazat',
+          },
+        },
+        dealLog: {
+          title: 'Protokol nového obchodu',
+          note: 'Všechna pole označená * jsou povinná. Ujistěte se, že jste zadali přesné informace pro správné sledování.',
+          customerInfo: 'Informace o zákazníkovi',
+          dealInfo: 'Informace o obchodu',
+          vehicleInfo: 'Informace o vozidle',
+          profitInfo: 'Informace o zisku',
+          firstName: 'Jméno *',
+          lastName: 'Příjmení *',
+          dealNumber: 'Číslo obchodu *',
+          stockNumber: 'Skladové číslo *',
+          vinLast8: 'Posledních 8 znaků VIN *',
+          dealDate: 'Datum obchodu *',
+          vehicleType: 'Typ vozidla *',
+          vehicleTypes: {
+            new: 'Nové',
+            used: 'Použité',
+            cpo: 'CPO',
+          },
+          lender: 'Věřitel',
+          frontEndGross: 'Front-End hrubý ($)',
+          vscProfit: 'VSC zisk ($)',
+          ppmProfit: 'PPM zisk ($)',
+          gapProfit: 'GAP zisk ($)',
+          tireAndWheelProfit: 'Pneumatiky & kola zisk ($)',
+          appearanceProfit: 'Vzhled zisk ($)',
+          theftProfit: 'Krádež zisk ($)',
+          bundledProfit: 'Balíček zisk ($)',
+          dealStatus: 'Stav obchodu',
+          saveDeal: 'Uložit obchod',
+          cancel: 'Zrušit',
+          success: 'Obchod byl úspěšně uložen!',
+          error: 'Chyba při ukládání obchodu. Zkuste to znovu.',
+          backEndGross: 'Back-end hrubý zisk vypočítán z jednotlivých zisků produktů',
+          totalGross: 'Celkový hrubý zisk (Front-end + Back-end)',
+          salesperson: 'Obchodník',
+          salespeople: 'Obchodníci',
+          selectSalesperson: 'Vyberte obchodníka',
+          addSalesperson: 'Přidat obchodníka',
+          noSalespeople: 'Nejsou k dispozici žádní obchodníci. Přidejte je v Nastavení.',
+          validationErrors: {
+            firstName: 'Jméno je povinné',
+            lastName: 'Příjmení je povinné',
+            dealNumber: 'Číslo obchodu je povinné',
+            stockNumber: 'Skladové číslo je povinné',
+            vinLast8: 'Posledních 8 znaků VIN je povinných',
+            dealDate: 'Datum obchodu je povinné',
+            vehicleType: 'Typ vozidla je povinný',
+            lender: 'Věřitel je povinný pro tento typ obchodu',
+          },
+        },
+        settings: {
+          title: 'Nastavení',
+          teamManagement: 'Správa týmu',
+          payConfiguration: 'Konfigurace platů',
+          languageSettings: 'Nastavení jazyka',
+          addNewMember: 'Přidat nového člena týmu',
+          firstName: 'Jméno',
+          lastName: 'Příjmení',
+          role: 'Role',
+          roles: {
+            salesperson: 'Obchodník',
+            salesManager: 'Manažer prodeje',
+          },
+          addMember: 'Přidat člena',
+          commissionBasePay: 'Provize a základní mzda',
+          commissionRate: 'Sazba provize (%)',
+          baseRate: 'Základní měsíční sazba ($)',
+          saveConfiguration: 'Uložit konfiguraci',
+          currentLanguage: 'Aktuální jazyk',
+          selectLanguage: 'Vybrat jazyk',
+          languageUpdated: 'Jazyk byl úspěšně aktualizován',
+        },
       },
     },
   } as Partial<Translations>,
@@ -1823,6 +3119,142 @@ export const translations: Record<Language, Translations | Partial<Translations>
         title: 'Accordo di abbonamento',
       },
     },
+    dashboard: {
+      singleFinance: {
+        title: 'Dashboard del Finance Manager',
+        kpi: {
+          fiGross: 'F&I Lordo',
+          dealsProcessed: 'Affare Elaborati',
+          avgDealSize: 'Dimensione Media Affare',
+          vscs: 'VSCs',
+          gaps: 'GAPs',
+          ppms: 'PPMs',
+        },
+        deals: {
+          title: 'Gestione Affari',
+          recentDeals: 'Affari Recenti',
+          allDeals: 'Tutti gli Affari',
+          viewAll: 'Visualizza tutti gli affari',
+          addNew: 'Aggiungi nuovo affare',
+          searchPlaceholder: 'Cerca per nome cliente, VIN o numero affare...',
+          allStatuses: 'Tutti gli stati',
+          backToDashboard: 'Torna alla dashboard',
+          noDealsYet: 'Nessun affare ancora. Inizia aggiungendo il tuo primo affare.',
+          noDealsFound: 'Nessun affare trovato che corrisponda ai tuoi criteri.',
+          showingDeals: 'Mostrando {count} di {total} affari',
+          totalGross: 'Totale Lordo:',
+          backEndTotal: 'Totale Back-end:',
+          confirmDelete: 'Sei sicuro di voler eliminare questo affare? Questa azione è irreversibile.',
+          finalConfirmDelete: 'Questa è la tua conferma finale. L\'affare sarà eliminato permanentemente. Continuare?',
+          editButton: 'Modifica',
+          note: 'Questi sono i tuoi affari elaborati. Puoi modificarli, eliminarli o cambiare il loro stato.',
+          statusOptions: {
+            pending: 'In Attesa',
+            funded: 'Finanziato',
+            held: 'Sospeso',
+            unwound: 'Annullato',
+            deadDeal: 'Affare Morto',
+          },
+          tableHeaders: {
+            number: '#',
+            lastName: 'Cognome',
+            dealNumber: 'Numero Affare',
+            stockNumber: 'Numero Stock',
+            date: 'Data',
+            vin: 'VIN',
+            vehicleType: 'Tipo',
+            lender: 'Prestatore',
+            frontEnd: 'Front-End',
+            vsc: 'VSC',
+            ppm: 'PPM',
+            gap: 'GAP',
+            tireWheel: 'P&C',
+            appearance: 'Aspetto',
+            theft: 'Furto',
+            bundled: 'Pacchetto',
+            ppd: 'PPD',
+            pvr: 'PVR',
+            total: 'Totale',
+            status: 'Stato',
+            edit: 'Modifica',
+            delete: 'Elimina',
+          },
+        },
+        dealLog: {
+          title: 'Registro Nuovo Affare',
+          note: 'Tutti i campi contrassegnati con * sono obbligatori. Assicurati di inserire informazioni accurate per un tracking corretto.',
+          customerInfo: 'Informazioni Cliente',
+          dealInfo: 'Informazioni Affare',
+          vehicleInfo: 'Informazioni Veicolo',
+          profitInfo: 'Informazioni Profitto',
+          firstName: 'Nome *',
+          lastName: 'Cognome *',
+          dealNumber: 'Numero Affare *',
+          stockNumber: 'Numero Stock *',
+          vinLast8: 'Ultimi 8 del VIN *',
+          dealDate: 'Data Affare *',
+          vehicleType: 'Tipo Veicolo *',
+          vehicleTypes: {
+            new: 'Nuovo',
+            used: 'Usato',
+            cpo: 'CPO',
+          },
+          lender: 'Prestatore',
+          frontEndGross: 'Front-End Lordo (€)',
+          vscProfit: 'Profitto VSC (€)',
+          ppmProfit: 'Profitto PPM (€)',
+          gapProfit: 'Profitto GAP (€)',
+          tireAndWheelProfit: 'Profitto Pneumatici & Cerchi (€)',
+          appearanceProfit: 'Profitto Aspetto (€)',
+          theftProfit: 'Profitto Furto (€)',
+          bundledProfit: 'Profitto Pacchetto (€)',
+          dealStatus: 'Stato Affare',
+          saveDeal: 'Salva Affare',
+          cancel: 'Annulla',
+          success: 'Affare salvato con successo!',
+          error: 'Errore nel salvare l\'affare. Riprova.',
+          backEndGross: 'Profitto Back-end lordo calcolato dai singoli profitti dei prodotti',
+          totalGross: 'Profitto totale lordo (Front-end + Back-end)',
+          salesperson: 'Venditore',
+          salespeople: 'Venditori',
+          selectSalesperson: 'Seleziona venditore',
+          addSalesperson: 'Aggiungi venditore',
+          noSalespeople: 'Nessun venditore disponibile. Aggiungili nelle Impostazioni.',
+          validationErrors: {
+            firstName: 'Il nome è obbligatorio',
+            lastName: 'Il cognome è obbligatorio',
+            dealNumber: 'Il numero affare è obbligatorio',
+            stockNumber: 'Il numero stock è obbligatorio',
+            vinLast8: 'Gli ultimi 8 del VIN sono obbligatori',
+            dealDate: 'La data affare è obbligatoria',
+            vehicleType: 'Il tipo veicolo è obbligatorio',
+            lender: 'Il prestatore è obbligatorio per questo tipo di affare',
+          },
+        },
+        settings: {
+          title: 'Impostazioni',
+          teamManagement: 'Gestione Team',
+          payConfiguration: 'Configurazione Paghe',
+          languageSettings: 'Impostazioni Lingua',
+          addNewMember: 'Aggiungi nuovo membro del team',
+          firstName: 'Nome',
+          lastName: 'Cognome',
+          role: 'Ruolo',
+          roles: {
+            salesperson: 'Venditore',
+            salesManager: 'Manager Vendite',
+          },
+          addMember: 'Aggiungi Membro',
+          commissionBasePay: 'Commissioni e Paga Base',
+          commissionRate: 'Tasso Commissione (%)',
+          baseRate: 'Tasso Base Mensile (€)',
+          saveConfiguration: 'Salva Configurazione',
+          currentLanguage: 'Lingua Corrente',
+          selectLanguage: 'Seleziona Lingua',
+          languageUpdated: 'Lingua aggiornata con successo',
+        },
+      },
+    },
   } as Partial<Translations>,
   pl: {
     nav: {
@@ -2059,6 +3491,142 @@ export const translations: Record<Language, Translations | Partial<Translations>
       },
       subscription: {
         title: 'Umowa subskrypcji',
+      },
+    },
+    dashboard: {
+      singleFinance: {
+        title: 'Dashboard Menedżera Finansowego',
+        kpi: {
+          fiGross: 'F&I Brutto',
+          dealsProcessed: 'Przetworzone Oferty',
+          avgDealSize: 'Średni Rozmiar Oferty',
+          vscs: 'VSCs',
+          gaps: 'GAPs',
+          ppms: 'PPMs',
+        },
+        deals: {
+          title: 'Zarządzanie Ofertami',
+          recentDeals: 'Ostatnie Oferty',
+          allDeals: 'Wszystkie Oferty',
+          viewAll: 'Zobacz wszystkie oferty',
+          addNew: 'Dodaj nową ofertę',
+          searchPlaceholder: 'Szukaj według nazwy klienta, VIN lub numeru oferty...',
+          allStatuses: 'Wszystkie statusy',
+          backToDashboard: 'Powrót do pulpitu',
+          noDealsYet: 'Brak ofert. Zacznij od dodania pierwszej oferty.',
+          noDealsFound: 'Nie znaleziono ofert odpowiadających Twoim kryteriom.',
+          showingDeals: 'Pokazano {count} z {total} ofert',
+          totalGross: 'Całkowity Brutto:',
+          backEndTotal: 'Całkowity Back-end:',
+          confirmDelete: 'Czy na pewno chcesz usunąć tę ofertę? Ta akcja jest nieodwracalna.',
+          finalConfirmDelete: 'To jest ostateczne potwierdzenie. Oferta zostanie trwale usunięta. Kontynuować?',
+          editButton: 'Edytuj',
+          note: 'To są Twoje przetworzone oferty. Możesz je edytować, usuwać lub zmieniać ich status.',
+          statusOptions: {
+            pending: 'Oczekujące',
+            funded: 'Sfinansowane',
+            held: 'Wstrzymane',
+            unwound: 'Anulowane',
+            deadDeal: 'Martwa Oferta',
+          },
+          tableHeaders: {
+            number: '#',
+            lastName: 'Nazwisko',
+            dealNumber: 'Numer Oferty',
+            stockNumber: 'Numer Magazynowy',
+            date: 'Data',
+            vin: 'VIN',
+            vehicleType: 'Typ',
+            lender: 'Pożyczkodawca',
+            frontEnd: 'Front-End',
+            vsc: 'VSC',
+            ppm: 'PPM',
+            gap: 'GAP',
+            tireWheel: 'O&K',
+            appearance: 'Wygląd',
+            theft: 'Kradzież',
+            bundled: 'Pakiet',
+            ppd: 'PPD',
+            pvr: 'PVR',
+            total: 'Razem',
+            status: 'Status',
+            edit: 'Edytuj',
+            delete: 'Usuń',
+          },
+        },
+        dealLog: {
+          title: 'Rejestr Nowej Oferty',
+          note: 'Wszystkie pola oznaczone * są wymagane. Upewnij się, że podasz dokładne informacje dla właściwego śledzenia.',
+          customerInfo: 'Informacje o Kliencie',
+          dealInfo: 'Informacje o Ofercie',
+          vehicleInfo: 'Informacje o Pojeździe',
+          profitInfo: 'Informacje o Zysku',
+          firstName: 'Imię *',
+          lastName: 'Nazwisko *',
+          dealNumber: 'Numer Oferty *',
+          stockNumber: 'Numer Magazynowy *',
+          vinLast8: 'Ostatnie 8 cyfr VIN *',
+          dealDate: 'Data Oferty *',
+          vehicleType: 'Typ Pojazdu *',
+          vehicleTypes: {
+            new: 'Nowy',
+            used: 'Używany',
+            cpo: 'CPO',
+          },
+          lender: 'Pożyczkodawca',
+          frontEndGross: 'Front-End Brutto (zł)',
+          vscProfit: 'Zysk VSC (zł)',
+          ppmProfit: 'Zysk PPM (zł)',
+          gapProfit: 'Zysk GAP (zł)',
+          tireAndWheelProfit: 'Zysk Opony & Koła (zł)',
+          appearanceProfit: 'Zysk Wygląd (zł)',
+          theftProfit: 'Zysk Kradzież (zł)',
+          bundledProfit: 'Zysk Pakiet (zł)',
+          dealStatus: 'Status Oferty',
+          saveDeal: 'Zapisz Ofertę',
+          cancel: 'Anuluj',
+          success: 'Oferta zapisana pomyślnie!',
+          error: 'Błąd podczas zapisywania oferty. Spróbuj ponownie.',
+          backEndGross: 'Zysk Back-end brutto obliczony z poszczególnych zysków produktów',
+          totalGross: 'Całkowity zysk brutto (Front-end + Back-end)',
+          salesperson: 'Sprzedawca',
+          salespeople: 'Sprzedawcy',
+          selectSalesperson: 'Wybierz sprzedawcę',
+          addSalesperson: 'Dodaj sprzedawcę',
+          noSalespeople: 'Brak dostępnych sprzedawców. Dodaj ich w Ustawieniach.',
+          validationErrors: {
+            firstName: 'Imię jest wymagane',
+            lastName: 'Nazwisko jest wymagane',
+            dealNumber: 'Numer oferty jest wymagany',
+            stockNumber: 'Numer magazynowy jest wymagany',
+            vinLast8: 'Ostatnie 8 cyfr VIN jest wymagane',
+            dealDate: 'Data oferty jest wymagana',
+            vehicleType: 'Typ pojazdu jest wymagany',
+            lender: 'Pożyczkodawca jest wymagany dla tego typu oferty',
+          },
+        },
+        settings: {
+          title: 'Ustawienia',
+          teamManagement: 'Zarządzanie Zespołem',
+          payConfiguration: 'Konfiguracja Płac',
+          languageSettings: 'Ustawienia Języka',
+          addNewMember: 'Dodaj nowego członka zespołu',
+          firstName: 'Imię',
+          lastName: 'Nazwisko',
+          role: 'Rola',
+          roles: {
+            salesperson: 'Sprzedawca',
+            salesManager: 'Menedżer Sprzedaży',
+          },
+          addMember: 'Dodaj Członka',
+          commissionBasePay: 'Prowizje i Płaca Podstawowa',
+          commissionRate: 'Stawka Prowizji (%)',
+          baseRate: 'Podstawowa Stawka Miesięczna (zł)',
+          saveConfiguration: 'Zapisz Konfigurację',
+          currentLanguage: 'Obecny Język',
+          selectLanguage: 'Wybierz Język',
+          languageUpdated: 'Język zaktualizowany pomyślnie',
+        },
       },
     },
   } as Partial<Translations>,
@@ -2304,6 +3872,142 @@ export const translations: Record<Language, Translations | Partial<Translations>
         title: 'Acordo de Assinatura',
       },
     },
+    dashboard: {
+      singleFinance: {
+        title: 'Dashboard do Gerente Financeiro',
+        kpi: {
+          fiGross: 'F&I Bruto',
+          dealsProcessed: 'Negócios Processados',
+          avgDealSize: 'Tamanho Médio do Negócio',
+          vscs: 'VSCs',
+          gaps: 'GAPs',
+          ppms: 'PPMs',
+        },
+        deals: {
+          title: 'Gestão de Negócios',
+          recentDeals: 'Negócios Recentes',
+          allDeals: 'Todos os Negócios',
+          viewAll: 'Ver todos os negócios',
+          addNew: 'Adicionar novo negócio',
+          searchPlaceholder: 'Pesquisar por nome do cliente, VIN ou número do negócio...',
+          allStatuses: 'Todos os status',
+          backToDashboard: 'Voltar ao dashboard',
+          noDealsYet: 'Nenhum negócio ainda. Comece adicionando seu primeiro negócio.',
+          noDealsFound: 'Nenhum negócio encontrado que corresponda aos seus critérios.',
+          showingDeals: 'Mostrando {count} de {total} negócios',
+          totalGross: 'Total Bruto:',
+          backEndTotal: 'Total Back-end:',
+          confirmDelete: 'Tem certeza de que deseja excluir este negócio? Esta ação é irreversível.',
+          finalConfirmDelete: 'Esta é sua confirmação final. O negócio será excluído permanentemente. Continuar?',
+          editButton: 'Editar',
+          note: 'Estes são seus negócios processados. Você pode editá-los, excluí-los ou alterar seu status.',
+          statusOptions: {
+            pending: 'Pendente',
+            funded: 'Financiado',
+            held: 'Retido',
+            unwound: 'Cancelado',
+            deadDeal: 'Negócio Morto',
+          },
+          tableHeaders: {
+            number: '#',
+            lastName: 'Sobrenome',
+            dealNumber: 'Número do Negócio',
+            stockNumber: 'Número de Estoque',
+            date: 'Data',
+            vin: 'VIN',
+            vehicleType: 'Tipo',
+            lender: 'Credor',
+            frontEnd: 'Front-End',
+            vsc: 'VSC',
+            ppm: 'PPM',
+            gap: 'GAP',
+            tireWheel: 'P&R',
+            appearance: 'Aparência',
+            theft: 'Roubo',
+            bundled: 'Pacote',
+            ppd: 'PPD',
+            pvr: 'PVR',
+            total: 'Total',
+            status: 'Status',
+            edit: 'Editar',
+            delete: 'Excluir',
+          },
+        },
+        dealLog: {
+          title: 'Registro de Novo Negócio',
+          note: 'Todos os campos marcados com * são obrigatórios. Certifique-se de inserir informações precisas para rastreamento adequado.',
+          customerInfo: 'Informações do Cliente',
+          dealInfo: 'Informações do Negócio',
+          vehicleInfo: 'Informações do Veículo',
+          profitInfo: 'Informações de Lucro',
+          firstName: 'Nome *',
+          lastName: 'Sobrenome *',
+          dealNumber: 'Número do Negócio *',
+          stockNumber: 'Número de Estoque *',
+          vinLast8: 'Últimos 8 do VIN *',
+          dealDate: 'Data do Negócio *',
+          vehicleType: 'Tipo de Veículo *',
+          vehicleTypes: {
+            new: 'Novo',
+            used: 'Usado',
+            cpo: 'CPO',
+          },
+          lender: 'Credor',
+          frontEndGross: 'Front-End Bruto (R$)',
+          vscProfit: 'Lucro VSC (R$)',
+          ppmProfit: 'Lucro PPM (R$)',
+          gapProfit: 'Lucro GAP (R$)',
+          tireAndWheelProfit: 'Lucro Pneus & Rodas (R$)',
+          appearanceProfit: 'Lucro Aparência (R$)',
+          theftProfit: 'Lucro Roubo (R$)',
+          bundledProfit: 'Lucro Pacote (R$)',
+          dealStatus: 'Status do Negócio',
+          saveDeal: 'Salvar Negócio',
+          cancel: 'Cancelar',
+          success: 'Negócio salvo com sucesso!',
+          error: 'Erro ao salvar negócio. Tente novamente.',
+          backEndGross: 'Lucro Back-end bruto calculado a partir de lucros individuais de produtos',
+          totalGross: 'Lucro total bruto (Front-end + Back-end)',
+          salesperson: 'Vendedor',
+          salespeople: 'Vendedores',
+          selectSalesperson: 'Selecionar vendedor',
+          addSalesperson: 'Adicionar vendedor',
+          noSalespeople: 'Nenhum vendedor disponível. Adicione-os nas Configurações.',
+          validationErrors: {
+            firstName: 'O nome é obrigatório',
+            lastName: 'O sobrenome é obrigatório',
+            dealNumber: 'O número do negócio é obrigatório',
+            stockNumber: 'O número de estoque é obrigatório',
+            vinLast8: 'Os últimos 8 do VIN são obrigatórios',
+            dealDate: 'A data do negócio é obrigatória',
+            vehicleType: 'O tipo de veículo é obrigatório',
+            lender: 'O credor é obrigatório para este tipo de negócio',
+          },
+        },
+        settings: {
+          title: 'Configurações',
+          teamManagement: 'Gestão de Equipe',
+          payConfiguration: 'Configuração de Pagamentos',
+          languageSettings: 'Configurações de Idioma',
+          addNewMember: 'Adicionar novo membro da equipe',
+          firstName: 'Nome',
+          lastName: 'Sobrenome',
+          role: 'Função',
+          roles: {
+            salesperson: 'Vendedor',
+            salesManager: 'Gerente de Vendas',
+          },
+          addMember: 'Adicionar Membro',
+          commissionBasePay: 'Comissões e Salário Base',
+          commissionRate: 'Taxa de Comissão (%)',
+          baseRate: 'Taxa Base Mensal (R$)',
+          saveConfiguration: 'Salvar Configuração',
+          currentLanguage: 'Idioma Atual',
+          selectLanguage: 'Selecionar Idioma',
+          languageUpdated: 'Idioma atualizado com sucesso',
+        },
+      },
+    },
   } as Translations,
   gr: {
     nav: {
@@ -2545,6 +4249,142 @@ export const translations: Record<Language, Translations | Partial<Translations>
       },
       subscription: {
         title: 'Συμφωνία Συνδρομής',
+      },
+    },
+    dashboard: {
+      singleFinance: {
+        title: 'Dashboard Διαχειριστή Χρηματοδότησης',
+        kpi: {
+          fiGross: 'F&I Μικτό',
+          dealsProcessed: 'Επεξεργασμένες Συμφωνίες',
+          avgDealSize: 'Μέσο Μέγεθος Συμφωνίας',
+          vscs: 'VSCs',
+          gaps: 'GAPs',
+          ppms: 'PPMs',
+        },
+        deals: {
+          title: 'Διαχείριση Συμφωνιών',
+          recentDeals: 'Πρόσφατες Συμφωνίες',
+          allDeals: 'Όλες οι Συμφωνίες',
+          viewAll: 'Προβολή όλων των συμφωνιών',
+          addNew: 'Προσθήκη νέας συμφωνίας',
+          searchPlaceholder: 'Αναζήτηση με όνομα πελάτη, VIN ή αριθμό συμφωνίας...',
+          allStatuses: 'Όλες οι καταστάσεις',
+          backToDashboard: 'Επιστροφή στο dashboard',
+          noDealsYet: 'Καμία συμφωνία ακόμα. Ξεκινήστε προσθέτοντας την πρώτη συμφωνία.',
+          noDealsFound: 'Δεν βρέθηκε συμφωνία που να ταιριάζει με τα κριτήριά σας.',
+          showingDeals: 'Εμφάνιση {count} από {total} συμφωνίες',
+          totalGross: 'Συνολικό Μικτό:',
+          backEndTotal: 'Συνολικό Back-end:',
+          confirmDelete: 'Είστε σίγουροι ότι θέλετε να διαγράψετε αυτή τη συμφωνία; Αυτή η ενέργεια είναι μη αναστρέψιμη.',
+          finalConfirmDelete: 'Αυτή είναι η τελική επιβεβαίωσή σας. Η συμφωνία θα διαγραφεί οριστικά. Συνέχεια;',
+          editButton: 'Επεξεργασία',
+          note: 'Αυτές είναι οι επεξεργασμένες συμφωνίες σας. Μπορείτε να τις επεξεργαστείτε, να τις διαγράψετε ή να αλλάξετε την κατάστασή τους.',
+          statusOptions: {
+            pending: 'Εκκρεμής',
+            funded: 'Χρηματοδοτήθηκε',
+            held: 'Αναμονή',
+            unwound: 'Ακυρώθηκε',
+            deadDeal: 'Νεκρή Συμφωνία',
+          },
+          tableHeaders: {
+            number: '#',
+            lastName: 'Επώνυμο',
+            dealNumber: 'Αριθμός Συμφωνίας',
+            stockNumber: 'Αριθμός Αποθέματος',
+            date: 'Ημερομηνία',
+            vin: 'VIN',
+            vehicleType: 'Τύπος',
+            lender: 'Δανειστής',
+            frontEnd: 'Front-End',
+            vsc: 'VSC',
+            ppm: 'PPM',
+            gap: 'GAP',
+            tireWheel: 'Λ&Ζ',
+            appearance: 'Εμφάνιση',
+            theft: 'Κλοπή',
+            bundled: 'Πακέτο',
+            ppd: 'PPD',
+            pvr: 'PVR',
+            total: 'Σύνολο',
+            status: 'Κατάσταση',
+            edit: 'Επεξεργασία',
+            delete: 'Διαγραφή',
+          },
+        },
+        dealLog: {
+          title: 'Αρχείο Νέας Συμφωνίας',
+          note: 'Όλα τα πεδία που επισημαίνονται με * είναι υποχρεωτικά. Βεβαιωθείτε ότι εισάγετε ακριβείς πληροφορίες για σωστή παρακολούθηση.',
+          customerInfo: 'Πληροφορίες Πελάτη',
+          dealInfo: 'Πληροφορίες Συμφωνίας',
+          vehicleInfo: 'Πληροφορίες Οχήματος',
+          profitInfo: 'Πληροφορίες Κέρδους',
+          firstName: 'Όνομα *',
+          lastName: 'Επώνυμο *',
+          dealNumber: 'Αριθμός Συμφωνίας *',
+          stockNumber: 'Αριθμός Αποθέματος *',
+          vinLast8: 'Τελευταία 8 του VIN *',
+          dealDate: 'Ημερομηνία Συμφωνίας *',
+          vehicleType: 'Τύπος Οχήματος *',
+          vehicleTypes: {
+            new: 'Καινούργιο',
+            used: 'Μεταχειρισμένο',
+            cpo: 'CPO',
+          },
+          lender: 'Δανειστής',
+          frontEndGross: 'Front-End Μικτό (€)',
+          vscProfit: 'Κέρδος VSC (€)',
+          ppmProfit: 'Κέρδος PPM (€)',
+          gapProfit: 'Κέρδος GAP (€)',
+          tireAndWheelProfit: 'Κέρδος Λάστιχα & Ζάντες (€)',
+          appearanceProfit: 'Κέρδος Εμφάνισης (€)',
+          theftProfit: 'Κέρδος Κλοπής (€)',
+          bundledProfit: 'Κέρδος Πακέτου (€)',
+          dealStatus: 'Κατάσταση Συμφωνίας',
+          saveDeal: 'Αποθήκευση Συμφωνίας',
+          cancel: 'Ακύρωση',
+          success: 'Συμφωνία αποθηκεύτηκε επιτυχώς!',
+          error: 'Σφάλμα κατά την αποθήκευση της συμφωνίας. Δοκιμάστε ξανά.',
+          backEndGross: 'Μικτό κέρδος Back-end υπολογισμένο από μεμονωμένα κέρδη προϊόντων',
+          totalGross: 'Συνολικό μικτό κέρδος (Front-end + Back-end)',
+          salesperson: 'Πωλητής',
+          salespeople: 'Πωλητές',
+          selectSalesperson: 'Επιλογή πωλητή',
+          addSalesperson: 'Προσθήκη πωλητή',
+          noSalespeople: 'Δεν υπάρχουν διαθέσιμοι πωλητές. Προσθέστε τους στις Ρυθμίσεις.',
+          validationErrors: {
+            firstName: 'Το όνομα είναι υποχρεωτικό',
+            lastName: 'Το επώνυμο είναι υποχρεωτικό',
+            dealNumber: 'Ο αριθμός συμφωνίας είναι υποχρεωτικός',
+            stockNumber: 'Ο αριθμός αποθέματος είναι υποχρεωτικός',
+            vinLast8: 'Τα τελευταία 8 του VIN είναι υποχρεωτικά',
+            dealDate: 'Η ημερομηνία συμφωνίας είναι υποχρεωτική',
+            vehicleType: 'Ο τύπος οχήματος είναι υποχρεωτικός',
+            lender: 'Ο δανειστής είναι υποχρεωτικός για αυτόν τον τύπο συμφωνίας',
+          },
+        },
+        settings: {
+          title: 'Ρυθμίσεις',
+          teamManagement: 'Διαχείριση Ομάδας',
+          payConfiguration: 'Διαμόρφωση Πληρωμών',
+          languageSettings: 'Ρυθμίσεις Γλώσσας',
+          addNewMember: 'Προσθήκη νέου μέλους ομάδας',
+          firstName: 'Όνομα',
+          lastName: 'Επώνυμο',
+          role: 'Ρόλος',
+          roles: {
+            salesperson: 'Πωλητής',
+            salesManager: 'Διευθυντής Πωλήσεων',
+          },
+          addMember: 'Προσθήκη Μέλους',
+          commissionBasePay: 'Προμήθειες και Βασικός Μισθός',
+          commissionRate: 'Ποσοστό Προμήθειας (%)',
+          baseRate: 'Βασικός Μηνιαίος Μισθός (€)',
+          saveConfiguration: 'Αποθήκευση Διαμόρφωσης',
+          currentLanguage: 'Τρέχουσα Γλώσσα',
+          selectLanguage: 'Επιλογή Γλώσσας',
+          languageUpdated: 'Η γλώσσα ενημερώθηκε επιτυχώς',
+        },
       },
     },
   } as Translations,
