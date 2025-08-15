@@ -11,11 +11,12 @@ import {
 } from 'lucide-react';
 import { useTranslation } from '../contexts/TranslationContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import LanguageSelector from '../components/auth/LanguageSelector';
 import { supabase } from '../lib/supabase';
 
 export default function SimpleSignup() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -99,6 +100,7 @@ export default function SimpleSignup() {
           promo_applied: true,
           status: 'approved',
           stripe_payment_status: 'free_promotional',
+          preferred_language: language,
         })
         .select()
         .single();
@@ -145,6 +147,7 @@ export default function SimpleSignup() {
           data: {
             full_name: formData.fullName,
             role: 'single_finance_manager',
+            preferred_language: language,
           }
         }
       });
@@ -205,6 +208,7 @@ export default function SimpleSignup() {
       localStorage.setItem('singleFinanceSignupDate', new Date().toISOString());
       localStorage.setItem('singleFinanceEmail', formData.email);
       localStorage.setItem('singleFinanceName', formData.fullName);
+      localStorage.setItem('app-language', language); // Persist language choice
       
       // Navigate to welcome page
       navigate('/welcome/single-finance', {
@@ -281,7 +285,12 @@ export default function SimpleSignup() {
       </nav>
 
       <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-19">
-        <div className="bg-gray-800 rounded-xl p-7 border border-gray-700">
+        <div className="bg-gray-800 rounded-xl p-7 border border-gray-700 relative">
+          {/* Compact Language Selector - Upper Right */}
+          <div className="absolute top-4 right-4">
+            <LanguageSelector variant="compact" />
+          </div>
+          
           <div className="text-center mb-7">
             <div className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
               <User className="w-7 h-7 text-white" />
@@ -337,6 +346,7 @@ export default function SimpleSignup() {
               )}
               <p className="text-gray-400 text-xs mt-1">{t('signup.form.emailNote')}</p>
             </div>
+
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">

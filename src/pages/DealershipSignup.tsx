@@ -16,9 +16,12 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
+import { useTranslation } from '../contexts/TranslationContext';
+import LanguageSelector from '../components/auth/LanguageSelector';
 
 export default function DealershipSignup() {
   const navigate = useNavigate();
+  const { language } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     organizationName: '',
@@ -233,7 +236,12 @@ export default function DealershipSignup() {
 
           {/* Right Side - Signup Form */}
           <div>
-            <div className="bg-gray-800 rounded-xl p-8 border border-gray-700">
+            <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 relative">
+              {/* Compact Language Selector - Upper Right */}
+              <div className="absolute top-4 right-4">
+                <LanguageSelector variant="compact" />
+              </div>
+              
               <div className="text-center mb-8">
                 <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Building2 className="w-8 h-8 text-white" />

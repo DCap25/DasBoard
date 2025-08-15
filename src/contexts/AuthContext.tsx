@@ -980,7 +980,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (sessionError) {
           console.error('[AuthContext] Error getting initial session:', sessionError, {
             timestamp: new Date().toISOString(),
-            retries: retries,
           });
           
           // If it's a timeout or network error, continue without session

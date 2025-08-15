@@ -58,6 +58,7 @@ import LogFinanceManagerDeal from './pages/finance/LogFinanceManagerDeal';
 import LogSingleFinanceDeal from './pages/finance/LogSingleFinanceDeal';
 import MasterAdminPage from './pages/admin/MasterAdminPage';
 import SignUp from './components/auth/SignUp';
+import SignupChoice from './pages/SignupChoice';
 import SingleFinanceSignup from './components/auth/SingleFinanceSignup';
 import DealershipSignupPage from './pages/DealershipSignup';
 import DealerGroupSignup from './components/auth/DealerGroupSignup';
@@ -307,15 +308,29 @@ function RoleBasedRedirect() {
   ]);
 
   // First check for direct auth
-  if (isDirectAuthAuthenticated()) {
+  const isDirectAuth = isDirectAuthAuthenticated();
+  console.log('[ROLE REDIRECT DEBUG] Direct auth check', {
+    isDirectAuth,
+    currentPath: location.pathname,
+    timestamp: new Date().toISOString()
+  });
+  
+  if (isDirectAuth) {
     const directUser = getCurrentDirectAuthUser();
+    console.log('[ROLE REDIRECT DEBUG] Direct auth user found', {
+      user: directUser,
+      currentPath: location.pathname,
+    });
+    
     if (directUser) {
+      const redirectPath = getRedirectPath(directUser);
       console.log('[ROLE REDIRECT] Direct auth user detected, redirecting to appropriate route', {
         email: directUser.email,
         role: directUser.role,
-        redirectPath: getRedirectPath(directUser),
+        redirectPath,
+        fromPath: location.pathname,
       });
-      return <Navigate to={getRedirectPath(directUser)} replace />;
+      return <Navigate to={redirectPath} replace />;
     }
   }
 
@@ -591,11 +606,7 @@ function App() {
         if (StorageMigration.needsMigration()) {
           console.log('[App] Starting automatic storage migration...');
 
-          // First, clean up any malformed data to prevent migration errors
-          const clearedCount = StorageMigration.clearMalformedSensitiveData();
-          if (clearedCount > 0) {
-            console.log(`[App] Cleaned up ${clearedCount} malformed storage items`);
-          }
+          // Storage migration without cleanup (method doesn't exist)
 
           // Now attempt migration
           const result = await StorageMigration.migrateAllSensitiveData();
@@ -815,7 +826,8 @@ function App() {
                       <Route path="/legal/subscription" element={<SubscriptionPage />} />
 
                       {/* Signup routes - public access */}
-                      <Route path="/signup" element={<SignUp />} />
+                      <Route path="/signup" element={<SignupChoice />} />
+                      <Route path="/signup/dealership-legacy" element={<SignUp />} />
                       <Route path="/simple-signup" element={<SimpleSignup />} />
                       <Route path="/signup/single-finance" element={<SingleFinanceSignup />} />
                       <Route path="/signup/dealership" element={<DealershipSignupPage />} />
@@ -995,19 +1007,6 @@ function App() {
                         }
                       />
 
-                      {/* Single Finance Manager Dashboard specific deal log route */}
-                      <Route
-                        path="/single-finance-deal-log"
-                        element={
-                          <ProtectedRoute
-                            requiredRoles={['finance_manager', 'single_finance_manager']}
-                          >
-                            <DashboardLayout>
-                              <DealLogPage dashboardType="single-finance" />
-                            </DashboardLayout>
-                          </ProtectedRoute>
-                        }
-                      />
 
                       <Route
                         path="/dashboard/sales-manager/*"

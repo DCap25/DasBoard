@@ -47,12 +47,12 @@ export default function LanguageSwitcher() {
         buttonRect &&
         createPortal(
           <div
-            className="bg-gray-800 border border-gray-700 rounded-lg shadow-xl w-48"
+            className="bg-gray-800 border border-gray-700 rounded-lg shadow-xl w-40"
             style={{
               position: 'fixed',
               zIndex: 2147483647,
               top: buttonRect.bottom + 8,
-              left: buttonRect.right - 192, // 192px = w-48
+              left: buttonRect.right - 160, // 160px = w-40
               transform: 'translateZ(0)',
               isolation: 'isolate',
               pointerEvents: 'auto',
