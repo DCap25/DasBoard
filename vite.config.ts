@@ -293,6 +293,15 @@ export default defineConfig(({ mode }) => {
         }
       },
       rollupOptions: {
+        // Security: Configure external dependencies for proper resolution
+        external: (id) => {
+          // Never externalize isomorphic-dompurify - bundle it
+          if (id === 'isomorphic-dompurify') {
+            return false;
+          }
+          // Don't externalize any other dependencies by default
+          return false;
+        },
         output: {
           // Security: Split chunks for better caching and security
           manualChunks: {
@@ -384,7 +393,8 @@ export default defineConfig(({ mode }) => {
         'react-dom',
         'react-router-dom',
         '@tanstack/react-query',
-        'lucide-react'
+        'lucide-react',
+        'isomorphic-dompurify' // Security: Ensure DOMPurify is pre-bundled
       ],
       // Security: Exclude Node.js modules from bundling
       exclude: ['node:fs', 'node:path', 'node:crypto']
@@ -399,5 +409,10 @@ export default defineConfig(({ mode }) => {
     // Security: Logger configuration
     logLevel: isProduction ? 'error' : 'info',
     clearScreen: !process.env.CI, // Don't clear screen in CI
+    // Security: SSR configuration for proper module resolution
+    ssr: {
+      // Security: Ensure isomorphic-dompurify is bundled, not externalized
+      noExternal: ['isomorphic-dompurify']
+    }
   };
 });
