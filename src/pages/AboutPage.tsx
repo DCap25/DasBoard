@@ -159,7 +159,7 @@ export default function AboutPage() {
               onClick={() => navigate('/signup')}
               className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 px-8 py-3 rounded-md text-lg font-medium transition-all duration-300 hover:scale-105 hover:shadow-[0_0_15px_rgba(59,130,246,0.5)]"
             >
-              {t('home.cta.startTrial')}
+              {t('home.signupNow')}
             </button>
           </div>
         </div>

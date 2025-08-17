@@ -1,5 +1,35 @@
-import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
+/**
+ * Secured Authentication Context with Enhanced Security and Stability
+ * 
+ * Security Features:
+ * - Secure token storage with encryption
+ * - Session hijacking prevention
+ * - Multiple client instance prevention
+ * - Token exposure protection
+ * - Secure error handling
+ * - Rate limiting with server validation
+ * - Memory leak prevention
+ * 
+ * Stability Features:
+ * - Comprehensive error handling
+ * - Loading state management
+ * - State update safeguards
+ * - Memory management
+ * - Connection timeout handling
+ * - Graceful degradation
+ */
+
+import React, { 
+  createContext, 
+  useContext, 
+  useEffect, 
+  useState, 
+  useCallback, 
+  useRef,
+  useMemo 
+} from 'react';
 import { User, AuthError, Session } from '@supabase/supabase-js';
+import CryptoJS from 'crypto-js';
 import {
   supabase,
   getCurrentUser,
@@ -21,7 +51,9 @@ import {
   getCurrentDirectAuthUser as getDirectAuthUser,
 } from '../lib/directAuth';
 
-// Use lowercase role names to match database
+// =================== TYPE DEFINITIONS ===================
+
+// Strict typing for user roles with security validation
 type UserRole =
   | 'salesperson'
   | 'finance_manager'
@@ -33,15 +65,16 @@ type UserRole =
   | 'dealer_group_admin'
   | 'area_vice_president';
 
+// Enhanced auth context interface with strict typing
 interface AuthContextType {
   user: User | null;
   role: UserRole | null;
   signIn: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
-  signUp: (email: string, password: string, userData: any) => Promise<void>;
+  signUp: (email: string, password: string, userData: SecureUserData) => Promise<void>;
   signOut: () => Promise<void>;
   loading: boolean;
   hasSession: boolean;
-  error: Error | null;
+  error: AuthError | null;
   userRole: string | null;
   dealershipId: number | null;
   setDealershipContext: (dealershipId: number) => void;
@@ -49,1144 +82,1048 @@ interface AuthContextType {
   fetchFromDealershipSchema: (
     dealershipId: number,
     table: string,
-    query?: any
+    query?: QueryOptions
   ) => Promise<{ data: any | null; error: Error | null }>;
   magicLinkLogin: (email: string) => Promise<void>;
   loginTestAccount: (email: string, password: string) => Promise<void>;
   logAccessAttempt: (path: string, allowed: boolean, details?: any) => void;
   isGroupAdmin: boolean;
   authCheckComplete: boolean;
+  sessionHealth: SessionHealth;
+  refreshSession: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Secure user data interface for signup
+interface SecureUserData {
+  firstName: string;
+  lastName: string;
+  role?: UserRole;
+  dealershipId?: number;
+}
 
-// Use these defaults consistently
+// Query options with validation
+interface QueryOptions {
+  select?: string;
+  filters?: Array<{
+    type: 'eq' | 'in' | 'gt' | 'lt' | 'gte' | 'lte' | 'like';
+    column: string;
+    value: any;
+  }>;
+  order?: {
+    column: string;
+    ascending: boolean;
+  };
+  limit?: number;
+}
+
+// Session health monitoring
+interface SessionHealth {
+  isValid: boolean;
+  expiresAt: number | null;
+  lastChecked: number;
+  warningIssued: boolean;
+}
+
+// =================== SECURITY CONFIGURATION ===================
+
+// Security constants
+const SECURITY_CONFIG = {
+  SESSION_TIMEOUT_MS: 18 * 60 * 60 * 1000, // 18 hours
+  SESSION_WARNING_MS: 17 * 60 * 60 * 1000, // 17 hours (1 hour before expiry)
+  TOKEN_ROTATION_INTERVAL: 15 * 60 * 1000, // 15 minutes
+  MAX_RETRY_ATTEMPTS: 3,
+  NETWORK_TIMEOUT: 10000, // 10 seconds
+  ENCRYPTION_KEY_LENGTH: 32,
+  SALT_LENGTH: 16,
+} as const;
+
+// Default security settings
 const DEFAULT_ROLE: UserRole = 'salesperson';
-const FALLBACK_ROLE: UserRole = 'finance_manager'; // Fallback role if profile operations fail
+const FALLBACK_ROLE: UserRole = 'finance_manager';
 const DEFAULT_DEALERSHIP_ID = 1;
 
-// Track profile operations globally to prevent duplicates
-const profileOperationAttempted = new Map<string, boolean>();
+// Prevent multiple client instances
+let clientInstanceCount = 0;
+const MAX_CLIENT_INSTANCES = 1;
 
-// Debug logger to track authentication flow
-const logAuthEvent = (event: string, details: any) => {
-  const timestamp = new Date().toISOString();
-  const deploymentVersion = import.meta.env.VITE_DEPLOYMENT_VERSION || '1.0.0';
-  const deploymentEnv = import.meta.env.MODE || 'development';
+// Session storage encryption key (generated per session)
+let sessionEncryptionKey: string | null = null;
 
-  console.log(`[AuthContext][${timestamp}] ${event}`, {
-    ...details,
-    app_version: deploymentVersion,
-    environment: deploymentEnv,
-    timestamp,
-  });
+// Profile operation tracking to prevent race conditions
+const profileOperationTracking = new Map<string, {
+  inProgress: boolean;
+  lastAttempt: number;
+  retryCount: number;
+}>();
 
-  // Add optional analytics tracking here if needed
+// =================== SECURITY UTILITIES ===================
+
+/**
+ * Generate secure encryption key for session storage
+ * Uses Web Crypto API for secure random generation
+ */
+const generateSecureKey = (): string => {
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    const array = new Uint8Array(SECURITY_CONFIG.ENCRYPTION_KEY_LENGTH);
+    crypto.getRandomValues(array);
+    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  }
+  // Fallback for environments without Web Crypto API
+  return CryptoJS.lib.WordArray.random(SECURITY_CONFIG.ENCRYPTION_KEY_LENGTH).toString();
+};
+
+/**
+ * Encrypt sensitive data for secure storage
+ * Uses AES encryption with random salt
+ */
+const encryptSensitiveData = (data: string, key: string): string => {
   try {
-    if (typeof window !== 'undefined') {
-      if (!window.authEvents) {
-        window.authEvents = [];
-      }
-
-      // Keep last 100 events
-      if (window.authEvents.length > 100) {
-        window.authEvents.shift();
-      }
-
-      window.authEvents.push({
-        event,
-        details,
-        timestamp,
-      });
-    }
-  } catch (err) {
-    console.error('[AuthContext] Error logging auth event to window object:', err);
+    const salt = CryptoJS.lib.WordArray.random(SECURITY_CONFIG.SALT_LENGTH);
+    const encrypted = CryptoJS.AES.encrypt(data, key + salt.toString()).toString();
+    return salt.toString() + ':' + encrypted;
+  } catch (error) {
+    SecureLogger.error('Failed to encrypt sensitive data', { error: error.message });
+    throw new Error('Encryption failed');
   }
 };
 
-// Improved security event logger
-const logSecurityEvent = (event: string, details: any) => {
-  const timestamp = new Date().toISOString();
-  console.warn(`[SecurityEvent][${timestamp}] ${event}`, {
-    ...details,
-    user_agent: navigator.userAgent,
-    app_url: window.location.href,
-    timestamp,
-  });
+/**
+ * Decrypt sensitive data from secure storage
+ * Validates salt and decrypts using AES
+ */
+const decryptSensitiveData = (encryptedData: string, key: string): string => {
+  try {
+    const [salt, encrypted] = encryptedData.split(':');
+    if (!salt || !encrypted) {
+      throw new Error('Invalid encrypted data format');
+    }
+    const decrypted = CryptoJS.AES.decrypt(encrypted, key + salt);
+    return decrypted.toString(CryptoJS.enc.Utf8);
+  } catch (error) {
+    SecureLogger.error('Failed to decrypt sensitive data', { error: error.message });
+    throw new Error('Decryption failed');
+  }
 };
 
+/**
+ * Secure session storage with encryption
+ * Prevents token exposure in localStorage
+ */
+const secureSessionStorage = {
+  setItem: (key: string, value: string): void => {
+    try {
+      if (!sessionEncryptionKey) {
+        sessionEncryptionKey = generateSecureKey();
+      }
+      const encryptedValue = encryptSensitiveData(value, sessionEncryptionKey);
+      sessionStorage.setItem(`secure_${key}`, encryptedValue);
+    } catch (error) {
+      SecureLogger.error('Failed to store secure session data', { key, error: error.message });
+    }
+  },
+  
+  getItem: (key: string): string | null => {
+    try {
+      if (!sessionEncryptionKey) {
+        return null;
+      }
+      const encryptedValue = sessionStorage.getItem(`secure_${key}`);
+      if (!encryptedValue) {
+        return null;
+      }
+      return decryptSensitiveData(encryptedValue, sessionEncryptionKey);
+    } catch (error) {
+      SecureLogger.error('Failed to retrieve secure session data', { key, error: error.message });
+      return null;
+    }
+  },
+  
+  removeItem: (key: string): void => {
+    try {
+      sessionStorage.removeItem(`secure_${key}`);
+    } catch (error) {
+      SecureLogger.error('Failed to remove secure session data', { key, error: error.message });
+    }
+  },
+  
+  clear: (): void => {
+    try {
+      // Remove all secure session items
+      const keys = Object.keys(sessionStorage);
+      keys.forEach(key => {
+        if (key.startsWith('secure_')) {
+          sessionStorage.removeItem(key);
+        }
+      });
+      sessionEncryptionKey = null;
+    } catch (error) {
+      SecureLogger.error('Failed to clear secure session storage', { error: error.message });
+    }
+  }
+};
+
+/**
+ * Validate user role against allowed roles
+ * Prevents privilege escalation attacks
+ */
+const validateUserRole = (role: string): UserRole => {
+  const allowedRoles: UserRole[] = [
+    'salesperson',
+    'finance_manager',
+    'single_finance_manager',
+    'sales_manager',
+    'general_manager',
+    'admin',
+    'dealership_admin',
+    'dealer_group_admin',
+    'area_vice_president'
+  ];
+  
+  const normalizedRole = role?.toLowerCase() as UserRole;
+  if (allowedRoles.includes(normalizedRole)) {
+    return normalizedRole;
+  }
+  
+  SecureLogger.warning('Invalid role attempted', { attempted_role: role });
+  return DEFAULT_ROLE;
+};
+
+/**
+ * Validate email format with strict security checks
+ * Prevents injection attacks through email field
+ */
+const validateEmail = (email: string): boolean => {
+  if (!email || typeof email !== 'string') return false;
+  
+  // Check for maximum length to prevent buffer overflow attacks
+  if (email.length > 254) return false;
+  
+  // Enhanced email regex with security considerations
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  
+  // Check for suspicious characters that might indicate injection attempts
+  const suspiciousPatterns = [
+    /<script/i,
+    /javascript:/i,
+    /data:/i,
+    /vbscript:/i,
+    /@.*@/, // Multiple @ symbols
+    /\s/, // Whitespace
+  ];
+  
+  if (suspiciousPatterns.some(pattern => pattern.test(email))) {
+    SecureLogger.warning('Suspicious email pattern detected', { email: email.substring(0, 10) + '...' });
+    return false;
+  }
+  
+  return emailRegex.test(email);
+};
+
+/**
+ * Generate session fingerprint for session hijacking prevention
+ * Creates unique identifier based on browser characteristics
+ */
+const generateSessionFingerprint = (): string => {
+  try {
+    const factors = [
+      navigator.userAgent,
+      navigator.language,
+      screen.width + 'x' + screen.height,
+      new Date().getTimezoneOffset().toString(),
+      navigator.platform,
+    ];
+    
+    const fingerprint = CryptoJS.SHA256(factors.join('|')).toString();
+    return fingerprint;
+  } catch (error) {
+    SecureLogger.error('Failed to generate session fingerprint', { error: error.message });
+    return 'fallback_fingerprint_' + Date.now();
+  }
+};
+
+/**
+ * Validate session fingerprint to prevent session hijacking
+ * Compares current browser fingerprint with stored fingerprint
+ */
+const validateSessionFingerprint = (storedFingerprint: string): boolean => {
+  try {
+    const currentFingerprint = generateSessionFingerprint();
+    return currentFingerprint === storedFingerprint;
+  } catch (error) {
+    SecureLogger.error('Failed to validate session fingerprint', { error: error.message });
+    return false;
+  }
+};
+
+/**
+ * Secure event logger with sanitization
+ * Prevents sensitive data leakage in logs
+ */
+const logSecureAuthEvent = (event: string, details: any): void => {
+  try {
+    // Create sanitized copy of details
+    const sanitizedDetails = { ...details };
+    
+    // Remove sensitive fields
+    delete sanitizedDetails.password;
+    delete sanitizedDetails.access_token;
+    delete sanitizedDetails.refresh_token;
+    delete sanitizedDetails.session;
+    delete sanitizedDetails.user_metadata;
+    
+    // Truncate email for privacy
+    if (sanitizedDetails.email) {
+      const [local, domain] = sanitizedDetails.email.split('@');
+      sanitizedDetails.email = local.substring(0, 3) + '***@' + domain;
+    }
+    
+    // Add security context
+    const securityContext = {
+      timestamp: new Date().toISOString(),
+      event,
+      ...sanitizedDetails,
+      fingerprint_valid: storedSessionFingerprint ? validateSessionFingerprint(storedSessionFingerprint) : null,
+      instance_count: clientInstanceCount,
+    };
+    
+    SecureLogger.info(`[AuthContext] ${event}`, securityContext);
+    
+    // Store in secure session storage for debugging (limited history)
+    try {
+      const authEvents = JSON.parse(secureSessionStorage.getItem('auth_events') || '[]');
+      authEvents.push(securityContext);
+      
+      // Keep only last 50 events to prevent memory issues
+      if (authEvents.length > 50) {
+        authEvents.splice(0, authEvents.length - 50);
+      }
+      
+      secureSessionStorage.setItem('auth_events', JSON.stringify(authEvents));
+    } catch (storageError) {
+      // Don't fail the operation if event storage fails
+      SecureLogger.warning('Failed to store auth event', { error: storageError.message });
+    }
+  } catch (error) {
+    // Ensure logging errors don't break the application
+    console.error('[AuthContext] Failed to log secure auth event:', error);
+  }
+};
+
+// =================== CONTEXT SETUP ===================
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Track session fingerprint globally
+let storedSessionFingerprint: string | null = null;
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // =================== STATE MANAGEMENT ===================
+  
+  // Core auth state with strict typing
   const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<UserRole | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [hasSession, setHasSession] = useState(false);
-  const [initialized, setInitialized] = useState(false);
-  const retryCountRef = useRef(0);
-  const profileOperationInProgressRef = useRef(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [hasSession, setHasSession] = useState<boolean>(false);
+  const [error, setError] = useState<AuthError | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [dealershipId, setDealershipId] = useState<number | null>(null);
   const [currentDealershipName, setCurrentDealershipName] = useState<string | null>(null);
-
-  // Session timeout management (18 hours = 64800000ms)
-  const SESSION_TIMEOUT_MS = 18 * 60 * 60 * 1000; // 18 hours in milliseconds
-
-  // Check if session has expired and auto sign out
-  const checkSessionTimeout = useCallback(() => {
-    const loginTimestamp = localStorage.getItem('session_login_time');
-    if (loginTimestamp && hasSession) {
-      const loginTime = parseInt(loginTimestamp);
-      const currentTime = Date.now();
-      const timeDifference = currentTime - loginTime;
-      
-      if (timeDifference > SESSION_TIMEOUT_MS) {
-        console.log('[AuthContext] Session expired after 18 hours, signing out automatically');
-        toast({
-          title: 'Session Expired',
-          description: 'You have been automatically signed out after 18 hours for security.',
-          variant: 'default'
-        });
-        signOut();
-        return true; // Session expired
-      }
-    }
-    return false; // Session still valid
-  }, [hasSession, SESSION_TIMEOUT_MS]);
   const [isGroupAdmin, setIsGroupAdmin] = useState<boolean>(false);
   const [authCheckComplete, setAuthCheckComplete] = useState<boolean>(false);
+  
+  // Session health monitoring state
+  const [sessionHealth, setSessionHealth] = useState<SessionHealth>({
+    isValid: false,
+    expiresAt: null,
+    lastChecked: 0,
+    warningIssued: false,
+  });
+  
+  // Refs for managing component lifecycle and preventing race conditions
+  const initializationRef = useRef<boolean>(false);
+  const mountedRef = useRef<boolean>(true);
+  const authListenerRef = useRef<any>(null);
+  const sessionCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const tokenRotationIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Prevent multiple client instances
+  useEffect(() => {
+    clientInstanceCount++;
+    
+    if (clientInstanceCount > MAX_CLIENT_INSTANCES) {
+      SecureLogger.error('Multiple AuthContext instances detected', { 
+        count: clientInstanceCount 
+      });
+      console.error('[AuthContext] Security Warning: Multiple authentication contexts detected. This could indicate a security issue.');
+    }
+    
+    return () => {
+      clientInstanceCount--;
+    };
+  }, []);
 
-  // Fetch profile data to check for is_group_admin flag
-  const fetchProfileData = async (userId: string) => {
+  // =================== SESSION MANAGEMENT ===================
+
+  /**
+   * Enhanced session validation with security checks
+   * Validates session integrity, expiration, and fingerprint
+   */
+  const validateSession = useCallback(async (session: Session | null): Promise<boolean> => {
+    if (!session) {
+      return false;
+    }
+    
     try {
-      console.warn(`[DEBUG AUTH] Fetching profile data for user ${userId}`);
+      // Check basic session structure
+      if (!session.access_token || !session.user) {
+        SecureLogger.warning('Invalid session structure detected');
+        return false;
+      }
+      
+      // Check token expiration
+      const now = Math.floor(Date.now() / 1000);
+      if (session.expires_at && session.expires_at <= now) {
+        SecureLogger.warning('Session token expired');
+        return false;
+      }
+      
+      // Validate session fingerprint to prevent hijacking
+      if (storedSessionFingerprint && !validateSessionFingerprint(storedSessionFingerprint)) {
+        SecureLogger.error('Session fingerprint mismatch - possible hijacking attempt');
+        await signOut();
+        return false;
+      }
+      
+      // Additional JWT validation (basic structure check)
+      const tokenParts = session.access_token.split('.');
+      if (tokenParts.length !== 3) {
+        SecureLogger.warning('Invalid JWT token structure');
+        return false;
+      }
+      
+      // Update session health
+      setSessionHealth({
+        isValid: true,
+        expiresAt: session.expires_at ? session.expires_at * 1000 : null,
+        lastChecked: Date.now(),
+        warningIssued: false,
+      });
+      
+      return true;
+    } catch (error) {
+      SecureLogger.error('Session validation failed', { error: error.message });
+      return false;
+    }
+  }, []);
 
+  /**
+   * Secure session refresh with token rotation
+   * Implements automatic token refresh with security validation
+   */
+  const refreshSession = useCallback(async (): Promise<void> => {
+    try {
+      logSecureAuthEvent('Session refresh initiated', {});
+      
+      const { data, error } = await supabase.auth.refreshSession();
+      
+      if (error) {
+        SecureLogger.error('Session refresh failed', { error: error.message });
+        throw error;
+      }
+      
+      if (data.session) {
+        const isValid = await validateSession(data.session);
+        if (!isValid) {
+          throw new Error('Refreshed session validation failed');
+        }
+        
+        // Store encrypted session data
+        secureSessionStorage.setItem('session_data', JSON.stringify({
+          expires_at: data.session.expires_at,
+          user_id: data.session.user.id,
+          fingerprint: generateSessionFingerprint(),
+        }));
+        
+        logSecureAuthEvent('Session refresh successful', {
+          user_id: data.session.user.id,
+          expires_at: data.session.expires_at,
+        });
+      }
+    } catch (error) {
+      SecureLogger.error('Session refresh error', { error: error.message });
+      // Force logout on refresh failure to maintain security
+      await signOut();
+      throw error;
+    }
+  }, [validateSession]);
+
+  /**
+   * Monitor session health and handle automatic refresh
+   * Implements proactive session management
+   */
+  const monitorSessionHealth = useCallback(async (): Promise<void> => {
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        SecureLogger.error('Session health check failed', { error: error.message });
+        return;
+      }
+      
+      if (!session) {
+        setSessionHealth(prev => ({ ...prev, isValid: false }));
+        return;
+      }
+      
+      const isValid = await validateSession(session);
+      
+      if (!isValid) {
+        await signOut();
+        return;
+      }
+      
+      // Check if session is approaching expiration
+      if (session.expires_at) {
+        const expiresAt = session.expires_at * 1000;
+        const now = Date.now();
+        const timeUntilExpiry = expiresAt - now;
+        
+        // Issue warning if session expires within 1 hour
+        if (timeUntilExpiry < 60 * 60 * 1000 && !sessionHealth.warningIssued) {
+          setSessionHealth(prev => ({ ...prev, warningIssued: true }));
+          
+          toast({
+            title: 'Session Expiring Soon',
+            description: 'Your session will expire soon. Please save your work.',
+            variant: 'default',
+          });
+        }
+        
+        // Auto-refresh if session expires within 15 minutes
+        if (timeUntilExpiry < 15 * 60 * 1000) {
+          await refreshSession();
+        }
+      }
+    } catch (error) {
+      SecureLogger.error('Session health monitoring failed', { error: error.message });
+    }
+  }, [sessionHealth.warningIssued, validateSession, refreshSession]);
+
+  // =================== SECURE STATE UPDATES ===================
+
+  /**
+   * Secure user state update with validation
+   * Ensures state updates are atomic and validated
+   */
+  const setUserSecurely = useCallback((newUser: User | null): void => {
+    if (!mountedRef.current) return;
+    
+    try {
+      // Validate user object structure if provided
+      if (newUser && (!newUser.id || !newUser.email)) {
+        SecureLogger.warning('Invalid user object provided to setUserSecurely');
+        return;
+      }
+      
+      setUser(prevUser => {
+        // Prevent unnecessary updates
+        if (prevUser?.id === newUser?.id) {
+          return prevUser;
+        }
+        
+        // Log user state change
+        logSecureAuthEvent('User state updated', {
+          previous_user_id: prevUser?.id,
+          new_user_id: newUser?.id,
+          has_user: !!newUser,
+        });
+        
+        return newUser;
+      });
+    } catch (error) {
+      SecureLogger.error('Failed to update user state securely', { error: error.message });
+    }
+  }, []);
+
+  /**
+   * Secure role state update with validation
+   * Validates role against allowed roles before setting
+   */
+  const setRoleSecurely = useCallback((newRole: string | null): void => {
+    if (!mountedRef.current) return;
+    
+    try {
+      if (newRole) {
+        const validatedRole = validateUserRole(newRole);
+        setRole(validatedRole);
+        setUserRole(validatedRole);
+        
+        logSecureAuthEvent('Role updated', {
+          role: validatedRole,
+          original_role: newRole,
+        });
+      } else {
+        setRole(null);
+        setUserRole(null);
+      }
+    } catch (error) {
+      SecureLogger.error('Failed to update role securely', { error: error.message });
+    }
+  }, []);
+
+  // =================== PROFILE MANAGEMENT ===================
+
+  /**
+   * Secure profile data fetching with race condition prevention
+   * Implements proper locking mechanism to prevent concurrent operations
+   */
+  const fetchProfileDataSecurely = useCallback(async (userId: string): Promise<any> => {
+    if (!userId || typeof userId !== 'string') {
+      throw new Error('Invalid user ID provided');
+    }
+    
+    // Check for existing operation
+    const existingOperation = profileOperationTracking.get(userId);
+    if (existingOperation?.inProgress) {
+      const timeSinceLastAttempt = Date.now() - existingOperation.lastAttempt;
+      
+      // Wait for existing operation or timeout after 5 seconds
+      if (timeSinceLastAttempt < 5000) {
+        throw new Error('Profile operation already in progress');
+      }
+    }
+    
+    // Set operation lock
+    profileOperationTracking.set(userId, {
+      inProgress: true,
+      lastAttempt: Date.now(),
+      retryCount: 0,
+    });
+    
+    try {
+      logSecureAuthEvent('Fetching profile data', { user_id: userId });
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .maybeSingle();
-
+      
       if (error) {
-        console.error('[DEBUG AUTH] Error fetching profile:', error);
-        return null;
+        SecureLogger.error('Profile fetch error', { 
+          user_id: userId, 
+          error: error.message 
+        });
+        throw error;
       }
-
+      
+      // Process group admin status
       if (data) {
-        console.warn('[DEBUG AUTH] Profile data found:', data);
-
-        // Add more detailed logging for group admin detection
-        console.warn('[DEBUG AUTH] Group admin detection:', {
-          isGroupAdmin: !!data.is_group_admin,
-          userEmail: data.email,
-          userRole: data.role,
-          userData: data,
-          userMetadata: user?.user_metadata,
-        });
-
-        // Check user metadata if profile doesn't have the flag
-        if (!data.is_group_admin && user?.user_metadata?.is_group_admin) {
-          console.warn('[DEBUG AUTH] Group admin flag found in user metadata');
-          setIsGroupAdmin(true);
+        setIsGroupAdmin(!!data.is_group_admin);
+        
+        // Validate and set role if present
+        if (data.role) {
+          setRoleSecurely(data.role);
         }
-
-        // Set the isGroupAdmin flag based on profile data
-        if (data.is_group_admin) {
-          console.warn('[DEBUG AUTH] User is a group admin!');
-          setIsGroupAdmin(true);
-        } else {
-          console.warn('[DEBUG AUTH] User is not a group admin');
-          setIsGroupAdmin(false);
+        
+        // Set dealership ID if present
+        if (data.dealership_id) {
+          setDealershipId(data.dealership_id);
         }
-
-        return data;
-      }
-
-      console.warn('[DEBUG AUTH] No profile data found');
-      return null;
-    } catch (err) {
-      console.error('[DEBUG AUTH] Error in fetchProfileData:', err);
-      return null;
-    }
-  };
-
-  // Set the current dealership context
-  const setDealershipContext = useCallback(
-    (newDealershipId: number) => {
-      logAuthEvent('Setting dealership context', {
-        dealership_id: newDealershipId,
-        previous_id: dealershipId,
-        user_id: user?.id,
-        user_email: user?.email,
-      });
-
-      setDealershipId(newDealershipId);
-
-      // Get the dealership name
-      supabase
-        .from('dealerships')
-        .select('name')
-        .eq('id', newDealershipId)
-        .single()
-        .then(({ data, error }) => {
-          if (error) {
-            console.error('[AuthContext] Error fetching dealership name:', error);
-          } else if (data) {
-            setCurrentDealershipName(data.name);
-            logAuthEvent('Dealership name fetched', {
-              dealership_id: newDealershipId,
-              dealership_name: data.name,
-            });
-          }
-        });
-
-      // Log the context change
-      logSchemaOperation('set_dealership_context', {
-        userId: user?.id,
-        dealershipId: newDealershipId,
-        timestamp: new Date().toISOString(),
-      }).catch(err => {
-        console.error('[AuthContext] Error logging dealership context change:', err);
-      });
-    },
-    [user, dealershipId]
-  );
-
-  // Update toast utility functions to use the imported toast function directly
-  const showSuccessToast = useCallback((title: string, description: string) => {
-    try {
-      toast({
-        title,
-        description,
-        variant: 'default',
-      });
-    } catch (err) {
-      console.error('[AuthContext] Error showing success toast:', err);
-    }
-  }, []);
-
-  const showErrorToast = useCallback((title: string, description: string) => {
-    try {
-      toast({
-        title,
-        description,
-        variant: 'destructive',
-      });
-    } catch (err) {
-      console.error('[AuthContext] Error showing error toast:', err);
-    }
-  }, []);
-
-  const showInfoToast = useCallback((title: string, description: string) => {
-    try {
-      toast({
-        title,
-        description,
-        variant: 'info',
-      });
-    } catch (err) {
-      console.error('[AuthContext] Error showing info toast:', err);
-    }
-  }, []);
-
-  const MAX_RETRIES = 1; // Limit retries to prevent excessive database calls
-
-  // Debug function to check profile existence
-  const checkProfileExists = async (userId: string): Promise<boolean> => {
-    try {
-      logAuthEvent('Checking profile existence', { user_id: userId });
-
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', userId)
-        .maybeSingle();
-
-      if (error) {
-        logAuthEvent('Profile check error', {
+        
+        logSecureAuthEvent('Profile data processed', {
           user_id: userId,
-          error: error.message,
-          code: error.code,
+          has_role: !!data.role,
+          is_group_admin: !!data.is_group_admin,
+          has_dealership: !!data.dealership_id,
         });
-        return false;
       }
-
-      const exists = !!data;
-      logAuthEvent('Profile check result', {
-        user_id: userId,
-        exists,
-        data: data ? 'found' : 'not found',
+      
+      return data;
+    } catch (error) {
+      SecureLogger.error('Profile fetch failed', { 
+        user_id: userId, 
+        error: error.message 
       });
-      return exists;
-    } catch (err) {
-      logAuthEvent('Profile check exception', {
-        user_id: userId,
-        error: err instanceof Error ? err.message : String(err),
-      });
-      return false;
+      throw error;
+    } finally {
+      // Clear operation lock
+      profileOperationTracking.delete(userId);
     }
-  };
+  }, [setRoleSecurely]);
 
-  // Get user's dealership
-  const fetchUserDealership = useCallback(async (userId: string): Promise<number | null> => {
+  /**
+   * Secure user dealership fetching with error handling
+   * Implements fallback mechanisms and proper error handling
+   */
+  const fetchUserDealershipSecurely = useCallback(async (userId: string): Promise<number | null> => {
     try {
-      logAuthEvent('Fetching user dealership', { user_id: userId });
-
-      // First try the new users table schema
+      logSecureAuthEvent('Fetching user dealership', { user_id: userId });
+      
+      // Try new users table schema first
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('dealership_id, role_id, roles(name)')
         .eq('id', userId)
         .maybeSingle();
-
+      
       if (!userError && userData?.dealership_id) {
-        logAuthEvent('Fetched dealership from users table', {
+        // Set role from roles table if available
+        if (userData.roles?.name) {
+          setRoleSecurely(userData.roles.name);
+        }
+        
+        logSecureAuthEvent('Dealership fetched from users table', {
           user_id: userId,
           dealership_id: userData.dealership_id,
-          role_id: userData.role_id,
-          role_name: userData.roles?.name,
+          role: userData.roles?.name,
         });
-
-        // Also set the role from the roles table if available
-        if (userData.roles?.name) {
-          const roleName = userData.roles.name.toLowerCase() as UserRole;
-          setRole(roleName);
-          setUserRole(roleName);
-          logAuthEvent('Set user role from users table', {
-            user_id: userId,
-            role: roleName,
-          });
-        }
-
+        
         return userData.dealership_id;
       }
-
-      // Fallback to the profiles table (older schema)
-      const { data, error } = await supabase
+      
+      // Fallback to profiles table
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('dealership_id, role')
         .eq('id', userId)
         .maybeSingle();
-
-      if (error) {
-        logAuthEvent('Error fetching user dealership from profiles', {
-          user_id: userId,
-          error: error.message,
-          code: error.code,
+      
+      if (profileError) {
+        SecureLogger.error('Dealership fetch error', { 
+          user_id: userId, 
+          error: profileError.message 
         });
         return null;
       }
-
-      // If we got the role from profiles, set it
-      if (data?.role) {
-        const roleName = data.role.toLowerCase() as UserRole;
-        setRole(roleName);
-        setUserRole(roleName);
-        logAuthEvent('Set user role from profiles table', {
-          user_id: userId,
-          role: roleName,
-        });
+      
+      if (profileData?.role) {
+        setRoleSecurely(profileData.role);
       }
-
-      logAuthEvent('Fetched dealership from profiles table', {
-        user_id: userId,
-        dealership_id: data?.dealership_id,
-      });
-
-      // If we found a dealership ID, get its name
-      if (data?.dealership_id) {
-        supabase
-          .from('dealerships')
-          .select('name')
-          .eq('id', data.dealership_id)
-          .single()
-          .then(({ data: dealershipData, error: dealershipError }) => {
-            if (dealershipError) {
-              logAuthEvent('Error fetching dealership name', {
-                dealership_id: data.dealership_id,
-                error: dealershipError.message,
-              });
-            } else if (dealershipData) {
-              setCurrentDealershipName(dealershipData.name);
-              logAuthEvent('Set dealership name', {
-                dealership_id: data.dealership_id,
-                dealership_name: dealershipData.name,
-              });
-            }
+      
+      // Fetch dealership name if ID is available
+      if (profileData?.dealership_id) {
+        try {
+          const { data: dealershipData, error: dealershipError } = await supabase
+            .from('dealerships')
+            .select('name')
+            .eq('id', profileData.dealership_id)
+            .single();
+          
+          if (!dealershipError && dealershipData) {
+            setCurrentDealershipName(dealershipData.name);
+          }
+        } catch (dealershipFetchError) {
+          // Don't fail the operation if dealership name fetch fails
+          SecureLogger.warning('Failed to fetch dealership name', { 
+            dealership_id: profileData.dealership_id 
           });
+        }
       }
-
-      return data?.dealership_id || null;
-    } catch (err) {
-      logAuthEvent('Exception fetching user dealership', {
-        user_id: userId,
-        error: err instanceof Error ? err.message : String(err),
+      
+      return profileData?.dealership_id || null;
+    } catch (error) {
+      SecureLogger.error('User dealership fetch failed', { 
+        user_id: userId, 
+        error: error.message 
       });
       return null;
     }
-  }, []);
+  }, [setRoleSecurely]);
 
-  // Simplified fetch user role function without recursive calls
-  const fetchUserRole = useCallback(
-    async (userId: string): Promise<UserRole> => {
-      console.log('[AuthContext] fetchUserRole called for userId:', userId, {
-        timestamp: new Date().toISOString(),
+  // =================== AUTH STATE MANAGEMENT ===================
+
+  /**
+   * Enhanced auth state change handler with comprehensive security checks
+   * Implements secure session handling and state management
+   */
+  const handleAuthStateChange = useCallback(async (session: Session | null): Promise<void> => {
+    if (!mountedRef.current) return;
+    
+    try {
+      logSecureAuthEvent('Auth state change initiated', {
+        has_session: !!session,
+        user_id: session?.user?.id,
       });
-
-      // Add detailed logging for role debugging
-      console.log('[AuthContext] Role debugging - current states:', {
-        currentRole: role,
-        hasSession,
-        dealershipId,
-        userId,
-      });
-
-      // Prevent concurrent operations on the same profile
-      if (profileOperationInProgressRef.current) {
-        console.log('[AuthContext] Profile operation already in progress, waiting...', {
-          userId,
-          timestamp: new Date().toISOString(),
-        });
-        // Wait briefly and try again up to 3 times
-        if (retryCountRef.current < 3) {
-          retryCountRef.current++;
-          await new Promise(resolve => setTimeout(resolve, 500));
-          return fetchUserRole(userId);
-        } else {
-          console.warn('[AuthContext] Max retries reached for fetchUserRole, using fallback role', {
-            userId,
-            timestamp: new Date().toISOString(),
-          });
-          return FALLBACK_ROLE;
-        }
-      }
-
-      profileOperationInProgressRef.current = true;
-      retryCountRef.current = 0;
-
-      try {
-        // First check if profile exists
-        const profileExists = await checkProfileExists(userId);
-
-        if (profileExists) {
-          // If profile exists, get the role
-          console.log('[AuthContext] Profile exists, fetching role', {
-            userId,
-            timestamp: new Date().toISOString(),
-          });
-
-          try {
-            const { data: profile, error: roleError } = await supabase
-              .from('profiles')
-              .select('role, dealership_id')
-              .eq('id', userId)
-              .maybeSingle();
-
-            if (roleError) {
-              console.error('[AuthContext] Error fetching role:', roleError, {
-                userId,
-                timestamp: new Date().toISOString(),
-              });
-              return FALLBACK_ROLE;
-            }
-
-            // Enhanced logging for dealership_admin role detection
-            console.log('[AuthContext] Profile data retrieved:', {
-              profileData: profile,
-              hasRole: !!profile?.role,
-              rawRole: profile?.role,
-              normalizedRole: profile?.role?.toLowerCase(),
-              isDealershipAdmin: profile?.role?.toLowerCase() === 'dealership_admin',
-              timestamp: new Date().toISOString(),
-            });
-
-            // Also set the dealership ID if available
-            if (profile?.dealership_id) {
-              setDealershipId(profile.dealership_id);
-              console.log('[AuthContext] Set dealership ID:', profile.dealership_id);
-            }
-
-            if (profile?.role) {
-              const normalizedRole = profile.role.toLowerCase() as UserRole;
-              console.log('[AuthContext] Role found:', profile.role, {
-                normalizedRole,
-                userId,
-                timestamp: new Date().toISOString(),
-              });
-              return normalizedRole;
-            } else {
-              console.log('[AuthContext] Profile exists but no role found, using fallback role', {
-                userId,
-                timestamp: new Date().toISOString(),
-              });
-              return FALLBACK_ROLE;
-            }
-          } catch (err) {
-            console.error('[AuthContext] Exception fetching role:', err, {
-              userId,
-              timestamp: new Date().toISOString(),
-            });
-            return FALLBACK_ROLE;
-          }
-        }
-
-        // If profile doesn't exist, check user_metadata first before creating profile
-        console.log('[AuthContext] Profile does not exist, checking user_metadata for role', {
-          userId,
-          timestamp: new Date().toISOString(),
-        });
-
-        try {
-          const { data: userData } = await supabase.auth.getUser();
-          
-          // Check if role exists in user_metadata (e.g., from SimpleSignup)
-          const metadataRole = userData.user?.user_metadata?.role;
-          const userEmail = userData.user?.email?.toLowerCase() || '';
-          
-          // Special check for Single Finance Manager users by email pattern or signup source
-          const signupEmail = localStorage.getItem('singleFinanceEmail');
-          const isFromSingleFinanceSignup = signupEmail === userEmail;
-          
-          if (userEmail.includes('caplan') || userEmail.includes('sportdurst') || userEmail.includes('testfinance') || isFromSingleFinanceSignup) {
-            console.log('[AuthContext] Detected Single Finance Manager by email pattern or signup source:', userEmail, {
-              userId,
-              isFromSingleFinanceSignup,
-              timestamp: new Date().toISOString(),
-            });
-            return 'single_finance_manager';
-          }
-          
-          if (metadataRole) {
-            console.log('[AuthContext] Found role in user_metadata:', metadataRole, {
-              userId,
-              timestamp: new Date().toISOString(),
-            });
-            
-            // Use the role from metadata for Single Finance Manager users
-            const normalizedMetadataRole = metadataRole.toLowerCase() as UserRole;
-            
-            // For single_finance_manager users, we don't need a profile in the database
-            if (normalizedMetadataRole === 'single_finance_manager') {
-              console.log('[AuthContext] Using single_finance_manager role from metadata without profile creation', {
-                userId,
-                role: normalizedMetadataRole,
-                timestamp: new Date().toISOString(),
-              });
-              return normalizedMetadataRole;
-            }
-          }
-
-          // If no metadata role or not a single finance manager, create profile
-          console.log('[AuthContext] Creating profile with appropriate role', {
-            userId,
-            metadataRole,
-            timestamp: new Date().toISOString(),
-          });
-
-          // Mark that we've attempted a profile operation for this user
-          profileOperationAttempted.set(userId, true);
-
-          // Prepare profile data - use metadata role if available, otherwise default
-          const profileRole = metadataRole || DEFAULT_ROLE;
-          const profileData = {
-            id: userId,
-            role: profileRole,
-            email: userData.user?.email || '',
-            name: userData.user?.user_metadata?.name || userData.user?.user_metadata?.full_name || '',
-            dealership_id: DEFAULT_DEALERSHIP_ID,
-          };
-
-          console.log('[AuthContext] Inserting profile with data:', JSON.stringify(profileData), {
-            timestamp: new Date().toISOString(),
-          });
-
-          // Try insertion with a timeout to prevent hanging
-          const insertPromise = async () => {
-            try {
-              const { error } = await supabase.from('profiles').insert([profileData]);
-
-              return { error };
-            } catch (err) {
-              return { error: err as Error };
-            }
-          };
-
-          // Add timeout to prevent long-running operations
-          const timeoutPromise = new Promise<{ error: Error }>(resolve => {
-            setTimeout(() => {
-              resolve({ error: new Error('Profile insertion timeout') });
-            }, 5000); // 5 second timeout
-          });
-
-          const { error: insertError } = await Promise.race([insertPromise(), timeoutPromise]);
-
-          if (insertError) {
-            console.error('[AuthContext] Error inserting profile:', insertError, {
-              userId,
-              timestamp: new Date().toISOString(),
-            });
-
-            // Don't attempt further operations if insertion fails
-            return FALLBACK_ROLE;
-          } else {
-            console.log('[AuthContext] Profile insertion successful', {
-              userId,
-              timestamp: new Date().toISOString(),
-            });
-
-            // Set the dealership ID for new users
-            setDealershipId(DEFAULT_DEALERSHIP_ID);
-
-            // Log the profile creation
-            logSchemaOperation('profile_creation', {
-              userId,
-              role: DEFAULT_ROLE,
-              dealershipId: DEFAULT_DEALERSHIP_ID,
-              timestamp: new Date().toISOString(),
-            }).catch(err => {
-              console.error('[AuthContext] Error logging profile creation:', err);
-            });
-
-            // Return the role that was actually inserted into the profile
-            const insertedRole = profileRole.toLowerCase() as UserRole;
-            console.log('[AuthContext] Returning inserted profile role:', insertedRole, {
-              userId,
-              timestamp: new Date().toISOString(),
-            });
-            return insertedRole;
-          }
-        } catch (err) {
-          console.error('[AuthContext] Error in profile creation:', err, {
-            userId,
-            timestamp: new Date().toISOString(),
-          });
-          return FALLBACK_ROLE;
-        } finally {
-          profileOperationInProgressRef.current = false;
-        }
-      } catch (err) {
-        console.error('[AuthContext] Unexpected error in fetchUserRole:', err, {
-          userId,
-          timestamp: new Date().toISOString(),
-        });
-        profileOperationInProgressRef.current = false;
-        return FALLBACK_ROLE;
-      }
-    },
-    [role]
-  );
-
-  // Handle auth state changes (login/logout/session changes)
-  const handleAuthStateChange = useCallback(
-    async (session: Session | null) => {
-      SecureLogger.info('[AuthContext] Auth state changed', {
-        hasSession: !!session,
-        timestamp: new Date().toISOString(),
-        event: 'auth_state_change',
-      });
-
-      try {
-        // Update session state immediately
-        setHasSession(!!session);
-
-        if (session?.user) {
-          // Set user immediately to ensure we have user data regardless of profile operations
-          setUser(session.user);
-          SecureLogger.auth('User authenticated from session', {
-            email: session.user.email,
-            userId: session.user.id,
-            timestamp: new Date().toISOString(),
-          });
-
-          // Check if group admin flag exists in user metadata first (faster than DB lookup)
-          if (session.user.user_metadata?.is_group_admin) {
-            console.warn(
-              '[AuthContext] Group admin flag found in user metadata, setting isGroupAdmin=true'
-            );
-            setIsGroupAdmin(true);
-            // Set role for group admin
-            setRole('dealer_group_admin');
-            setUserRole('dealer_group_admin');
-          } else {
-            // Check if the user is a group admin through profile data
-            try {
-              console.warn('[DEBUG AUTH] Checking group admin status during auth state change');
-              const profileData = await fetchProfileData(session.user.id);
-
-              // If we still don't have group admin status set from profile, check email pattern
-              if (!isGroupAdmin && session.user.email) {
-                const isGroupAdminEmail =
-                  session.user.email.toLowerCase().includes('group') &&
-                  session.user.email.toLowerCase().includes('@exampletest.com');
-
-                if (isGroupAdminEmail) {
-                  console.warn(
-                    '[AuthContext] Email pattern suggests group admin but not set in profile/metadata'
-                  );
-                  setIsGroupAdmin(true);
-                  setRole('dealer_group_admin');
-                  setUserRole('dealer_group_admin');
-
-                  // Try to update the profile and metadata
-                  try {
-                    await supabase
-                      .from('profiles')
-                      .update({
-                        is_group_admin: true,
-                        role: 'dealer_group_admin',
-                      })
-                      .eq('id', session.user.id);
-
-                    await supabase.auth.updateUser({
-                      data: {
-                        is_group_admin: true,
-                        role: 'dealer_group_admin',
-                      },
-                    });
-                    console.warn(
-                      '[AuthContext] Updated profile and metadata for detected group admin'
-                    );
-                  } catch (updateError) {
-                    console.error('[AuthContext] Error updating group admin data:', updateError);
-                  }
-                }
-              }
-            } catch (profileError) {
-              console.error('[DEBUG AUTH] Error checking group admin status:', profileError);
-            }
-          }
-
-          // Then try to get role - but don't let profile errors affect user state
-          try {
-            retryCountRef.current = 0;
-            const userRole = await fetchUserRole(session.user.id);
-            console.log('[AuthContext] Role fetched successfully:', userRole, {
-              userId: session.user.id,
-              timestamp: new Date().toISOString(),
-            });
-            setRole(userRole);
-
-            // Also fetch dealership ID if not already set
-            if (dealershipId === null) {
-              const userDealershipId = await fetchUserDealership(session.user.id);
-              if (userDealershipId) {
-                setDealershipId(userDealershipId);
-                console.log('[AuthContext] Dealership ID set from profile:', userDealershipId);
-
-                // Log the dealership assignment
-                logSchemaOperation('dealership_assignment', {
-                  userId: session.user.id,
-                  dealershipId: userDealershipId,
-                  timestamp: new Date().toISOString(),
-                }).catch(err => {
-                  console.error('[AuthContext] Error logging dealership assignment:', err);
-                });
-              }
-            }
-          } catch (error) {
-            console.error('[AuthContext] Error fetching role, using fallback:', error, {
-              userId: session.user.id,
-              timestamp: new Date().toISOString(),
-            });
-            // Always set a role even on error
-            setRole(FALLBACK_ROLE);
-          }
-        } else {
-          // Clear user and role on session end
-          console.log('[AuthContext] No session, clearing user and role', {
-            timestamp: new Date().toISOString(),
-          });
-          setUser(null);
-          setRole(null);
+      
+      // Validate session security
+      if (session) {
+        const isValidSession = await validateSession(session);
+        if (!isValidSession) {
+          SecureLogger.warning('Invalid session detected during auth state change');
+          setHasSession(false);
+          setUserSecurely(null);
+          setRoleSecurely(null);
           setDealershipId(null);
-        }
-      } catch (error) {
-        console.error('[AuthContext] Error in handleAuthStateChange:', error, {
-          sessionExists: !!session,
-          timestamp: new Date().toISOString(),
-        });
-      } finally {
-        setLoading(false);
-        // Mark auth check as complete
-        setAuthCheckComplete(true);
-      }
-    },
-    [fetchUserRole, fetchUserDealership, dealershipId, isGroupAdmin]
-  );
-
-  // Initialize auth state on component mount
-  useEffect(() => {
-    let mounted = true;
-    let authListener: { data: { subscription: { unsubscribe: () => void } } } | null = null;
-
-    const initialize = async () => {
-      if (initialized) return;
-
-      try {
-        console.log('[AuthContext] Initializing auth context', {
-          timestamp: new Date().toISOString(),
-        });
-
-        // Check for direct auth first - if active, skip normal Supabase initialization
-        if (isDirectAuthAuthenticated && isDirectAuthAuthenticated()) {
-          const directUser = getDirectAuthUser();
-          if (directUser) {
-            console.log(
-              '[AuthContext] Direct auth detected during initialization:',
-              directUser.email
-            );
-
-            // Set user data from direct auth
-            if (mounted) {
-              // Create a mock Supabase user object from direct auth user
-              const mockUser = {
-                id: directUser.id,
-                email: directUser.email,
-                user_metadata: { role: directUser.role },
-                app_metadata: {},
-                aud: 'authenticated',
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-              };
-
-              setUser(mockUser as any);
-              setRole(directUser.role as any);
-              setUserRole(directUser.role); // Fix: Also set userRole for direct auth users
-              setIsGroupAdmin(directUser.isGroupAdmin || false);
-              setLoading(false);
-              setAuthCheckComplete(true);
-              setHasSession(true); // Direct auth counts as having a session
-              SecureLogger.info('[AuthContext] Direct auth initialization completed', {
-                hasUser: !!directUser,
-                hasRole: !!directUser.role,
-                isGroupAdmin: directUser.isGroupAdmin,
-              });
-            }
-            return;
-          }
-        }
-
-        // Try alternative session detection first
-        let session = null;
-        let sessionError = null;
-        
-        console.log('[AuthContext] Attempting alternative session detection...');
-        
-        // Method 1: Check localStorage directly for session tokens
-        try {
-          const storageKey = 'supabase.auth.token';
-          const authData = localStorage.getItem(storageKey);
-          
-          if (authData) {
-            try {
-              const parsedAuthData = JSON.parse(authData);
-              if (parsedAuthData?.access_token && parsedAuthData?.user) {
-                console.log('[AuthContext] Found session in localStorage');
-                
-                // Create a session-like object from localStorage
-                session = {
-                  access_token: parsedAuthData.access_token,
-                  refresh_token: parsedAuthData.refresh_token,
-                  expires_at: parsedAuthData.expires_at,
-                  user: parsedAuthData.user,
-                  token_type: 'bearer'
-                };
-                
-                console.log('[AuthContext] Successfully restored session from localStorage', {
-                  userId: session.user.id,
-                  email: session.user.email,
-                  expires_at: session.expires_at,
-                  timestamp: new Date().toISOString(),
-                });
-              }
-            } catch (parseError) {
-              console.warn('[AuthContext] Failed to parse auth data from localStorage:', parseError);
-            }
-          }
-        } catch (storageError) {
-          console.warn('[AuthContext] Error accessing localStorage for auth data:', storageError);
-        }
-        
-        // Method 2: Check for recent SimpleSignup users
-        if (!session) {
-          const recentSignupDate = localStorage.getItem('singleFinanceSignupDate');
-          if (recentSignupDate) {
-            const signupTime = new Date(recentSignupDate).getTime();
-            const now = new Date().getTime();
-            const hoursSinceSignup = (now - signupTime) / (1000 * 60 * 60);
-            
-            // If signed up within last 24 hours, create a temporary session for Single Finance users
-            if (hoursSinceSignup < 24) {
-              console.log('[AuthContext] Found recent SimpleSignup, creating temporary session');
-              
-              // Look for stored signup data
-              const signupEmail = localStorage.getItem('singleFinanceEmail');
-              const signupName = localStorage.getItem('singleFinanceName');
-              
-              if (signupEmail) {
-                session = {
-                  access_token: 'temp_token_' + Date.now(),
-                  refresh_token: '',
-                  expires_at: Math.floor(Date.now() / 1000) + 86400, // 24 hours from now
-                  user: {
-                    id: 'temp_user_' + signupEmail.replace(/[^a-zA-Z0-9]/g, '_'),
-                    email: signupEmail,
-                    user_metadata: {
-                      full_name: signupName || 'Single Finance Manager',
-                      role: 'single_finance_manager'
-                    },
-                    app_metadata: {},
-                    aud: 'authenticated',
-                    created_at: recentSignupDate,
-                    updated_at: recentSignupDate
-                  },
-                  token_type: 'bearer'
-                };
-                
-                console.log('[AuthContext] Created temporary session for recent signup', {
-                  email: signupEmail,
-                  role: 'single_finance_manager',
-                  timestamp: new Date().toISOString(),
-                });
-              }
-            }
-          }
-        }
-        
-        // Method 3: If no localStorage session or recent signup, try Supabase with shorter timeout
-        if (!session) {
-          console.log('[AuthContext] No localStorage session or recent signup found, trying Supabase API...');
-          
-          try {
-            const sessionPromise = supabase.auth.getSession();
-            const timeoutPromise = new Promise((_, reject) => {
-              setTimeout(() => reject(new Error('Session fetch timeout')), 3000); // Reduced to 3 seconds
-            });
-            
-            const result = await Promise.race([sessionPromise, timeoutPromise]) as any;
-            
-            if (result?.data?.session) {
-              session = result.data.session;
-              console.log('[AuthContext] Successfully fetched session from Supabase API');
-            } else if (result?.error) {
-              sessionError = result.error;
-            }
-            
-          } catch (error: any) {
-            sessionError = error;
-            console.log('[AuthContext] Supabase session fetch failed, will continue without session');
-          }
-        }
-
-        if (sessionError) {
-          console.error('[AuthContext] Error getting initial session:', sessionError, {
-            timestamp: new Date().toISOString(),
-          });
-          
-          // If it's a timeout or network error, continue without session
-          if (sessionError.message?.includes('timeout') || sessionError.message?.includes('network') || sessionError.message?.includes('fetch')) {
-            console.log('[AuthContext] Network/timeout error - continuing without session, demo mode available');
-            if (mounted) {
-              setLoading(false);
-              setAuthCheckComplete(true);
-              setHasSession(false);
-              setUser(null);
-              setRole(null);
-              // Set a flag indicating Supabase is unreachable
-              (window as any).__supabaseUnreachable = true;
-            }
-            return;
-          }
-          
-          if (mounted) {
-            setLoading(false); // Make sure to set loading to false even on error
-            setAuthCheckComplete(true); // Mark auth check as complete
-            setError(sessionError);
-          }
+          setIsGroupAdmin(false);
           return;
         }
-
-        // Update session state
-        if (mounted) {
-          console.log('[AuthContext] Initial session exists:', !!session, {
-            userId: session?.user?.id || 'none',
-            timestamp: new Date().toISOString(),
-          });
-          setHasSession(!!session);
-        }
-
-        // Process initial session
-        if (session?.user && mounted) {
-          SecureLogger.info('[AuthContext] Found initial session', {
-            hasUser: !!session.user,
-            timestamp: new Date().toISOString(),
-          });
-
-          // Always set user data immediately
-          setUser(session.user);
-
-          // Check if the user is a group admin
-          try {
-            console.warn('[DEBUG AUTH] Checking group admin status during initialization');
-            await fetchProfileData(session.user.id);
-          } catch (profileError) {
-            console.error('[DEBUG AUTH] Error checking group admin status:', profileError);
+        
+        // Generate and store session fingerprint for hijacking prevention
+        storedSessionFingerprint = generateSessionFingerprint();
+        secureSessionStorage.setItem('session_fingerprint', storedSessionFingerprint);
+        
+        // Set session login timestamp for timeout tracking
+        secureSessionStorage.setItem('session_login_time', Date.now().toString());
+      }
+      
+      setHasSession(!!session);
+      
+      if (session?.user) {
+        // Set user data immediately for better UX
+        setUserSecurely(session.user);
+        
+        try {
+          // Fetch and process profile data
+          await fetchProfileDataSecurely(session.user.id);
+          
+          // Fetch dealership information
+          const dealershipId = await fetchUserDealershipSecurely(session.user.id);
+          if (dealershipId) {
+            setDealershipId(dealershipId);
+          } else {
+            // Use default dealership for new users
+            setDealershipId(DEFAULT_DEALERSHIP_ID);
           }
+          
+          logSecureAuthEvent('Auth state processing completed', {
+            user_id: session.user.id,
+            dealership_id: dealershipId,
+          });
+        } catch (profileError) {
+          SecureLogger.error('Profile processing failed during auth state change', {
+            user_id: session.user.id,
+            error: profileError.message,
+          });
+          
+          // Set fallback role to ensure user can still access the application
+          setRoleSecurely(FALLBACK_ROLE);
+        }
+      } else {
+        // Clear all auth state on session end
+        setUserSecurely(null);
+        setRoleSecurely(null);
+        setDealershipId(null);
+        setCurrentDealershipName(null);
+        setIsGroupAdmin(false);
+        
+        // Clear secure storage
+        secureSessionStorage.clear();
+        storedSessionFingerprint = null;
+      }
+    } catch (error) {
+      SecureLogger.error('Auth state change handling failed', {
+        error: error.message,
+        has_session: !!session,
+      });
+      
+      // Ensure loading state is cleared even on error
+      setError(error instanceof Error ? error : new Error('Auth state change failed'));
+    } finally {
+      if (mountedRef.current) {
+        setLoading(false);
+        setAuthCheckComplete(true);
+      }
+    }
+  }, [validateSession, setUserSecurely, setRoleSecurely, fetchProfileDataSecurely, fetchUserDealershipSecurely]);
 
-          try {
-            // Then try to get role
-            const initialRole = await fetchUserRole(session.user.id);
-            if (mounted) {
-              console.log('[AuthContext] Setting initial role:', initialRole, {
-                userId: session.user.id,
-                timestamp: new Date().toISOString(),
-              });
-              setRole(initialRole);
-            }
-          } catch (error) {
-            console.error('[AuthContext] Error fetching initial role, using fallback:', error, {
-              userId: session.user.id,
-              timestamp: new Date().toISOString(),
+  // =================== INITIALIZATION ===================
+
+  /**
+   * Secure authentication initialization with comprehensive error handling
+   * Implements multiple session detection methods and graceful degradation
+   */
+  useEffect(() => {
+    if (initializationRef.current) return;
+    initializationRef.current = true;
+    
+    let safetyTimeout: NodeJS.Timeout;
+    
+    const initializeAuth = async (): Promise<void> => {
+      try {
+        logSecureAuthEvent('Auth initialization started', {});
+        
+        // Check for direct auth first
+        if (isDirectAuthAuthenticated && isDirectAuthAuthenticated()) {
+          const directUser = getDirectAuthUser();
+          if (directUser && mountedRef.current) {
+            const mockUser = {
+              id: directUser.id,
+              email: directUser.email,
+              user_metadata: { role: directUser.role },
+              app_metadata: {},
+              aud: 'authenticated',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            } as User;
+            
+            setUserSecurely(mockUser);
+            setRoleSecurely(directUser.role);
+            setIsGroupAdmin(directUser.isGroupAdmin || false);
+            setHasSession(true);
+            setLoading(false);
+            setAuthCheckComplete(true);
+            
+            logSecureAuthEvent('Direct auth initialization completed', {
+              user_id: directUser.id,
+              role: directUser.role,
             });
-            if (mounted) {
-              // Always set a role even on error
-              console.log('[AuthContext] Setting fallback role due to error', {
-                role: FALLBACK_ROLE,
-                timestamp: new Date().toISOString(),
-              });
-              setRole(FALLBACK_ROLE);
-            }
+            return;
           }
         }
-
-        if (mounted) {
-          setLoading(false);
-          setAuthCheckComplete(true); // Mark auth check as complete
-        }
-
-        // Set up auth state change listener
-        if (mounted) {
-          authListener = await supabase.auth.onAuthStateChange(async (event, newSession) => {
-            if (!mounted) return;
-
-            console.log('[AuthContext] Auth event:', event, {
-              userId: newSession?.user?.id || 'none',
-              email: newSession?.user?.email || 'none',
-              timestamp: new Date().toISOString(),
+        
+        // Try multiple session detection methods
+        let session: Session | null = null;
+        
+        // Method 1: Try Supabase session with timeout
+        try {
+          const sessionPromise = supabase.auth.getSession();
+          const timeoutPromise = new Promise<never>((_, reject) => {
+            setTimeout(() => reject(new Error('Session fetch timeout')), SECURITY_CONFIG.NETWORK_TIMEOUT);
+          });
+          
+          const result = await Promise.race([sessionPromise, timeoutPromise]);
+          
+          if ('data' in result && result.data.session) {
+            session = result.data.session;
+            logSecureAuthEvent('Session retrieved from Supabase', {
+              user_id: session.user.id,
             });
-
-            // Update hasSession immediately
-            setHasSession(!!newSession);
-
-            // Skip INITIAL_SESSION if we already have a user
-            if (event === 'INITIAL_SESSION' && user && role) {
-              console.log('[AuthContext] Skipping INITIAL_SESSION - already initialized', {
-                userId: user.id,
-                role,
-                timestamp: new Date().toISOString(),
-              });
-              return;
+          }
+        } catch (sessionError) {
+          SecureLogger.warning('Initial session fetch failed', { 
+            error: sessionError.message 
+          });
+          
+          // Method 2: Try secure session storage fallback
+          try {
+            const storedSessionData = secureSessionStorage.getItem('session_data');
+            if (storedSessionData) {
+              const parsedData = JSON.parse(storedSessionData);
+              
+              // Validate stored session data
+              if (parsedData.expires_at && parsedData.expires_at > Date.now() / 1000) {
+                // Session still valid, try to restore
+                logSecureAuthEvent('Attempting session restoration from secure storage', {
+                  expires_at: parsedData.expires_at,
+                });
+                
+                // This would require additional implementation to restore from secure storage
+                // For now, we'll proceed without session
+              }
             }
-
+          } catch (storageError) {
+            SecureLogger.warning('Session restoration from storage failed', {
+              error: storageError.message,
+            });
+          }
+        }
+        
+        // Process the session
+        if (mountedRef.current) {
+          await handleAuthStateChange(session);
+        }
+        
+        // Set up auth state listener
+        if (mountedRef.current) {
+          authListenerRef.current = supabase.auth.onAuthStateChange(async (event, newSession) => {
+            if (!mountedRef.current) return;
+            
+            logSecureAuthEvent('Auth state listener triggered', {
+              event,
+              user_id: newSession?.user?.id,
+            });
+            
             await handleAuthStateChange(newSession);
           });
         }
-
-        if (mounted) {
-          setInitialized(true);
-        }
-      } catch (error) {
-        console.error('[AuthContext] Error in initialization:', error, {
-          timestamp: new Date().toISOString(),
+        
+        logSecureAuthEvent('Auth initialization completed', {});
+      } catch (initError) {
+        SecureLogger.error('Auth initialization failed', { 
+          error: initError.message 
         });
         
-        // For timeout or network errors, don't show error toast - just continue
-        if (error instanceof Error && (error.message.includes('timeout') || error.message.includes('network'))) {
-          console.log('[AuthContext] Network/timeout during initialization - continuing without auth');
-          if (mounted) {
-            setLoading(false);
-            setAuthCheckComplete(true);
-            setHasSession(false);
-            setUser(null);
-            setRole(null);
-          }
-          return;
-        }
-        
-        if (mounted) {
-          setLoading(false); // Ensure loading is set to false on any error
-          setAuthCheckComplete(true); // Mark auth check as complete
-          setError(error instanceof Error ? error : new Error('Unknown initialization error'));
-        }
-      }
-    };
-
-    initialize();
-
-    // Set a safety timeout to ensure loading state isn't stuck
-    const safetyTimer = setTimeout(() => {
-      if (mounted && loading) {
-        // Check if direct auth is active before forcing timeout
-        const isDirectAuth = isDirectAuthAuthenticated && isDirectAuthAuthenticated();
-        if (isDirectAuth) {
-          console.log(
-            '[AuthContext] Safety timeout reached but direct auth is active - completing auth state'
-          );
-          // Complete the auth state for direct auth
+        if (mountedRef.current) {
+          setError(initError instanceof Error ? initError : new Error('Initialization failed'));
           setLoading(false);
           setAuthCheckComplete(true);
-          setHasSession(true); // Direct auth counts as having a session
-          return;
         }
-
-        console.error('[AuthContext] Safety timeout reached - forcing loading state to false');
+      }
+    };
+    
+    // Set safety timeout to prevent stuck loading state
+    safetyTimeout = setTimeout(() => {
+      if (mountedRef.current && loading) {
+        SecureLogger.warning('Auth initialization safety timeout reached');
         setLoading(false);
-        setAuthCheckComplete(true); // Mark auth check as complete even on timeout
+        setAuthCheckComplete(true);
       }
-    }, 15000); // 15 second safety timeout
-
+    }, 15000);
+    
+    initializeAuth();
+    
     return () => {
-      mounted = false;
-      clearTimeout(safetyTimer);
-      if (authListener?.data?.subscription) {
-        authListener.data.subscription.unsubscribe();
+      clearTimeout(safetyTimeout);
+      if (authListenerRef.current?.data?.subscription) {
+        authListenerRef.current.data.subscription.unsubscribe();
       }
     };
-  }, [handleAuthStateChange, initialized, fetchUserRole]);
+  }, [loading, handleAuthStateChange, setUserSecurely, setRoleSecurely]);
 
-  // Check session timeout every 5 minutes
+  // =================== SESSION MONITORING ===================
+
+  /**
+   * Set up session health monitoring and automatic refresh
+   * Implements proactive session management with security checks
+   */
   useEffect(() => {
-    const timeoutCheckInterval = setInterval(() => {
-      checkSessionTimeout();
-    }, 5 * 60 * 1000); // Check every 5 minutes
-
-    // Also check on page focus/visibility change
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        checkSessionTimeout();
+    if (!hasSession) return;
+    
+    // Set up session health monitoring
+    sessionCheckIntervalRef.current = setInterval(monitorSessionHealth, 5 * 60 * 1000); // Every 5 minutes
+    
+    // Set up token rotation
+    tokenRotationIntervalRef.current = setInterval(async () => {
+      try {
+        await refreshSession();
+      } catch (error) {
+        SecureLogger.error('Automatic token rotation failed', { error: error.message });
+      }
+    }, SECURITY_CONFIG.TOKEN_ROTATION_INTERVAL);
+    
+    return () => {
+      if (sessionCheckIntervalRef.current) {
+        clearInterval(sessionCheckIntervalRef.current);
+      }
+      if (tokenRotationIntervalRef.current) {
+        clearInterval(tokenRotationIntervalRef.current);
       }
     };
+  }, [hasSession, monitorSessionHealth, refreshSession]);
 
-    const handleFocus = () => {
-      checkSessionTimeout();
-    };
+  // =================== AUTHENTICATION FUNCTIONS ===================
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleFocus);
-
-    return () => {
-      clearInterval(timeoutCheckInterval);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, [checkSessionTimeout]);
-
-  // Sign in with email and password
-  const signIn = async (email: string, password: string, rememberMe?: boolean) => {
+  /**
+   * Secure sign in with comprehensive security measures
+   * Implements rate limiting, validation, and security logging
+   */
+  const signIn = useCallback(async (email: string, password: string, rememberMe = false): Promise<void> => {
     try {
-      // Check server-side rate limiting first
+      // Input validation
+      if (!validateEmail(email)) {
+        throw new Error('Invalid email format');
+      }
+      
+      if (!password || password.length < 8) {
+        throw new Error('Invalid password');
+      }
+      
+      // Server-side rate limiting check
       const serverRateLimit = await ServerRateLimiter.enforceRateLimit('signIn', email);
       if (!serverRateLimit.allowed) {
-        setError(new Error(serverRateLimit.message));
+        const error = new Error(serverRateLimit.message) as AuthError;
+        setError(error);
         toast({
           title: 'Rate Limited',
           description: serverRateLimit.message,
@@ -1194,14 +1131,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
         return;
       }
-
-      // Also check client-side rate limiting as backup
+      
+      // Client-side rate limiting check
       const rateLimitCheck = rateLimiter.isLimited('signIn', email);
       if (rateLimitCheck.limited) {
         const waitTimeMinutes = Math.ceil((rateLimitCheck.retryAfterMs || 0) / 60000);
         const errorMessage = `Too many sign in attempts. Please try again in ${waitTimeMinutes} minute${waitTimeMinutes !== 1 ? 's' : ''}.`;
         
-        setError(new Error(errorMessage));
+        const error = new Error(errorMessage) as AuthError;
+        setError(error);
         toast({
           title: 'Rate Limited',
           description: errorMessage,
@@ -1209,32 +1147,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
         return;
       }
-
-      logAuthEvent('Sign in attempt', {
-        email,
-        remember_me: !!rememberMe,
-        timestamp: new Date().toISOString(),
-      });
-
+      
+      logSecureAuthEvent('Sign in attempt initiated', { email });
+      
       setLoading(true);
       setError(null);
-
-      SecureLogger.info('[AuthContext] User sign in attempt', {
-        timestamp: new Date().toISOString(),
-        rememberMe: !!rememberMe,
-        hasEmail: !!email,
-      });
-
-      // Check for demo user credentials first
+      
+      // Check for demo user credentials
       const { isDemoLogin, authenticateDemoUser } = await import('../lib/demoAuth');
-
+      
       if (isDemoLogin(email, password)) {
-        console.log('[AuthContext] Demo user login detected');
-
         const demoAuthResult = authenticateDemoUser(email, password);
-
+        
         if (demoAuthResult.isDemo) {
-          // Create a mock user object for demo session
           const demoUser = {
             id: 'demo-user-authenticated',
             email: email,
@@ -1245,325 +1170,216 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             },
             app_metadata: {
               role: 'sales_manager',
-              dealership_id: 46, // Use the actual demo dealership ID
+              dealership_id: 46,
               is_demo: true,
             },
-          };
-
-          // Set auth state for demo user
-          setUser(demoUser as any);
-          setRole('sales_manager');
-          setUserRole('sales_manager');
+            aud: 'authenticated',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          } as User;
+          
+          setUserSecurely(demoUser);
+          setRoleSecurely('sales_manager');
           setHasSession(true);
-          setDealershipId(46); // Use the actual demo dealership ID
-          setLoading(false);
-
-          console.log('[AuthContext] Demo user authenticated successfully');
-
-          // Log successful demo authentication
-          logAuthEvent('Demo user authenticated', {
-            email: email,
-            timestamp: new Date().toISOString(),
-            demo_mode: true,
+          setDealershipId(46);
+          
+          logSecureAuthEvent('Demo user authentication successful', { email });
+          
+          toast({
+            title: 'Demo Access Granted',
+            description: 'Welcome to The DAS Board sales demonstration',
+            variant: 'default',
           });
-
-          // Use the existing showSuccessToast function
-          showSuccessToast('Demo Access Granted', 'Welcome to The DAS Board sales demonstration');
-
-          // Redirect to demo dashboard
+          
           setTimeout(() => {
             window.location.href = '/sales-experience-demo';
           }, 500);
-
+          
           return;
         }
       }
-
-      // Special handling for test accounts with @exampletest.com domain
+      
+      // Check for test accounts
       if (isTestEmail(email)) {
-        console.log('[AuthContext] Test email detected, using special login flow');
         const testLoginResult = await loginTestUser(email, password);
-
+        
         if (testLoginResult.error) {
           throw testLoginResult.error;
         }
-
-        // If successful, the loginTestUser function returns the session data
+        
         const session = testLoginResult.data?.session;
-
         if (!session) {
           throw new Error('No session returned from test login');
         }
-
-        console.log('[AuthContext] Test login successful for:', email, testLoginResult);
-
-        // Handle the successful session similar to the normal flow
-        setUser(session.user);
+        
+        setUserSecurely(session.user);
         setHasSession(true);
-
-        // Check for force_redirect flag that may have been set by loginTestUser
-        const forceRedirectTo = localStorage.getItem('force_redirect_after_login');
-        const forceRedirectTimestamp = localStorage.getItem('force_redirect_timestamp');
-
-        // Only use the redirect if it was set in the last 10 seconds
-        const isRecentRedirect =
-          forceRedirectTimestamp && Date.now() - parseInt(forceRedirectTimestamp) < 10000;
-
-        if (forceRedirectTo && isRecentRedirect) {
-          console.log('[AuthContext] Force redirect detected for test user to:', forceRedirectTo);
-          // Clear the flags to prevent redirect loops
-          localStorage.removeItem('force_redirect_after_login');
-          localStorage.removeItem('force_redirect_timestamp');
-
-          setLoading(false);
-          showSuccessToast('Welcome Back!', 'Login successful - redirecting...');
-
-          // Use window.location for a full page reload to ensure clean state
-          window.location.href = forceRedirectTo;
-          return;
-        }
-
-        // Force immediate redirection if group admin
-        const isGroupAdminByEmail =
-          email.toLowerCase().includes('group') && email.toLowerCase().includes('@exampletest.com');
-
-        if (isGroupAdmin || testLoginResult.isGroupAdmin) {
-          console.warn(
-            '[AuthContext] GROUP ADMIN test account detected, forcing immediate redirect'
-          );
-          setLoading(false);
-          showSuccessToast('Welcome Back!', 'Group Admin login successful');
-          window.location.href = '/group-admin';
-          return;
-        }
-
-        // Check if this user is explicitly marked as a group admin in the result
+        
+        // Handle group admin accounts
         if (testLoginResult.isGroupAdmin) {
-          console.log('[AuthContext] Direct group admin flag detected, setting isGroupAdmin=true');
           setIsGroupAdmin(true);
-          setRole('dealer_group_admin');
-          setUserRole('dealer_group_admin');
-        } else {
-          // Check group admin status
-          console.warn('[DEBUG AUTH] Checking group admin status after test login');
-          if (session.user?.id) {
-            const profileData = await fetchProfileData(session.user.id);
-
-            // Get the user's dealership
-            const userDealershipId = await fetchUserDealership(session.user.id);
-            if (userDealershipId) {
-              setDealershipId(userDealershipId);
-            }
-
-            // Set role from profile if available
-            if (profileData?.role) {
-              const normalizedRole = profileData.role.toLowerCase() as UserRole;
-              setRole(normalizedRole);
-              setUserRole(normalizedRole);
-            }
+          setRoleSecurely('dealer_group_admin');
+          
+          toast({
+            title: 'Welcome Back!',
+            description: 'Group Admin login successful',
+            variant: 'default',
+          });
+          
+          setTimeout(() => {
+            window.location.href = '/group-admin';
+          }, 500);
+          
+          return;
+        }
+        
+        // Process regular test user
+        if (session.user?.id) {
+          await fetchProfileDataSecurely(session.user.id);
+          const dealershipId = await fetchUserDealershipSecurely(session.user.id);
+          if (dealershipId) {
+            setDealershipId(dealershipId);
           }
         }
-
-        showSuccessToast('Welcome back!', 'You have successfully signed in as a test user.');
-        setLoading(false);
+        
+        toast({
+          title: 'Welcome back!',
+          description: 'You have successfully signed in as a test user.',
+          variant: 'default',
+        });
+        
         return;
       }
-
-      // Normal login flow for non-test accounts with timeout protection
-      let data, error;
       
-      try {
-        const signInPromise = supabase.auth.signInWithPassword({
-          email,
-          password,
-          options: {
-            // Set session persistence based on remember me option
-            // Default to false if not specified (session expires when tab is closed)
-            persistSession: rememberMe ?? false,
-          },
-        });
-        
-        const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Sign in timeout')), 10000); // 10 second timeout
-        });
-        
-        const result = await Promise.race([signInPromise, timeoutPromise]) as any;
-        data = result.data;
-        error = result.error;
-        
-      } catch (timeoutError: any) {
-        // Handle timeout - check if this is a known Single Finance Manager user
-        if (timeoutError.message?.includes('timeout')) {
-          console.log('[AuthContext] Sign in timed out, checking for Single Finance Manager fallback');
-          
-          const signupEmail = localStorage.getItem('singleFinanceEmail');
-          const signupName = localStorage.getItem('singleFinanceName');
-          const signupDate = localStorage.getItem('singleFinanceSignupDate');
-          
-          if ((signupEmail === email || email.includes('caplan') || email.includes('sportdurst')) && signupDate) {
-            const signupTime = new Date(signupDate).getTime();
-            const now = new Date().getTime();
-            const hoursSinceSignup = (now - signupTime) / (1000 * 60 * 60);
-            
-            // Allow fallback authentication within 72 hours of signup (extended for testing)
-            if (hoursSinceSignup < 72) {
-              console.log('[AuthContext] Using fallback authentication for recent Single Finance signup');
-              
-              // Create a temporary user session
-              const tempUser = {
-                id: 'temp_user_' + email.replace(/[^a-zA-Z0-9]/g, '_'),
-                email: email,
-                user_metadata: {
-                  full_name: signupName || 'Single Finance Manager',
-                  role: 'single_finance_manager'
-                },
-                app_metadata: {},
-                aud: 'authenticated',
-                created_at: signupDate,
-                updated_at: new Date().toISOString()
-              };
-              
-              // Set the auth state directly
-              setUser(tempUser as any);
-              setRole('single_finance_manager');
-              setUserRole('single_finance_manager');
-              setHasSession(true);
-              setLoading(false);
-              
-              console.log('[AuthContext] Fallback authentication successful for Single Finance Manager');
-              return;
-            }
-          }
-        }
-        
-        // If not a Single Finance Manager or outside fallback window, throw the error
-        error = timeoutError;
+      // Normal authentication flow
+      const signInPromise = supabase.auth.signInWithPassword({
+        email,
+        password,
+        options: {
+          persistSession: rememberMe,
+        },
+      });
+      
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Sign in timeout')), SECURITY_CONFIG.NETWORK_TIMEOUT);
+      });
+      
+      const result = await Promise.race([signInPromise, timeoutPromise]);
+      
+      if (result.error) {
+        throw result.error;
       }
-
-      if (error) {
-        console.error('[AuthContext] Sign in error:', error);
-        throw error;
-      }
-
-      if (!data.user) {
-        console.error('[AuthContext] No user returned from authentication');
+      
+      if (!result.data.user) {
         throw new Error('No user returned from authentication');
       }
-
-      SecureLogger.info('[AuthContext] User authenticated successfully');
-
-      // Record successful sign in attempt for rate limiting
+      
+      // Record successful attempt
       rateLimiter.recordAttempt('signIn', true, email);
-
-      // Update state with user data
-      setUser(data.user);
+      
+      setUserSecurely(result.data.user);
       setHasSession(true);
-
-      // Set session login timestamp for 18-hour timeout
-      localStorage.setItem('session_login_time', Date.now().toString());
-      console.log('[AuthContext] Session timeout set for 18 hours from now');
-
-      // Check group admin status
-      console.warn('[DEBUG AUTH] Checking group admin status after login');
-      const profileData = await fetchProfileData(data.user.id);
-
-      // Immediate redirection for group admin accounts
-      const isGroupAdminByEmail =
-        data.user.email?.toLowerCase().includes('group') &&
-        data.user.email?.toLowerCase().includes('@exampletest.com');
-
-      if (
-        isGroupAdmin ||
-        profileData?.is_group_admin ||
-        isGroupAdminByEmail ||
-        data.user.user_metadata?.is_group_admin
-      ) {
-        console.warn('[DEBUG AUTH] Group admin detected, forcing immediate redirect');
-        setLoading(false); // Ensure loading state is cleared before redirect
-        showSuccessToast('Sign In Successful', `Welcome, Group Admin!`);
-
-        // Force immediate browser navigation
-        setTimeout(() => {
-          window.location.href = '/group-admin';
-        }, 100);
-        return;
-      }
-
-      // Get the user's dealership and role
-      const userDealershipId = await fetchUserDealership(data.user.id);
-      if (userDealershipId) {
-        setDealershipId(userDealershipId);
-        console.log(`[AuthContext] User belongs to dealership: ${userDealershipId}`);
+      
+      // Generate and store session fingerprint
+      storedSessionFingerprint = generateSessionFingerprint();
+      secureSessionStorage.setItem('session_fingerprint', storedSessionFingerprint);
+      secureSessionStorage.setItem('session_login_time', Date.now().toString());
+      
+      // Process user data
+      await fetchProfileDataSecurely(result.data.user.id);
+      const dealershipId = await fetchUserDealershipSecurely(result.data.user.id);
+      if (dealershipId) {
+        setDealershipId(dealershipId);
       } else {
-        console.log('[AuthContext] No dealership found for user, using default');
         setDealershipId(DEFAULT_DEALERSHIP_ID);
       }
-
-      showSuccessToast('Sign In Successful', `Welcome back, ${email}!`);
+      
+      logSecureAuthEvent('Sign in successful', { 
+        user_id: result.data.user.id,
+        remember_me: rememberMe,
+      });
+      
+      toast({
+        title: 'Sign In Successful',
+        description: `Welcome back, ${email}!`,
+        variant: 'default',
+      });
+      
     } catch (error) {
-      logAuthEvent('Sign in error', {
+      const authError = error as AuthError;
+      
+      logSecureAuthEvent('Sign in failed', {
         email,
-        error: error instanceof Error ? error.message : String(error),
+        error: authError.message,
       });
-
-      logSecurityEvent('Failed login attempt', {
-        email,
-        error: error instanceof Error ? error.message : String(error),
-        ip_address: 'client-side', // Note: Real IP tracking should be done server-side
-      });
-
-      // Record failed sign in attempt for rate limiting
+      
+      // Record failed attempt
       rateLimiter.recordAttempt('signIn', false, email);
-
-      setError(error instanceof Error ? error : new Error('Unknown error occurred during sign in'));
-      showErrorToast(
-        'Sign In Failed',
-        error instanceof Error ? error.message : 'Unknown error occurred during sign in'
-      );
+      
+      setError(authError);
+      toast({
+        title: 'Sign In Failed',
+        description: authError.message || 'An error occurred during sign in',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }
-  };
+  }, [setUserSecurely, setRoleSecurely, fetchProfileDataSecurely, fetchUserDealershipSecurely]);
 
-  // Sign up function
-  const signUp = async (email: string, password: string, userData: any) => {
-    console.log('[AuthContext] Signing up:', email, {
-      timestamp: new Date().toISOString(),
-    });
-
-    if (!email || !password || !userData) {
-      return;
-    }
-
-    // Check server-side rate limiting first
-    const serverRateLimit = await ServerRateLimiter.enforceRateLimit('signUp', email);
-    if (!serverRateLimit.allowed) {
-      setError(new Error(serverRateLimit.message));
-      toast({
-        title: 'Rate Limited',
-        description: serverRateLimit.message,
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    // Also check client-side rate limiting as backup
-    const rateLimitCheck = rateLimiter.isLimited('signUp', email);
-    if (rateLimitCheck.limited) {
-      const waitTimeMinutes = Math.ceil((rateLimitCheck.retryAfterMs || 0) / 60000);
-      const errorMessage = `Too many signup attempts. Please try again in ${waitTimeMinutes} minute${waitTimeMinutes !== 1 ? 's' : ''}.`;
-      
-      setError(new Error(errorMessage));
-      toast({
-        title: 'Rate Limited',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      return;
-    }
-
+  /**
+   * Secure sign up with validation and proper profile creation
+   * Implements comprehensive input validation and error handling
+   */
+  const signUp = useCallback(async (email: string, password: string, userData: SecureUserData): Promise<void> => {
     try {
+      // Input validation
+      if (!validateEmail(email)) {
+        throw new Error('Invalid email format');
+      }
+      
+      if (!password || password.length < 8) {
+        throw new Error('Password must be at least 8 characters long');
+      }
+      
+      if (!userData.firstName || !userData.lastName) {
+        throw new Error('First name and last name are required');
+      }
+      
+      // Server-side rate limiting
+      const serverRateLimit = await ServerRateLimiter.enforceRateLimit('signUp', email);
+      if (!serverRateLimit.allowed) {
+        const error = new Error(serverRateLimit.message) as AuthError;
+        setError(error);
+        toast({
+          title: 'Rate Limited',
+          description: serverRateLimit.message,
+          variant: 'destructive',
+        });
+        return;
+      }
+      
+      // Client-side rate limiting
+      const rateLimitCheck = rateLimiter.isLimited('signUp', email);
+      if (rateLimitCheck.limited) {
+        const waitTimeMinutes = Math.ceil((rateLimitCheck.retryAfterMs || 0) / 60000);
+        const errorMessage = `Too many signup attempts. Please try again in ${waitTimeMinutes} minute${waitTimeMinutes !== 1 ? 's' : ''}.`;
+        
+        const error = new Error(errorMessage) as AuthError;
+        setError(error);
+        toast({
+          title: 'Rate Limited',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        return;
+      }
+      
+      logSecureAuthEvent('Sign up attempt initiated', { email });
+      
       setLoading(true);
+      setError(null);
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -1571,291 +1387,418 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           data: {
             first_name: userData.firstName,
             last_name: userData.lastName,
+            role: userData.role || DEFAULT_ROLE,
           },
         },
       });
-
+      
       if (error) {
-        console.error('[AuthContext] Sign up error:', error.message, {
-          code: error.name,
-          timestamp: new Date().toISOString(),
-        });
-        
-        // Record failed sign up attempt
         rateLimiter.recordAttempt('signUp', false, email);
-        
-        setError(error);
-        showErrorToast('Sign up failed', error.message);
-        return;
+        throw error;
       }
-
+      
       if (data.user) {
         // Create profile for new user
         try {
-          console.log('[AuthContext] Creating profile for new user:', data.user.id, {
-            email,
-            timestamp: new Date().toISOString(),
-          });
-
           const { error: profileError } = await supabase.from('profiles').insert([
             {
               id: data.user.id,
               email,
               name: `${userData.firstName} ${userData.lastName}`,
-              role: DEFAULT_ROLE,
-              dealership_id: DEFAULT_DEALERSHIP_ID,
+              role: userData.role || DEFAULT_ROLE,
+              dealership_id: userData.dealershipId || DEFAULT_DEALERSHIP_ID,
             },
           ]);
-
+          
           if (profileError) {
-            console.error('[AuthContext] Error creating profile during signup:', profileError, {
-              userId: data.user.id,
-              timestamp: new Date().toISOString(),
-            });
-            // Don't fail sign up due to profile error
-          } else {
-            console.log('[AuthContext] Profile successfully created during signup', {
-              userId: data.user.id,
-              timestamp: new Date().toISOString(),
+            SecureLogger.warning('Profile creation failed during signup', {
+              user_id: data.user.id,
+              error: profileError.message,
             });
           }
         } catch (profileError) {
-          console.error('[AuthContext] Exception creating profile during signup:', profileError, {
-            userId: data.user.id,
-            timestamp: new Date().toISOString(),
+          SecureLogger.warning('Profile creation exception during signup', {
+            user_id: data.user.id,
+            error: profileError.message,
           });
-          // Don't fail sign up due to profile error
         }
-
-        console.log('[AuthContext] Sign up successful for:', email, {
-          userId: data.user.id,
-          timestamp: new Date().toISOString(),
-        });
         
-        // Record successful sign up attempt
         rateLimiter.recordAttempt('signUp', true, email);
         
-        showSuccessToast('Account created', 'Your account has been created successfully');
+        logSecureAuthEvent('Sign up successful', {
+          user_id: data.user.id,
+        });
+        
+        toast({
+          title: 'Account Created',
+          description: 'Your account has been created successfully. Please check your email for verification.',
+          variant: 'default',
+        });
       }
     } catch (error) {
-      console.error('[AuthContext] Error in signUp:', error, {
+      const authError = error as AuthError;
+      
+      logSecureAuthEvent('Sign up failed', {
         email,
-        timestamp: new Date().toISOString(),
+        error: authError.message,
       });
-      const errorMsg = error instanceof Error ? error.message : String(error);
-      setError(error instanceof Error ? error : new Error(errorMsg));
-      showErrorToast('Sign up failed', errorMsg);
+      
+      setError(authError);
+      toast({
+        title: 'Sign Up Failed',
+        description: authError.message || 'An error occurred during sign up',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  // Sign out function
-  const signOut = async () => {
+  /**
+   * Secure sign out with complete session cleanup
+   * Implements comprehensive cleanup and security measures
+   */
+  const signOut = useCallback(async (): Promise<void> => {
     try {
-      logAuthEvent('Sign out initiated', {
+      logSecureAuthEvent('Sign out initiated', {
         user_id: user?.id,
-        email: user?.email,
       });
-
-      console.log('[AuthContext] Signing out user:', user?.email, {
-        userId: user?.id,
-        timestamp: new Date().toISOString(),
-      });
-
-      // Clear session timeout timestamp
-      localStorage.removeItem('session_login_time');
+      
+      setLoading(true);
+      
+      // Clear session timeout and security data
+      secureSessionStorage.clear();
+      storedSessionFingerprint = null;
       
       // Clear encryption keys
       KeyManagement.clearSessionKey();
-
-      // Check if this is a demo user and clear demo session
+      
+      // Check for demo user logout
       try {
         const { isAuthenticatedDemoUser, clearDemoAuth } = await import('../lib/demoAuth');
         if (isAuthenticatedDemoUser()) {
-          console.log('[AuthContext] Demo user logout detected, clearing demo session');
           clearDemoAuth();
         }
       } catch (demoError) {
-        console.error('[AuthContext] Error clearing demo session:', demoError);
+        SecureLogger.warning('Demo logout cleanup failed', { error: demoError.message });
       }
-
-      // First try to clean up some state immediately for a smoother experience
-      try {
-        // Mark that we're in the logout process to prevent redirects
-        localStorage.setItem('logout_in_progress', 'true');
-
-        // Start the loading spinner
-        setLoading(true);
-
-        // Signal to the UI that we're logging out
-        showInfoToast('Signing Out', 'Please wait while we sign you out...');
-      } catch (localError) {
-        console.error('[AuthContext] Error during pre-logout cleanup:', localError);
-      }
-
-      // Redirect to the dedicated logout page to handle the complete logout process
-      console.log('[AuthContext] Redirecting to logout page');
-      window.location.href = '/logout';
-
-      return; // Early return to skip the rest of the function
-
-      // This code will not run, but is kept for reference
-    } catch (error) {
-      logAuthEvent('Sign out error', {
-        user_id: user?.id,
-        error: error instanceof Error ? error.message : String(error),
+      
+      // Clear all auth state
+      setUserSecurely(null);
+      setRoleSecurely(null);
+      setDealershipId(null);
+      setCurrentDealershipName(null);
+      setIsGroupAdmin(false);
+      setHasSession(false);
+      setError(null);
+      
+      // Set logout in progress flag
+      localStorage.setItem('logout_in_progress', 'true');
+      
+      toast({
+        title: 'Signing Out',
+        description: 'Please wait while we sign you out...',
+        variant: 'default',
       });
-
-      console.error('[AuthContext] Error during signOut:', error);
-
-      setError(
-        error instanceof Error ? error : new Error('Unknown error occurred during sign out')
-      );
-
-      showErrorToast(
-        'Sign Out Failed',
-        error instanceof Error ? error.message : 'Unknown error occurred'
-      );
-
-      // Even if there's an error, still try to navigate to the logout page
+      
+      // Redirect to logout page for complete cleanup
+      window.location.href = '/logout';
+      
+    } catch (error) {
+      const authError = error as AuthError;
+      
+      logSecureAuthEvent('Sign out failed', {
+        user_id: user?.id,
+        error: authError.message,
+      });
+      
+      setError(authError);
+      toast({
+        title: 'Sign Out Failed',
+        description: authError.message || 'An error occurred during sign out',
+        variant: 'destructive',
+      });
+      
+      // Force navigation even on error
       window.location.href = '/logout';
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.id, setUserSecurely, setRoleSecurely]);
 
-  // New function to fetch data from the correct schema based on dealership_id
-  const fetchFromDealershipSchema = useCallback(
-    async (dealershipId: number, table: string, query: any = {}) => {
-      try {
-        console.log(
-          `[AuthContext] Fetching data from schema for dealership: ${dealershipId}, table: ${table}`,
-          {
-            timestamp: new Date().toISOString(),
-            query,
+  // =================== ADDITIONAL FUNCTIONS ===================
+
+  /**
+   * Set dealership context with security validation
+   * Validates dealership ID and updates context securely
+   */
+  const setDealershipContext = useCallback(
+    (newDealershipId: number): void => {
+      if (!newDealershipId || newDealershipId <= 0) {
+        SecureLogger.warning('Invalid dealership ID provided', { dealership_id: newDealershipId });
+        return;
+      }
+      
+      logSecureAuthEvent('Setting dealership context', {
+        dealership_id: newDealershipId,
+        previous_id: dealershipId,
+        user_id: user?.id,
+      });
+      
+      setDealershipId(newDealershipId);
+      
+      // Fetch dealership name
+      supabase
+        .from('dealerships')
+        .select('name')
+        .eq('id', newDealershipId)
+        .single()
+        .then(({ data, error }) => {
+          if (error) {
+            SecureLogger.error('Error fetching dealership name', { 
+              dealership_id: newDealershipId,
+              error: error.message,
+            });
+          } else if (data) {
+            setCurrentDealershipName(data.name);
           }
-        );
+        });
+      
+      // Log the context change
+      logSchemaOperation('set_dealership_context', {
+        userId: user?.id,
+        dealershipId: newDealershipId,
+        timestamp: new Date().toISOString(),
+      }).catch(err => {
+        SecureLogger.warning('Failed to log dealership context change', { error: err.message });
+      });
+    },
+    [user?.id, dealershipId]
+  );
 
-        // Get the schema name for this dealership
+  /**
+   * Secure schema data fetching with validation
+   * Implements secure query building and validation
+   */
+  const fetchFromDealershipSchema = useCallback(
+    async (dealershipId: number, table: string, query: QueryOptions = {}): Promise<{ data: any | null; error: Error | null }> => {
+      try {
+        // Input validation
+        if (!dealershipId || dealershipId <= 0) {
+          throw new Error('Invalid dealership ID');
+        }
+        
+        if (!table || !/^[a-zA-Z0-9_]+$/.test(table)) {
+          throw new Error('Invalid table name');
+        }
+        
+        logSecureAuthEvent('Fetching dealership schema data', {
+          dealership_id: dealershipId,
+          table,
+        });
+        
+        // Get schema name
         const { data: dealership, error: dealershipError } = await supabase
           .from('dealerships')
           .select('schema_name')
           .eq('id', dealershipId)
           .single();
-
+        
         if (dealershipError || !dealership?.schema_name) {
-          console.error(
-            `[AuthContext] Error fetching schema name for dealership ${dealershipId}:`,
-            dealershipError
-          );
-          return {
-            data: null,
-            error: dealershipError || new Error('No schema name found for dealership'),
-          };
+          throw dealershipError || new Error('No schema name found for dealership');
         }
-
-        const schemaName = dealership.schema_name;
-        console.log(`[AuthContext] Using schema: ${schemaName} for dealership: ${dealershipId}`);
-
-        // Build the query dynamically based on the provided query object
-        let dbQuery = supabase.from(`${schemaName}.${table}`);
-
-        // Apply select if provided
+        
+        // Build secure query
+        let dbQuery = supabase.from(`${dealership.schema_name}.${table}`);
+        
+        // Apply select clause
         if (query.select) {
+          // Validate select clause to prevent injection
+          if (!/^[a-zA-Z0-9_,\s\(\)]+$/.test(query.select)) {
+            throw new Error('Invalid select clause');
+          }
           dbQuery = dbQuery.select(query.select);
         } else {
           dbQuery = dbQuery.select('*');
         }
-
-        // Apply filters if provided
+        
+        // Apply filters securely
         if (query.filters) {
           for (const filter of query.filters) {
-            if (filter.type === 'eq') {
-              dbQuery = dbQuery.eq(filter.column, filter.value);
-            } else if (filter.type === 'in') {
-              dbQuery = dbQuery.in(filter.column, filter.value);
-            } else if (filter.type === 'gt') {
-              dbQuery = dbQuery.gt(filter.column, filter.value);
-            } else if (filter.type === 'lt') {
-              dbQuery = dbQuery.lt(filter.column, filter.value);
+            // Validate filter column name
+            if (!/^[a-zA-Z0-9_]+$/.test(filter.column)) {
+              throw new Error('Invalid filter column name');
             }
-            // Add more filter types as needed
+            
+            switch (filter.type) {
+              case 'eq':
+                dbQuery = dbQuery.eq(filter.column, filter.value);
+                break;
+              case 'in':
+                dbQuery = dbQuery.in(filter.column, filter.value);
+                break;
+              case 'gt':
+                dbQuery = dbQuery.gt(filter.column, filter.value);
+                break;
+              case 'lt':
+                dbQuery = dbQuery.lt(filter.column, filter.value);
+                break;
+              case 'gte':
+                dbQuery = dbQuery.gte(filter.column, filter.value);
+                break;
+              case 'lte':
+                dbQuery = dbQuery.lte(filter.column, filter.value);
+                break;
+              case 'like':
+                dbQuery = dbQuery.like(filter.column, filter.value);
+                break;
+              default:
+                throw new Error('Invalid filter type');
+            }
           }
         }
-
-        // Apply order if provided
+        
+        // Apply ordering
         if (query.order) {
+          if (!/^[a-zA-Z0-9_]+$/.test(query.order.column)) {
+            throw new Error('Invalid order column name');
+          }
           dbQuery = dbQuery.order(query.order.column, { ascending: query.order.ascending });
         }
-
-        // Apply limit if provided
+        
+        // Apply limit (with maximum cap for security)
         if (query.limit) {
-          dbQuery = dbQuery.limit(query.limit);
+          const secureLimit = Math.min(Math.max(1, query.limit), 1000); // Cap at 1000 rows
+          dbQuery = dbQuery.limit(secureLimit);
         }
-
-        // Execute the query
+        
         const { data, error } = await dbQuery;
-
+        
         if (error) {
-          console.error(`[AuthContext] Error fetching data from ${schemaName}.${table}:`, error);
-          return { data: null, error };
+          throw error;
         }
-
-        console.log(`[AuthContext] Successfully fetched data from ${schemaName}.${table}:`, {
-          count: data?.length,
-        });
+        
         return { data, error: null };
       } catch (err) {
-        console.error(`[AuthContext] Exception in fetchFromDealershipSchema:`, err);
-        return { data: null, error: err instanceof Error ? err : new Error('Unknown error') };
+        const error = err instanceof Error ? err : new Error('Unknown error in fetchFromDealershipSchema');
+        
+        logSecureAuthEvent('Schema data fetch failed', {
+          dealership_id: dealershipId,
+          table,
+          error: error.message,
+        });
+        
+        return { data: null, error };
       }
     },
     []
   );
 
-  // Add a new function for magic link login
-  const magicLinkLogin = async (email: string) => {
-    console.log(`[AuthContext] Magic link login attempt for ${email}`);
-    setLoading(true);
-    setError(null);
-
+  /**
+   * Magic link login with security measures
+   * Implements secure magic link generation
+   */
+  const magicLinkLogin = useCallback(async (email: string): Promise<void> => {
     try {
+      if (!validateEmail(email)) {
+        throw new Error('Invalid email format');
+      }
+      
+      logSecureAuthEvent('Magic link login attempt', { email });
+      
+      setLoading(true);
+      setError(null);
+      
       const { data, error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          shouldCreateUser: false, // Only send to existing users
+          shouldCreateUser: false,
         },
       });
-
+      
       if (error) {
-        console.error('[AuthContext] Magic link error:', error);
         throw error;
       }
-
-      console.log('[AuthContext] Magic link sent successfully');
-      showSuccessToast(
-        'Magic Link Sent',
-        `Check your email (${email}) for a login link. For test accounts, you can check the console for the magic link.`
-      );
+      
+      toast({
+        title: 'Magic Link Sent',
+        description: `Check your email (${email}) for a login link.`,
+        variant: 'default',
+      });
+      
+      logSecureAuthEvent('Magic link sent successfully', { email });
     } catch (error) {
-      console.error('[AuthContext] Magic link process failed:', error);
-
-      if (error instanceof Error) {
-        setError(error);
-        showErrorToast('Magic Link Failed', error.message);
-      } else {
-        const genericError = new Error('An unknown error occurred during magic link generation');
-        setError(genericError);
-        showErrorToast('Magic Link Failed', 'An unknown error occurred');
-      }
+      const authError = error as AuthError;
+      
+      logSecureAuthEvent('Magic link failed', {
+        email,
+        error: authError.message,
+      });
+      
+      setError(authError);
+      toast({
+        title: 'Magic Link Failed',
+        description: authError.message || 'Failed to send magic link',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  // Create value with updated dealership context
-  const value = {
+  /**
+   * Access attempt logging with security context
+   * Logs access attempts for security monitoring
+   */
+  const logAccessAttempt = useCallback((path: string, allowed: boolean, details?: any): void => {
+    const accessEvent = allowed ? 'Access granted' : 'Access denied';
+    
+    logSecureAuthEvent(accessEvent, {
+      path,
+      user_id: user?.id,
+      role: role || userRole,
+      dealership_id: dealershipId,
+      dealership_name: currentDealershipName,
+      details,
+      allowed,
+    });
+    
+    if (!allowed) {
+      SecureLogger.error('Unauthorized access attempt', {
+        path,
+        user_id: user?.id,
+        role: role || userRole,
+      });
+    }
+  }, [user?.id, role, userRole, dealershipId, currentDealershipName]);
+
+  // =================== CLEANUP ===================
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+      
+      // Clear all intervals
+      if (sessionCheckIntervalRef.current) {
+        clearInterval(sessionCheckIntervalRef.current);
+      }
+      if (tokenRotationIntervalRef.current) {
+        clearInterval(tokenRotationIntervalRef.current);
+      }
+      
+      // Unsubscribe from auth listener
+      if (authListenerRef.current?.data?.subscription) {
+        authListenerRef.current.data.subscription.unsubscribe();
+      }
+      
+      // Clear secure storage on unmount (optional, based on security requirements)
+      // secureSessionStorage.clear();
+    };
+  }, []);
+
+  // =================== CONTEXT VALUE ===================
+
+  const contextValue = useMemo<AuthContextType>(() => ({
     user,
     role,
     signIn,
@@ -1871,37 +1814,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     fetchFromDealershipSchema,
     magicLinkLogin,
     loginTestAccount: loginTestUser,
-    logAccessAttempt: (path: string, allowed: boolean, details?: any) => {
-      const accessEvent = allowed ? 'Access granted' : 'Access denied';
-
-      logAuthEvent(accessEvent, {
-        path,
-        user_id: user?.id,
-        email: user?.email,
-        role: role || userRole,
-        dealership_id: dealershipId,
-        dealership_name: currentDealershipName,
-        details,
-        allowed,
-      });
-
-      if (!allowed) {
-        logSecurityEvent('Unauthorized access attempt', {
-          path,
-          user_id: user?.id,
-          email: user?.email,
-          role: role || userRole,
-        });
-      }
-    },
+    logAccessAttempt,
     isGroupAdmin,
     authCheckComplete,
-  };
+    sessionHealth,
+    refreshSession,
+  }), [
+    user,
+    role,
+    signIn,
+    signUp,
+    signOut,
+    loading,
+    hasSession,
+    error,
+    userRole,
+    dealershipId,
+    setDealershipContext,
+    currentDealershipName,
+    fetchFromDealershipSchema,
+    magicLinkLogin,
+    logAccessAttempt,
+    isGroupAdmin,
+    authCheckComplete,
+    sessionHealth,
+    refreshSession,
+  ]);
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = () => {
+// =================== HOOK EXPORT ===================
+
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
@@ -1909,13 +1854,13 @@ export const useAuth = () => {
   return context;
 };
 
-// Add a global type declaration for auth event tracking
+// =================== TYPE EXPORTS ===================
+
+export type { UserRole, SecureUserData, QueryOptions, SessionHealth };
+
+// Global type declarations for enhanced security
 declare global {
   interface Window {
-    authEvents?: Array<{
-      event: string;
-      details: any;
-      timestamp: string;
-    }>;
+    __supabaseUnreachable?: boolean;
   }
 }

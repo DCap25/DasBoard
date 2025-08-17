@@ -19,7 +19,25 @@ import { Toaster } from './components/ui/toaster';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
-import { queryClient } from './lib/react-query';
+// =================== ERROR BOUNDARY IMPORTS ===================
+import { 
+  PageErrorBoundary, 
+  SectionErrorBoundary, 
+  ComponentErrorBoundary,
+  withAsyncErrorHandling,
+  type SafeErrorInfo,
+  type ErrorType,
+  type ErrorSeverity
+} from './components/ErrorBoundary';
+import { 
+  createSafeQueryClient, 
+  safeStateUpdate, 
+  reportError,
+  createSpecializedErrorBoundary 
+} from './lib/errorHandling';
+
+// Create safe query client with enhanced error handling
+const safeQueryClient = createSafeQueryClient();
 import { ToastContextProvider } from './lib/use-toast';
 import {
   SalesDashboard,
@@ -96,36 +114,41 @@ const APP_URL = import.meta.env.VITE_APP_URL || 'http://localhost:5173';
 const MARKETING_URL = import.meta.env.VITE_MARKETING_URL || 'http://localhost:3000';
 const IS_PRODUCTION = APP_ENV === 'production';
 
-// Enhanced logging function
-const logAppEvent = (event: string, details: any = {}) => {
-  const timestamp = new Date().toISOString();
-  console.log(`[App][${timestamp}] ${event}`, {
-    ...details,
-    app_version: APP_VERSION,
-    environment: APP_ENV,
-    timestamp,
-  });
-
-  // Track navigation events in window object if in development
-  if (!IS_PRODUCTION && typeof window !== 'undefined') {
-    if (!window.appEvents) {
-      window.appEvents = [];
-    }
-
-    // Keep last 100 events
-    if (window.appEvents.length > 100) {
-      window.appEvents.shift();
-    }
-
-    window.appEvents.push({
-      event,
-      details: {
-        ...details,
-        timestamp,
-      },
+// Enhanced logging function with error handling
+const logAppEvent = withAsyncErrorHandling(
+  (event: string, details: any = {}) => {
+    const timestamp = new Date().toISOString();
+    console.log(`[App][${timestamp}] ${event}`, {
+      ...details,
+      app_version: APP_VERSION,
+      environment: APP_ENV,
+      timestamp,
     });
+
+    // Track navigation events in window object if in development
+    if (!IS_PRODUCTION && typeof window !== 'undefined') {
+      if (!window.appEvents) {
+        window.appEvents = [];
+      }
+
+      // Keep last 100 events
+      if (window.appEvents.length > 100) {
+        window.appEvents.shift();
+      }
+
+      window.appEvents.push({
+        event,
+        details: {
+          ...details,
+          timestamp,
+        },
+      });
+    }
+  },
+  (error: SafeErrorInfo) => {
+    console.error('App event logging failed:', error.message);
   }
-};
+);
 
 // DealershipContext for multi-dealership support
 interface DealershipContextType {
@@ -142,26 +165,46 @@ export const DealershipProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [currentDealershipName, setCurrentDealershipName] = useState<string | null>(null);
   const { setDealershipContext } = useAuth();
 
+  // Safe state update functions
+  const safeSetDealershipId = (id: number | null) => 
+    safeStateUpdate(setCurrentDealershipId, id, 'DealershipProvider');
+  
+  const safeSetDealershipName = (name: string | null) => 
+    safeStateUpdate(setCurrentDealershipName, name, 'DealershipProvider');
+
   // Update the AuthContext when dealership changes
   useEffect(() => {
-    if (currentDealershipId) {
-      logAppEvent('Setting dealership context', {
-        dealership_id: currentDealershipId,
-        dealership_name: currentDealershipName,
-      });
+    try {
+      if (currentDealershipId) {
+        logAppEvent('Setting dealership context', {
+          dealership_id: currentDealershipId,
+          dealership_name: currentDealershipName,
+        });
 
-      setDealershipContext(currentDealershipId);
+        setDealershipContext(currentDealershipId);
+      }
+    } catch (error) {
+      reportError(error instanceof Error ? error : new Error(String(error)), {
+        operation: 'setDealershipContext',
+        dealership_id: currentDealershipId
+      });
     }
   }, [currentDealershipId, currentDealershipName, setDealershipContext]);
 
   const value = {
     currentDealershipId,
-    setCurrentDealershipId,
+    setCurrentDealershipId: safeSetDealershipId,
     currentDealershipName,
-    setCurrentDealershipName,
+    setCurrentDealershipName: safeSetDealershipName,
   };
 
-  return <DealershipContext.Provider value={value}>{children}</DealershipContext.Provider>;
+  return (
+    <SectionErrorBoundary identifier="DealershipProvider">
+      <DealershipContext.Provider value={value}>
+        {children}
+      </DealershipContext.Provider>
+    </SectionErrorBoundary>
+  );
 };
 
 export const useDealership = () => {
@@ -583,9 +626,9 @@ function GroupAdminAccessCheck({ children }: { children: React.ReactNode }) {
 
 function App() {
   useEffect(() => {
-    // Initialize security features
-    const initializeSecurity = () => {
-      try {
+    // Initialize security features with error handling
+    const initializeSecurity = withAsyncErrorHandling(
+      () => {
         // Set up CSP violation reporting
         SecurityHeadersManager.setupCSPReporting();
 
@@ -595,10 +638,12 @@ function App() {
         }
 
         console.log('[Security] Security features initialized');
-      } catch (error) {
-        console.error('[Security] Failed to initialize security features:', error);
+      },
+      (error: SafeErrorInfo) => {
+        console.error('[Security] Failed to initialize security features:', error.message);
+        reportError(error);
       }
-    };
+    );
 
     // Migrate sensitive data to encrypted storage on app load
     const migrateStorageData = async () => {
@@ -638,7 +683,11 @@ function App() {
     // Add failsafe for group admin detection on app load
     const checkForAuthenticatedGroupAdmin = async () => {
       try {
-        const { data } = await supabase.auth.getSession();
+        // Initialize Supabase client before using it
+        const { getSecureSupabaseClient } = await import('./lib/supabaseClient');
+        const supabaseClient = await getSecureSupabaseClient();
+        
+        const { data } = await supabaseClient.auth.getSession();
         if (data?.session?.user) {
           console.warn('[App] Found authenticated user on app load:', data.session.user.email);
 
@@ -695,8 +744,8 @@ function App() {
     // Add debug helper to window in development
     if (import.meta.env.DEV) {
       (window as any).debugStorage = {
-        inspect: () => StorageMigration.debugLocalStorage(),
-        clearMalformed: () => StorageMigration.clearMalformedSensitiveData(),
+        inspect: () => StorageMigration.debugStorageData(),
+        forceClean: () => StorageMigration.forceCleanMigration(),
         clearAll: () => StorageMigration.clearUnencryptedSensitiveData(),
         status: () => StorageMigration.getMigrationStatus(),
       };
@@ -708,12 +757,14 @@ function App() {
           return testSupabaseConnection();
         },
         getSession: async () => {
-          const { supabase } = await import('./lib/supabaseClient');
-          return supabase.auth.getSession();
+          const { getSecureSupabaseClient } = await import('./lib/supabaseClient');
+          const supabaseClient = await getSecureSupabaseClient();
+          return supabaseClient.auth.getSession();
         },
         getUser: async () => {
-          const { supabase } = await import('./lib/supabaseClient');
-          return supabase.auth.getUser();
+          const { getSecureSupabaseClient } = await import('./lib/supabaseClient');
+          const supabaseClient = await getSecureSupabaseClient();
+          return supabaseClient.auth.getUser();
         },
       };
 
@@ -744,70 +795,141 @@ function App() {
         typeof window !== 'undefined' ? `${window.innerWidth}x${window.innerHeight}` : 'unknown',
     });
 
-    // Add listener for authentication state changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.warn('[DEBUG AUTH] Auth state changed:', event);
+    // Initialize Supabase client and add listener for authentication state changes
+    let subscription: any = null;
+    
+    const initializeAuthListener = async () => {
+      try {
+        // Initialize the Supabase client first
+        const { getSecureSupabaseClient } = await import('./lib/supabaseClient');
+        const supabaseClient = await getSecureSupabaseClient();
+        
+        // Now set up the auth state change listener
+        const {
+          data: { subscription: authSubscription },
+        } = supabaseClient.auth.onAuthStateChange(async (event, session) => {
+          console.warn('[DEBUG AUTH] Auth state changed:', event);
 
-      if (event === 'SIGNED_IN' && session?.user) {
-        console.warn(`[DEBUG AUTH] User signed in: ${session.user.email}`);
+          if (event === 'SIGNED_IN' && session?.user) {
+            console.warn(`[DEBUG AUTH] User signed in: ${session.user.email}`);
 
-        // Check if user is a group admin
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('is_group_admin, role')
-          .eq('id', session.user.id)
-          .maybeSingle();
+            try {
+              // Check if user is a group admin using the initialized client
+              const { data, error } = await supabaseClient
+                .from('profiles')
+                .select('is_group_admin, role')
+                .eq('id', session.user.id)
+                .maybeSingle();
 
-        if (!error && data) {
-          console.warn('[DEBUG AUTH] User profile data:', data);
-          console.warn(`[DEBUG AUTH] is_group_admin: ${data.is_group_admin}, role: ${data.role}`);
+              if (!error && data) {
+                console.warn('[DEBUG AUTH] User profile data:', data);
+                console.warn(`[DEBUG AUTH] is_group_admin: ${data.is_group_admin}, role: ${data.role}`);
 
-          if (data.is_group_admin) {
-            console.warn(
-              '[DEBUG AUTH] User is a group admin, should be redirected to /group-admin'
-            );
-          } else {
-            console.warn('[DEBUG AUTH] User is NOT a group admin');
+                if (data.is_group_admin) {
+                  console.warn(
+                    '[DEBUG AUTH] User is a group admin, should be redirected to /group-admin'
+                  );
+                } else {
+                  console.warn('[DEBUG AUTH] User is NOT a group admin');
+                }
+              } else if (error) {
+                console.error('[DEBUG AUTH] Error fetching user profile:', error);
+              }
+            } catch (error) {
+              console.error('[DEBUG AUTH] Exception while fetching user profile:', error);
+            }
           }
-        }
-      }
-    });
+        });
 
-    // Listen for network changes
-    const handleNetworkChange = () => {
-      logAppEvent('Network status change', {
-        online: typeof window !== 'undefined' && window.navigator ? window.navigator.onLine : true,
-      });
+        // Store the subscription for cleanup
+        subscription = authSubscription;
+
+        // Listen for network changes
+        const handleNetworkChange = () => {
+          logAppEvent('Network status change', {
+            online: typeof window !== 'undefined' && window.navigator ? window.navigator.onLine : true,
+          });
+        };
+
+        if (typeof window !== 'undefined') {
+          window.addEventListener('online', handleNetworkChange);
+          window.addEventListener('offline', handleNetworkChange);
+        }
+
+        // Return cleanup function for this specific initialization
+        return () => {
+          if (subscription) {
+            subscription.unsubscribe();
+          }
+          if (typeof window !== 'undefined') {
+            window.removeEventListener('online', handleNetworkChange);
+            window.removeEventListener('offline', handleNetworkChange);
+          }
+        };
+
+      } catch (error) {
+        console.error('[App] Error initializing Supabase auth listener:', error);
+        
+        // Still set up network listeners even if auth fails
+        const handleNetworkChange = () => {
+          logAppEvent('Network status change', {
+            online: typeof window !== 'undefined' && window.navigator ? window.navigator.onLine : true,
+          });
+        };
+
+        if (typeof window !== 'undefined') {
+          window.addEventListener('online', handleNetworkChange);
+          window.addEventListener('offline', handleNetworkChange);
+        }
+
+        return () => {
+          if (typeof window !== 'undefined') {
+            window.removeEventListener('online', handleNetworkChange);
+            window.removeEventListener('offline', handleNetworkChange);
+          }
+        };
+      }
     };
 
-    if (typeof window !== 'undefined') {
-      window.addEventListener('online', handleNetworkChange);
-      window.addEventListener('offline', handleNetworkChange);
-    }
+    // Initialize the auth listener
+    const cleanup = initializeAuthListener();
 
+    // Return cleanup function
     return () => {
-      subscription.unsubscribe();
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('online', handleNetworkChange);
-        window.removeEventListener('offline', handleNetworkChange);
+      if (cleanup && typeof cleanup.then === 'function') {
+        cleanup.then(cleanupFn => {
+          if (cleanupFn && typeof cleanupFn === 'function') {
+            cleanupFn();
+          }
+        });
       }
     };
   }, []);
 
   return (
-    <TranslationProvider>
-      <QueryClientProvider client={queryClient}>
-        <ToastContextProvider>
-          <AuthProvider>
-            <DealershipProvider>
-              <Router>
-                <DirectAuthProvider>
-                  <TestUserMiddleware>
-                    <RouteLogger />
-                    <CookieConsent />
-                    <Routes>
+    <PageErrorBoundary 
+      identifier="AppRoot"
+      onError={(error: SafeErrorInfo) => {
+        console.error('Critical app-level error:', error);
+        reportError(error);
+      }}
+    >
+      <TranslationProvider>
+        <QueryClientProvider client={safeQueryClient}>
+          <ToastContextProvider>
+            <SectionErrorBoundary identifier="AuthProvider" {...createSpecializedErrorBoundary('auth')}>
+              <AuthProvider>
+                <DealershipProvider>
+                  <SectionErrorBoundary identifier="Router" {...createSpecializedErrorBoundary('navigation')}>
+                    <Router>
+                      <DirectAuthProvider>
+                        <TestUserMiddleware>
+                          <ComponentErrorBoundary identifier="AppComponents">
+                            <RouteLogger />
+                            <CookieConsent />
+                          </ComponentErrorBoundary>
+                          <SectionErrorBoundary identifier="Routes" {...createSpecializedErrorBoundary('navigation')}>
+                            <Routes>
                       {/* Marketing Pages - Public Access */}
                       <Route path="/" element={<HomePage />} />
                       <Route path="/demo" element={<DemoPage />} />
@@ -1085,19 +1207,29 @@ function App() {
                         }
                       />
 
-                      {/* Fallback - redirect to dashboard */}
-                      <Route path="*" element={<RedirectLogger to="/dashboard" />} />
-                    </Routes>
-                    <Toaster />
-                  </TestUserMiddleware>
-                </DirectAuthProvider>
-              </Router>
-            </DealershipProvider>
-          </AuthProvider>
-          {APP_ENV !== 'production' && <ReactQueryDevtools />}
-        </ToastContextProvider>
-      </QueryClientProvider>
-    </TranslationProvider>
+                              {/* Fallback - redirect to dashboard */}
+                              <Route path="*" element={<RedirectLogger to="/dashboard" />} />
+                            </Routes>
+                          </SectionErrorBoundary>
+                          <ComponentErrorBoundary identifier="Toaster">
+                            <Toaster />
+                          </ComponentErrorBoundary>
+                        </TestUserMiddleware>
+                      </DirectAuthProvider>
+                    </Router>
+                  </SectionErrorBoundary>
+                </DealershipProvider>
+              </AuthProvider>
+            </SectionErrorBoundary>
+            {APP_ENV !== 'production' && (
+              <ComponentErrorBoundary identifier="ReactQueryDevtools">
+                <ReactQueryDevtools />
+              </ComponentErrorBoundary>
+            )}
+          </ToastContextProvider>
+        </QueryClientProvider>
+      </TranslationProvider>
+    </PageErrorBoundary>
   );
 }
 
@@ -1120,33 +1252,46 @@ function DealershipLayout() {
   return <DealershipLayoutContent dealershipId={parsedId} />;
 }
 
-// Content for dealership-specific routes
+// Content for dealership-specific routes with error handling
 function DealershipLayoutContent({ dealershipId }: { dealershipId: number }) {
   const { setCurrentDealershipId, setCurrentDealershipName } = useDealership();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set the current dealership in context
-    setCurrentDealershipId(dealershipId);
+    const loadDealershipData = withAsyncErrorHandling(
+      async () => {
+        // Set the current dealership in context
+        setCurrentDealershipId(dealershipId);
 
-    // Fetch the dealership name
-    supabase
-      .from('dealerships')
-      .select('name')
-      .eq('id', dealershipId)
-      .single()
-      .then(({ data, error }) => {
+        // Fetch the dealership name with error handling
+        const { data, error } = await supabase
+          .from('dealerships')
+          .select('name')
+          .eq('id', dealershipId)
+          .single();
+
         if (error) {
-          console.error('Error fetching dealership name:', error);
-        } else if (data) {
+          throw new Error(`Failed to fetch dealership name: ${error.message}`);
+        }
+
+        if (data) {
           setCurrentDealershipName(data.name);
           logAppEvent('Set dealership name in context', {
             dealership_id: dealershipId,
             dealership_name: data.name,
           });
         }
-        setLoading(false);
-      });
+
+        safeStateUpdate(setLoading, false, 'DealershipLayoutContent');
+      },
+      (error: SafeErrorInfo) => {
+        console.error('Failed to load dealership data:', error.message);
+        reportError(error);
+        safeStateUpdate(setLoading, false, 'DealershipLayoutContent');
+      }
+    );
+
+    loadDealershipData();
   }, [dealershipId, setCurrentDealershipId, setCurrentDealershipName]);
 
   if (loading) {
@@ -1158,17 +1303,20 @@ function DealershipLayoutContent({ dealershipId }: { dealershipId: number }) {
   }
 
   return (
-    <Routes>
-      <Route
-        path="sales"
-        element={
-          <ProtectedRoute requiredRoles={['salesperson']} requiredDealership={dealershipId}>
-            <DashboardLayout>
-              <SalesDashboard />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
+    <SectionErrorBoundary identifier="DealershipRoutes" {...createSpecializedErrorBoundary('navigation')}>
+      <Routes>
+        <Route
+          path="sales"
+          element={
+            <ProtectedRoute requiredRoles={['salesperson']} requiredDealership={dealershipId}>
+              <DashboardLayout>
+                <ComponentErrorBoundary identifier="SalesDashboard">
+                  <SalesDashboard />
+                </ComponentErrorBoundary>
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
       <Route
         path="finance"
         element={
@@ -1220,9 +1368,10 @@ function DealershipLayoutContent({ dealershipId }: { dealershipId: number }) {
           </ProtectedRoute>
         }
       />
-      {/* Add more dealership-specific routes as needed */}
-      <Route path="*" element={<Navigate to={`/dealership/${dealershipId}/sales`} replace />} />
-    </Routes>
+        {/* Add more dealership-specific routes as needed */}
+        <Route path="*" element={<Navigate to={`/dealership/${dealershipId}/sales`} replace />} />
+      </Routes>
+    </SectionErrorBoundary>
   );
 }
 

@@ -3,7 +3,7 @@
  * Generates and manages encryption keys dynamically per session
  */
 
-import CryptoJS from 'crypto-js';
+import * as CryptoJS from 'crypto-js';
 
 class KeyManagement {
   private static readonly KEY_STORAGE = 'session_key';

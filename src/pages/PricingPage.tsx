@@ -137,13 +137,13 @@ export default function PricingPage() {
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl font-bold text-white mb-6">
-            Select Your{' '}
+            {t('pricing.pricingPage.title')}{' '}
             <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
-              Solution
+              {t('pricing.pricingPage.titleHighlight')}
             </span>
           </h1>
           <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
-            Select the option that best describes your needs. We'll customize your experience accordingly.
+            {t('pricing.pricingPage.subtitle')}
           </p>
         </div>
       </section>
@@ -159,43 +159,33 @@ export default function PricingPage() {
                 <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
                   <User className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-4">Single Finance Manager</h2>
+                <h2 className="text-2xl font-bold text-white mb-4">{t('pricing.pricingPage.singleFinance.title')}</h2>
                 <p className="text-gray-400 mb-6">
-                  Perfect for individual finance managers who want to track their personal performance and deals.
+                  {t('pricing.pricingPage.singleFinance.description')}
                 </p>
-                <div className="text-3xl font-bold text-blue-400 mb-2">FREE</div>
-                <div className="text-sm text-gray-500">Limited time offer</div>
+                <div className="text-lg text-gray-500 line-through mb-1">{t('pricing.pricingPage.singleFinance.originalPrice')}</div>
+                <div className="text-3xl font-bold text-blue-400 mb-2">{t('pricing.pricingPage.singleFinance.price')}</div>
               </div>
 
               <div className="space-y-4 mb-8">
-                <div className="flex items-center">
-                  <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
-                  <span className="text-gray-300">Personal deal tracking</span>
-                </div>
-                <div className="flex items-center">
-                  <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
-                  <span className="text-gray-300">PVR & product profit analytics</span>
-                </div>
-                <div className="flex items-center">
-                  <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
-                  <span className="text-gray-300">Pay calculator</span>
-                </div>
-                <div className="flex items-center">
-                  <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
-                  <span className="text-gray-300">Performance metrics</span>
-                </div>
+                {(t('pricing.pricingPage.singleFinance.features') as string[]).map((feature, index) => (
+                  <div key={index} className="flex items-center">
+                    <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
+                    <span className="text-gray-300">{feature}</span>
+                  </div>
+                ))}
               </div>
 
               <button
                 onClick={handleSingleFinanceManager}
                 className="w-full bg-blue-600 hover:bg-blue-500 text-white py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/25 flex items-center justify-center"
               >
-                Get Started Free
+                {t('pricing.pricingPage.singleFinance.buttonText')}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </button>
 
               <div className="mt-4 text-center text-sm text-gray-400">
-                Setup takes less than 2 minutes
+                {t('pricing.pricingPage.singleFinance.setupTime')}
               </div>
             </div>
 
@@ -203,7 +193,7 @@ export default function PricingPage() {
             <div className="bg-gray-800 rounded-xl p-8 border-2 border-blue-500 hover:border-blue-400 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/20 relative">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                 <span className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
-                  Most Popular
+                  {t('pricing.pricingPage.dealership.popular')}
                 </span>
               </div>
 
@@ -211,47 +201,39 @@ export default function PricingPage() {
                 <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Building2 className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-4">Dealership / Dealer Group</h2>
+                <h2 className="text-2xl font-bold text-white mb-4">{t('pricing.pricingPage.dealership.title')}</h2>
                 <p className="text-gray-400 mb-6">
-                  Complete dealership management with role-specific dashboards, team management, and multi-location support.
+                  {t('pricing.pricingPage.dealership.description')}
                 </p>
-                <div className="text-3xl font-bold text-white mb-2">$250/mo base</div>
-                <div className="text-sm text-gray-500">per dealership + add-ons</div>
+                <div className="text-3xl font-bold text-white mb-2">{t('pricing.pricingPage.dealership.price')}</div>
+                <div className="text-sm text-gray-500">{t('pricing.pricingPage.dealership.priceSubtext')}</div>
               </div>
 
               <div className="space-y-4 mb-8">
-                <div className="flex items-center">
-                  <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
-                  <span className="text-white">All single manager features</span>
-                </div>
-                <div className="flex items-center">
-                  <Users className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
-                  <span className="text-white">Team dashboards for all roles</span>
-                </div>
-                <div className="flex items-center">
-                  <TrendingUp className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
-                  <span className="text-white">Multi-location analytics</span>
-                </div>
-                <div className="flex items-center">
-                  <Shield className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
-                  <span className="text-white">Flexible admin structures</span>
-                </div>
-                <div className="flex items-center">
-                  <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
-                  <span className="text-white">Volume discounts available</span>
-                </div>
+                {(t('pricing.pricingPage.dealership.features') as string[]).map((feature, index) => {
+                  let IconComponent = Check;
+                  if (index === 1) IconComponent = Users;
+                  if (index === 2) IconComponent = TrendingUp;
+                  if (index === 3) IconComponent = Shield;
+                  return (
+                    <div key={index} className="flex items-center">
+                      <IconComponent className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
+                      <span className="text-white">{feature}</span>
+                    </div>
+                  );
+                })}
               </div>
 
               <button
                 onClick={handleDealershipGroup}
                 className="w-full bg-blue-600 hover:bg-blue-500 text-white py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/25 flex items-center justify-center"
               >
-                View Dynamic Package Pricing
+                {t('pricing.pricingPage.dealership.buttonText')}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </button>
 
               <div className="mt-4 text-center text-sm text-gray-400">
-                Get started today
+                {t('pricing.pricingPage.dealership.setupTime')}
               </div>
             </div>
 
@@ -262,16 +244,16 @@ export default function PricingPage() {
       {/* Info Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-800/30">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-white mb-8">Transform Your Dealership Today</h2>
+          <h2 className="text-3xl font-bold text-white mb-8">{t('pricing.pricingPage.benefits.title')}</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <TrendingUp className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Increase Performance</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">{t('pricing.pricingPage.benefits.performance.title')}</h3>
               <p className="text-gray-400 text-sm">
-                Real-time insights help teams exceed goals and maximize profitability
+                {t('pricing.pricingPage.benefits.performance.description')}
               </p>
             </div>
             
@@ -279,9 +261,9 @@ export default function PricingPage() {
               <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Users className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Streamline Operations</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">{t('pricing.pricingPage.benefits.operations.title')}</h3>
               <p className="text-gray-400 text-sm">
-                Centralized management reduces admin time and improves efficiency
+                {t('pricing.pricingPage.benefits.operations.description')}
               </p>
             </div>
             
@@ -289,17 +271,16 @@ export default function PricingPage() {
               <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Shield className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Secure & Reliable</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">{t('pricing.pricingPage.benefits.security.title')}</h3>
               <p className="text-gray-400 text-sm">
-                Enterprise-grade security with 99.9% uptime guarantee
+                {t('pricing.pricingPage.benefits.security.description')}
               </p>
             </div>
           </div>
 
           <div className="mt-12 p-6 bg-gray-800 rounded-lg border border-gray-700">
             <p className="text-gray-300 text-sm">
-              <strong>Not sure which option to choose?</strong> Start with the single finance manager option to try our platform, 
-              then easily upgrade to dealership features when you're ready to expand your team.
+              <strong>{t('pricing.pricingPage.helpText.title')}</strong> {t('pricing.pricingPage.helpText.description')}
             </p>
           </div>
         </div>
@@ -309,11 +290,11 @@ export default function PricingPage() {
       <footer className="border-t border-gray-700 bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-gray-400">
-            <p>© 2025 The DAS Board. All rights reserved.</p>
+            <p>{t('pricing.pricingPage.footer.copyright')}</p>
             <p className="mt-2 text-sm">
-              Questions? Contact us at{' '}
-              <a href="mailto:support@thedasboard.com" className="text-blue-400 hover:text-blue-300">
-                support@thedasboard.com
+              {t('pricing.pricingPage.footer.support')}{' '}
+              <a href={`mailto:${t('pricing.pricingPage.footer.email')}`} className="text-blue-400 hover:text-blue-300">
+                {t('pricing.pricingPage.footer.email')}
               </a>
             </p>
           </div>

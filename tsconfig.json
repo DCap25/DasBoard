@@ -4,7 +4,7 @@
     "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "skipLibCheck": true,
+    "skipLibCheck": false, // Security: Enable library checking for better type safety
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -13,20 +13,38 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
 
-    /* Linting */
+    /* Enhanced Linting & Security */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-
+    
+    /* Security: Strict type checking to prevent 'any' usage */
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    // "exactOptionalPropertyTypes": true, // Disabled due to library compatibility
+    // "noUncheckedIndexedAccess": true, // Disabled due to legacy code compatibility
+    
+    /* Security: Additional strict checks */
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "forceConsistentCasingInFileNames": true,
+    
     /* Path aliases */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/utils/*": ["./src/utils/*"],
+      "@/types/*": ["./src/types/*"]
     }
   },
-  "include": ["src"],
-  "exclude": ["src/app", "node_modules", "dist"],
+  "include": ["src/**/*", "vite.config.ts"],
+  "exclude": ["src/app", "node_modules", "dist", "**/*.test.*", "**/*.spec.*"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

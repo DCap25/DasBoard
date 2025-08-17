@@ -20,6 +20,14 @@ import { useTranslation } from '../../contexts/TranslationContext';
 import LanguageSwitcher from '../LanguageSwitcher';
 import CSRFProtection from '../../lib/csrfProtection';
 import { signUpSchema, type SignUpData } from '../../lib/validation/authSchemas';
+import { 
+  sanitizeUserInput, 
+  validateFormData, 
+  isValidEmail, 
+  VALIDATION_PATTERNS,
+  SECURITY_LIMITS 
+} from '../../lib/security/inputSanitization';
+import { withInputSanitization } from '../../lib/security/safeRendering';
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -47,7 +55,56 @@ export default function SignUp() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Sanitize input based on field type
+    let sanitizedValue = value;
+    
+    // Apply field-specific sanitization
+    switch (name) {
+      case 'adminEmail':
+        // Email fields: basic sanitization only (full validation on submit)
+        sanitizedValue = value.trim().toLowerCase();
+        break;
+      case 'organizationName':
+      case 'adminName':
+        // Name fields: remove potential XSS while preserving spaces
+        sanitizedValue = sanitizeUserInput(value, {
+          allowHtml: false,
+          maxLength: SECURITY_LIMITS.MAX_NAME_LENGTH,
+          trimWhitespace: false,
+          normalizeSpaces: false
+        });
+        break;
+      case 'address':
+        // Address fields: longer length, preserve formatting
+        sanitizedValue = sanitizeUserInput(value, {
+          allowHtml: false,
+          maxLength: SECURITY_LIMITS.MAX_DESCRIPTION_LENGTH,
+          trimWhitespace: false,
+          normalizeSpaces: false
+        });
+        break;
+      case 'zipCode':
+        // Zip code: alphanumeric and dashes only
+        sanitizedValue = value.replace(/[^a-zA-Z0-9\-\s]/g, '').substring(0, 20);
+        break;
+      case 'password':
+      case 'confirmPassword':
+        // Passwords: minimal sanitization to preserve special characters
+        sanitizedValue = value.substring(0, 128); // Just length limit
+        break;
+      default:
+        // Default sanitization for other fields
+        sanitizedValue = sanitizeUserInput(value, {
+          allowHtml: false,
+          maxLength: 500,
+          trimWhitespace: false,
+          normalizeSpaces: false
+        });
+    }
+    
+    setFormData(prev => ({ ...prev, [name]: sanitizedValue }));
+    
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
@@ -55,19 +112,82 @@ export default function SignUp() {
   };
 
   const validateForm = () => {
-    // Parse the admin name into first and last name for validation
-    const nameParts = formData.adminName.trim().split(' ');
+    // First, validate form data using our security validation
+    const formValidation = validateFormData(formData, {
+      organizationName: {
+        required: true,
+        type: 'string',
+        maxLength: SECURITY_LIMITS.MAX_NAME_LENGTH,
+        sanitize: true
+      },
+      address: {
+        required: true,
+        type: 'string',
+        maxLength: SECURITY_LIMITS.MAX_DESCRIPTION_LENGTH,
+        sanitize: true
+      },
+      city: {
+        required: true,
+        type: 'string',
+        maxLength: SECURITY_LIMITS.MAX_NAME_LENGTH,
+        sanitize: true
+      },
+      state: {
+        required: true,
+        type: 'string',
+        maxLength: 50,
+        sanitize: true
+      },
+      zipCode: {
+        required: true,
+        type: 'string',
+        maxLength: 20,
+        sanitize: true
+      },
+      adminName: {
+        required: true,
+        type: 'string',
+        maxLength: SECURITY_LIMITS.MAX_NAME_LENGTH,
+        sanitize: true
+      },
+      adminEmail: {
+        required: true,
+        type: 'email',
+        maxLength: SECURITY_LIMITS.MAX_EMAIL_LENGTH
+      },
+      password: {
+        required: true,
+        type: 'string',
+        maxLength: 128,
+        sanitize: false // Don't sanitize passwords
+      },
+      confirmPassword: {
+        required: true,
+        type: 'string',
+        maxLength: 128,
+        sanitize: false
+      }
+    });
+    
+    // If security validation fails, show errors and return false
+    if (!formValidation.isValid) {
+      setErrors(formValidation.errors);
+      return false;
+    }
+    
+    // Parse the admin name into first and last name for Zod validation
+    const nameParts = formValidation.sanitizedData.adminName.trim().split(' ');
     const firstName = nameParts[0] || '';
     const lastName = nameParts.slice(1).join(' ') || '';
     
-    // Prepare data for Zod validation
+    // Prepare data for Zod validation using sanitized data
     const validationData = {
-      email: formData.adminEmail,
-      password: formData.password,
-      confirmPassword: formData.confirmPassword,
+      email: formValidation.sanitizedData.adminEmail,
+      password: formValidation.sanitizedData.password,
+      confirmPassword: formValidation.sanitizedData.confirmPassword,
       firstName: firstName,
       lastName: lastName,
-      companyName: formData.organizationName,
+      companyName: formValidation.sanitizedData.organizationName,
       phone: '', // Optional field
       role: 'admin' as const,
       agreeToTerms: true // Assume terms are agreed to for dealership signup
@@ -139,15 +259,36 @@ export default function SignUp() {
     // CSRF Protection
     const form = new FormData(e.target as HTMLFormElement);
     if (!CSRFProtection.validateFromRequest(form)) {
-      setError('Security validation failed. Please refresh the page and try again.');
+      setErrors({ form: 'Security validation failed. Please refresh the page and try again.' });
+      return;
+    }
+    
+    // Additional security validation
+    const hasInvalidInput = Object.values(formData).some(value => {
+      if (typeof value === 'string') {
+        // Check for script tags or other dangerous content
+        return /<script|javascript:|data:text\/html|vbscript:|onload=|onerror=/i.test(value);
+      }
+      return false;
+    });
+    
+    if (hasInvalidInput) {
+      setErrors({ form: 'Invalid characters detected in form data. Please check your input.' });
       return;
     }
     
     if (validateForm()) {
+      // Use sanitized data for navigation state
+      const sanitizedOrganizationName = sanitizeUserInput(formData.organizationName, {
+        allowHtml: false,
+        maxLength: SECURITY_LIMITS.MAX_NAME_LENGTH,
+        trimWhitespace: true
+      });
+      
       // Navigate to success page or admin dashboard
       navigate('/signup/success', {
         state: {
-          organizationName: formData.organizationName,
+          organizationName: sanitizedOrganizationName,
           planName: 'Dealership Package',
           setupComplete: true
         }

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Shield } from 'lucide-react';
 import { useTranslation } from '../../contexts/TranslationContext';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
+import { SafeText, SafeHtml } from '../../lib/security/safeRendering';
 
 export default function PrivacyPage() {
   const navigate = useNavigate();
@@ -34,260 +35,162 @@ export default function PrivacyPage() {
         <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-8">
           <div className="flex items-center space-x-3 mb-8">
             <Shield className="w-8 h-8 text-blue-400" />
-            <h1 className="text-3xl font-bold text-white">Privacy Policy</h1>
+            <h1 className="text-3xl font-bold text-white">{t('legal.privacy.title')}</h1>
           </div>
 
           <div className="prose prose-invert max-w-none">
             <p className="text-gray-300 text-sm mb-8">
-              <strong>Last Updated:</strong> 6/28/2025
+              <strong>{t('legal.privacy.lastUpdated')}</strong>
             </p>
 
             <div className="space-y-8 text-gray-300">
               <section>
                 <p>
-                  This Privacy Policy describes how The DAS Board ("we," "us," or "our") collects,
-                  uses, and protects your personal information when you use our dealership
-                  management software platform. We are committed to protecting your privacy and
-                  handling your data responsibly.
+                  {t('legal.privacy.intro')}
                 </p>
               </section>
 
+              {/* Information Collection */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">1. Information We Collect</h2>
-                <p className="mb-4">
-                  When you use The DAS Board, we collect several types of information to provide and
-                  improve our services:
-                </p>
-
+                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.collection.title')}</h2>
+                <p className="mb-4">{t('legal.privacy.sections.collection.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
-                  <li>
-                    <strong>Account Information:</strong> Name, email address, phone number, company
-                    name, job title, and billing information
-                  </li>
-                  <li>
-                    <strong>Dealership Data:</strong> Vehicle inventory, sales records, customer
-                    information, and financial transactions
-                  </li>
-                  <li>
-                    <strong>Usage Data:</strong> Features accessed, time spent on platform, user
-                    interactions, and performance metrics
-                  </li>
-                  <li>
-                    <strong>Technical Data:</strong> IP address, browser type, device information,
-                    operating system, and access logs
-                  </li>
-                  <li>
-                    <strong>Communication Data:</strong> Support requests, feedback, and
-                    correspondence with our team
-                  </li>
-                  <li>
-                    <strong>Location Data:</strong> Dealership addresses and, with consent, device
-                    location for mobile features
-                  </li>
+                  {(t('legal.privacy.sections.collection.items') as string[]).map((item, index) => (
+                    <li key={index}>
+                      <SafeHtml 
+                        html={item} 
+                        allowedTags={['strong', 'em', 'code', 'a']}
+                        allowedAttributes={['href', 'target', 'rel']}
+                        maxLength={500}
+                        fallback={<SafeText>{item}</SafeText>}
+                      />
+                    </li>
+                  ))}
                 </ul>
               </section>
 
+              {/* Information Usage */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  2. How We Use Your Information
-                </h2>
-                <p className="mb-4">
-                  We use the collected information for legitimate business purposes, including:
-                </p>
-
+                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.usage.title')}</h2>
+                <p className="mb-4">{t('legal.privacy.sections.usage.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
-                  <li>Providing, maintaining, and improving The DAS Board platform and features</li>
-                  <li>Processing subscriptions, payments, and managing your account</li>
-                  <li>Generating analytics, reports, and business insights for your dealership</li>
-                  <li>Providing customer support and responding to your inquiries</li>
-                  <li>Sending service updates, security alerts, and administrative messages</li>
-                  <li>
-                    Detecting, preventing, and addressing technical issues and security threats
-                  </li>
-                  <li>Complying with legal obligations and industry regulations</li>
-                  <li>Improving user experience through product development and research</li>
+                  {(t('legal.privacy.sections.usage.items') as string[]).map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
                 </ul>
               </section>
 
+              {/* Information Sharing */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  3. Sharing Your Information
-                </h2>
-                <p className="mb-4">
-                  We do not sell, rent, or trade your personal information. We may share your
-                  information only in the following circumstances:
-                </p>
-
+                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.sharing.title')}</h2>
+                <p className="mb-4">{t('legal.privacy.sections.sharing.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
-                  <li>
-                    <strong>Service Providers:</strong> Third-party vendors who help us operate our
-                    platform (hosting, analytics, payment processing)
-                  </li>
-                  <li>
-                    <strong>Business Partners:</strong> Authorized integrations and automotive
-                    industry partners with your explicit consent
-                  </li>
-                  <li>
-                    <strong>Legal Requirements:</strong> When required by law, regulation, or valid
-                    legal process
-                  </li>
-                  <li>
-                    <strong>Business Transfers:</strong> In connection with mergers, acquisitions,
-                    or asset sales (with notice to you)
-                  </li>
-                  <li>
-                    <strong>Safety and Security:</strong> To protect the rights, property, or safety
-                    of our users or the public
-                  </li>
+                  {(t('legal.privacy.sections.sharing.items') as string[]).map((item, index) => (
+                    <li key={index}>
+                      <SafeHtml 
+                        html={item} 
+                        allowedTags={['strong', 'em', 'code', 'a']}
+                        allowedAttributes={['href', 'target', 'rel']}
+                        maxLength={500}
+                        fallback={<SafeText>{item}</SafeText>}
+                      />
+                    </li>
+                  ))}
                 </ul>
               </section>
 
+              {/* Data Retention */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">4. Data Retention</h2>
-                <p className="mb-4">
-                  We retain your personal information for as long as necessary to provide our
-                  services and comply with legal obligations. Specifically:
-                </p>
-
+                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.retention.title')}</h2>
+                <p className="mb-4">{t('legal.privacy.sections.retention.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
-                  <li>
-                    Account data is retained while your subscription is active and for 3 years after
-                    termination
-                  </li>
-                  <li>
-                    Transaction records are kept for 7 years to comply with financial regulations
-                  </li>
-                  <li>Usage logs are retained for 2 years for security and performance analysis</li>
-                  <li>Communication records are kept for 5 years for customer service purposes</li>
+                  {(t('legal.privacy.sections.retention.items') as string[]).map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
                 </ul>
               </section>
 
+              {/* Rights and Choices */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  5. Your Rights and Choices
-                </h2>
-                <p className="mb-4">
-                  Depending on your location, you may have the following rights regarding your
-                  personal information:
-                </p>
-
+                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.rights.title')}</h2>
+                <p className="mb-4">{t('legal.privacy.sections.rights.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
-                  <li>
-                    <strong>Access:</strong> Request a copy of your personal information we hold
-                  </li>
-                  <li>
-                    <strong>Correction:</strong> Update or correct inaccurate personal information
-                  </li>
-                  <li>
-                    <strong>Deletion:</strong> Request deletion of your personal information
-                    (subject to legal obligations)
-                  </li>
-                  <li>
-                    <strong>Portability:</strong> Receive your data in a machine-readable format
-                  </li>
-                  <li>
-                    <strong>Restriction:</strong> Limit how we process your personal information
-                  </li>
-                  <li>
-                    <strong>Objection:</strong> Object to processing based on legitimate interests
-                  </li>
+                  {(t('legal.privacy.sections.rights.items') as string[]).map((item, index) => (
+                    <li key={index}>
+                      <SafeHtml 
+                        html={item} 
+                        allowedTags={['strong', 'em', 'code', 'a']}
+                        allowedAttributes={['href', 'target', 'rel']}
+                        maxLength={500}
+                        fallback={<SafeText>{item}</SafeText>}
+                      />
+                    </li>
+                  ))}
                 </ul>
               </section>
 
+              {/* Cookies */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  6. Cookies and Tracking Technologies
-                </h2>
-                <p className="mb-4">
-                  We use cookies and similar technologies to enhance your experience:
-                </p>
-
+                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.cookies.title')}</h2>
+                <p className="mb-4">{t('legal.privacy.sections.cookies.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
-                  <li>
-                    <strong>Essential Cookies:</strong> Required for platform functionality and
-                    security
-                  </li>
-                  <li>
-                    <strong>Analytics Cookies:</strong> Help us understand how you use our platform
-                  </li>
-                  <li>
-                    <strong>Preference Cookies:</strong> Remember your settings and customizations
-                  </li>
-                  <li>
-                    <strong>Marketing Cookies:</strong> Used for targeted communications (with your
-                    consent)
-                  </li>
+                  {(t('legal.privacy.sections.cookies.items') as string[]).map((item, index) => (
+                    <li key={index}>
+                      <SafeHtml 
+                        html={item} 
+                        allowedTags={['strong', 'em', 'code', 'a']}
+                        allowedAttributes={['href', 'target', 'rel']}
+                        maxLength={500}
+                        fallback={<SafeText>{item}</SafeText>}
+                      />
+                    </li>
+                  ))}
                 </ul>
-
-                <p className="mt-4">
-                  You can control cookie preferences through your browser settings or our cookie
-                  management tool.
-                </p>
+                <p className="mt-4">{t('legal.privacy.sections.cookies.footer')}</p>
               </section>
 
+              {/* Security */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">7. Security Measures</h2>
-                <p className="mb-4">
-                  We implement industry-standard security measures to protect your information,
-                  including:
-                </p>
-
+                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.security.title')}</h2>
+                <p className="mb-4">{t('legal.privacy.sections.security.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
-                  <li>Encryption of data in transit and at rest using AES-256 standards</li>
-                  <li>Regular security audits and penetration testing</li>
-                  <li>Multi-factor authentication and access controls</li>
-                  <li>SOC 2 Type II compliance and regular security assessments</li>
-                  <li>Employee training on data protection and security best practices</li>
+                  {(t('legal.privacy.sections.security.items') as string[]).map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
                 </ul>
               </section>
 
+              {/* International */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  8. International Data Transfers
-                </h2>
-                <p>
-                  Your information may be transferred to and processed in countries other than your
-                  own. We ensure appropriate safeguards are in place, including Standard Contractual
-                  Clauses and adequacy decisions, to protect your data during international
-                  transfers.
-                </p>
+                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.international.title')}</h2>
+                <p>{t('legal.privacy.sections.international.content')}</p>
               </section>
 
+              {/* Children */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">9. Children's Privacy</h2>
-                <p>
-                  The DAS Board is not intended for use by individuals under 18 years of age. We do
-                  not knowingly collect personal information from children under 18. If we become
-                  aware of such collection, we will delete the information promptly.
-                </p>
+                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.children.title')}</h2>
+                <p>{t('legal.privacy.sections.children.content')}</p>
               </section>
 
+              {/* Changes */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  10. Changes to This Privacy Policy
-                </h2>
-                <p>
-                  We may update this Privacy Policy periodically to reflect changes in our practices
-                  or legal requirements. We will notify you of significant changes via email or
-                  platform notification at least 30 days before they take effect.
-                </p>
+                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.changes.title')}</h2>
+                <p>{t('legal.privacy.sections.changes.content')}</p>
               </section>
 
+              {/* Contact */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">11. Contact Us</h2>
-                <p>
-                  If you have questions about this Privacy Policy or wish to exercise your rights,
-                  please contact us:
-                </p>
+                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.contact.title')}</h2>
+                <p>{t('legal.privacy.sections.contact.content')}</p>
                 <div className="mt-2 bg-gray-700/50 p-4 rounded-lg">
                   <p>
-                    <strong>Email:</strong> privacy@thedasboard.com
+                    <strong>Email:</strong> {t('legal.privacy.sections.contact.email')}
                   </p>
                   <p>
-                    <strong>Address:</strong> [Company Address]
+                    <strong>Address:</strong> {t('legal.privacy.sections.contact.address')}
                   </p>
                   <p>
-                    <strong>Phone:</strong> [Support Phone Number]
+                    <strong>Phone:</strong> {t('legal.privacy.sections.contact.phone')}
                   </p>
                 </div>
               </section>

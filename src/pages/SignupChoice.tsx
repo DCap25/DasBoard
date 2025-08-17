@@ -12,7 +12,8 @@ export default function SignupChoice() {
     {
       id: 'single-finance',
       name: 'Single Finance Manager',
-      price: 'FREE',
+      price: '$20/mo limited time',
+      originalPrice: '$29.99/mo',
       description: 'Perfect for individual finance managers who want to track their personal performance',
       icon: User,
       popular: false,
@@ -21,10 +22,10 @@ export default function SignupChoice() {
         'PVR & product profit analytics', 
         'Pay calculator',
         'Performance metrics',
-        'No monthly fees',
-        'Instant setup'
+        'May be tax deductible',
+        'Try risk free for one calendar month'
       ],
-      buttonText: 'Start Free Account',
+      buttonText: 'Get Started Now!',
       route: '/simple-signup'
     },
     {
@@ -124,6 +125,9 @@ export default function SignupChoice() {
                   </div>
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-2">{option.name}</h3>
+                {option.originalPrice && (
+                  <div className="text-lg text-gray-500 line-through mb-1">{option.originalPrice}</div>
+                )}
                 <div className="text-4xl font-bold text-white mb-2">{option.price}</div>
                 <p className="text-gray-300">{option.description}</p>
               </div>

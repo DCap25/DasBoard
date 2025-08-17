@@ -3,7 +3,7 @@
  * Provides secure storage for sensitive data using AES encryption
  */
 
-import CryptoJS from 'crypto-js';
+import * as CryptoJS from 'crypto-js';
 import KeyManagement from './keyManagement';
 
 class EncryptedStorage {

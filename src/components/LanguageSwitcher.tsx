@@ -12,6 +12,7 @@ const languages = [
   { code: 'it', name: 'Italiano', flag: '🇮🇹' },
   { code: 'pl', name: 'Polski', flag: '🇵🇱' },
   { code: 'pt', name: 'Português', flag: '🇵🇹' },
+  { code: 'nl', name: 'Nederlands', flag: '🇳🇱' },
   { code: 'gr', name: 'Ελληνικά', flag: '🇬🇷' },
 ];
 
@@ -35,12 +36,12 @@ export default function LanguageSwitcher() {
       <button
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 text-sm bg-gray-800 border border-gray-700 rounded-lg text-white hover:bg-gray-700 transition-colors"
+        className="flex items-center space-x-1.5 px-2 py-1.5 text-xs bg-gray-800 border border-gray-700 rounded-md text-white hover:bg-gray-700 transition-colors"
       >
-        <Globe className="w-4 h-4" />
-        <span className="text-lg">{currentLanguage.flag}</span>
-        <span className="hidden sm:inline">{currentLanguage.name}</span>
-        <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <Globe className="w-3 h-3" />
+        <span className="text-sm">{currentLanguage.flag}</span>
+        <span className="hidden sm:inline text-xs">{currentLanguage.name}</span>
+        <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen &&

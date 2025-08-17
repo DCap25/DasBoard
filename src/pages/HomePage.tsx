@@ -54,20 +54,20 @@ export default function HomePage() {
 
   const pricingTiers = [
     {
-      name: 'Single Finance Manager',
-      price: 'FREE',
-      description: 'Perfect for individual finance managers who want to track their personal performance',
+      name: t('home.pricingTiers.singleFinance.name'),
+      price: t('home.pricingTiers.singleFinance.price'),
+      description: t('home.pricingTiers.singleFinance.description'),
       popular: false,
       icon: User,
-      features: ['Personal deal tracking', 'PVR & product profit analytics', 'Pay calculator', 'Performance metrics']
+      features: t('home.pricingTiers.singleFinance.features') as string[]
     },
     {
-      name: 'Dealership / Dealer Group',
-      price: '$250/mo base',
-      description: 'Complete dealership management with role-specific dashboards and team management',
+      name: t('home.pricingTiers.dealership.name'),
+      price: t('home.pricingTiers.dealership.price'),
+      description: t('home.pricingTiers.dealership.description'),
       popular: true,
       icon: Building2,
-      features: ['All single manager features', 'Team dashboards for all roles', 'Multi-location analytics', 'Flexible admin structures']
+      features: t('home.pricingTiers.dealership.features') as string[]
     },
   ];
 
@@ -230,7 +230,7 @@ export default function HomePage() {
                   {tier.popular && (
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                       <span className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
-                        Most Popular
+                        {t('home.pricingTiers.dealership.popular')}
                       </span>
                     </div>
                   )}
@@ -241,9 +241,16 @@ export default function HomePage() {
                     </div>
                     <h3 className="text-2xl font-bold text-white mb-4">{tier.name}</h3>
                     <p className="text-gray-400 mb-6">{tier.description}</p>
-                    <div className="text-3xl font-bold text-blue-400 mb-2">{tier.price}</div>
-                    {tier.price !== 'FREE' && (
-                      <div className="text-sm text-gray-500">per dealership + add-ons</div>
+                    <div className="mb-2">
+                      {!tier.popular && t('home.pricingTiers.singleFinance.originalPrice') && (
+                        <div className="text-lg text-gray-500 line-through mb-1">
+                          {t('home.pricingTiers.singleFinance.originalPrice')}
+                        </div>
+                      )}
+                      <div className="text-3xl font-bold text-blue-400">{tier.price}</div>
+                    </div>
+                    {tier.popular && (
+                      <div className="text-sm text-gray-500">{t('home.pricingTiers.priceSubtext')}</div>
                     )}
                   </div>
 
@@ -264,12 +271,12 @@ export default function HomePage() {
                         : 'bg-blue-600 hover:bg-blue-500 text-white'
                     }`}
                   >
-                    {tier.price === 'FREE' ? 'Get Started Free' : 'Configure Your Package'}
+                    {tier.popular ? t('home.pricingTiers.dealership.buttonText') : t('home.pricingTiers.singleFinance.buttonText')}
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </button>
 
                   <div className="mt-4 text-center text-sm text-gray-400">
-                    {tier.price === 'FREE' ? 'Setup takes less than 2 minutes' : 'Get started today'}
+                    {tier.popular ? t('home.pricingTiers.dealership.setupTime') : t('home.pricingTiers.singleFinance.setupTime')}
                   </div>
                 </div>
               );

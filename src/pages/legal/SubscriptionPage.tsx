@@ -34,130 +34,93 @@ export default function SubscriptionPage() {
         <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-8">
           <div className="flex items-center space-x-3 mb-8">
             <FileCheck className="w-8 h-8 text-blue-400" />
-            <h1 className="text-3xl font-bold text-white">Subscription Agreement</h1>
+            <h1 className="text-3xl font-bold text-white">{t('legal.subscription.title')}</h1>
           </div>
 
           <div className="prose prose-invert max-w-none">
             <p className="text-gray-300 text-sm mb-8">
-              <strong>Last Updated:</strong> 6/28/2025
+              <strong>{t('legal.subscription.lastUpdated')}</strong>
             </p>
 
             <div className="space-y-8 text-gray-300">
               <section>
                 <p>
-                  This Subscription Agreement governs your subscription to and use of The DAS Board
-                  dealership management platform.
+                  {t('legal.subscription.intro')}
                 </p>
               </section>
 
+              {/* Subscription Plans */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">1. Subscription Plans</h2>
-                <p className="mb-4">
-                  The DAS Board offers subscription tiers designed for different dealership needs:
-                </p>
+                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.subscription.sections.plans.title')}</h2>
+                <p className="mb-4">{t('legal.subscription.sections.plans.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
-                  <li>
-                    <strong>60-Day Free Trial:</strong> Full platform access with no credit card
-                    required
-                  </li>
-                  <li>
-                    <strong>Finance Manager:</strong> Individual user access with core financial
-                    tools
-                  </li>
-                  <li>
-                    <strong>Dealership:</strong> Multi-user access with full inventory and sales
-                    management
-                  </li>
-                  <li>
-                    <strong>Dealer Group:</strong> Enterprise-level access across multiple locations
-                  </li>
+                  {(t('legal.subscription.sections.plans.items') as string[]).map((item, index) => (
+                    <li key={index} dangerouslySetInnerHTML={{ __html: item }} />
+                  ))}
                 </ul>
-                <p className="mt-4">
-                  Subscriptions are billed monthly in advance. You may upgrade or downgrade your
-                  subscription at any time, with changes taking effect at the next billing cycle.
-                </p>
+                <p className="mt-4">{t('legal.subscription.sections.plans.footer')}</p>
               </section>
 
+              {/* Payment Terms */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">2. Payment Terms</h2>
-                <p>
-                  Payment is due upon subscription commencement and on the same day each month
-                  thereafter. We accept major credit cards and ACH transfers for enterprise
-                  accounts. If payment fails, we may suspend your access to The DAS Board after
-                  reasonable notice.
-                </p>
+                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.subscription.sections.payment.title')}</h2>
+                <p>{t('legal.subscription.sections.payment.content')}</p>
               </section>
 
+              {/* Trial Period */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">3. Trial Period</h2>
-                <p>
-                  The 60-day trial provides full access to The DAS Board platform. No credit card is
-                  required to start your trial. At the end of the trial period, you will need to
-                  select a paid plan to continue using the platform. Trial data will be preserved
-                  for 30 days after trial expiration.
-                </p>
+                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.subscription.sections.trial.title')}</h2>
+                <p>{t('legal.subscription.sections.trial.content')}</p>
               </section>
 
+              {/* Cancellation */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  4. Cancellation and Refunds
-                </h2>
-                <p className="mb-4">
-                  You may cancel your subscription at any time through your account settings or by
-                  contacting our support team. Upon cancellation:
-                </p>
+                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.subscription.sections.cancellation.title')}</h2>
+                <p className="mb-4">{t('legal.subscription.sections.cancellation.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
-                  <li>You will maintain access until the end of your current billing period</li>
-                  <li>No refunds are provided for partial months of service</li>
-                  <li>Your data will be available for export for 90 days after cancellation</li>
-                  <li>Automatic renewal will be disabled</li>
+                  {(t('legal.subscription.sections.cancellation.items') as string[]).map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
                 </ul>
               </section>
 
+              {/* Service Level Agreement */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  5. Service Level Agreement
-                </h2>
-                <p className="mb-4">For paid subscriptions, we commit to:</p>
+                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.subscription.sections.sla.title')}</h2>
+                <p className="mb-4">{t('legal.subscription.sections.sla.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
-                  <li>99.9% platform uptime availability</li>
-                  <li>Scheduled maintenance windows with 48-hour advance notice</li>
-                  <li>Customer support response within 24 hours for standard requests</li>
-                  <li>Priority support for Dealer Group subscribers</li>
+                  {(t('legal.subscription.sections.sla.items') as string[]).map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
                 </ul>
               </section>
 
+              {/* Data and Security */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">6. Data and Security</h2>
-                <p className="mb-4">Your dealership data remains your property. We provide:</p>
+                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.subscription.sections.data.title')}</h2>
+                <p className="mb-4">{t('legal.subscription.sections.data.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
-                  <li>Daily automated backups with 30-day retention</li>
-                  <li>Bank-level encryption and security protocols</li>
-                  <li>GDPR and CCPA compliance for data protection</li>
-                  <li>Data export capabilities in standard formats</li>
+                  {(t('legal.subscription.sections.data.items') as string[]).map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
                 </ul>
               </section>
 
+              {/* Support and Training */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">7. Support and Training</h2>
-                <p className="mb-4">All paid subscriptions include:</p>
+                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.subscription.sections.support.title')}</h2>
+                <p className="mb-4">{t('legal.subscription.sections.support.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
-                  <li>Comprehensive onboarding and setup assistance</li>
-                  <li>Online training resources and documentation</li>
-                  <li>Email and chat support during business hours</li>
-                  <li>Regular platform updates and new feature releases</li>
+                  {(t('legal.subscription.sections.support.items') as string[]).map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
                 </ul>
               </section>
 
+              {/* Modifications */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  8. Modifications to Service
-                </h2>
-                <p>
-                  We may modify or update The DAS Board platform to improve functionality, security,
-                  or compliance. We will provide reasonable notice of significant changes that may
-                  affect your usage.
-                </p>
+                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.subscription.sections.modifications.title')}</h2>
+                <p>{t('legal.subscription.sections.modifications.content')}</p>
               </section>
             </div>
           </div>

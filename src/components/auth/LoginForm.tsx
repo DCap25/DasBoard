@@ -9,6 +9,13 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../contexts/TranslationContext';
 import LanguageSwitcher from '../LanguageSwitcher';
 import CSRFProtection from '../../lib/csrfProtection';
+import { 
+  sanitizeEmail, 
+  sanitizeUserInput, 
+  isValidEmail,
+  SECURITY_LIMITS 
+} from '../../lib/security/inputSanitization';
+import { createSafeEventHandler } from '../../lib/security/safeRendering';
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -22,13 +29,45 @@ export default function LoginForm() {
   const [isMagicLinkSent, setIsMagicLinkSent] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [showResendVerification, setShowResendVerification] = useState(false);
+  
+  // Safe email handler with validation
+  const handleEmailChange = (value: string) => {
+    // Basic sanitization - don't over-sanitize email input while typing
+    const sanitized = value.trim().toLowerCase().substring(0, SECURITY_LIMITS.MAX_EMAIL_LENGTH);
+    setEmail(sanitized);
+  };
+  
+  // Safe password handler with length limit
+  const handlePasswordChange = (value: string) => {
+    // Only apply length limit to passwords, no other sanitization
+    const sanitized = value.substring(0, 128);
+    setPassword(sanitized);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     console.log('[LoginForm] Submit clicked', { email: email.trim() });
-    if (!email || !password) {
-      setError('Please enter both email and password');
+    
+    // Validate and sanitize email input
+    const sanitizedEmail = sanitizeEmail(email);
+    if (!sanitizedEmail) {
+      setError('Please enter a valid email address');
+      return;
+    }
+    
+    if (!password || password.length < 1) {
+      setError('Please enter your password');
+      return;
+    }
+    
+    // Additional security check for malicious input
+    const hasInvalidInput = [email, password].some(value => {
+      return /<script|javascript:|data:text\/html|vbscript:|onload=|onerror=/i.test(value);
+    });
+    
+    if (hasInvalidInput) {
+      setError('Invalid characters detected. Please check your input.');
       return;
     }
 
@@ -45,7 +84,7 @@ export default function LoginForm() {
 
     try {
       console.log('[LoginForm] Calling AuthContext.signIn');
-      await signIn(email.trim(), password, rememberMe);
+      await signIn(sanitizedEmail, password, rememberMe);
       localStorage.setItem('recent_supabase_login', 'true');
       console.log('[LoginForm] AuthContext.signIn resolved');
       // Double-check session; if missing, try direct supabase sign-in fallback
@@ -57,7 +96,7 @@ export default function LoginForm() {
           '[LoginForm] No session after context signIn; attempting direct supabase signIn'
         );
         const { data, error } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
+          email: sanitizedEmail,
           password,
         });
         if (error) throw error;
@@ -107,15 +146,16 @@ export default function LoginForm() {
 
   // Handle magic link login
   const handleMagicLinkLogin = async () => {
-    if (!email) {
-      setError('Please enter your email address');
+    const sanitizedEmail = sanitizeEmail(email);
+    if (!sanitizedEmail) {
+      setError('Please enter a valid email address');
       return;
     }
 
     try {
       setLoading(true);
       const { error } = await supabase.auth.signInWithOtp({
-        email: email.trim(),
+        email: sanitizedEmail,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
@@ -139,8 +179,9 @@ export default function LoginForm() {
 
   // Handle resend verification email
   const handleResendVerification = async () => {
-    if (!email) {
-      setError('Please enter your email address');
+    const sanitizedEmail = sanitizeEmail(email);
+    if (!sanitizedEmail) {
+      setError('Please enter a valid email address');
       return;
     }
 
@@ -148,7 +189,7 @@ export default function LoginForm() {
       setLoading(true);
       const { error } = await supabase.auth.resend({
         type: 'signup',
-        email: email.trim(),
+        email: sanitizedEmail,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
@@ -161,7 +202,7 @@ export default function LoginForm() {
 
       setError('');
       setShowResendVerification(false);
-      alert(`Verification email sent to ${email}. Please check your inbox and spam folder.`);
+      alert(`Verification email sent to ${sanitizedEmail}. Please check your inbox and spam folder.`);
     } catch (error) {
       console.error('[LoginForm] Resend verification error:', error);
       const errorMsg = error instanceof Error ? error.message : 'Failed to resend verification';
@@ -176,7 +217,7 @@ export default function LoginForm() {
       <div className="text-center space-y-4">
         <div className="p-4 bg-green-50 text-green-700 rounded-md">
           <h3 className="font-medium">Magic link sent!</h3>
-          <p className="text-sm mt-1">Check your email ({email}) for a login link.</p>
+          <p className="text-sm mt-1">Check your email ({sanitizeUserInput(email, { allowHtml: false, maxLength: 100 })}) for a login link.</p>
         </div>
         <Button variant="outline" onClick={() => setIsMagicLinkSent(false)} className="w-full">
           Back to Login
@@ -212,7 +253,7 @@ export default function LoginForm() {
             type="email"
             placeholder="Enter your email"
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={e => handleEmailChange(e.target.value)}
             disabled={loading}
             required
           />
@@ -226,7 +267,7 @@ export default function LoginForm() {
               type={showPassword ? 'text' : 'password'}
               placeholder="Enter your password"
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={e => handlePasswordChange(e.target.value)}
               disabled={loading}
               required
               className="pr-10"
