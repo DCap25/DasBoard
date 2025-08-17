@@ -293,15 +293,6 @@ export default defineConfig(({ mode }) => {
         }
       },
       rollupOptions: {
-        // Security: Configure external dependencies for proper resolution
-        external: (id) => {
-          // Never externalize isomorphic-dompurify - bundle it
-          if (id === 'isomorphic-dompurify') {
-            return false;
-          }
-          // Don't externalize any other dependencies by default
-          return false;
-        },
         output: {
           // Security: Split chunks for better caching and security
           manualChunks: {
@@ -318,8 +309,7 @@ export default defineConfig(({ mode }) => {
             'query': ['@tanstack/react-query'],
             'utils': ['clsx', 'tailwind-merge', 'date-fns'],
             'icons': ['lucide-react'],
-            'crypto': ['crypto-js'], // Security: Separate crypto libraries
-            'security': ['isomorphic-dompurify'] // Security: Include DOMPurify for XSS prevention
+            'crypto': ['crypto-js'] // Security: Separate crypto libraries
           },
           // Security: Use hash-based file names for cache busting
           chunkFileNames: 'assets/[name].[hash].js',
@@ -393,8 +383,7 @@ export default defineConfig(({ mode }) => {
         'react-dom',
         'react-router-dom',
         '@tanstack/react-query',
-        'lucide-react',
-        'isomorphic-dompurify' // Security: Ensure DOMPurify is pre-bundled
+        'lucide-react'
       ],
       // Security: Exclude Node.js modules from bundling
       exclude: ['node:fs', 'node:path', 'node:crypto']
@@ -409,10 +398,5 @@ export default defineConfig(({ mode }) => {
     // Security: Logger configuration
     logLevel: isProduction ? 'error' : 'info',
     clearScreen: !process.env.CI, // Don't clear screen in CI
-    // Security: SSR configuration for proper module resolution
-    ssr: {
-      // Security: Ensure isomorphic-dompurify is bundled, not externalized
-      noExternal: ['isomorphic-dompurify']
-    }
   };
 });

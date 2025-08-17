@@ -15,7 +15,7 @@ import { supabase, getUserSession, getCurrentUser, getDealershipSupabase } from 
 import { createClient } from '@supabase/supabase-js';
 import SecureLogger from './secureLogger';
 import type { User } from '@supabase/supabase-js';
-import DOMPurify from 'isomorphic-dompurify';
+import { sanitizeUserInput } from './security/inputSanitization';
 
 // =================== TYPE DEFINITIONS ===================
 // Strong typing for all API responses and requests
@@ -150,16 +150,17 @@ const requestCounts = new Map<string, { count: number; resetTime: number }>();
 
 /**
  * Sanitize string input to prevent XSS and injection attacks
- * Uses DOMPurify for comprehensive sanitization
+ * Uses our comprehensive security sanitization
  */
 const sanitizeInput = (input: any): any => {
   if (typeof input === 'string') {
-    // Remove any HTML/script tags and sanitize
-    return DOMPurify.sanitize(input, { 
-      ALLOWED_TAGS: [], 
-      ALLOWED_ATTR: [],
-      KEEP_CONTENT: true 
-    }).trim();
+    // Use our robust sanitization function
+    return sanitizeUserInput(input, { 
+      allowHtml: false,
+      maxLength: 1000,
+      trimWhitespace: true,
+      normalizeSpaces: true
+    });
   }
   if (Array.isArray(input)) {
     return input.map(sanitizeInput);
