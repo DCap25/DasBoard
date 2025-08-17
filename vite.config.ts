@@ -309,7 +309,8 @@ export default defineConfig(({ mode }) => {
             'query': ['@tanstack/react-query'],
             'utils': ['clsx', 'tailwind-merge', 'date-fns'],
             'icons': ['lucide-react'],
-            'crypto': ['crypto-js'] // Security: Separate crypto libraries
+            'crypto': ['crypto-js'], // Security: Separate crypto libraries
+            'security': ['isomorphic-dompurify'] // Security: Include DOMPurify for XSS prevention
           },
           // Security: Use hash-based file names for cache busting
           chunkFileNames: 'assets/[name].[hash].js',

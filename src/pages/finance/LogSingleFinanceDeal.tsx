@@ -415,7 +415,6 @@ export default function LogSingleFinanceDeal() {
           otherProfit: dealToEdit.otherProfit?.toString() || '',
           backEndGross: dealToEdit.backEndGross?.toString() || '',
           totalGross: dealToEdit.totalGross?.toString() || '',
-          status: dealToEdit.status || dealToEdit.dealStatus || 'pending',
           notes: dealToEdit.notes || ''
         });
       } else {
@@ -607,7 +606,6 @@ export default function LogSingleFinanceDeal() {
         other_profit: parseFloat(formData.otherProfit) || 0,
         otherProfit: parseFloat(formData.otherProfit) || 0,
         products: productsSold,
-        status: formData.status,
         dealStatus: formData.status,
         notes: formData.notes,
         vsc_sold: parseFloat(formData.vscProfit) > 0,
