@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { getSecureSupabaseClient } from '../../lib/supabaseClient';
 import { quickHasSupabaseSessionToken } from '../../lib/supabaseClient';
 import { isTestEmail } from '../../lib/supabaseClient';
 import {
@@ -27,13 +27,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     useAuth();
   const location = useLocation();
   // If Supabase token exists locally but context isn't ready yet, allow dashboard routes immediately
+  // Also allow single-finance routes with proper token
   if (
     (!user || !hasSession) &&
     quickHasSupabaseSessionToken() &&
-    (location.pathname.startsWith('/dashboard') ||
-      location.pathname.startsWith('/single-finance-deal-log'))
+    (location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/single-finance'))
   ) {
-    console.log('[ProtectedRoute] Token present but context not ready; allowing dashboard route');
+    console.log('[ProtectedRoute] Token present but context not ready; allowing route:', location.pathname);
     return <>{children}</>;
   }
   const deploymentEnv = import.meta.env.MODE || 'development';
@@ -133,6 +133,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     recentSupabaseLogin: recentSupabaseLogin,
     path: location.pathname,
     isDemoUser: isDemoUserAuthenticated,
+    hasDirectAuthInStorage: !!localStorage.getItem('directauth_user'),
+    directAuthTimestamp: localStorage.getItem('directauth_timestamp'),
   });
 
   // If we have a fresh login flag, optimistically allow dashboard access while auth propagates
@@ -144,6 +146,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     // Check direct Supabase auth as fallback to bypass context issues
     const checkDirectSupabaseAuth = async () => {
       try {
+        const supabase = await getSecureSupabaseClient();
         const {
           data: { session },
         } = await supabase.auth.getSession();
@@ -161,10 +164,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     };
 
     // For finance routes, try direct auth check
-    if (location.pathname === '/dashboard/single-finance') {
+    if (location.pathname === '/dashboard/single-finance' || location.pathname.startsWith('/single-finance-deal-log')) {
       checkDirectSupabaseAuth().then(isAuthenticated => {
         if (isAuthenticated) {
           window.location.reload(); // Force reload to refresh auth context
+        } else {
+          // If not authenticated, clear the flag to prevent infinite loading
+          localStorage.removeItem('recent_supabase_login');
         }
       });
     }
@@ -173,11 +179,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     // Clear the flag after a short grace period
     if (!extraLoadingStartTime) {
       setExtraLoadingStartTime(Date.now());
-      setTimeout(() => localStorage.removeItem('recent_supabase_login'), 15000);
+      setTimeout(() => localStorage.removeItem('recent_supabase_login'), 5000); // Reduced from 15s to 5s
     }
-    // If route is clearly a dashboard route, allow access, else fallback to loading UI
+    // If route is clearly a dashboard or single-finance route, allow access, else fallback to loading UI
     const isDashboardRoute =
-      location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/dealership/');
+      location.pathname.startsWith('/dashboard') || 
+      location.pathname.startsWith('/dealership/') ||
+      location.pathname.startsWith('/single-finance');
     if (isDashboardRoute) return <>{children}</>;
     return (
       <div className="flex h-screen items-center justify-center">
@@ -243,11 +251,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       authCheckComplete,
       path: location.pathname,
     });
-    // During loading, allow content for dashboard and single finance deal log to avoid blank screens
-    if (
-      location.pathname.startsWith('/dashboard') ||
-      location.pathname.startsWith('/single-finance-deal-log')
-    ) {
+    // During loading, allow content for dashboard and single-finance routes to avoid blank screens
+    if (location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/single-finance')) {
       return <>{children}</>;
     }
     return (
@@ -262,17 +267,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Add a simple delay for auth state to propagate on fresh logins
   // If we just came from login and don't have auth state yet, wait a bit
-  const isComingFromLogin = document.referrer.includes('/') || location.pathname !== '/';
+  const isComingFromLogin = document.referrer.includes('/auth') || document.referrer.includes('/login');
 
-  if (!user && !hasSession && isComingFromLogin && !extraLoadingStartTime) {
+  if (!user && !hasSession && isComingFromLogin && !extraLoadingStartTime && location.pathname === '/dashboard') {
     console.log(
       '[ProtectedRoute] Detected navigation from login without auth state, adding delay...'
     );
     // Instead of delay, redirect root dashboard to sales immediately
-    if (location.pathname === '/dashboard') {
-      return <Navigate to="/dashboard/sales" replace />;
-    }
-    setExtraLoadingStartTime(Date.now());
+    return <Navigate to="/dashboard/sales" replace />;
   }
 
   if (extraLoadingStartTime && !user && !hasSession) {
@@ -294,7 +296,15 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     } else {
       console.warn('[ProtectedRoute] Auth state timeout reached, redirecting to login');
       setExtraLoadingStartTime(null);
-      return <Navigate to="/" replace state={{ from: location }} />;
+      // Clear the recent login flag to prevent getting stuck
+      localStorage.removeItem('recent_supabase_login');
+      
+      // Use same redirect logic as the main auth check
+      const isDevelopment = import.meta.env.MODE === 'development' || import.meta.env.VITE_ENVIRONMENT === 'development';
+      const redirectTo = isDevelopment ? '/dashboard-selector' : '/';
+      
+      console.log(`[ProtectedRoute] Timeout redirect to ${redirectTo}`);
+      return <Navigate to={redirectTo} replace state={{ from: location }} />;
     }
   }
 
@@ -355,10 +365,15 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     logAccessAttempt(location.pathname, false, {
       reason: 'Not authenticated',
       has_session: hasSession,
-      redirect_to: '/',
+      redirect_to: '/dashboard-selector',
     });
 
-    return <Navigate to="/" replace state={{ from: location }} />;
+    // For development/testing, redirect to dashboard selector for easier access
+    const isDevelopment = import.meta.env.MODE === 'development' || import.meta.env.VITE_ENVIRONMENT === 'development';
+    const redirectTo = isDevelopment ? '/dashboard-selector' : '/';
+    
+    console.log(`[ProtectedRoute] Redirecting unauthenticated user to ${redirectTo}`);
+    return <Navigate to={redirectTo} replace state={{ from: location }} />;
   }
 
   // If specific roles are required, check if user has any of them
@@ -385,6 +400,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         // The flag might also be in the database profile
         const checkGroupAdminFlag = async () => {
           try {
+            const supabase = await getSecureSupabaseClient();
             const { data, error } = await supabase
               .from('profiles')
               .select('is_group_admin')

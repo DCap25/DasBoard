@@ -92,7 +92,14 @@ interface Metrics {
 }
 
 // Time period options - now includes specific YYYY-MM format for archived months
-type TimePeriod = 'this-month' | 'last-month' | 'last-quarter' | 'ytd' | 'last-year' | 'custom' | string;
+type TimePeriod =
+  | 'this-month'
+  | 'last-month'
+  | 'last-quarter'
+  | 'ytd'
+  | 'last-year'
+  | 'custom'
+  | string;
 
 // Add schedule data
 // Mock schedule data
@@ -118,8 +125,32 @@ export const SingleFinanceHomePage: React.FC = () => {
   const { t } = useTranslation();
   const [localUserId, setLocalUserId] = useState<string | null>(null);
 
+  // If auth check is complete and no user/session, redirect to dashboard selector
+  useEffect(() => {
+    if (authCheckComplete && !hasSession && !user && !localUserId) {
+      console.log('[SingleFinanceHomePage] No authentication found, redirecting to dashboard selector');
+      navigate('/dashboard-selector');
+    }
+  }, [authCheckComplete, hasSession, user, localUserId, navigate]);
+
   // Helper function to get user ID consistently
   const getUserId = () => {
+    // Debug logging to see what user object we're getting
+    console.log('[SingleFinanceHomePage] getUserId called with user:', {
+      user,
+      userType: typeof user,
+      userStringified: user ? JSON.stringify(user) : 'null',
+      localUserId,
+      hasSession,
+      authCheckComplete,
+    });
+    
+    // Don't attempt to get user ID if we don't have a valid user object
+    if (!user && !localUserId) {
+      console.log('[SingleFinanceHomePage] No user or localUserId available, returning null');
+      return null;
+    }
+    
     return getConsistentUserId(user) || localUserId;
   };
   useEffect(() => {
@@ -232,7 +263,10 @@ export const SingleFinanceHomePage: React.FC = () => {
       if (timePeriod.match(/^\d{4}-\d{2}$/)) {
         // Load archived deals for specific month
         parsedDeals = SingleFinanceStorage.getArchivedDeals(userId, timePeriod);
-        console.log(`[SingleFinanceHomePage] Loaded archived deals for ${timePeriod}:`, parsedDeals.length);
+        console.log(
+          `[SingleFinanceHomePage] Loaded archived deals for ${timePeriod}:`,
+          parsedDeals.length
+        );
       } else {
         // Load current deals
         parsedDeals = SingleFinanceStorage.getDeals(userId);
@@ -355,7 +389,6 @@ export const SingleFinanceHomePage: React.FC = () => {
     setShowPayAmounts(newShowState);
     SingleFinanceStorage.setPayPrivacyState(userId, newShowState);
   };
-
 
   // Filter deals based on selected time period
   const filterDealsByDateRange = useCallback(() => {
@@ -680,12 +713,18 @@ export const SingleFinanceHomePage: React.FC = () => {
               <Trophy size={20} />
             </div>
             <div>
-              <h3 className="font-medium text-blue-800">{t('dashboard.singleFinance.promo.title')}</h3>
+              <h3 className="font-medium text-blue-800">
+                {t('dashboard.singleFinance.promo.title')}
+              </h3>
               <p className="text-blue-600">
                 {t('dashboard.singleFinance.promo.description')}{' '}
                 <span className="line-through text-gray-500 mr-1">$5/month</span>
-                <span className="font-bold text-red-500">{t('dashboard.singleFinance.promo.free')}</span>
-                <span className="text-gray-500 text-sm italic ml-1">{t('dashboard.singleFinance.promo.limited')}</span>
+                <span className="font-bold text-red-500">
+                  {t('dashboard.singleFinance.promo.free')}
+                </span>
+                <span className="text-gray-500 text-sm italic ml-1">
+                  {t('dashboard.singleFinance.promo.limited')}
+                </span>
               </p>
             </div>
           </div>
@@ -695,7 +734,9 @@ export const SingleFinanceHomePage: React.FC = () => {
       {/* Page Header */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold text-gray-900">{t('dashboard.singleFinance.homeTitle')}</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {t('dashboard.singleFinance.homeTitle')}
+          </h1>
           <MonthYearPicker
             selectedMonth={timePeriod}
             onMonthChange={setTimePeriod}
@@ -707,18 +748,20 @@ export const SingleFinanceHomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mb-2">
+      {/* KPIs - Enhanced Mobile Layout */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-4">
         <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-base font-semibold text-slate-700">{t('dashboard.singleFinance.kpi.fiGross')}</CardTitle>
-            <DollarSign className="h-5 w-5 text-blue-500" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3 px-4 sm:px-6">
+            <CardTitle className="text-sm sm:text-base font-semibold text-slate-700 leading-tight">
+              {t('dashboard.singleFinance.kpi.fiGross')}
+            </CardTitle>
+            <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
           </CardHeader>
-          <CardContent className="pt-2">
-            <div className="text-2xl font-bold text-slate-900">
+          <CardContent className="pt-1 sm:pt-2 px-4 sm:px-6">
+            <div className="text-xl sm:text-2xl font-bold text-slate-900 break-all">
               ${metrics.mtdRevenue.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
               {metrics.mtdRevenue > 12000 ? (
                 <span className="text-green-500 flex items-center">
                   <ChevronUp className="mr-1 h-4 w-4" />
@@ -735,15 +778,17 @@ export const SingleFinanceHomePage: React.FC = () => {
         </Card>
 
         <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-base font-semibold text-slate-700">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3 px-4 sm:px-6">
+            <CardTitle className="text-sm sm:text-base font-semibold text-slate-700 leading-tight">
               {t('dashboard.singleFinance.kpi.dealsProcessed')}
             </CardTitle>
-            <FileText className="h-5 w-5 text-blue-500" />
+            <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
           </CardHeader>
-          <CardContent className="pt-2">
-            <div className="text-2xl font-bold text-slate-900">{metrics.dealsProcessed}</div>
-            <p className="text-xs text-muted-foreground">
+          <CardContent className="pt-1 sm:pt-2 px-4 sm:px-6">
+            <div className="text-xl sm:text-2xl font-bold text-slate-900">
+              {metrics.dealsProcessed}
+            </div>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
               <span className="text-green-500 flex items-center">
                 <ChevronUp className="mr-1 h-4 w-4" />
                 {t('dashboard.singleFinance.trends.up3')}
@@ -753,42 +798,54 @@ export const SingleFinanceHomePage: React.FC = () => {
         </Card>
 
         <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-base font-semibold text-slate-700">{t('dashboard.singleFinance.kpi.dealTypes')}</CardTitle>
-            <Car className="h-5 w-5 text-blue-500" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3 px-4 sm:px-6">
+            <CardTitle className="text-sm sm:text-base font-semibold text-slate-700 leading-tight">
+              {t('dashboard.singleFinance.kpi.dealTypes')}
+            </CardTitle>
+            <Car className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
           </CardHeader>
-          <CardContent className="pt-2">
-            <div className="space-y-1">
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-600">{t('dashboard.singleFinance.dealTypes.finance')}:</span>
-                <span className="text-sm font-bold text-indigo-600">
+          <CardContent className="pt-1 sm:pt-2 px-4 sm:px-6">
+            <div className="space-y-1 sm:space-y-2">
+              <div className="flex justify-between items-center py-0.5">
+                <span className="text-xs sm:text-sm text-gray-600 truncate">
+                  {t('dashboard.singleFinance.dealTypes.finance')}:
+                </span>
+                <span className="text-sm sm:text-base font-bold text-indigo-600 ml-2">
                   {metrics.dealTypes.finance}
                 </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-600">{t('dashboard.singleFinance.dealTypes.cash')}:</span>
-                <span className="text-sm font-bold text-green-600">{metrics.dealTypes.cash}</span>
+              <div className="flex justify-between items-center py-0.5">
+                <span className="text-xs sm:text-sm text-gray-600 truncate">
+                  {t('dashboard.singleFinance.dealTypes.cash')}:
+                </span>
+                <span className="text-sm sm:text-base font-bold text-green-600 ml-2">
+                  {metrics.dealTypes.cash}
+                </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-600">{t('dashboard.singleFinance.dealTypes.lease')}:</span>
-                <span className="text-sm font-bold text-blue-600">{metrics.dealTypes.lease}</span>
+              <div className="flex justify-between items-center py-0.5">
+                <span className="text-xs sm:text-sm text-gray-600 truncate">
+                  {t('dashboard.singleFinance.dealTypes.lease')}:
+                </span>
+                <span className="text-sm sm:text-base font-bold text-blue-600 ml-2">
+                  {metrics.dealTypes.lease}
+                </span>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-base font-semibold text-slate-700">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3 px-4 sm:px-6">
+            <CardTitle className="text-sm sm:text-base font-semibold text-slate-700 leading-tight">
               {t('dashboard.singleFinance.kpi.productsPerDeal')}
             </CardTitle>
-            <BarChart4 className="h-5 w-5 text-blue-500" />
+            <BarChart4 className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
           </CardHeader>
-          <CardContent className="pt-2">
-            <div className="text-2xl font-bold text-slate-900">
+          <CardContent className="pt-1 sm:pt-2 px-4 sm:px-6">
+            <div className="text-xl sm:text-2xl font-bold text-slate-900">
               {metrics.productsPerDeal.toFixed(1)}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
               {metrics.productsPerDeal >= 2.0 ? (
                 <span className="text-green-500 flex items-center">
                   <ChevronUp className="mr-1 h-4 w-4" />
@@ -805,15 +862,17 @@ export const SingleFinanceHomePage: React.FC = () => {
         </Card>
 
         <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-base font-semibold text-slate-700">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3 px-4 sm:px-6">
+            <CardTitle className="text-sm sm:text-base font-semibold text-slate-700 leading-tight">
               {t('dashboard.singleFinance.kpi.pvrFull')}
             </CardTitle>
-            <CreditCard className="h-5 w-5 text-blue-500" />
+            <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
           </CardHeader>
-          <CardContent className="pt-2">
-            <div className="text-2xl font-bold text-slate-900">${metrics.pvr.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
+          <CardContent className="pt-1 sm:pt-2 px-4 sm:px-6">
+            <div className="text-xl sm:text-2xl font-bold text-slate-900 break-all">
+              ${metrics.pvr.toLocaleString()}
+            </div>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
               {metrics.pvr > 1500 ? (
                 <span className="text-green-500 flex items-center">
                   <ChevronUp className="mr-1 h-4 w-4" />
@@ -830,37 +889,37 @@ export const SingleFinanceHomePage: React.FC = () => {
         </Card>
       </div>
 
-      {/* F&I Product Mix & Pay Calculator Section - Side by Side */}
-      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
-        {/* F&I Product Mix - Condensed */}
+      {/* F&I Product Mix & Pay Calculator Section - Enhanced Mobile Layout */}
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
+        {/* F&I Product Mix - Mobile Optimized */}
         <Card className="border hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center text-sm font-medium">
-              <BarChart4 className="mr-1 h-4 w-4 text-blue-500" />
+          <CardHeader className="pb-2 px-3 sm:px-6">
+            <CardTitle className="flex items-center text-sm sm:text-base font-medium">
+              <BarChart4 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
               {t('dashboard.singleFinance.productMix.title')}
             </CardTitle>
           </CardHeader>
-          <CardContent className="px-2 pb-2">
-            {/* Header Row */}
-            <div className="flex items-center py-1 px-2 mb-2 border-b border-gray-200">
-              <div className="flex-1">
-                <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+          <CardContent className="px-2 sm:px-3 pb-3">
+            {/* Header Row - Mobile Responsive */}
+            <div className="flex items-center py-2 px-2 sm:px-3 mb-2 border-b border-gray-200 bg-gray-50 rounded-t-md">
+              <div className="flex-1 min-w-0">
+                <span className="text-xs sm:text-sm font-medium text-gray-600 uppercase tracking-wide truncate">
                   {t('dashboard.singleFinance.productMix.product')}
                 </span>
               </div>
               <div className="flex-1 text-center">
-                <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+                <span className="text-xs sm:text-sm font-medium text-gray-600 uppercase tracking-wide">
                   {t('dashboard.singleFinance.productMix.avgProfit')}
                 </span>
               </div>
               <div className="flex-1 text-right">
-                <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+                <span className="text-xs sm:text-sm font-medium text-gray-600 uppercase tracking-wide">
                   {t('dashboard.singleFinance.productMix.penetration')}
                 </span>
               </div>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1 sm:space-y-2 max-h-80 sm:max-h-96 overflow-y-auto">
               {[
                 {
                   name: t('dashboard.singleFinance.productMix.extendedWarranty'),
@@ -911,33 +970,40 @@ export const SingleFinanceHomePage: React.FC = () => {
                   color: 'bg-gray-500',
                 },
               ].map((product, index) => (
-                <div key={index} className="flex items-center py-1 px-2 bg-gray-50 rounded-md">
-                  <div className="flex items-center flex-1">
+                <div
+                  key={index}
+                  className="flex items-center py-2 px-2 sm:px-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
+                >
+                  <div className="flex items-center flex-1 min-w-0">
                     <div
-                      className={`w-2 h-2 ${product.color} rounded-full mr-2 flex-shrink-0`}
+                      className={`w-2 h-2 sm:w-3 sm:h-3 ${product.color} rounded-full mr-2 flex-shrink-0`}
                     ></div>
-                    <span className="font-medium text-xs">{product.name}</span>
+                    <span className="font-medium text-xs sm:text-sm truncate">{product.name}</span>
                   </div>
                   <div className="flex-1 text-center">
-                    <div className="font-bold text-sm">
-                      <span className="text-xs">$</span>
+                    <div className="font-bold text-sm sm:text-base">
+                      <span className="text-xs sm:text-sm">$</span>
                       {product.value}
                     </div>
                   </div>
                   <div className="flex-1 text-right">
-                    <div className="font-bold text-xs text-blue-600">{product.percent}%</div>
+                    <div className="font-bold text-xs sm:text-sm text-blue-600">
+                      {product.percent}%
+                    </div>
                   </div>
                 </div>
               ))}
 
-              {/* PPD metric */}
-              <div className="mt-2 pt-2 border-t border-gray-200">
-                <div className="flex items-center py-1 px-2 bg-blue-50 rounded-md">
+              {/* PPD metric - Enhanced Mobile */}
+              <div className="mt-3 pt-3 border-t border-gray-200">
+                <div className="flex items-center py-2 px-2 sm:px-3 bg-blue-50 rounded-md">
                   <div className="flex-1">
-                    <span className="font-medium text-xs">{t('dashboard.singleFinance.productMix.ppd')}</span>
+                    <span className="font-medium text-xs sm:text-sm">
+                      {t('dashboard.singleFinance.productMix.ppd')}
+                    </span>
                   </div>
                   <div className="flex-1 text-center">
-                    <div className="font-bold text-sm text-blue-600">
+                    <div className="font-bold text-sm sm:text-base text-blue-600">
                       {metrics.productsPerDeal.toFixed(1)}
                     </div>
                   </div>
@@ -948,18 +1014,22 @@ export const SingleFinanceHomePage: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Pay Calculator Card */}
+        {/* Pay Calculator Card - Mobile Enhanced */}
         <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-bold flex items-center justify-between text-green-800">
-              <div className="flex items-center">
-                <DollarSign className="mr-1 h-4 w-4" />
-                {t('dashboard.singleFinance.payCalculator.title')}
+          <CardHeader className="pb-2 px-3 sm:px-6">
+            <CardTitle className="text-sm sm:text-base font-bold flex items-center justify-between text-green-800">
+              <div className="flex items-center min-w-0">
+                <DollarSign className="mr-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                <span className="truncate">{t('dashboard.singleFinance.payCalculator.title')}</span>
               </div>
               <button
                 onClick={handleTogglePayVisibility}
-                className="p-1 hover:bg-green-200 rounded-lg transition-colors shadow-sm border border-green-300"
-                title={showPayAmounts ? t('dashboard.singleFinance.payCalculator.hideAmounts') : t('dashboard.singleFinance.payCalculator.showAmounts')}
+                className="p-2 sm:p-1 hover:bg-green-200 rounded-lg transition-colors shadow-sm border border-green-300 flex-shrink-0 ml-2"
+                title={
+                  showPayAmounts
+                    ? t('dashboard.singleFinance.payCalculator.hideAmounts')
+                    : t('dashboard.singleFinance.payCalculator.showAmounts')
+                }
                 type="button"
               >
                 {showPayAmounts ? (
@@ -970,7 +1040,7 @@ export const SingleFinanceHomePage: React.FC = () => {
               </button>
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-3 sm:px-6">
             {(() => {
               // Load pay configuration from localStorage
               let payConfig;
@@ -1047,42 +1117,52 @@ export const SingleFinanceHomePage: React.FC = () => {
                 showPayAmounts ? `$${amount.toLocaleString()}` : 'XXX';
 
               return (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  <div className="space-y-1">
-                    <div className="flex justify-between items-center p-2 bg-white rounded-lg border">
-                      <span className="text-xs font-medium">{t('dashboard.singleFinance.payCalculator.baseAmount')}</span>
-                      <span className="font-bold text-green-600 text-sm">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="space-y-2 sm:space-y-3">
+                    <div className="flex justify-between items-center p-3 sm:p-2 bg-white rounded-lg border">
+                      <span className="text-xs sm:text-sm font-medium truncate pr-2">
+                        {t('dashboard.singleFinance.payCalculator.baseAmount')}
+                      </span>
+                      <span className="font-bold text-green-600 text-sm sm:text-base flex-shrink-0">
                         {displayAmount(baseEarnings)}
                       </span>
                     </div>
 
-                    <div className="flex justify-between items-center p-2 bg-white rounded-lg border">
-                      <span className="text-xs font-medium">
-                        {t('dashboard.singleFinance.payCalculator.commission', { rate: payConfig.commissionRate })}
+                    <div className="flex justify-between items-center p-3 sm:p-2 bg-white rounded-lg border">
+                      <span className="text-xs sm:text-sm font-medium truncate pr-2">
+                        {t('dashboard.singleFinance.payCalculator.commission', {
+                          rate: payConfig.commissionRate,
+                        })}
                       </span>
-                      <span className="font-bold text-green-600 text-sm">
+                      <span className="font-bold text-green-600 text-sm sm:text-base flex-shrink-0">
                         {displayAmount(commissionEarnings)}
                       </span>
                     </div>
 
-                    <div className="flex justify-between items-center p-2 bg-white rounded-lg border">
-                      <span className="text-xs font-medium">{t('dashboard.singleFinance.payCalculator.bonuses')}</span>
-                      <span className="font-bold text-green-600 text-sm">
+                    <div className="flex justify-between items-center p-3 sm:p-2 bg-white rounded-lg border">
+                      <span className="text-xs sm:text-sm font-medium truncate pr-2">
+                        {t('dashboard.singleFinance.payCalculator.bonuses')}
+                      </span>
+                      <span className="font-bold text-green-600 text-sm sm:text-base flex-shrink-0">
                         {displayAmount(totalBonuses)}
                       </span>
                     </div>
                   </div>
 
-                  <div className="space-y-1">
-                    <div className="p-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg">
-                      <div className="text-xs font-medium">{t('dashboard.singleFinance.payCalculator.estimatedPay')}</div>
-                      <div className="text-lg font-bold">
+                  <div className="space-y-2 sm:space-y-3">
+                    <div className="p-3 sm:p-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg">
+                      <div className="text-xs sm:text-sm font-medium">
+                        {t('dashboard.singleFinance.payCalculator.estimatedPay')}
+                      </div>
+                      <div className="text-lg sm:text-xl font-bold break-all">
                         {showPayAmounts ? `$${estimatedPay.toLocaleString()}` : 'XXX'}
                       </div>
                     </div>
 
-                    <div className="text-xs text-gray-600 p-2 bg-white rounded-lg border">
-                      <p className="font-medium mb-0.5">{t('dashboard.singleFinance.payCalculator.bonusBreakdown')}:</p>
+                    <div className="text-xs sm:text-sm text-gray-600 p-3 sm:p-2 bg-white rounded-lg border max-h-40 sm:max-h-48 overflow-y-auto">
+                      <p className="font-medium mb-1 sm:mb-0.5">
+                        {t('dashboard.singleFinance.payCalculator.bonusBreakdown')}:
+                      </p>
                       <p>
                         {t('dashboard.singleFinance.payCalculator.vscDeals')}:{' '}
                         {
@@ -1128,9 +1208,12 @@ export const SingleFinanceHomePage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="col-span-1 md:col-span-2 mt-1">
-                    <p className="text-xs text-gray-500 text-center">
-                      <strong>{t('dashboard.singleFinance.payCalculator.disclaimer.title')}:</strong> {t('dashboard.singleFinance.payCalculator.disclaimer.text')}
+                  <div className="col-span-1 lg:col-span-2 mt-2 sm:mt-1">
+                    <p className="text-xs sm:text-sm text-gray-500 text-center p-2 bg-gray-50 rounded-md">
+                      <strong>
+                        {t('dashboard.singleFinance.payCalculator.disclaimer.title')}:
+                      </strong>{' '}
+                      {t('dashboard.singleFinance.payCalculator.disclaimer.text')}
                     </p>
                   </div>
                 </div>

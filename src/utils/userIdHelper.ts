@@ -1,19 +1,46 @@
+// Define user types to handle different user object structures
+type SupabaseUser = {
+  id: string;
+  email?: string;
+  user_metadata?: Record<string, unknown>;
+};
+
+type NestedUser = {
+  user: SupabaseUser;
+  id?: string;
+  email?: string;
+};
+
+type UserInput = SupabaseUser | NestedUser | null | undefined;
+
 /**
  * Helper function to get a consistent user ID across the application
  * Handles both real Supabase users and demo/test users
  * Enhanced to provide better debugging and fallback mechanisms
  */
-export const getConsistentUserId = (user: any): string | null => {
-  const debug = (message: string, value?: any) => {
+export const getConsistentUserId = (user: UserInput): string | null => {
+  const debug = (message: string, value?: unknown) => {
     console.log(`[UserIdHelper] ${message}`, value);
   };
 
+  // Check if user is a valid object first
+  if (typeof user === 'string') {
+    console.error(`[UserIdHelper] ERROR: Received string instead of user object: "${user}"`);
+    return null;
+  }
+
+  if (user !== null && typeof user !== 'object') {
+    console.error(`[UserIdHelper] ERROR: Invalid user type: ${typeof user}`, user);
+    return null;
+  }
+
   debug('Starting user ID resolution for user:', {
     hasUser: !!user,
+    userType: typeof user,
     directId: user?.id,
     nestedId: user?.user?.id,
     email: user?.email,
-    sub: user?.sub
+    sub: user?.sub,
   });
 
   // Try to get the ID in order of preference
@@ -24,7 +51,12 @@ export const getConsistentUserId = (user: any): string | null => {
   }
 
   // 2. Try the nested user.id (some auth contexts nest the user)
-  if (user?.user?.id && user.user.id !== 'undefined' && user.user.id !== null && user.user.id !== '') {
+  if (
+    user?.user?.id &&
+    user.user.id !== 'undefined' &&
+    user.user.id !== null &&
+    user.user.id !== ''
+  ) {
     debug('Found nested user ID:', user.user.id);
     return user.user.id;
   }
@@ -54,7 +86,12 @@ export const getConsistentUserId = (user: any): string | null => {
         if (raw) {
           const parsed = JSON.parse(raw);
           const sessionUserId = parsed?.currentSession?.user?.id || parsed?.user?.id;
-          if (sessionUserId && sessionUserId !== 'undefined' && sessionUserId !== null && sessionUserId !== '') {
+          if (
+            sessionUserId &&
+            sessionUserId !== 'undefined' &&
+            sessionUserId !== null &&
+            sessionUserId !== ''
+          ) {
             debug('Found ID from localStorage token:', sessionUserId);
             return sessionUserId;
           }
@@ -73,8 +110,11 @@ export const getConsistentUserId = (user: any): string | null => {
  * Enhanced getUserId function that provides multiple fallback strategies
  * Designed to be used by both Settings and LogDeal pages for consistency
  */
-export const getUserIdWithFallbacks = async (user: any, localUserId: string | null = null): Promise<string | null> => {
-  const debug = (message: string, value?: any) => {
+export const getUserIdWithFallbacks = async (
+  user: UserInput,
+  localUserId: string | null = null
+): Promise<string | null> => {
+  const debug = (message: string, value?: unknown) => {
     console.log(`[getUserIdWithFallbacks] ${message}`, value);
   };
 
@@ -99,7 +139,12 @@ export const getUserIdWithFallbacks = async (user: any, localUserId: string | nu
       const { supabase } = await import('../lib/supabaseClient');
       const { data } = await supabase.auth.getSession();
       const sessionUserId = data?.session?.user?.id;
-      if (sessionUserId && sessionUserId !== 'undefined' && sessionUserId !== null && sessionUserId !== '') {
+      if (
+        sessionUserId &&
+        sessionUserId !== 'undefined' &&
+        sessionUserId !== null &&
+        sessionUserId !== ''
+      ) {
         debug('Retrieved from Supabase session:', sessionUserId);
         return sessionUserId;
       }
@@ -115,7 +160,7 @@ export const getUserIdWithFallbacks = async (user: any, localUserId: string | nu
 /**
  * Synchronous version for cases where async is not possible
  */
-export const getUserIdSync = (user: any, localUserId: string | null = null): string | null => {
+export const getUserIdSync = (user: UserInput, localUserId: string | null = null): string | null => {
   // Try the standard method first
   let userId = getConsistentUserId(user);
   if (userId) {
@@ -133,7 +178,7 @@ export const getUserIdSync = (user: any, localUserId: string | null = null): str
 /**
  * Debug helper to log user ID information
  */
-export const debugUserId = (context: string, user: any, localUserId?: string | null): void => {
+export const debugUserId = (context: string, user: UserInput, localUserId?: string | null): void => {
   const userId = getConsistentUserId(user);
   const syncUserId = getUserIdSync(user, localUserId);
   console.log(`[${context}] User ID resolution:`, {
