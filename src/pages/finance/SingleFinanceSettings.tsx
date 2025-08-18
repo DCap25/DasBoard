@@ -43,24 +43,49 @@ export default function SingleFinanceSettings() {
   const [activeTab, setActiveTab] = useState<'team' | 'pay' | 'language'>('team');
   const [localUserId, setLocalUserId] = useState<string | null>(null);
 
-  // Helper to resolve a consistent user ID with enhanced fallback mechanisms
+  // Enhanced user ID resolution with immediate synchronous priority
   const getUserId = (): string | null => {
-    // First, try to use the cached resolved user ID
+    // Strategy 1: Direct user object ID (highest priority - most reliable)
+    if (user?.id) {
+      console.log('[Settings] Found user ID from user context:', user.id);
+      // Update cache immediately for consistency
+      if (user.id !== resolvedUserId) {
+        setResolvedUserId(user.id);
+      }
+      return user.id;
+    }
+    
+    // Strategy 2: Use cached resolved user ID if available
     if (resolvedUserId) {
       console.log('[Settings] Using cached resolved user ID:', resolvedUserId);
       return resolvedUserId;
     }
     
-    // Try the secure user ID helper first
-    let userId = getConsistentUserId(user);
-    
-    // If that fails, try the sync version with local fallback
-    if (!userId) {
-      userId = getUserIdSync(user, localUserId);
+    // Strategy 3: Try locally stored user ID
+    if (localUserId) {
+      console.log('[Settings] Using locally stored user ID:', localUserId);
+      setResolvedUserId(localUserId);
+      return localUserId;
     }
     
-    // If still no userId, try to get from localStorage token directly
-    if (!userId && typeof window !== 'undefined') {
+    // Strategy 4: Try secure user ID helper
+    let userId = getConsistentUserId(user);
+    if (userId) {
+      console.log('[Settings] Found user ID from secure helper:', userId);
+      setResolvedUserId(userId);
+      return userId;
+    }
+    
+    // Strategy 5: Try sync version with fallback
+    userId = getUserIdSync(user, localUserId);
+    if (userId) {
+      console.log('[Settings] Found user ID from sync helper:', userId);
+      setResolvedUserId(userId);
+      return userId;
+    }
+    
+    // Strategy 6: Direct localStorage access (synchronous)
+    if (typeof window !== 'undefined') {
       try {
         const tokenKey = Object.keys(localStorage).find(key => 
           key.startsWith('sb-') && key.endsWith('-auth-token')
@@ -68,26 +93,28 @@ export default function SingleFinanceSettings() {
         if (tokenKey) {
           const tokenData = JSON.parse(localStorage.getItem(tokenKey) || '{}');
           userId = tokenData?.currentSession?.user?.id || tokenData?.user?.id;
+          if (userId) {
+            console.log('[Settings] Found user ID from localStorage token:', userId);
+            setResolvedUserId(userId);
+            return userId;
+          }
         }
       } catch (error) {
         console.warn('[Settings] Error reading from localStorage:', error);
       }
     }
     
-    // Last resort: create a demo user ID if we're in development or if user has email
-    if (!userId && user?.email) {
+    // Strategy 7: Demo user ID from email (development/demo mode)
+    if (user?.email) {
       userId = `demo_${user.email.replace(/[^a-zA-Z0-9]/g, '_')}`;
       console.log('[Settings] Created demo user ID:', userId);
-    }
-    
-    // Cache the resolved user ID for future use
-    if (userId && userId !== resolvedUserId) {
       setResolvedUserId(userId);
-      console.log('[Settings] Cached new resolved user ID:', userId);
+      return userId;
     }
     
+    // Debug logging for troubleshooting
     debugUserId('SingleFinanceSettings', user, localUserId);
-    console.log('[Settings] Final resolved user ID:', userId);
+    console.log('[Settings] ALL STRATEGIES FAILED - No user ID found');
     console.log('[Settings] User object details:', {
       hasUser: !!user,
       userType: typeof user,
@@ -98,7 +125,7 @@ export default function SingleFinanceSettings() {
       cachedUserId: resolvedUserId
     });
     
-    return userId;
+    return null;
   };
 
   // Manual authentication refresh function
@@ -346,46 +373,58 @@ export default function SingleFinanceSettings() {
     }
   }, [user]);
 
-  // Save team members to localStorage with enhanced verification
-  const saveTeamMembers = (members: TeamMember[]) => {
-    const userId = getUserId();
+  // Save team members to localStorage with enhanced verification and retry logic
+  const saveTeamMembers = async (members: TeamMember[]) => {
+    let userId = getUserId();
     console.log('[Settings] saveTeamMembers called with:', {
       userId,
       memberCount: members.length,
       members,
     });
 
+    // Enhanced validation with retry mechanism
     if (!userId) {
-      console.error('[Settings] No userId found, cannot save team members');
-      console.error('[Settings] Debug info:', {
-        user,
-        localUserId,
-        userType: typeof user,
-        userKeys: user ? Object.keys(user) : [],
-        hasSupabaseToken: quickHasSupabaseSessionToken()
-      });
+      console.warn('[Settings] No userId found on first attempt, trying authentication refresh...');
       
-      toast({
-        title: 'Authentication Error',
-        description: 'Unable to determine user identity. Please sign out and sign back in.',
-        variant: 'destructive',
-      });
-      
-      // Try to force a re-authentication
-      setTimeout(async () => {
-        try {
-          const { data } = await supabase.auth.getSession();
-          if (data?.session?.user?.id) {
-            setLocalUserId(data.session.user.id);
-            setResolvedUserId(data.session.user.id);
-            console.log('[Settings] Force-resolved user ID:', data.session.user.id);
-          }
-        } catch (error) {
-          console.error('[Settings] Force auth resolution failed:', error);
+      // Try to force resolve the user ID immediately
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (data?.session?.user?.id) {
+          userId = data.session.user.id;
+          setLocalUserId(userId);
+          setResolvedUserId(userId);
+          console.log('[Settings] Successfully resolved user ID via Supabase session:', userId);
         }
-      }, 1000);
+      } catch (error) {
+        console.error('[Settings] Failed to resolve user ID via Supabase session:', error);
+      }
       
-      return;
+      // Second attempt with all fallback methods
+      if (!userId) {
+        userId = getUserId();
+        console.log('[Settings] Second getUserId attempt returned:', userId);
+      }
+      
+      // Final validation
+      if (!userId) {
+        console.error('[Settings] CRITICAL: No userId found after all attempts, cannot save team members');
+        console.error('[Settings] Debug info:', {
+          user,
+          localUserId,
+          userType: typeof user,
+          userKeys: user ? Object.keys(user) : [],
+          hasSupabaseToken: quickHasSupabaseSessionToken(),
+          resolvedUserId
+        });
+        
+        toast({
+          title: 'Authentication Error',
+          description: 'Unable to resolve user identity after multiple attempts. Please refresh the page and try again.',
+          variant: 'destructive',
+        });
+        
+        return;
+      }
     }
 
     try {
@@ -477,7 +516,7 @@ export default function SingleFinanceSettings() {
   };
 
   // Add new team member
-  const handleAddTeamMember = () => {
+  const handleAddTeamMember = async () => {
     const userId = getUserId();
     console.log('[Settings] Add team member clicked:', { newMember, userId });
     console.log('[Settings] Full user object:', user);
@@ -526,7 +565,7 @@ export default function SingleFinanceSettings() {
 
     const updatedMembers = [...teamMembers, member];
     console.log('[Settings] About to save team members:', updatedMembers);
-    saveTeamMembers(updatedMembers);
+    await saveTeamMembers(updatedMembers);
 
     // Reset form and clear validation errors
     setNewMember({
@@ -547,7 +586,7 @@ export default function SingleFinanceSettings() {
   };
 
   // Remove team member
-  const handleRemoveTeamMember = (memberId: string) => {
+  const handleRemoveTeamMember = async (memberId: string) => {
     const member = teamMembers.find(m => m.id === memberId);
     if (
       confirm(
@@ -558,7 +597,7 @@ export default function SingleFinanceSettings() {
       )
     ) {
       const updatedMembers = teamMembers.filter(m => m.id !== memberId);
-      saveTeamMembers(updatedMembers);
+      await saveTeamMembers(updatedMembers);
 
       toast({
         title: t('common.success'),
@@ -568,11 +607,11 @@ export default function SingleFinanceSettings() {
   };
 
   // Toggle team member active status
-  const handleToggleActive = (memberId: string) => {
+  const handleToggleActive = async (memberId: string) => {
     const updatedMembers = teamMembers.map(member =>
       member.id === memberId ? { ...member, active: !member.active } : member
     );
-    saveTeamMembers(updatedMembers);
+    await saveTeamMembers(updatedMembers);
   };
 
   return (
