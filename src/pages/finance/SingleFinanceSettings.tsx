@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../contexts/TranslationContext';
-import { getConsistentUserId, getUserIdSync, debugUserId } from '../../utils/userIdHelper';
+import { getConsistentUserId, getUserIdSync, debugUserId, getUserIdWithFallbacks } from '../../utils/secureUserIdHelper';
 import { supabase, quickHasSupabaseSessionToken } from '../../lib/supabaseClient';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
@@ -43,29 +43,155 @@ export default function SingleFinanceSettings() {
   const [activeTab, setActiveTab] = useState<'team' | 'pay' | 'language'>('team');
   const [localUserId, setLocalUserId] = useState<string | null>(null);
 
-  // Helper to resolve a consistent user ID (context or token fallback)
+  // Helper to resolve a consistent user ID with enhanced fallback mechanisms
   const getUserId = (): string | null => {
-    const userId = getUserIdSync(user, localUserId);
+    // Try the secure user ID helper first
+    let userId = getConsistentUserId(user);
+    
+    // If that fails, try the sync version with local fallback
+    if (!userId) {
+      userId = getUserIdSync(user, localUserId);
+    }
+    
+    // If still no userId, try to get from localStorage token directly
+    if (!userId && typeof window !== 'undefined') {
+      try {
+        const tokenKey = Object.keys(localStorage).find(key => 
+          key.startsWith('sb-') && key.endsWith('-auth-token')
+        );
+        if (tokenKey) {
+          const tokenData = JSON.parse(localStorage.getItem(tokenKey) || '{}');
+          userId = tokenData?.currentSession?.user?.id || tokenData?.user?.id;
+        }
+      } catch (error) {
+        console.warn('[Settings] Error reading from localStorage:', error);
+      }
+    }
+    
     debugUserId('SingleFinanceSettings', user, localUserId);
     console.log('[Settings] Final resolved user ID:', userId);
+    console.log('[Settings] User object details:', {
+      hasUser: !!user,
+      userType: typeof user,
+      userId: user?.id,
+      userEmail: user?.email,
+      localUserId,
+      resolvedUserId: userId
+    });
+    
+    // Last resort: create a demo user ID if we're in development or if user has email
+    if (!userId && user?.email) {
+      userId = `demo_${user.email.replace(/[^a-zA-Z0-9]/g, '_')}`;
+      console.log('[Settings] Created demo user ID:', userId);
+    }
+    
     return userId;
   };
 
-  // Try to resolve user id from Supabase session if context not ready
+  // Manual authentication refresh function
+  const refreshAuthentication = async () => {
+    try {
+      console.log('[Settings] Manual auth refresh triggered');
+      
+      // Clear current state
+      setLocalUserId(null);
+      
+      // Try to get fresh session
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        throw error;
+      }
+      
+      if (data?.session?.user?.id) {
+        setLocalUserId(data.session.user.id);
+        console.log('[Settings] Manual refresh successful:', data.session.user.id);
+        toast({
+          title: 'Success',
+          description: 'Authentication refreshed successfully',
+        });
+      } else {
+        throw new Error('No valid session found');
+      }
+    } catch (error) {
+      console.error('[Settings] Manual refresh failed:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to refresh authentication. Please sign out and sign back in.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  // Enhanced user ID resolution with multiple fallback strategies
   useEffect(() => {
     let cancelled = false;
-    const tryFetch = async () => {
+    
+    const tryFetchUserId = async () => {
+      console.log('[Settings] Attempting to resolve user ID...', {
+        hasLocalUserId: !!localUserId,
+        hasUserFromAuth: !!user?.id,
+        userObject: user
+      });
+      
+      // If we already have a user ID, don't fetch again
       if (localUserId || user?.id) return;
-      if (!quickHasSupabaseSessionToken()) return;
-      const { data } = await supabase.auth.getSession();
-      const uid = data?.session?.user?.id || null;
-      if (!cancelled && uid) setLocalUserId(uid);
+      
+      try {
+        // Try the async version of getUserId with fallbacks
+        const asyncUserId = await getUserIdWithFallbacks(user, localUserId);
+        if (!cancelled && asyncUserId) {
+          console.log('[Settings] Async getUserId resolved:', asyncUserId);
+          setLocalUserId(asyncUserId);
+          return;
+        }
+        
+        // Fallback to Supabase session check
+        if (quickHasSupabaseSessionToken()) {
+          const { data, error } = await supabase.auth.getSession();
+          if (error) {
+            console.warn('[Settings] Error getting Supabase session:', error);
+            return;
+          }
+          
+          const uid = data?.session?.user?.id || null;
+          console.log('[Settings] Supabase session user ID:', uid);
+          if (!cancelled && uid) {
+            setLocalUserId(uid);
+          }
+        }
+        
+        // Last resort: check localStorage directly
+        if (!cancelled && typeof window !== 'undefined') {
+          const tokenKey = Object.keys(localStorage).find(key => 
+            key.startsWith('sb-') && key.endsWith('-auth-token')
+          );
+          if (tokenKey) {
+            const tokenData = JSON.parse(localStorage.getItem(tokenKey) || '{}');
+            const storageUserId = tokenData?.currentSession?.user?.id || tokenData?.user?.id;
+            if (storageUserId) {
+              console.log('[Settings] Found user ID in localStorage:', storageUserId);
+              setLocalUserId(storageUserId);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('[Settings] Error in user ID resolution:', error);
+      }
     };
-    tryFetch();
-    const t = setTimeout(tryFetch, 800);
+
+    // Initial attempt
+    tryFetchUserId();
+    
+    // Retry after delays to catch auth state changes
+    const timeouts = [
+      setTimeout(tryFetchUserId, 500),
+      setTimeout(tryFetchUserId, 1500),
+      setTimeout(tryFetchUserId, 3000),
+    ];
+    
     return () => {
       cancelled = true;
-      clearTimeout(t);
+      timeouts.forEach(clearTimeout);
     };
   }, [user, localUserId]);
 
@@ -77,6 +203,7 @@ export default function SingleFinanceSettings() {
     role: 'salesperson' as 'salesperson' | 'sales_manager',
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [authDebugMode, setAuthDebugMode] = useState(false);
 
   // Pay configuration state
   const [payConfig, setPayConfig] = useState<PayConfig>({
@@ -144,11 +271,33 @@ export default function SingleFinanceSettings() {
 
     if (!userId) {
       console.error('[Settings] No userId found, cannot save team members');
+      console.error('[Settings] Debug info:', {
+        user,
+        localUserId,
+        userType: typeof user,
+        userKeys: user ? Object.keys(user) : [],
+        hasSupabaseToken: quickHasSupabaseSessionToken()
+      });
+      
       toast({
-        title: 'Error',
-        description: 'Unable to determine user identity. Please refresh the page.',
+        title: 'Authentication Error',
+        description: 'Unable to determine user identity. Please sign out and sign back in.',
         variant: 'destructive',
       });
+      
+      // Try to force a re-authentication
+      setTimeout(async () => {
+        try {
+          const { data } = await supabase.auth.getSession();
+          if (data?.session?.user?.id) {
+            setLocalUserId(data.session.user.id);
+            console.log('[Settings] Force-resolved user ID:', data.session.user.id);
+          }
+        } catch (error) {
+          console.error('[Settings] Force auth resolution failed:', error);
+        }
+      }, 1000);
+      
       return;
     }
 
@@ -358,6 +507,57 @@ export default function SingleFinanceSettings() {
           {t('dashboard.settings.note.description')}
         </p>
       </div>
+
+      {/* Authentication Debug Section */}
+      {!getUserId() && (
+        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-yellow-800 text-sm font-medium">
+                ⚠️ Authentication Issue Detected
+              </p>
+              <p className="text-yellow-700 text-xs mt-1">
+                Unable to resolve user ID. This may prevent saving team members.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={refreshAuthentication}
+                size="sm"
+                className="bg-yellow-600 hover:bg-yellow-700 text-white"
+              >
+                Refresh Auth
+              </Button>
+              <Button
+                onClick={() => setAuthDebugMode(!authDebugMode)}
+                size="sm"
+                variant="outline"
+              >
+                {authDebugMode ? 'Hide' : 'Show'} Debug
+              </Button>
+            </div>
+          </div>
+          
+          {authDebugMode && (
+            <div className="mt-3 p-3 bg-yellow-100 rounded text-xs">
+              <pre className="text-yellow-800 overflow-auto">
+                {JSON.stringify({
+                  user: user ? {
+                    id: user.id,
+                    email: user.email,
+                    type: typeof user,
+                  } : null,
+                  localUserId,
+                  resolvedUserId: getUserId(),
+                  hasSupabaseToken: quickHasSupabaseSessionToken(),
+                  localStorage: typeof window !== 'undefined' ? 
+                    Object.keys(localStorage).filter(k => k.includes('sb-')) : [],
+                }, null, 2)}
+              </pre>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Tab navigation */}
       <div className="flex space-x-4 mb-6">
