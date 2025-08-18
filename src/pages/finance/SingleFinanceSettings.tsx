@@ -38,7 +38,7 @@ interface PayConfig {
 
 export default function SingleFinanceSettings() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { t, language, setLanguage } = useTranslation();
   const [activeTab, setActiveTab] = useState<'team' | 'pay' | 'language'>('team');
   const [localUserId, setLocalUserId] = useState<string | null>(null);
@@ -330,6 +330,19 @@ export default function SingleFinanceSettings() {
     },
   });
 
+  // Authentication check and redirect for unauthenticated users
+  useEffect(() => {
+    if (!user) {
+      console.log('[Settings] No user found, will redirect to auth page in 3 seconds');
+      const timer = setTimeout(() => {
+        console.log('[Settings] Redirecting unauthenticated user to auth page');
+        navigate('/auth');
+      }, 3000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [user, navigate]);
+
   // Make user available globally for encryption layer
   useEffect(() => {
     if (typeof window !== 'undefined' && user) {
@@ -614,6 +627,18 @@ export default function SingleFinanceSettings() {
     await saveTeamMembers(updatedMembers);
   };
 
+  // Show loading screen while authentication is being resolved
+  if (authLoading) {
+    return (
+      <div className="container mx-auto py-6">
+        <div className="flex flex-col items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+          <p className="text-gray-600">Loading authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto py-6">
       <div className="flex items-center mb-6">
@@ -635,7 +660,58 @@ export default function SingleFinanceSettings() {
       </div>
 
       {/* Authentication Debug Section */}
-      {!getUserId() && (
+      {!user && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-red-800 text-sm font-medium">
+                🔒 Not Authenticated
+              </p>
+              <p className="text-red-700 text-xs mt-1">
+                You need to sign in to access team settings. Redirecting to login page...
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => navigate('/auth')}
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                Go to Login
+              </Button>
+              <Button
+                onClick={() => setAuthDebugMode(!authDebugMode)}
+                size="sm"
+                variant="outline"
+              >
+                {authDebugMode ? 'Hide' : 'Show'} Debug
+              </Button>
+            </div>
+          </div>
+          
+          {authDebugMode && (
+            <div className="mt-3 p-3 bg-red-100 rounded text-xs">
+              <pre className="text-red-800 overflow-auto">
+                {JSON.stringify({
+                  user: user ? {
+                    id: user.id,
+                    email: user.email,
+                    type: typeof user,
+                  } : null,
+                  localUserId,
+                  resolvedUserId: getUserId(),
+                  hasSupabaseToken: quickHasSupabaseSessionToken(),
+                  localStorage: typeof window !== 'undefined' ? 
+                    Object.keys(localStorage).filter(k => k.includes('sb-')) : [],
+                }, null, 2)}
+              </pre>
+            </div>
+          )}
+        </div>
+      )}
+      
+      {/* Enhanced Authentication Issue Detection */}
+      {user && !getUserId() && (
         <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
           <div className="flex items-center justify-between">
             <div>
@@ -643,7 +719,7 @@ export default function SingleFinanceSettings() {
                 ⚠️ Authentication Issue Detected
               </p>
               <p className="text-yellow-700 text-xs mt-1">
-                Unable to resolve user ID. This may prevent saving team members.
+                User is authenticated but unable to resolve user ID. This may prevent saving team members.
               </p>
             </div>
             <div className="flex gap-2">
