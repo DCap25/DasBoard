@@ -56,15 +56,63 @@ npm run build
 - `temp/`: Temporary files for development
 - `public/`: Static assets
 
+## Session Persistence & Route Protection
+
+The application implements secure session persistence across routes:
+
+- **Automatic Token Refresh**: Sessions are refreshed before expiration
+- **Route Guards**: Protected routes require valid authentication
+- **Persistent Storage**: Sessions persist across browser refreshes
+- **Cross-Tab Sync**: Authentication state syncs across browser tabs
+- **Secure Cookies**: Production uses httpOnly, secure cookies
+
+### Testing Session Persistence
+
+```bash
+# Run session persistence tests
+npm run test:session
+
+# Manual testing
+1. Sign in to the application
+2. Navigate between protected routes
+3. Refresh the browser
+4. Open app in new tab
+5. Verify session persists
+```
+
+## Performance Optimization
+
+- **Code Splitting**: Automatic route-based code splitting
+- **Bundle Optimization**: Vendor chunks for better caching
+- **Compression**: Brotli and Gzip compression in production
+- **CDN Support**: Static assets can be served from CDN
+- **PWA Support**: Optional Progressive Web App features
+- **Image Optimization**: Automatic image optimization
+
+## Monitoring & Analytics
+
+- **Error Tracking**: Sentry integration for error monitoring
+- **Performance Monitoring**: Core Web Vitals tracking
+- **User Analytics**: Google Analytics support
+- **Custom Events**: Track user interactions and conversions
+- **Session Recording**: Optional session replay for debugging
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Deployment Status
 
-**⚠️ NOTICE: This application is currently not deployed to production.**
+**✅ PRODUCTION READY**: This application has been updated with comprehensive authentication, error handling, and production deployment configurations.
 
-The Vercel deployment has been removed due to authentication issues. Local development is still fully functional.
+**Latest Updates:**
+- ✅ Fixed authentication system with secure session management
+- ✅ Added comprehensive error boundaries and recovery mechanisms
+- ✅ Implemented production-ready auth middleware
+- ✅ Added environment-specific configurations (dev/staging/prod)
+- ✅ Integrated comprehensive testing suite with Vitest
+- ✅ Added security headers and CSP policies
+- ✅ Implemented rate limiting and CSRF protection
 
 ## Development Setup
 
@@ -83,20 +131,148 @@ The Vercel deployment has been removed due to authentication issues. Local devel
 
 ## Testing
 
-This application can be run in two modes:
+### Running Tests
 
-- Development mode using the mock API (default)
-- Production mode using Supabase
+```bash
+# Run all tests
+npm test
 
-See the `supabase-test-guide.md` for detailed testing procedures.
+# Run tests with UI
+npm run test:ui
 
-## Re-deployment Instructions
+# Run tests with coverage
+npm run test:coverage
 
-Deployment is currently paused until authentication issues are resolved. To re-enable deployment:
+# Run auth-specific tests
+npm run test:auth
 
-1. Fix the authentication issues in `src/lib/apiService.ts` and `src/contexts/AuthContext.tsx`
-2. Update the Supabase configuration in `.env.production`
-3. Set up a new Vercel project with the repository
+# Watch mode for development
+npm run test:watch
+```
+
+### Testing Modes
+
+This application can be run in three modes:
+
+- **Development**: Uses local mock API for rapid development
+- **Staging**: Uses staging Supabase instance for integration testing
+- **Production**: Uses production Supabase with full security
+
+## Production Deployment
+
+### Prerequisites
+
+1. **Environment Setup**
+   ```bash
+   # Copy production environment template
+   cp .env.production.example .env.production
+   
+   # Edit with your production values
+   nano .env.production
+   ```
+
+2. **Build for Production**
+   ```bash
+   # Install dependencies
+   npm ci
+   
+   # Run production build
+   npm run build
+   
+   # Preview production build locally
+   npm run preview
+   ```
+
+### Deployment Platforms
+
+#### Netlify
+
+1. **Connect Repository**
+   - Link your GitHub repository in Netlify Dashboard
+   - Set build command: `npm run build`
+   - Set publish directory: `dist`
+
+2. **Environment Variables**
+   - Add all variables from `.env.production.example`
+   - Ensure all URLs use HTTPS
+   - Set `VITE_ENVIRONMENT=production`
+
+3. **Deploy Settings**
+   ```toml
+   # netlify.toml
+   [build]
+     command = "npm run build"
+     publish = "dist"
+   
+   [[headers]]
+     for = "/*"
+     [headers.values]
+       X-Frame-Options = "DENY"
+       X-Content-Type-Options = "nosniff"
+       X-XSS-Protection = "1; mode=block"
+   ```
+
+#### Vercel
+
+1. **Import Project**
+   - Import from GitHub in Vercel Dashboard
+   - Framework Preset: Vite
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+
+2. **Environment Variables**
+   - Add production variables in Project Settings
+   - Enable "Automatically expose System Environment Variables"
+
+3. **Deploy Configuration**
+   ```json
+   // vercel.json
+   {
+     "buildCommand": "npm run build",
+     "outputDirectory": "dist",
+     "framework": "vite",
+     "rewrites": [
+       { "source": "/(.*)", "destination": "/" }
+     ]
+   }
+   ```
+
+#### AWS Amplify
+
+1. **App Settings**
+   ```yaml
+   # amplify.yml
+   version: 1
+   frontend:
+     phases:
+       preBuild:
+         commands:
+           - npm ci
+       build:
+         commands:
+           - npm run build
+     artifacts:
+       baseDirectory: dist
+       files:
+         - '**/*'
+   ```
+
+2. **Environment Variables**
+   - Configure in Amplify Console > App Settings
+   - Set all production environment variables
+
+### Security Checklist
+
+- [ ] All environment URLs use HTTPS
+- [ ] Mock API is disabled (`USE_MOCK_SUPABASE=false`)
+- [ ] Email verification is enabled
+- [ ] Debug mode is disabled
+- [ ] Rate limiting is configured
+- [ ] CSRF protection is enabled
+- [ ] Security headers are configured
+- [ ] Source maps are disabled in production
+- [ ] Error tracking (Sentry) is configured
+- [ ] Analytics is configured
 
 ## Finance Manager Promotion Implementation
 
