@@ -517,8 +517,8 @@ const SalesManagerDashboard = () => {
                     (managerDealData?.metrics?.salesPerformance || data.salesPerformance) >= 100
                       ? 'bg-white border-r border-gray-600'
                       : (managerDealData?.metrics?.salesPerformance || data.salesPerformance) >= 80
-                      ? 'bg-blue-500'
-                      : 'bg-blue-500'
+                        ? 'bg-blue-500'
+                        : 'bg-blue-500'
                   }`}
                   style={{
                     width: `${Math.min(
@@ -776,10 +776,10 @@ const SalesManagerDashboard = () => {
                         index === 0
                           ? 'bg-yellow-100 text-yellow-600'
                           : index === 1
-                          ? 'bg-gray-100 text-gray-600'
-                          : index === 2
-                          ? 'bg-amber-100 text-amber-600'
-                          : 'bg-white border-r border-gray-600 text-blue-500'
+                            ? 'bg-gray-100 text-gray-600'
+                            : index === 2
+                              ? 'bg-amber-100 text-amber-600'
+                              : 'bg-white border-r border-gray-600 text-blue-500'
                       }`}
                     >
                       <span className="text-xs font-bold">{index + 1}</span>
@@ -1063,8 +1063,8 @@ const SalesManagerDashboard = () => {
                         (deal.status || deal.dealStatus) === 'Funded'
                           ? 'bg-green-100 text-green-800 border-green-200'
                           : (deal.status || deal.dealStatus) === 'Unwound'
-                          ? 'bg-red-100 text-red-800 border-red-200'
-                          : 'bg-amber-100 text-amber-800 border-amber-200';
+                            ? 'bg-red-100 text-red-800 border-red-200'
+                            : 'bg-amber-100 text-amber-800 border-amber-200';
 
                       // Calculate the reverse index (10, 9, 8, ..., 1)
                       const reverseIndex = 10 - index;
@@ -1093,8 +1093,8 @@ const SalesManagerDashboard = () => {
                                 deal.vehicleType === 'N'
                                   ? 'bg-green-100 text-green-800'
                                   : deal.vehicleType === 'U' || deal.vehicleType === 'C'
-                                  ? 'bg-amber-100 text-amber-800'
-                                  : 'bg-blue-100 text-blue-800'
+                                    ? 'bg-amber-100 text-amber-800'
+                                    : 'bg-blue-100 text-blue-800'
                               }`}
                             >
                               {deal.vehicleType || 'U'}
@@ -1394,8 +1394,8 @@ const SalesManagerDashboard = () => {
                           person.csiFollowUp >= 90
                             ? 'bg-green-100 text-green-800'
                             : person.csiFollowUp >= 80
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-amber-100 text-amber-800'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-amber-100 text-amber-800'
                         }`}
                       >
                         {person.csiFollowUp}%
@@ -1410,10 +1410,10 @@ const SalesManagerDashboard = () => {
                             person.percentGoal >= 90
                               ? 'bg-white border-r border-gray-600'
                               : person.percentGoal >= 70
-                              ? 'bg-white border-r border-gray-600'
-                              : person.percentGoal >= 50
-                              ? 'bg-white border-r border-gray-600'
-                              : 'bg-blue-500'
+                                ? 'bg-white border-r border-gray-600'
+                                : person.percentGoal >= 50
+                                  ? 'bg-white border-r border-gray-600'
+                                  : 'bg-blue-500'
                           }`}
                           style={{ width: `${Math.min(person.percentGoal, 100)}%` }}
                         ></div>

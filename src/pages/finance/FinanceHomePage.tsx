@@ -937,10 +937,10 @@ const FinanceHomePage: React.FC = () => {
                           index === 0
                             ? 'bg-yellow-100 text-yellow-600'
                             : index === 1
-                            ? 'bg-gray-100 text-gray-600'
-                            : index === 2
-                            ? 'bg-amber-100 text-amber-600'
-                            : 'bg-blue-50 text-blue-500'
+                              ? 'bg-gray-100 text-gray-600'
+                              : index === 2
+                                ? 'bg-amber-100 text-amber-600'
+                                : 'bg-blue-50 text-blue-500'
                         }`}
                       >
                         <span className="text-xs font-bold">{index + 1}</span>
@@ -952,10 +952,18 @@ const FinanceHomePage: React.FC = () => {
                     <div className="w-28 text-center bg-blue-50 text-base font-medium">
                       ${person.pvr.toLocaleString()}
                     </div>
-                    <div className="w-28 text-center bg-blue-50 text-base font-medium">{person.vscPen}%</div>
-                    <div className="w-28 text-center bg-blue-50 text-base font-medium">{person.gapPen}%</div>
-                    <div className="w-28 text-center bg-blue-50 text-base font-medium">{person.ppmPen}%</div>
-                    <div className="w-24 text-center bg-blue-50 text-base font-medium">{person.ppd}</div>
+                    <div className="w-28 text-center bg-blue-50 text-base font-medium">
+                      {person.vscPen}%
+                    </div>
+                    <div className="w-28 text-center bg-blue-50 text-base font-medium">
+                      {person.gapPen}%
+                    </div>
+                    <div className="w-28 text-center bg-blue-50 text-base font-medium">
+                      {person.ppmPen}%
+                    </div>
+                    <div className="w-24 text-center bg-blue-50 text-base font-medium">
+                      {person.ppd}
+                    </div>
                     <div className="w-36 text-right pr-3">
                       <span className="text-xl font-bold text-green-600">
                         ${person.profit.toLocaleString()}
@@ -1063,8 +1071,8 @@ const FinanceHomePage: React.FC = () => {
                         (deal.vehicle.toLowerCase().includes('new')
                           ? 'N'
                           : deal.vehicle.toLowerCase().includes('cpo')
-                          ? 'C'
-                          : 'U');
+                            ? 'C'
+                            : 'U');
 
                       // Get individual product profits - ensure we handle both number and string values
                       const vscProfit =
@@ -1115,16 +1123,16 @@ const FinanceHomePage: React.FC = () => {
                         deal.status === 'Complete' || deal.status === 'Funded'
                           ? 'Funded'
                           : deal.status === 'Canceled' || deal.status === 'Unwound'
-                          ? 'Unwound'
-                          : 'Pending';
+                            ? 'Unwound'
+                            : 'Pending';
 
                       // Status badge colors
                       const statusColor =
                         status === 'Funded'
                           ? 'bg-green-100 text-green-800 border-green-200'
                           : status === 'Unwound'
-                          ? 'bg-red-100 text-red-800 border-red-200'
-                          : 'bg-amber-100 text-amber-800 border-amber-200';
+                            ? 'bg-red-100 text-red-800 border-red-200'
+                            : 'bg-amber-100 text-amber-800 border-amber-200';
 
                       return (
                         <tr
@@ -1157,8 +1165,8 @@ const FinanceHomePage: React.FC = () => {
                                 vehicleType === 'N'
                                   ? 'bg-green-100 text-green-800'
                                   : vehicleType === 'C'
-                                  ? 'bg-blue-100 text-blue-800'
-                                  : 'bg-amber-100 text-amber-800'
+                                    ? 'bg-blue-100 text-blue-800'
+                                    : 'bg-amber-100 text-amber-800'
                               }`}
                             >
                               {vehicleType}

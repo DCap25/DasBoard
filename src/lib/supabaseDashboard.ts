@@ -8,11 +8,7 @@ export async function getCurrentUserProfile() {
   } = await supabase.auth.getUser();
   if (authError || !user) return { error: authError || 'No user', data: null };
 
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', user.id)
-    .single();
+  const { data, error } = await supabase.from('users').select('*').eq('id', user.id).single();
   return { data, error };
 }
 
@@ -47,10 +43,7 @@ export async function getSalesLeaderboard(dealership_id: number) {
 
 // Get all deals for the current user
 export async function getUserDeals(user_id: string) {
-  const { data, error } = await supabase
-    .from('deals')
-    .select('*')
-    .eq('created_by', user_id);
+  const { data, error } = await supabase.from('deals').select('*').eq('created_by', user_id);
   return { data, error };
 }
 
@@ -73,4 +66,4 @@ export async function getUserSchedule(user_id: string) {
     .eq('user_id', user_id)
     .order('start_time', { ascending: true });
   return { data, error };
-} 
+}

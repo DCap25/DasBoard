@@ -11,7 +11,7 @@ const LOG_LEVELS: LogLevel = {
   DEBUG: 'debug',
   INFO: 'info',
   WARN: 'warn',
-  ERROR: 'error'
+  ERROR: 'error',
 };
 
 // Sensitive fields that should never be logged
@@ -25,7 +25,7 @@ const SENSITIVE_FIELDS = [
   'secret',
   'key',
   'credential',
-  'authorization'
+  'authorization',
 ];
 
 /**
@@ -41,7 +41,7 @@ function sanitizeData(data: any): any {
   }
 
   const sanitized = { ...data };
-  
+
   Object.keys(sanitized).forEach(key => {
     const lowerKey = key.toLowerCase();
     if (SENSITIVE_FIELDS.some(field => lowerKey.includes(field))) {

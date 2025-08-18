@@ -1,6 +1,6 @@
 /**
  * Comprehensive Error Boundary Component for The DAS Board
- * 
+ *
  * SECURITY FEATURES IMPLEMENTED:
  * - Secure error logging without sensitive data exposure
  * - Production-safe error messages
@@ -32,17 +32,17 @@ export enum ErrorType {
   COMPONENT = 'component',
   STATE_MANAGEMENT = 'state_management',
   API = 'api',
-  UNKNOWN = 'unknown'
+  UNKNOWN = 'unknown',
 }
 
 /**
  * Error severity levels for appropriate user messaging
  */
 export enum ErrorSeverity {
-  LOW = 'low',       // Minor issues, app continues functioning
+  LOW = 'low', // Minor issues, app continues functioning
   MEDIUM = 'medium', // Noticeable issues, some features affected
-  HIGH = 'high',     // Major issues, significant functionality lost
-  CRITICAL = 'critical' // App-breaking issues, requires immediate attention
+  HIGH = 'high', // Major issues, significant functionality lost
+  CRITICAL = 'critical', // App-breaking issues, requires immediate attention
 }
 
 /**
@@ -116,7 +116,7 @@ class SecureErrorLogger {
     /bearer/i,
     /jwt/i,
     /refresh/i,
-    /access[_-]?token/i
+    /access[_-]?token/i,
   ];
 
   /**
@@ -136,14 +136,14 @@ class SecureErrorLogger {
       if (obj.length > 1000) {
         return obj.substring(0, 1000) + '... [Truncated]';
       }
-      
+
       // Check for sensitive patterns
       for (const pattern of this.SENSITIVE_PATTERNS) {
         if (pattern.test(obj)) {
           return '[REDACTED]';
         }
       }
-      
+
       return obj;
     }
 
@@ -154,29 +154,29 @@ class SecureErrorLogger {
     if (Array.isArray(obj)) {
       // Limit array size
       const maxArraySize = 10;
-      const sanitizedArray = obj.slice(0, maxArraySize).map(item => 
-        this.sanitizeObject(item, maxDepth, currentDepth + 1)
-      );
-      
+      const sanitizedArray = obj
+        .slice(0, maxArraySize)
+        .map(item => this.sanitizeObject(item, maxDepth, currentDepth + 1));
+
       if (obj.length > maxArraySize) {
         sanitizedArray.push(`... [${obj.length - maxArraySize} more items]`);
       }
-      
+
       return sanitizedArray;
     }
 
     if (typeof obj === 'object') {
       const sanitized: any = {};
       const keys = Object.keys(obj);
-      
+
       // Limit object size
       const maxKeys = 20;
       const keysToProcess = keys.slice(0, maxKeys);
-      
+
       for (const key of keysToProcess) {
         // Check if key contains sensitive information
         const isSensitiveKey = this.SENSITIVE_PATTERNS.some(pattern => pattern.test(key));
-        
+
         if (isSensitiveKey) {
           sanitized[key] = '[REDACTED]';
         } else {
@@ -187,11 +187,11 @@ class SecureErrorLogger {
           }
         }
       }
-      
+
       if (keys.length > maxKeys) {
         sanitized['...'] = `[${keys.length - maxKeys} more properties]`;
       }
-      
+
       return sanitized;
     }
 
@@ -202,32 +202,28 @@ class SecureErrorLogger {
   /**
    * Create safe error information from raw error
    */
-  static createSafeErrorInfo(
-    error: Error, 
-    errorInfo?: ErrorInfo, 
-    context?: any
-  ): SafeErrorInfo {
+  static createSafeErrorInfo(error: Error, errorInfo?: ErrorInfo, context?: any): SafeErrorInfo {
     const errorId = `error_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     const timestamp = new Date().toISOString();
-    
+
     // Classify error type based on error message and stack
     const errorType = this.classifyError(error);
     const severity = this.determineSeverity(error, errorType);
-    
+
     // Create user-friendly message
     const userMessage = this.generateUserMessage(errorType, severity);
-    
+
     // Sanitize error message
     const sanitizedMessage = this.sanitizeString(error.message || 'Unknown error');
-    
+
     // Sanitize component stack
-    const sanitizedComponentStack = errorInfo?.componentStack 
-      ? this.sanitizeString(errorInfo.componentStack) 
+    const sanitizedComponentStack = errorInfo?.componentStack
+      ? this.sanitizeString(errorInfo.componentStack)
       : undefined;
-    
+
     // Get safe context information
     const safeContext = context ? this.sanitizeObject(context) : undefined;
-    
+
     return {
       id: errorId,
       type: errorType,
@@ -237,13 +233,14 @@ class SecureErrorLogger {
       timestamp,
       componentStack: sanitizedComponentStack,
       errorBoundary: context?.boundaryName || 'Unknown',
-      userAgent: typeof window !== 'undefined' ? window.navigator?.userAgent?.substring(0, 200) : undefined,
+      userAgent:
+        typeof window !== 'undefined' ? window.navigator?.userAgent?.substring(0, 200) : undefined,
       url: typeof window !== 'undefined' ? window.location?.pathname : undefined,
       userId: this.getSafeUserId(),
       sessionId: this.getSafeSessionId(),
       retryable: this.isRetryable(errorType),
       recoverable: this.isRecoverable(errorType, severity),
-      ...safeContext
+      ...safeContext,
     };
   }
 
@@ -254,15 +251,15 @@ class SecureErrorLogger {
     if (!str || typeof str !== 'string') {
       return 'Invalid string';
     }
-    
+
     // Truncate very long strings
     let sanitized = str.length > 2000 ? str.substring(0, 2000) + '... [Truncated]' : str;
-    
+
     // Remove potential sensitive information using patterns
     for (const pattern of this.SENSITIVE_PATTERNS) {
       sanitized = sanitized.replace(pattern, '[REDACTED]');
     }
-    
+
     return sanitized;
   }
 
@@ -273,55 +270,87 @@ class SecureErrorLogger {
     const message = error.message?.toLowerCase() || '';
     const stack = error.stack?.toLowerCase() || '';
     const name = error.name?.toLowerCase() || '';
-    
+
     // Network-related errors
-    if (message.includes('network') || message.includes('fetch') || 
-        message.includes('connection') || name.includes('network')) {
+    if (
+      message.includes('network') ||
+      message.includes('fetch') ||
+      message.includes('connection') ||
+      name.includes('network')
+    ) {
       return ErrorType.NETWORK;
     }
-    
+
     // Authentication errors
-    if (message.includes('auth') || message.includes('login') || 
-        message.includes('unauthorized') || message.includes('token')) {
+    if (
+      message.includes('auth') ||
+      message.includes('login') ||
+      message.includes('unauthorized') ||
+      message.includes('token')
+    ) {
       return ErrorType.AUTHENTICATION;
     }
-    
+
     // Authorization errors
-    if (message.includes('permission') || message.includes('forbidden') || 
-        message.includes('access denied') || message.includes('not allowed')) {
+    if (
+      message.includes('permission') ||
+      message.includes('forbidden') ||
+      message.includes('access denied') ||
+      message.includes('not allowed')
+    ) {
       return ErrorType.AUTHORIZATION;
     }
-    
+
     // Validation errors
-    if (message.includes('validation') || message.includes('invalid') || 
-        message.includes('required') || message.includes('format')) {
+    if (
+      message.includes('validation') ||
+      message.includes('invalid') ||
+      message.includes('required') ||
+      message.includes('format')
+    ) {
       return ErrorType.VALIDATION;
     }
-    
+
     // API errors
-    if (message.includes('api') || message.includes('supabase') || 
-        message.includes('database') || stack.includes('apiservice')) {
+    if (
+      message.includes('api') ||
+      message.includes('supabase') ||
+      message.includes('database') ||
+      stack.includes('apiservice')
+    ) {
       return ErrorType.API;
     }
-    
+
     // State management errors
-    if (stack.includes('context') || stack.includes('provider') || 
-        stack.includes('reducer') || message.includes('state')) {
+    if (
+      stack.includes('context') ||
+      stack.includes('provider') ||
+      stack.includes('reducer') ||
+      message.includes('state')
+    ) {
       return ErrorType.STATE_MANAGEMENT;
     }
-    
+
     // Component errors
-    if (stack.includes('component') || message.includes('render') || 
-        message.includes('hook') || name.includes('react')) {
+    if (
+      stack.includes('component') ||
+      message.includes('render') ||
+      message.includes('hook') ||
+      name.includes('react')
+    ) {
       return ErrorType.COMPONENT;
     }
-    
+
     // Runtime errors
-    if (name.includes('reference') || name.includes('type') || 
-        name.includes('syntax') || name.includes('range')) {
+    if (
+      name.includes('reference') ||
+      name.includes('type') ||
+      name.includes('syntax') ||
+      name.includes('range')
+    ) {
       return ErrorType.RUNTIME;
     }
-    
+
     return ErrorType.UNKNOWN;
   }
 
@@ -330,24 +359,31 @@ class SecureErrorLogger {
    */
   private static determineSeverity(error: Error, type: ErrorType): ErrorSeverity {
     const message = error.message?.toLowerCase() || '';
-    
+
     // Critical errors that break the app
-    if (message.includes('chunk load') || message.includes('script error') || 
-        message.includes('loading css') || type === ErrorType.AUTHENTICATION) {
+    if (
+      message.includes('chunk load') ||
+      message.includes('script error') ||
+      message.includes('loading css') ||
+      type === ErrorType.AUTHENTICATION
+    ) {
       return ErrorSeverity.CRITICAL;
     }
-    
+
     // High severity errors
-    if (type === ErrorType.NETWORK || type === ErrorType.API || 
-        type === ErrorType.STATE_MANAGEMENT) {
+    if (
+      type === ErrorType.NETWORK ||
+      type === ErrorType.API ||
+      type === ErrorType.STATE_MANAGEMENT
+    ) {
       return ErrorSeverity.HIGH;
     }
-    
+
     // Medium severity errors
     if (type === ErrorType.VALIDATION || type === ErrorType.AUTHORIZATION) {
       return ErrorSeverity.MEDIUM;
     }
-    
+
     // Low severity for component-level issues
     return ErrorSeverity.LOW;
   }
@@ -358,59 +394,69 @@ class SecureErrorLogger {
   private static generateUserMessage(type: ErrorType, severity: ErrorSeverity): string {
     const messages = {
       [ErrorType.NETWORK]: {
-        [ErrorSeverity.CRITICAL]: 'Unable to connect to our servers. Please check your internet connection and try again.',
-        [ErrorSeverity.HIGH]: 'Network connection issues detected. Some features may not work properly.',
-        [ErrorSeverity.MEDIUM]: 'Slow network connection detected. Loading may take longer than usual.',
-        [ErrorSeverity.LOW]: 'Minor network hiccup detected. Most features should work normally.'
+        [ErrorSeverity.CRITICAL]:
+          'Unable to connect to our servers. Please check your internet connection and try again.',
+        [ErrorSeverity.HIGH]:
+          'Network connection issues detected. Some features may not work properly.',
+        [ErrorSeverity.MEDIUM]:
+          'Slow network connection detected. Loading may take longer than usual.',
+        [ErrorSeverity.LOW]: 'Minor network hiccup detected. Most features should work normally.',
       },
       [ErrorType.AUTHENTICATION]: {
         [ErrorSeverity.CRITICAL]: 'Authentication session has expired. Please log in again.',
-        [ErrorSeverity.HIGH]: 'Authentication issues detected. Please refresh the page or log in again.',
+        [ErrorSeverity.HIGH]:
+          'Authentication issues detected. Please refresh the page or log in again.',
         [ErrorSeverity.MEDIUM]: 'Session verification required. Please confirm your credentials.',
-        [ErrorSeverity.LOW]: 'Authentication check in progress. Please wait a moment.'
+        [ErrorSeverity.LOW]: 'Authentication check in progress. Please wait a moment.',
       },
       [ErrorType.AUTHORIZATION]: {
-        [ErrorSeverity.CRITICAL]: 'You do not have permission to access this area. Please contact your administrator.',
+        [ErrorSeverity.CRITICAL]:
+          'You do not have permission to access this area. Please contact your administrator.',
         [ErrorSeverity.HIGH]: 'Access restricted for this feature. Please check your permissions.',
         [ErrorSeverity.MEDIUM]: 'Limited access detected. Some features may be unavailable.',
-        [ErrorSeverity.LOW]: 'Permission verification in progress.'
+        [ErrorSeverity.LOW]: 'Permission verification in progress.',
       },
       [ErrorType.VALIDATION]: {
-        [ErrorSeverity.CRITICAL]: 'Critical validation error. Please refresh the page and try again.',
+        [ErrorSeverity.CRITICAL]:
+          'Critical validation error. Please refresh the page and try again.',
         [ErrorSeverity.HIGH]: 'Data validation failed. Please check your input and try again.',
         [ErrorSeverity.MEDIUM]: 'Some information needs to be corrected before proceeding.',
-        [ErrorSeverity.LOW]: 'Minor validation issue detected.'
+        [ErrorSeverity.LOW]: 'Minor validation issue detected.',
       },
       [ErrorType.API]: {
-        [ErrorSeverity.CRITICAL]: 'Server connection lost. Please refresh the page or try again later.',
-        [ErrorSeverity.HIGH]: 'Server communication error. Some features may be temporarily unavailable.',
+        [ErrorSeverity.CRITICAL]:
+          'Server connection lost. Please refresh the page or try again later.',
+        [ErrorSeverity.HIGH]:
+          'Server communication error. Some features may be temporarily unavailable.',
         [ErrorSeverity.MEDIUM]: 'Data synchronization issue. Changes may not be saved immediately.',
-        [ErrorSeverity.LOW]: 'Minor server communication delay detected.'
+        [ErrorSeverity.LOW]: 'Minor server communication delay detected.',
       },
       [ErrorType.COMPONENT]: {
         [ErrorSeverity.CRITICAL]: 'Application component failed to load. Please refresh the page.',
         [ErrorSeverity.HIGH]: 'Feature temporarily unavailable due to technical issues.',
         [ErrorSeverity.MEDIUM]: 'Display issue detected. Some elements may not appear correctly.',
-        [ErrorSeverity.LOW]: 'Minor display glitch detected.'
+        [ErrorSeverity.LOW]: 'Minor display glitch detected.',
       },
       [ErrorType.STATE_MANAGEMENT]: {
         [ErrorSeverity.CRITICAL]: 'Application state corrupted. Please refresh the page.',
         [ErrorSeverity.HIGH]: 'Data synchronization error. Please refresh to restore proper state.',
         [ErrorSeverity.MEDIUM]: 'Temporary state inconsistency. Some data may appear outdated.',
-        [ErrorSeverity.LOW]: 'Minor state update delay.'
+        [ErrorSeverity.LOW]: 'Minor state update delay.',
       },
       [ErrorType.RUNTIME]: {
         [ErrorSeverity.CRITICAL]: 'Critical application error. Please refresh the page.',
         [ErrorSeverity.HIGH]: 'Runtime error detected. Some features may not work properly.',
         [ErrorSeverity.MEDIUM]: 'Processing error occurred. Please try the action again.',
-        [ErrorSeverity.LOW]: 'Minor processing delay detected.'
+        [ErrorSeverity.LOW]: 'Minor processing delay detected.',
       },
       [ErrorType.UNKNOWN]: {
-        [ErrorSeverity.CRITICAL]: 'Unexpected error occurred. Please refresh the page or contact support.',
-        [ErrorSeverity.HIGH]: 'Technical issue detected. Please try again or contact support if the problem persists.',
+        [ErrorSeverity.CRITICAL]:
+          'Unexpected error occurred. Please refresh the page or contact support.',
+        [ErrorSeverity.HIGH]:
+          'Technical issue detected. Please try again or contact support if the problem persists.',
         [ErrorSeverity.MEDIUM]: 'Unexpected issue occurred. Please try the action again.',
-        [ErrorSeverity.LOW]: 'Minor technical hiccup detected.'
-      }
+        [ErrorSeverity.LOW]: 'Minor technical hiccup detected.',
+      },
     };
 
     return messages[type]?.[severity] || 'An unexpected issue occurred. Please try again.';
@@ -420,11 +466,7 @@ class SecureErrorLogger {
    * Determine if error is retryable
    */
   private static isRetryable(type: ErrorType): boolean {
-    return [
-      ErrorType.NETWORK,
-      ErrorType.API,
-      ErrorType.COMPONENT
-    ].includes(type);
+    return [ErrorType.NETWORK, ErrorType.API, ErrorType.COMPONENT].includes(type);
   }
 
   /**
@@ -475,18 +517,18 @@ class SecureErrorLogger {
       console.error('Message:', safeError.message);
       console.error('User Message:', safeError.userMessage);
       console.error('Timestamp:', safeError.timestamp);
-      
+
       if (safeError.componentStack) {
         console.error('Component Stack:', safeError.componentStack);
       }
-      
+
       console.error('Context:', {
         url: safeError.url,
         userAgent: safeError.userAgent,
         userId: safeError.userId,
         sessionId: safeError.sessionId,
         retryable: safeError.retryable,
-        recoverable: safeError.recoverable
+        recoverable: safeError.recoverable,
       });
       console.groupEnd();
     }
@@ -496,7 +538,7 @@ class SecureErrorLogger {
       try {
         // Log only essential information in production
         console.error(`[${safeError.id}] ${safeError.type}: ${safeError.userMessage}`);
-        
+
         // Send to external error tracking service if configured
         if (typeof window !== 'undefined' && (window as any).errorTracker) {
           (window as any).errorTracker.captureError({
@@ -506,7 +548,7 @@ class SecureErrorLogger {
             message: safeError.userMessage, // Only user-safe message
             timestamp: safeError.timestamp,
             url: safeError.url,
-            retryable: safeError.retryable
+            retryable: safeError.retryable,
           });
         }
       } catch (loggingError) {
@@ -524,14 +566,14 @@ class SecureErrorLogger {
         severity: safeError.severity,
         userMessage: safeError.userMessage,
         timestamp: safeError.timestamp,
-        url: safeError.url
+        url: safeError.url,
       });
-      
+
       // Keep only last 10 errors
       if (errorHistory.length > 10) {
         errorHistory.shift();
       }
-      
+
       sessionStorage.setItem('error_history', JSON.stringify(errorHistory));
     } catch {
       // Storage might be full or unavailable
@@ -565,7 +607,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
    */
   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
     const safeError = SecureErrorLogger.createSafeErrorInfo(error);
-    
+
     return {
       hasError: true,
       error: safeError,
@@ -581,17 +623,17 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       boundaryName: this.props.identifier || 'UnknownBoundary',
       boundaryLevel: this.props.level || 'component',
       retryCount: this.state.retryCount,
-      isolateErrors: this.props.isolateErrors
+      isolateErrors: this.props.isolateErrors,
     };
 
     const safeError = SecureErrorLogger.createSafeErrorInfo(error, errorInfo, context);
-    
+
     // Log the error securely
     SecureErrorLogger.logError(safeError);
-    
+
     // Update state with error information
     this.setState({
-      error: safeError
+      error: safeError,
     });
 
     // Call custom error handler if provided
@@ -625,7 +667,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   private handleRetry = (): void => {
     const { maxRetries = 3, retryDelay = 1000 } = this.props;
     const now = Date.now();
-    
+
     // Check retry limits
     if (this.state.retryCount >= maxRetries) {
       console.warn(`Max retries (${maxRetries}) exceeded for error boundary`);
@@ -748,7 +790,7 @@ function ErrorFallback({
   onReload,
   retryCount,
   maxRetries,
-  level
+  level,
 }: ErrorFallbackProps): JSX.Element {
   const canRetry = onRetry && error.retryable && retryCount < maxRetries;
   const isPageLevel = level === 'page';
@@ -761,40 +803,24 @@ function ErrorFallback({
         <div className="max-w-md w-full text-center">
           <div className="mb-8">
             <AlertTriangle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Something went wrong
-            </h1>
-            <p className="text-gray-600 mb-6">
-              {error.userMessage}
-            </p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Something went wrong</h1>
+            <p className="text-gray-600 mb-6">{error.userMessage}</p>
           </div>
 
           <div className="space-y-3">
             {canRetry && (
-              <Button 
-                onClick={onRetry} 
-                className="w-full"
-                variant="default"
-              >
+              <Button onClick={onRetry} className="w-full" variant="default">
                 <RefreshCcw className="h-4 w-4 mr-2" />
                 Try Again ({maxRetries - retryCount} attempts left)
               </Button>
             )}
 
-            <Button 
-              onClick={onReload} 
-              className="w-full"
-              variant="outline"
-            >
+            <Button onClick={onReload} className="w-full" variant="outline">
               <RefreshCcw className="h-4 w-4 mr-2" />
               Reload Page
             </Button>
 
-            <Button 
-              onClick={onGoHome} 
-              className="w-full"
-              variant="outline"
-            >
+            <Button onClick={onGoHome} className="w-full" variant="outline">
               <Home className="h-4 w-4 mr-2" />
               Go to Home
             </Button>
@@ -807,14 +833,18 @@ function ErrorFallback({
                 Debug Information
               </summary>
               <pre className="mt-2 p-3 bg-gray-100 rounded text-xs overflow-auto max-h-32">
-                {JSON.stringify({
-                  id: error.id,
-                  type: error.type,
-                  severity: error.severity,
-                  timestamp: error.timestamp,
-                  retryable: error.retryable,
-                  recoverable: error.recoverable
-                }, null, 2)}
+                {JSON.stringify(
+                  {
+                    id: error.id,
+                    type: error.type,
+                    severity: error.severity,
+                    timestamp: error.timestamp,
+                    retryable: error.retryable,
+                    recoverable: error.recoverable,
+                  },
+                  null,
+                  2
+                )}
               </pre>
             </details>
           )}
@@ -837,39 +867,23 @@ function ErrorFallback({
         <CardTitle className="text-lg">
           {error.severity === ErrorSeverity.HIGH ? 'Feature Unavailable' : 'Minor Issue Detected'}
         </CardTitle>
-        <CardDescription>
-          {error.userMessage}
-        </CardDescription>
+        <CardDescription>{error.userMessage}</CardDescription>
       </CardHeader>
 
       <CardContent className="text-center space-y-3">
         {canRetry && (
-          <Button 
-            onClick={onRetry} 
-            className="w-full"
-            size="sm"
-          >
+          <Button onClick={onRetry} className="w-full" size="sm">
             <RefreshCcw className="h-4 w-4 mr-2" />
             Retry ({maxRetries - retryCount} left)
           </Button>
         )}
 
         <div className="flex gap-2">
-          <Button 
-            onClick={onReset} 
-            className="flex-1"
-            variant="outline"
-            size="sm"
-          >
+          <Button onClick={onReset} className="flex-1" variant="outline" size="sm">
             Reset
           </Button>
-          
-          <Button 
-            onClick={onGoHome} 
-            className="flex-1"
-            variant="outline"
-            size="sm"
-          >
+
+          <Button onClick={onGoHome} className="flex-1" variant="outline" size="sm">
             <Home className="h-4 w-4 mr-1" />
             Home
           </Button>
@@ -877,9 +891,7 @@ function ErrorFallback({
 
         {process.env.NODE_ENV === 'development' && (
           <details className="mt-4">
-            <summary className="cursor-pointer text-xs text-gray-500">
-              Debug Info
-            </summary>
+            <summary className="cursor-pointer text-xs text-gray-500">Debug Info</summary>
             <pre className="mt-2 p-2 bg-gray-100 rounded text-xs overflow-auto max-h-24">
               Error ID: {error.id}
               Type: {error.type}
@@ -899,8 +911,8 @@ function ErrorFallback({
  */
 export function PageErrorBoundary({ children, ...props }: Omit<ErrorBoundaryProps, 'level'>) {
   return (
-    <ErrorBoundary 
-      level="page" 
+    <ErrorBoundary
+      level="page"
       identifier="PageBoundary"
       enableRetry={true}
       maxRetries={3}
@@ -916,8 +928,8 @@ export function PageErrorBoundary({ children, ...props }: Omit<ErrorBoundaryProp
  */
 export function SectionErrorBoundary({ children, ...props }: Omit<ErrorBoundaryProps, 'level'>) {
   return (
-    <ErrorBoundary 
-      level="section" 
+    <ErrorBoundary
+      level="section"
       identifier="SectionBoundary"
       enableRetry={true}
       maxRetries={2}
@@ -934,8 +946,8 @@ export function SectionErrorBoundary({ children, ...props }: Omit<ErrorBoundaryP
  */
 export function ComponentErrorBoundary({ children, ...props }: Omit<ErrorBoundaryProps, 'level'>) {
   return (
-    <ErrorBoundary 
-      level="component" 
+    <ErrorBoundary
+      level="component"
       identifier="ComponentBoundary"
       enableRetry={true}
       maxRetries={1}
@@ -965,13 +977,13 @@ export function withAsyncErrorHandling<T extends (...args: any[]) => Promise<any
         undefined,
         { functionName: fn.name, arguments: args?.length || 0 }
       );
-      
+
       SecureErrorLogger.logError(safeError);
-      
+
       if (errorHandler) {
         errorHandler(safeError);
       }
-      
+
       throw error;
     }
   }) as T;
@@ -993,9 +1005,9 @@ export function withErrorBoundary<P extends object>(
       <Component {...props} />
     </ErrorBoundary>
   );
-  
+
   WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`;
-  
+
   return WrappedComponent;
 }
 

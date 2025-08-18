@@ -14,25 +14,27 @@ export default function SignupChoice() {
       name: 'Single Finance Manager',
       price: '$20/mo limited time',
       originalPrice: '$29.99/mo',
-      description: 'Perfect for individual finance managers who want to track their personal performance',
+      description:
+        'Perfect for individual finance managers who want to track their personal performance',
       icon: User,
       popular: false,
       features: [
         'Personal deal tracking',
-        'PVR & product profit analytics', 
+        'PVR & product profit analytics',
         'Pay calculator',
         'Performance metrics',
         'May be tax deductible',
-        'Try risk free for one calendar month'
+        'Try risk free for one calendar month',
       ],
       buttonText: 'Get Started Now!',
-      route: '/simple-signup'
+      route: '/simple-signup',
     },
     {
       id: 'dealership',
       name: 'Dealership / Dealer Group',
       price: '$250/mo base',
-      description: 'Complete dealership management with role-specific dashboards and team management',
+      description:
+        'Complete dealership management with role-specific dashboards and team management',
       icon: Building2,
       popular: true,
       features: [
@@ -41,11 +43,11 @@ export default function SignupChoice() {
         'Multi-location analytics',
         'Flexible admin structures',
         'Advanced reporting',
-        'Dedicated support'
+        'Dedicated support',
       ],
       buttonText: 'Start Dealership Setup',
-      route: '/signup/dealership'
-    }
+      route: '/signup/dealership',
+    },
   ];
 
   return (
@@ -88,18 +90,17 @@ export default function SignupChoice() {
       {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-16">
-          <h1 className="text-5xl font-bold text-white mb-6">
-            Choose Your Dashboard Solution
-          </h1>
+          <h1 className="text-5xl font-bold text-white mb-6">Choose Your Dashboard Solution</h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Select the plan that best fits your needs. Start with our free Single Finance Manager option 
-            or get the full dealership experience with team management and advanced analytics.
+            Select the plan that best fits your needs. Start with our free Single Finance Manager
+            option or get the full dealership experience with team management and advanced
+            analytics.
           </p>
         </div>
 
         {/* Pricing Options */}
         <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-          {signupOptions.map((option) => (
+          {signupOptions.map(option => (
             <div
               key={option.id}
               className={`relative bg-gray-800 rounded-2xl p-8 border-2 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 ${
@@ -118,15 +119,17 @@ export default function SignupChoice() {
 
               <div className="text-center mb-8">
                 <div className="flex justify-center mb-4">
-                  <div className={`p-3 rounded-full ${
-                    option.popular ? 'bg-blue-600' : 'bg-gray-700'
-                  }`}>
+                  <div
+                    className={`p-3 rounded-full ${option.popular ? 'bg-blue-600' : 'bg-gray-700'}`}
+                  >
                     <option.icon className="w-8 h-8 text-white" />
                   </div>
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-2">{option.name}</h3>
                 {option.originalPrice && (
-                  <div className="text-lg text-gray-500 line-through mb-1">{option.originalPrice}</div>
+                  <div className="text-lg text-gray-500 line-through mb-1">
+                    {option.originalPrice}
+                  </div>
                 )}
                 <div className="text-4xl font-bold text-white mb-2">{option.price}</div>
                 <p className="text-gray-300">{option.description}</p>
@@ -159,7 +162,8 @@ export default function SignupChoice() {
         {/* Additional Info */}
         <div className="text-center mt-16">
           <p className="text-gray-400 mb-4">
-            Need help choosing? <button 
+            Need help choosing?{' '}
+            <button
               onClick={() => navigate('/pricing')}
               className="text-blue-400 hover:text-blue-300 underline"
             >

@@ -1,10 +1,10 @@
 /**
  * Secure Promotions Database Utilities
- * 
+ *
  * This module provides TypeScript utilities for secure interaction with
  * the promotions database tables, preventing SQL injection and ensuring
  * proper data validation and type safety.
- * 
+ *
  * Security Features:
  * - Parameterized queries only
  * - Input validation and sanitization
@@ -15,12 +15,16 @@
  */
 
 import { supabase } from '../supabaseClient';
-import { sanitizeUserInput, validateFormData, SECURITY_LIMITS } from '../security/inputSanitization';
+import {
+  sanitizeUserInput,
+  validateFormData,
+  SECURITY_LIMITS,
+} from '../security/inputSanitization';
 
 // Type definitions for type safety
-export type PromotionTier = 
+export type PromotionTier =
   | 'finance_manager_only'
-  | 'salesperson' 
+  | 'salesperson'
   | 'sales_manager'
   | 'general_manager'
   | 'dealership_basic'
@@ -145,30 +149,30 @@ function validatePromotionInput(data: Partial<CreatePromotionRequest>): void {
     tier: {
       required: true,
       type: 'string',
-      sanitize: false // Enum validation handled separately
+      sanitize: false, // Enum validation handled separately
     },
     original_price: {
       required: true,
-      type: 'number'
+      type: 'number',
     },
     promo_price: {
       required: true,
-      type: 'number'
+      type: 'number',
     },
     start_date: {
       required: true,
-      type: 'string'
+      type: 'string',
     },
     end_date: {
       required: false,
-      type: 'string'
+      type: 'string',
     },
     description: {
       required: false,
       type: 'string',
       maxLength: 1000,
-      sanitize: true
-    }
+      sanitize: true,
+    },
   });
 
   if (!validation.isValid) {
@@ -185,8 +189,8 @@ function validatePromotionInput(data: Partial<CreatePromotionRequest>): void {
   }
 
   if (
-    data.original_price !== undefined && 
-    data.promo_price !== undefined && 
+    data.original_price !== undefined &&
+    data.promo_price !== undefined &&
     data.promo_price > data.original_price
   ) {
     throw new ValidationError('Promo price cannot exceed original price');
@@ -195,7 +199,7 @@ function validatePromotionInput(data: Partial<CreatePromotionRequest>): void {
   if (data.start_date && data.end_date) {
     const startDate = new Date(data.start_date);
     const endDate = new Date(data.end_date);
-    
+
     if (endDate <= startDate) {
       throw new ValidationError('End date must be after start date');
     }
@@ -205,11 +209,11 @@ function validatePromotionInput(data: Partial<CreatePromotionRequest>): void {
   const validTiers: PromotionTier[] = [
     'finance_manager_only',
     'salesperson',
-    'sales_manager', 
+    'sales_manager',
     'general_manager',
     'dealership_basic',
     'dealership_pro',
-    'dealership_enterprise'
+    'dealership_enterprise',
   ];
 
   if (data.tier && !validTiers.includes(data.tier)) {
@@ -222,9 +226,8 @@ function validatePromotionInput(data: Partial<CreatePromotionRequest>): void {
  */
 function validateUsageInput(data: CreateUsageRequest): void {
   // Ensure exactly one entity identifier is provided
-  const entityCount = [data.user_id, data.schema_name, data.dealership_id]
-    .filter(Boolean).length;
-    
+  const entityCount = [data.user_id, data.schema_name, data.dealership_id].filter(Boolean).length;
+
   if (entityCount !== 1) {
     throw new ValidationError(
       'Exactly one of user_id, schema_name, or dealership_id must be provided'
@@ -249,8 +252,8 @@ function validateUsageInput(data: CreateUsageRequest): void {
   }
 
   if (
-    data.original_amount !== undefined && 
-    data.discounted_amount !== undefined && 
+    data.original_amount !== undefined &&
+    data.discounted_amount !== undefined &&
     data.discounted_amount > data.original_amount
   ) {
     throw new ValidationError('Discounted amount cannot exceed original amount');
@@ -268,11 +271,11 @@ export async function createPromotion(
     validatePromotionInput(data);
 
     // Sanitize description if provided
-    const sanitizedDescription = data.description 
+    const sanitizedDescription = data.description
       ? sanitizeUserInput(data.description, {
           allowHtml: false,
           maxLength: 1000,
-          trimWhitespace: true
+          trimWhitespace: true,
         })
       : null;
 
@@ -283,12 +286,12 @@ export async function createPromotion(
       p_promo_price: data.promo_price,
       p_start_date: data.start_date,
       p_end_date: data.end_date || null,
-      p_description: sanitizedDescription
+      p_description: sanitizedDescription,
     });
 
     if (error) {
       console.error('[createPromotion] Database error:', error);
-      
+
       // Map database errors to user-friendly messages
       if (error.code === 'P0001') {
         throw new UnauthorizedError('Only admins can create promotions');
@@ -306,7 +309,7 @@ export async function createPromotion(
     if (error instanceof PromotionError) {
       throw error;
     }
-    
+
     console.error('[createPromotion] Unexpected error:', error);
     throw new PromotionError('Unexpected error creating promotion', 'UNKNOWN_ERROR');
   }
@@ -315,9 +318,7 @@ export async function createPromotion(
 /**
  * Securely updates a promotion using parameterized function
  */
-export async function updatePromotion(
-  data: UpdatePromotionRequest
-): Promise<{ success: boolean }> {
+export async function updatePromotion(data: UpdatePromotionRequest): Promise<{ success: boolean }> {
   try {
     // Validate input data
     if (data.description !== undefined) {
@@ -325,13 +326,14 @@ export async function updatePromotion(
     }
 
     // Sanitize description if provided
-    const sanitizedDescription = data.description !== undefined
-      ? sanitizeUserInput(data.description, {
-          allowHtml: false,
-          maxLength: 1000,
-          trimWhitespace: true
-        })
-      : undefined;
+    const sanitizedDescription =
+      data.description !== undefined
+        ? sanitizeUserInput(data.description, {
+            allowHtml: false,
+            maxLength: 1000,
+            trimWhitespace: true,
+          })
+        : undefined;
 
     // Call secure database function
     const { data: result, error } = await supabase.rpc('update_promotion', {
@@ -341,12 +343,12 @@ export async function updatePromotion(
       p_start_date: data.start_date || null,
       p_end_date: data.end_date || null,
       p_description: sanitizedDescription || null,
-      p_status: data.status || null
+      p_status: data.status || null,
     });
 
     if (error) {
       console.error('[updatePromotion] Database error:', error);
-      
+
       if (error.code === 'P0001') {
         throw new UnauthorizedError('Only admins can update promotions');
       } else if (error.code === 'P0002') {
@@ -363,7 +365,7 @@ export async function updatePromotion(
     if (error instanceof PromotionError) {
       throw error;
     }
-    
+
     console.error('[updatePromotion] Unexpected error:', error);
     throw new PromotionError('Unexpected error updating promotion', 'UNKNOWN_ERROR');
   }
@@ -382,12 +384,12 @@ export async function deletePromotion(promotionId: string): Promise<{ success: b
 
     // Call secure database function
     const { data: result, error } = await supabase.rpc('delete_promotion', {
-      p_promotion_id: promotionId
+      p_promotion_id: promotionId,
     });
 
     if (error) {
       console.error('[deletePromotion] Database error:', error);
-      
+
       if (error.code === 'P0001') {
         throw new UnauthorizedError('Only admins can delete promotions');
       } else if (error.code === 'P0002') {
@@ -402,7 +404,7 @@ export async function deletePromotion(promotionId: string): Promise<{ success: b
     if (error instanceof PromotionError) {
       throw error;
     }
-    
+
     console.error('[deletePromotion] Unexpected error:', error);
     throw new PromotionError('Unexpected error deleting promotion', 'UNKNOWN_ERROR');
   }
@@ -428,7 +430,7 @@ export async function getActivePromotions(): Promise<Promotion[]> {
     if (error instanceof PromotionError) {
       throw error;
     }
-    
+
     console.error('[getActivePromotions] Unexpected error:', error);
     throw new PromotionError('Unexpected error retrieving promotions', 'UNKNOWN_ERROR');
   }
@@ -452,12 +454,12 @@ export async function recordPromotionUsage(
       p_dealership_id: data.dealership_id || null,
       p_usage_type: data.usage_type || 'signup',
       p_original_amount: data.original_amount || null,
-      p_discounted_amount: data.discounted_amount || null
+      p_discounted_amount: data.discounted_amount || null,
     });
 
     if (error) {
       console.error('[recordPromotionUsage] Database error:', error);
-      
+
       if (error.code === 'P0001') {
         throw new ValidationError('Promotion not found');
       } else if (error.code === 'P0002') {
@@ -476,7 +478,7 @@ export async function recordPromotionUsage(
     if (error instanceof PromotionError) {
       throw error;
     }
-    
+
     console.error('[recordPromotionUsage] Unexpected error:', error);
     throw new PromotionError('Unexpected error recording usage', 'UNKNOWN_ERROR');
   }
@@ -495,9 +497,10 @@ export async function checkPromotionEligibility(
 ): Promise<PromotionEligibility[]> {
   try {
     // Validate entity parameters
-    const entityCount = [entity.user_id, entity.schema_name, entity.dealership_id]
-      .filter(Boolean).length;
-      
+    const entityCount = [entity.user_id, entity.schema_name, entity.dealership_id].filter(
+      Boolean
+    ).length;
+
     if (entityCount !== 1) {
       throw new ValidationError(
         'Exactly one of user_id, schema_name, or dealership_id must be provided'
@@ -509,7 +512,7 @@ export async function checkPromotionEligibility(
       p_user_id: entity.user_id || null,
       p_schema_name: entity.schema_name || null,
       p_dealership_id: entity.dealership_id || null,
-      p_tier: tier || null
+      p_tier: tier || null,
     });
 
     if (error) {
@@ -522,7 +525,7 @@ export async function checkPromotionEligibility(
     if (error instanceof PromotionError) {
       throw error;
     }
-    
+
     console.error('[checkPromotionEligibility] Unexpected error:', error);
     throw new PromotionError('Unexpected error checking eligibility', 'UNKNOWN_ERROR');
   }
@@ -531,21 +534,21 @@ export async function checkPromotionEligibility(
 /**
  * Retrieves user's promotion usage history (RLS protected)
  */
-export async function getUserPromotionUsage(
-  entity: {
-    user_id?: string;
-    schema_name?: string;
-    dealership_id?: number;
-  }
-): Promise<PromotionUsage[]> {
+export async function getUserPromotionUsage(entity: {
+  user_id?: string;
+  schema_name?: string;
+  dealership_id?: number;
+}): Promise<PromotionUsage[]> {
   try {
     // Build query based on entity type
     let query = supabase
       .from('promotions_usage')
-      .select(`
+      .select(
+        `
         *,
         promotions!inner(tier, description, status)
-      `)
+      `
+      )
       .eq('deleted_at', null)
       .order('created_at', { ascending: false });
 
@@ -571,7 +574,7 @@ export async function getUserPromotionUsage(
     if (error instanceof PromotionError) {
       throw error;
     }
-    
+
     console.error('[getUserPromotionUsage] Unexpected error:', error);
     throw new PromotionError('Unexpected error retrieving usage history', 'UNKNOWN_ERROR');
   }
@@ -594,7 +597,7 @@ export async function validatePromotionMigrations(): Promise<Record<string, unkn
     if (error instanceof PromotionError) {
       throw error;
     }
-    
+
     console.error('[validatePromotionMigrations] Unexpected error:', error);
     throw new PromotionError('Unexpected error validating migrations', 'UNKNOWN_ERROR');
   }
@@ -615,16 +618,16 @@ export async function withRetry<T>(
       return await operation();
     } catch (error) {
       lastError = error as Error;
-      
+
       // Don't retry validation errors or unauthorized errors
       if (error instanceof ValidationError || error instanceof UnauthorizedError) {
         throw error;
       }
-      
+
       if (attempt === maxAttempts) {
         break;
       }
-      
+
       // Wait before retrying
       await new Promise(resolve => setTimeout(resolve, delay * attempt));
     }
@@ -639,24 +642,24 @@ export const promotionUtils = {
     const validTiers: PromotionTier[] = [
       'finance_manager_only',
       'salesperson',
-      'sales_manager', 
+      'sales_manager',
       'general_manager',
       'dealership_basic',
       'dealership_pro',
-      'dealership_enterprise'
+      'dealership_enterprise',
     ];
     return validTiers.includes(tier as PromotionTier);
   },
 
   calculateDiscount: (originalPrice: number, promoPrice: number): number => {
     if (originalPrice <= 0) return 0;
-    return Math.round(((originalPrice - promoPrice) / originalPrice * 100) * 100) / 100;
+    return Math.round(((originalPrice - promoPrice) / originalPrice) * 100 * 100) / 100;
   },
 
   formatCurrency: (amount: number): string => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'USD',
     }).format(amount);
   },
 
@@ -664,12 +667,12 @@ export const promotionUtils = {
     const now = new Date();
     const startDate = new Date(promotion.start_date);
     const endDate = promotion.end_date ? new Date(promotion.end_date) : null;
-    
+
     return (
       promotion.status === 'active' &&
       !promotion.deleted_at &&
       startDate <= now &&
       (endDate === null || endDate >= now)
     );
-  }
+  },
 };

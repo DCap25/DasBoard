@@ -883,8 +883,8 @@ export function MasterAdminPanel() {
           selectedBrands.length > 1
             ? `brands (${selectedBrands.join(', ')})`
             : selectedBrands[0] === 'Default'
-            ? 'default'
-            : `brand ${selectedBrands[0]}`;
+              ? 'default'
+              : `brand ${selectedBrands[0]}`;
 
         safeToast({
           title: 'Success',
@@ -3492,19 +3492,19 @@ export function MasterAdminPanel() {
                                     request.tier === 'free_trial'
                                       ? 'outline'
                                       : request.tier === 'finance_manager'
-                                      ? 'secondary'
-                                      : request.tier === 'dealership'
-                                      ? 'default'
-                                      : 'destructive'
+                                        ? 'secondary'
+                                        : request.tier === 'dealership'
+                                          ? 'default'
+                                          : 'destructive'
                                   }
                                 >
                                   {request.tier === 'free_trial'
                                     ? 'Free Trial'
                                     : request.tier === 'finance_manager'
-                                    ? 'Finance Manager'
-                                    : request.tier === 'dealership'
-                                    ? 'Dealership'
-                                    : 'Dealer Group'}
+                                      ? 'Finance Manager'
+                                      : request.tier === 'dealership'
+                                        ? 'Dealership'
+                                        : 'Dealer Group'}
                                 </Badge>
                               </TableCell>
                               <TableCell>
@@ -3537,8 +3537,8 @@ export function MasterAdminPanel() {
                                     request.status === 'pending'
                                       ? 'outline'
                                       : request.status === 'approved'
-                                      ? 'default'
-                                      : 'destructive'
+                                        ? 'default'
+                                        : 'destructive'
                                   }
                                 >
                                   {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
@@ -3589,10 +3589,10 @@ export function MasterAdminPanel() {
                                                 {request.tier === 'free_trial'
                                                   ? 'Free Trial'
                                                   : request.tier === 'finance_manager'
-                                                  ? 'Finance Manager'
-                                                  : request.tier === 'dealership'
-                                                  ? 'Dealership'
-                                                  : 'Dealer Group'}
+                                                    ? 'Finance Manager'
+                                                    : request.tier === 'dealership'
+                                                      ? 'Dealership'
+                                                      : 'Dealer Group'}
                                               </p>
                                               <p className="text-sm text-muted-foreground">
                                                 <strong>Created:</strong>{' '}
@@ -3733,10 +3733,10 @@ export function MasterAdminPanel() {
                                               {request.tier === 'free_trial'
                                                 ? 'Free Trial'
                                                 : request.tier === 'finance_manager'
-                                                ? 'Finance Manager'
-                                                : request.tier === 'dealership'
-                                                ? 'Dealership'
-                                                : 'Dealer Group'}
+                                                  ? 'Finance Manager'
+                                                  : request.tier === 'dealership'
+                                                    ? 'Dealership'
+                                                    : 'Dealer Group'}
                                             </p>
                                           </div>
 

@@ -40,8 +40,10 @@ export const submitSimplifiedSignup = async (
     };
 
     console.log('[SIGNUP] Step 3: Subscription tier map created, proceeding to user creation...');
-    console.log('[SIGNUP] Skipping database signup request for now - going directly to user creation');
-    
+    console.log(
+      '[SIGNUP] Skipping database signup request for now - going directly to user creation'
+    );
+
     // TEMPORARY: Skip the database signup request creation for testing
     // TODO: Fix signup_requests table permissions
     const signupRequest = {
@@ -50,17 +52,17 @@ export const submitSimplifiedSignup = async (
       full_name: formData.fullName,
       account_type: formData.accountType,
     };
-    
+
     console.log('[SIGNUP] Using temporary signup request:', signupRequest);
 
     console.log('[SIGNUP] Signup request created:', signupRequest);
-    
+
     console.log('[SIGNUP] Checking account type for auth creation:', formData.accountType);
 
     // For single finance managers, create user account immediately
     if (formData.accountType === 'single-finance') {
       console.log('[SIGNUP] Creating Supabase auth user for single-finance...');
-      
+
       try {
         // Add timeout wrapper to prevent hanging
         const authPromise = supabase.auth.signUp({
@@ -73,40 +75,42 @@ export const submitSimplifiedSignup = async (
             },
           },
         });
-        
+
         const timeoutPromise = new Promise((_, reject) => {
           setTimeout(() => {
             reject(new Error('Auth signup timeout - taking too long'));
           }, 10000); // 10 second timeout
         });
-        
+
         console.log('[SIGNUP] Waiting for auth signup to complete...');
-        const { data: authData, error: authError } = await Promise.race([
+        const { data: authData, error: authError } = (await Promise.race([
           authPromise,
-          timeoutPromise
-        ]) as any;
-        
+          timeoutPromise,
+        ])) as any;
+
         console.log('[SIGNUP] Auth signup completed with timeout protection');
-        
-        console.log('[SIGNUP] Auth signup result:', { 
-          user: authData?.user?.id, 
+
+        console.log('[SIGNUP] Auth signup result:', {
+          user: authData?.user?.id,
           session: !!authData?.session,
-          error: authError?.message 
+          error: authError?.message,
         });
 
         if (authError) {
           console.error('[SIGNUP] Auth error:', authError);
-          
+
           // Handle specific auth errors
           if (authError.message?.includes('User already registered')) {
             console.log('[SIGNUP] User already exists, checking if they are signed in...');
-            
+
             // Check if user is already signed in
             try {
-              const { data: { session } } = await supabase.auth.getSession();
+              const {
+                data: { session },
+              } = await supabase.auth.getSession();
               if (session?.user && session.user.email === formData.email) {
                 console.log('[SIGNUP] User already signed in, redirecting to welcome page');
-                
+
                 // User exists and is signed in, redirect to welcome page
                 return {
                   success: true,
@@ -123,12 +127,13 @@ export const submitSimplifiedSignup = async (
             } catch (sessionError) {
               console.error('[SIGNUP] Error checking session for existing user:', sessionError);
             }
-            
+
             return {
               success: false,
               message: 'An account with this email already exists. Please sign in instead.',
               error: authError.message,
-              redirectTo: '/auth?message=' + encodeURIComponent('Account already exists. Please sign in.'),
+              redirectTo:
+                '/auth?message=' + encodeURIComponent('Account already exists. Please sign in.'),
             };
           } else if (authError.message?.includes('Password should be at least')) {
             return {
@@ -147,15 +152,17 @@ export const submitSimplifiedSignup = async (
 
         // Check if we're in development mode
         const isDevelopment = import.meta.env.MODE === 'development';
-        const skipEmailVerification = isDevelopment || import.meta.env.VITE_SKIP_EMAIL_VERIFICATION === 'true';
-        
+        const skipEmailVerification =
+          isDevelopment || import.meta.env.VITE_SKIP_EMAIL_VERIFICATION === 'true';
+
         // Check if email confirmation is required
         if (authData.user && !authData.user.email_confirmed_at && !skipEmailVerification) {
           // For Single Finance Manager, still direct to welcome page after verification
           if (formData.accountType === 'single-finance') {
             return {
               success: true,
-              message: 'Account created successfully! Please check your email and click the verification link, then you\'ll see your welcome page.',
+              message:
+                "Account created successfully! Please check your email and click the verification link, then you'll see your welcome page.",
               data: {
                 user: authData.user,
                 signupRequest,
@@ -167,7 +174,8 @@ export const submitSimplifiedSignup = async (
           } else {
             return {
               success: true,
-              message: 'Account created successfully! Please check your email and click the verification link before signing in.',
+              message:
+                'Account created successfully! Please check your email and click the verification link before signing in.',
               data: {
                 user: authData.user,
                 signupRequest,
@@ -178,7 +186,7 @@ export const submitSimplifiedSignup = async (
           }
         } else {
           // In development or when email verification is disabled
-          const message = skipEmailVerification 
+          const message = skipEmailVerification
             ? 'Account created! You can now sign in (email verification disabled for development).'
             : 'Account created and verified! You can now sign in.';
 
@@ -199,7 +207,7 @@ export const submitSimplifiedSignup = async (
             console.log('[SIGNUP] Response:', response);
             return response;
           }
-            
+
           return {
             success: true,
             message,
@@ -213,27 +221,30 @@ export const submitSimplifiedSignup = async (
         }
       } catch (authError) {
         console.error('[SIGNUP] Auth exception:', authError);
-        
+
         // If it's a timeout error, but we detected the user was created (SIGNED_IN event)
         // let's check if the user actually exists
         if (authError instanceof Error && authError.message.includes('timeout')) {
           console.log('[SIGNUP] Timeout detected, checking if user was created anyway...');
-          
+
           try {
             // Check if user was created despite timeout
             console.log('[SIGNUP] Calling getSession to check for created user...');
-            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-            
-            console.log('[SIGNUP] Session check result:', { 
-              hasSession: !!session, 
+            const {
+              data: { session },
+              error: sessionError,
+            } = await supabase.auth.getSession();
+
+            console.log('[SIGNUP] Session check result:', {
+              hasSession: !!session,
               userEmail: session?.user?.email,
               targetEmail: formData.email,
-              sessionError: sessionError?.message 
+              sessionError: sessionError?.message,
             });
-            
+
             if (session?.user && session.user.email === formData.email) {
               console.log('[SIGNUP] User was created despite timeout, proceeding with success');
-              
+
               const successResponse = {
                 success: true,
                 message: 'Account created successfully! Welcome to The DAS Board.',
@@ -245,7 +256,7 @@ export const submitSimplifiedSignup = async (
                   requiresEmailConfirmation: false,
                 },
               };
-              
+
               console.log('[SIGNUP] Returning success response:', successResponse);
               return successResponse;
             } else {
@@ -255,7 +266,7 @@ export const submitSimplifiedSignup = async (
             console.error('[SIGNUP] Error checking session after timeout:', sessionError);
           }
         }
-        
+
         return {
           success: false,
           message: 'Account creation failed. Please try again.',

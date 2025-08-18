@@ -13,13 +13,38 @@ export interface DirectAuthUser {
 // Test accounts for direct authentication
 export const TEST_USERS: DirectAuthUser[] = [
   { id: 'admin', email: 'testadmin@example.com', role: 'admin', isAdmin: true },
-  { id: 'group-admin', email: 'group1.admin@exampletest.com', role: 'dealer_group_admin', isGroupAdmin: true },
-  { id: 'dealer-admin', email: 'dealer1.admin@exampletest.com', role: 'dealership_admin', dealershipId: 1 },
+  {
+    id: 'group-admin',
+    email: 'group1.admin@exampletest.com',
+    role: 'dealer_group_admin',
+    isGroupAdmin: true,
+  },
+  {
+    id: 'dealer-admin',
+    email: 'dealer1.admin@exampletest.com',
+    role: 'dealership_admin',
+    dealershipId: 1,
+  },
   { id: 'finance', email: 'finance@exampletest.com', role: 'finance_manager' },
   { id: 'finance-director', email: 'finance.director@exampletest.com', role: 'finance_director' },
-  { id: 'single-finance', email: 'testfinance@example.com', role: 'single_finance_manager', dealershipId: 1 },
-  { id: 'single-finance-2', email: 'testsingle@example.com', role: 'single_finance_manager', dealershipId: 1 },
-  { id: 'single-finance-3', email: 'testsingle758_1753110602135@example.com', role: 'single_finance_manager', dealershipId: 1 },
+  {
+    id: 'single-finance',
+    email: 'testfinance@example.com',
+    role: 'single_finance_manager',
+    dealershipId: 1,
+  },
+  {
+    id: 'single-finance-2',
+    email: 'testsingle@example.com',
+    role: 'single_finance_manager',
+    dealershipId: 1,
+  },
+  {
+    id: 'single-finance-3',
+    email: 'testsingle758_1753110602135@example.com',
+    role: 'single_finance_manager',
+    dealershipId: 1,
+  },
   { id: 'sales-manager', email: 'sales.manager@exampletest.com', role: 'sales_manager' },
   { id: 'gm', email: 'gm@exampletest.com', role: 'general_manager' },
   { id: 'sales', email: 'sales@exampletest.com', role: 'salesperson' },
@@ -33,9 +58,9 @@ export function getCurrentDirectAuthUser(): DirectAuthUser | null {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return null;
-    
+
     const user = JSON.parse(stored);
-    
+
     // Check if the auth is still valid (expires after 24 hours)
     const timestamp = localStorage.getItem('directauth_timestamp');
     if (timestamp) {
@@ -45,7 +70,7 @@ export function getCurrentDirectAuthUser(): DirectAuthUser | null {
         return null;
       }
     }
-    
+
     return user;
   } catch {
     return null;
@@ -63,10 +88,10 @@ export function loginWithTestAccount(email: string): { success: boolean; message
   if (!user) {
     return { success: false, message: 'User not found' };
   }
-  
+
   localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
   localStorage.setItem('directauth_timestamp', Date.now().toString());
-  
+
   return { success: true, message: 'Logged in successfully' };
 }
 

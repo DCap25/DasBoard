@@ -44,10 +44,10 @@ const GroupAdminBypass: React.FC = () => {
     try {
       // First clear any existing session to prevent issues
       await supabase.auth.signOut();
-      
+
       // Clear localStorage
       localStorage.clear();
-      
+
       // Clear any existing direct auth
       if ('logout' in window) {
         try {
@@ -57,10 +57,10 @@ const GroupAdminBypass: React.FC = () => {
           console.error('Error calling direct logout:', e);
         }
       }
-      
+
       // Set a flag to force redirect after login
       localStorage.setItem('bypass_redirect', '/group-admin');
-      
+
       // Wait a moment to ensure logout is complete
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -74,7 +74,9 @@ const GroupAdminBypass: React.FC = () => {
       const testPassword = import.meta.env.VITE_TEST_ADMIN_PASSWORD;
 
       if (!testEmail || !testPassword) {
-        throw new Error('Test credentials not configured. Please set VITE_TEST_ADMIN_EMAIL and VITE_TEST_ADMIN_PASSWORD in your .env file');
+        throw new Error(
+          'Test credentials not configured. Please set VITE_TEST_ADMIN_EMAIL and VITE_TEST_ADMIN_PASSWORD in your .env file'
+        );
       }
 
       // Now login with the test group admin credentials from environment
@@ -88,15 +90,15 @@ const GroupAdminBypass: React.FC = () => {
       }
 
       console.log('[GroupAdminBypass] Login successful:', data);
-      
+
       // Add metadata for group admin
       await supabase.auth.updateUser({
         data: {
           is_group_admin: true,
           role: 'dealer_group_admin',
-        }
+        },
       });
-      
+
       // Update profile record
       await supabase
         .from('profiles')
@@ -108,12 +110,11 @@ const GroupAdminBypass: React.FC = () => {
 
       setStatus('success');
       setMessage('Login successful! Redirecting to group admin dashboard...');
-      
+
       // Force immediate redirect after 3 seconds
       setTimeout(() => {
         window.location.href = '/group-admin';
       }, 3000);
-      
     } catch (error) {
       console.error('[GroupAdminBypass] Login error:', error);
       setStatus('error');
@@ -126,25 +127,19 @@ const GroupAdminBypass: React.FC = () => {
       <div className="w-full max-w-md space-y-8 rounded-xl bg-white p-8 shadow-xl">
         <div className="flex flex-col items-center justify-center space-y-4">
           <h1 className="text-2xl font-bold text-gray-900">Group Admin Login Bypass</h1>
-          
+
           <p className="text-center text-gray-600">{message}</p>
-          
-          {status === 'loading' && (
-            <Loader2 className="h-12 w-12 animate-spin text-indigo-600" />
-          )}
-          
+
+          {status === 'loading' && <Loader2 className="h-12 w-12 animate-spin text-indigo-600" />}
+
           {status === 'success' && (
-            <p className="text-green-600 font-semibold">
-              Redirecting in {countdown} seconds...
-            </p>
+            <p className="text-green-600 font-semibold">Redirecting in {countdown} seconds...</p>
           )}
-          
+
           {status === 'error' && (
-            <p className="text-red-600">
-              An error occurred. Please try again.
-            </p>
+            <p className="text-red-600">An error occurred. Please try again.</p>
           )}
-          
+
           {status === 'idle' && (
             <button
               onClick={handleGroupAdminLogin}
@@ -153,7 +148,7 @@ const GroupAdminBypass: React.FC = () => {
               Login as Group Admin
             </button>
           )}
-          
+
           {status === 'error' && (
             <button
               onClick={handleGroupAdminLogin}
@@ -162,11 +157,8 @@ const GroupAdminBypass: React.FC = () => {
               Try Again
             </button>
           )}
-          
-          <a 
-            href="/"
-            className="text-sm text-indigo-600 hover:underline"
-          >
+
+          <a href="/" className="text-sm text-indigo-600 hover:underline">
             Back to regular login
           </a>
         </div>
@@ -175,4 +167,4 @@ const GroupAdminBypass: React.FC = () => {
   );
 };
 
-export default GroupAdminBypass; 
+export default GroupAdminBypass;

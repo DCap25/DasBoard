@@ -1,9 +1,9 @@
 /**
  * Secure User ID Helper for The DAS Board
- * 
+ *
  * This module provides secure user identification utilities with proper
  * error handling, input validation, and minimal logging exposure.
- * 
+ *
  * Security Features:
  * - Input validation and sanitization
  * - Secure error handling without sensitive data exposure
@@ -57,7 +57,7 @@ function secureLog(level: 'info' | 'warn' | 'error', message: string, data?: unk
 
   // Security: Sanitize sensitive data from logs
   const sanitizedData = data ? sanitizeLogData(data) : undefined;
-  
+
   switch (level) {
     case 'info':
       console.log(`[SecureUserIdHelper] ${message}`, sanitizedData);
@@ -84,14 +84,23 @@ function sanitizeLogData(data: unknown): unknown {
   }
 
   const sanitized: Record<string, unknown> = {};
-  
+
   for (const [key, value] of Object.entries(data as Record<string, unknown>)) {
     // Security: Remove sensitive fields from logs
     const sensitiveFields = [
-      'password', 'token', 'key', 'secret', 'auth', 'session',
-      'email', 'phone', 'ssn', 'credit', 'payment'
+      'password',
+      'token',
+      'key',
+      'secret',
+      'auth',
+      'session',
+      'email',
+      'phone',
+      'ssn',
+      'credit',
+      'payment',
     ];
-    
+
     if (sensitiveFields.some(field => key.toLowerCase().includes(field))) {
       sanitized[key] = '[REDACTED]';
     } else if (typeof value === 'object' && value !== null) {
@@ -100,7 +109,7 @@ function sanitizeLogData(data: unknown): unknown {
       sanitized[key] = value;
     }
   }
-  
+
   return sanitized;
 }
 
@@ -145,7 +154,7 @@ function isNonEmptyString(value: unknown): value is string {
 export function getConsistentUserId(user: UserInputType): string | null {
   secureLog('info', 'Starting secure user ID resolution', {
     hasUser: !!user,
-    userType: typeof user
+    userType: typeof user,
   });
 
   if (!user || typeof user !== 'object') {
@@ -235,12 +244,12 @@ export async function getUserIdWithFallbacks(
       // Security: Dynamic import to avoid SSR issues and reduce bundle size
       const { supabase } = await import('../lib/supabaseClient');
       const { data, error } = await supabase.auth.getSession();
-      
+
       if (error) {
         secureLog('error', 'Error getting Supabase session');
         return null;
       }
-      
+
       const sessionUserId = data?.session?.user?.id;
       if (isNonEmptyString(sessionUserId) && isValidUUID(sessionUserId)) {
         secureLog('info', 'Retrieved valid ID from Supabase session');
@@ -248,8 +257,8 @@ export async function getUserIdWithFallbacks(
       }
     }
   } catch (error) {
-    secureLog('error', 'Failed to get Supabase session', { 
-      error: error instanceof Error ? error.message : 'Unknown error' 
+    secureLog('error', 'Failed to get Supabase session', {
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 
@@ -263,10 +272,7 @@ export async function getUserIdWithFallbacks(
  * @param localUserId - Optional local fallback user ID
  * @returns Validated user ID or null
  */
-export function getUserIdSync(
-  user: UserInputType,
-  localUserId?: string | null
-): string | null {
+export function getUserIdSync(user: UserInputType, localUserId?: string | null): string | null {
   // Security: Try the standard secure method first
   const userId = getConsistentUserId(user);
   if (userId) {
@@ -301,17 +307,17 @@ function getSecureLocalStorageItem(key: string): LocalStorageToken | null {
 
     // Security: Parse with try-catch and validate structure
     const parsed = JSON.parse(raw) as unknown;
-    
+
     // Security: Basic structure validation
     if (typeof parsed === 'object' && parsed !== null) {
       return parsed as LocalStorageToken;
     }
-    
+
     return null;
   } catch (error) {
     secureLog('error', 'Error reading from localStorage', {
       key: key.replace(/[a-f0-9]{32,}/g, '[KEY_HASH]'), // Hide sensitive key parts
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
     return null;
   }
@@ -329,9 +335,7 @@ export function recoverUserIdFromStorage(): string | null {
 
     // Security: Look for Supabase auth token with pattern matching
     const storageKeys = Object.keys(window.localStorage);
-    const tokenKey = storageKeys.find(key => 
-      key.startsWith('sb-') && key.endsWith('-auth-token')
-    );
+    const tokenKey = storageKeys.find(key => key.startsWith('sb-') && key.endsWith('-auth-token'));
 
     if (!tokenKey) {
       secureLog('info', 'No Supabase auth token found in localStorage');
@@ -344,10 +348,7 @@ export function recoverUserIdFromStorage(): string | null {
     }
 
     // Security: Try multiple paths to find user ID
-    const possibleUserIds = [
-      tokenData.currentSession?.user?.id,
-      tokenData.user?.id
-    ];
+    const possibleUserIds = [tokenData.currentSession?.user?.id, tokenData.user?.id];
 
     for (const userId of possibleUserIds) {
       if (isNonEmptyString(userId) && isValidUUID(userId)) {
@@ -360,7 +361,7 @@ export function recoverUserIdFromStorage(): string | null {
     return null;
   } catch (error) {
     secureLog('error', 'Error recovering user ID from storage', {
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
     return null;
   }
@@ -392,7 +393,7 @@ export function debugUserId(
     storageUserId: storageUserId,
     localUserId: localUserId,
     hasUser: !!user,
-    userType: typeof user
+    userType: typeof user,
   });
 }
 
@@ -421,10 +422,10 @@ export function isSecureUserObject(user: unknown): user is UserLike {
   }
 
   const userObj = user as Record<string, unknown>;
-  
+
   // Security: Check for common injection patterns
   const dangerousPatterns = ['<script', 'javascript:', 'data:text/html', 'vbscript:'];
-  
+
   for (const [key, value] of Object.entries(userObj)) {
     if (typeof value === 'string') {
       const lowerValue = value.toLowerCase();
@@ -445,5 +446,5 @@ export const secureUserUtils = {
   isValidUserId,
   isSecureUserObject,
   sanitizeString,
-  secureLog
+  secureLog,
 };

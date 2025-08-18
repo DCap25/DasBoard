@@ -4,7 +4,7 @@ import { AlertTriangle, Loader2, Mail, Eye, EyeOff, Bookmark } from 'lucide-reac
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { supabase } from '../../lib/supabaseClient';
+import { getSecureSupabaseClient } from '../../lib/supabaseClient';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../contexts/TranslationContext';
 import LanguageSwitcher from '../LanguageSwitcher';
@@ -88,6 +88,7 @@ export default function LoginForm() {
       localStorage.setItem('recent_supabase_login', 'true');
       console.log('[LoginForm] AuthContext.signIn resolved');
       // Double-check session; if missing, try direct supabase sign-in fallback
+      const supabase = await getSecureSupabaseClient();
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -154,6 +155,7 @@ export default function LoginForm() {
 
     try {
       setLoading(true);
+      const supabase = await getSecureSupabaseClient();
       const { error } = await supabase.auth.signInWithOtp({
         email: sanitizedEmail,
         options: {
@@ -187,6 +189,7 @@ export default function LoginForm() {
 
     try {
       setLoading(true);
+      const supabase = await getSecureSupabaseClient();
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email: sanitizedEmail,
@@ -227,13 +230,13 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="w-full max-w-md">
-      {/* Bookmark Reminder */}
-      <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <div className="flex items-start gap-3">
-          <Bookmark className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+    <div className="w-full max-w-md mx-auto px-4 sm:px-0">
+      {/* Bookmark Reminder - mobile optimized */}
+      <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="flex items-start gap-2 sm:gap-3">
+          <Bookmark className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 mt-0.5 flex-shrink-0" />
           <div>
-            <h3 className="text-sm font-medium text-blue-900 mb-1">Bookmark This Page</h3>
+            <h3 className="text-xs sm:text-sm font-medium text-blue-900 mb-1">Bookmark This Page</h3>
             <p className="text-xs text-blue-700">
               For easy access, bookmark this login page or add it to your home screen. Press Ctrl+D
               (Windows) or Cmd+D (Mac) to bookmark now.
@@ -242,12 +245,12 @@ export default function LoginForm() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
         {/* CSRF Protection */}
         <input type="hidden" name="csrf_token" value={CSRFProtection.getToken()} />
 
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+        <div className="space-y-2 sm:space-y-3">
+          <Label htmlFor="email" className="text-sm sm:text-base font-medium">Email</Label>
           <Input
             id="email"
             type="email"
@@ -259,8 +262,8 @@ export default function LoginForm() {
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
+        <div className="space-y-2 sm:space-y-3">
+          <Label htmlFor="password" className="text-sm sm:text-base font-medium">Password</Label>
           <div className="relative">
             <Input
               id="password"
@@ -275,24 +278,25 @@ export default function LoginForm() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 -m-1"
               disabled={loading}
+              aria-label={showPassword ? "Hide password" : "Show password"}
             >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {showPassword ? <EyeOff className="h-5 w-5 sm:h-4 sm:w-4" /> : <Eye className="h-5 w-5 sm:h-4 sm:w-4" />}
             </button>
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-3 sm:space-x-2 py-1">
           <input
             type="checkbox"
             id="rememberMe"
             checked={rememberMe}
             onChange={e => setRememberMe(e.target.checked)}
-            className="h-4 w-4 rounded border-gray-300"
+            className="h-5 w-5 sm:h-4 sm:w-4 rounded border-gray-300"
             disabled={loading}
           />
-          <Label htmlFor="rememberMe" className="text-sm">
+          <Label htmlFor="rememberMe" className="text-sm sm:text-base cursor-pointer">
             Remember me
           </Label>
         </div>
@@ -301,7 +305,7 @@ export default function LoginForm() {
           <button
             type="button"
             onClick={() => navigate('/auth/reset-password')}
-            className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+            className="text-sm sm:text-base text-blue-600 hover:text-blue-800 hover:underline p-2 -m-2 sm:p-0 sm:m-0"
             disabled={loading}
           >
             Forgot your password?
@@ -309,7 +313,7 @@ export default function LoginForm() {
         </div>
 
         {error && (
-          <div className="p-3 rounded bg-red-50 text-red-600 text-sm flex flex-col gap-2">
+          <div className="p-3 sm:p-4 rounded bg-red-50 text-red-600 text-sm flex flex-col gap-2">
             <div className="flex items-start gap-2">
               <AlertTriangle size={16} className="mt-0.5 flex-shrink-0" />
               <span>{error}</span>
@@ -327,8 +331,8 @@ export default function LoginForm() {
           </div>
         )}
 
-        <div className="flex gap-2">
-          <Button type="submit" disabled={loading} className="flex-1">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-2">
+          <Button type="submit" disabled={loading} className="flex-1 order-1 sm:order-1">
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -344,20 +348,20 @@ export default function LoginForm() {
             variant="outline"
             disabled={loading || !email}
             onClick={handleMagicLinkLogin}
-            className="flex items-center"
+            className="flex items-center justify-center order-2 sm:order-2 w-full sm:w-auto"
           >
             <Mail className="mr-2 h-4 w-4" />
             Magic Link
           </Button>
         </div>
 
-        <div className="text-center pt-4 border-t border-gray-200">
-          <p className="text-sm text-gray-600">
+        <div className="text-center pt-4 sm:pt-6 border-t border-gray-200">
+          <p className="text-sm sm:text-base text-gray-600">
             Don't have an account?{' '}
             <button
               type="button"
               onClick={() => navigate('/signup')}
-              className="text-blue-600 hover:text-blue-800 hover:underline"
+              className="text-blue-600 hover:text-blue-800 hover:underline p-2 -m-2 sm:p-0 sm:m-0"
               disabled={loading}
             >
               Sign up here

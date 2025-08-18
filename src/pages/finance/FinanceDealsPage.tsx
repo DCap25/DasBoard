@@ -324,8 +324,8 @@ const FinanceDealsPage: React.FC = () => {
                       (deal.vehicle.toLowerCase().includes('new')
                         ? 'N'
                         : deal.vehicle.toLowerCase().includes('cpo')
-                        ? 'C'
-                        : 'U');
+                          ? 'C'
+                          : 'U');
 
                     // Get individual product profits - ensure we handle both number and string values
                     const vscProfit =
@@ -376,20 +376,20 @@ const FinanceDealsPage: React.FC = () => {
                       deal.status === 'Complete' || deal.status === 'Funded'
                         ? 'Funded'
                         : deal.status === 'Canceled' || deal.status === 'Unwound'
-                        ? 'Unwound'
-                        : deal.status === 'Dead Deal'
-                        ? 'Dead Deal'
-                        : 'Pending';
+                          ? 'Unwound'
+                          : deal.status === 'Dead Deal'
+                            ? 'Dead Deal'
+                            : 'Pending';
 
                     // Status badge colors
                     const statusColor =
                       status === 'Funded'
                         ? 'bg-green-100 text-green-800 border-green-200'
                         : status === 'Unwound'
-                        ? 'bg-red-100 text-red-800 border-red-200'
-                        : status === 'Dead Deal'
-                        ? 'bg-gray-100 text-gray-800 border-gray-200'
-                        : 'bg-amber-100 text-amber-800 border-amber-200';
+                          ? 'bg-red-100 text-red-800 border-red-200'
+                          : status === 'Dead Deal'
+                            ? 'bg-gray-100 text-gray-800 border-gray-200'
+                            : 'bg-amber-100 text-amber-800 border-amber-200';
 
                     return (
                       <tr
@@ -422,8 +422,8 @@ const FinanceDealsPage: React.FC = () => {
                               vehicleType === 'N'
                                 ? 'bg-blue-100 text-blue-800'
                                 : vehicleType === 'C'
-                                ? 'bg-slate-100 text-slate-800'
-                                : 'bg-slate-100 text-slate-600'
+                                  ? 'bg-slate-100 text-slate-800'
+                                  : 'bg-slate-100 text-slate-600'
                             }`}
                           >
                             {vehicleType}

@@ -13,8 +13,8 @@ import { supabase } from '@/lib/supabaseClient';
 export function DebugPanel() {
   const { user, signOut } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
-  const [lastError, setLastError] = useState<any>(null);
-  const [lastRequest, setLastRequest] = useState<any>(null);
+  const [lastError, setLastError] = useState<Error | null>(null);
+  const [lastRequest, setLastRequest] = useState<{ url: string; method: string; timestamp: string } | null>(null);
 
   // Only render in development mode
   if (process.env.NODE_ENV !== 'development') {

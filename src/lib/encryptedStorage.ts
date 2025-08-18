@@ -8,7 +8,7 @@ import KeyManagement from './keyManagement';
 
 class EncryptedStorage {
   // Dynamic key management - no longer hardcoded
-  
+
   /**
    * Get the current user ID from auth context
    */
@@ -26,7 +26,7 @@ class EncryptedStorage {
       const tokenKey = Object.keys(localStorage).find(
         k => k.startsWith('sb-') && k.endsWith('-auth-token')
       );
-      
+
       if (tokenKey) {
         const tokenData = localStorage.getItem(tokenKey);
         if (tokenData) {
@@ -58,7 +58,7 @@ class EncryptedStorage {
     } catch (error) {
       console.error('[EncryptedStorage] Error in getCurrentUserId:', error);
     }
-    
+
     return undefined;
   }
 
@@ -85,11 +85,11 @@ class EncryptedStorage {
       const key = KeyManagement.getSessionKey(userId);
       const bytes = CryptoJS.AES.decrypt(encryptedData, key);
       const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-      
+
       if (!decrypted) {
         throw new Error('Failed to decrypt data - invalid key or corrupted data');
       }
-      
+
       return decrypted;
     } catch (error) {
       console.error('Decryption error:', error);
@@ -124,7 +124,7 @@ class EncryptedStorage {
     try {
       // Try encrypted version first
       const encryptedData = localStorage.getItem(`enc_${key}`);
-      
+
       if (encryptedData) {
         const decrypted = this.decrypt(encryptedData);
         return JSON.parse(decrypted) as T;
@@ -134,11 +134,11 @@ class EncryptedStorage {
       const unencryptedData = localStorage.getItem(key);
       if (unencryptedData) {
         const parsed = JSON.parse(unencryptedData) as T;
-        
+
         // Migrate to encrypted storage
         this.setItem(key, parsed);
         localStorage.removeItem(key); // Remove unencrypted version
-        
+
         return parsed;
       }
 
@@ -169,14 +169,14 @@ class EncryptedStorage {
    */
   static clearAll(): void {
     const keys: string[] = [];
-    
+
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key && key.startsWith('enc_')) {
         keys.push(key);
       }
     }
-    
+
     keys.forEach(key => localStorage.removeItem(key));
     console.log(`Cleared ${keys.length} encrypted localStorage keys`);
   }
@@ -186,14 +186,14 @@ class EncryptedStorage {
    */
   static getEncryptedKeys(): string[] {
     const keys: string[] = [];
-    
+
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key && key.startsWith('enc_')) {
         keys.push(key.substring(4)); // Remove 'enc_' prefix
       }
     }
-    
+
     return keys;
   }
 }

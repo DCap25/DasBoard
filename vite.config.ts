@@ -1,7 +1,9 @@
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig, loadEnv, type ViteDevServer, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import fs from 'fs';
+import { Buffer } from 'buffer';
+import type { Request, Response, NextFunction } from 'express';
 
 // ================================================================
 // SECURE VITE CONFIGURATION FOR THE DAS BOARD
@@ -158,11 +160,11 @@ function generateCSP(): string {
 }
 
 // Security: Security headers plugin for production
-function securityHeadersPlugin() {
+function securityHeadersPlugin(): Plugin {
   return {
     name: 'security-headers',
-    configureServer(server: any) {
-      server.middlewares.use((_req: any, res: any, next: any) => {
+    configureServer(server: ViteDevServer) {
+      server.middlewares.use((_req: Request, res: Response, next: NextFunction) => {
         // Security headers for development
         res.setHeader('X-Content-Type-Options', 'nosniff');
         res.setHeader('X-Frame-Options', 'DENY');
@@ -172,7 +174,7 @@ function securityHeadersPlugin() {
         next();
       });
     },
-    generateBundle(options: any, bundle: any) {
+    generateBundle(options: unknown, bundle: Record<string, unknown>) {
       // Add security headers meta tags to HTML for production
       for (const fileName in bundle) {
         if (fileName.endsWith('.html')) {

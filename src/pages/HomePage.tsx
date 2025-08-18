@@ -59,7 +59,7 @@ export default function HomePage() {
       description: t('home.pricingTiers.singleFinance.description'),
       popular: false,
       icon: User,
-      features: t('home.pricingTiers.singleFinance.features') as string[]
+      features: t('home.pricingTiers.singleFinance.features') as string[],
     },
     {
       name: t('home.pricingTiers.dealership.name'),
@@ -67,7 +67,7 @@ export default function HomePage() {
       description: t('home.pricingTiers.dealership.description'),
       popular: true,
       icon: Building2,
-      features: t('home.pricingTiers.dealership.features') as string[]
+      features: t('home.pricingTiers.dealership.features') as string[],
     },
   ];
 
@@ -234,7 +234,7 @@ export default function HomePage() {
                       </span>
                     </div>
                   )}
-                  
+
                   <div className="text-center mb-8">
                     <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
                       <IconComponent className="w-8 h-8 text-white" />
@@ -250,7 +250,9 @@ export default function HomePage() {
                       <div className="text-3xl font-bold text-blue-400">{tier.price}</div>
                     </div>
                     {tier.popular && (
-                      <div className="text-sm text-gray-500">{t('home.pricingTiers.priceSubtext')}</div>
+                      <div className="text-sm text-gray-500">
+                        {t('home.pricingTiers.priceSubtext')}
+                      </div>
                     )}
                   </div>
 
@@ -271,12 +273,16 @@ export default function HomePage() {
                         : 'bg-blue-600 hover:bg-blue-500 text-white'
                     }`}
                   >
-                    {tier.popular ? t('home.pricingTiers.dealership.buttonText') : t('home.pricingTiers.singleFinance.buttonText')}
+                    {tier.popular
+                      ? t('home.pricingTiers.dealership.buttonText')
+                      : t('home.pricingTiers.singleFinance.buttonText')}
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </button>
 
                   <div className="mt-4 text-center text-sm text-gray-400">
-                    {tier.popular ? t('home.pricingTiers.dealership.setupTime') : t('home.pricingTiers.singleFinance.setupTime')}
+                    {tier.popular
+                      ? t('home.pricingTiers.dealership.setupTime')
+                      : t('home.pricingTiers.singleFinance.setupTime')}
                   </div>
                 </div>
               );

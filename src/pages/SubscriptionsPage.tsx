@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  User, 
-  Building2, 
+import {
+  ArrowLeft,
+  User,
+  Building2,
   ArrowRight,
   Check,
   Users,
@@ -12,7 +12,7 @@ import {
   X,
   Percent,
   Copy,
-  Mail
+  Mail,
 } from 'lucide-react';
 
 export default function SubscriptionsPage() {
@@ -41,7 +41,7 @@ export default function SubscriptionsPage() {
       setEmailError('Please enter a valid email address');
       return;
     }
-    
+
     setEmailError('');
     setDiscountCodeRevealed(true);
   };
@@ -57,18 +57,18 @@ export default function SubscriptionsPage() {
   };
 
   const handleSingleFinanceManager = () => {
-    navigate('/auth', { 
-      state: { 
-        signupType: 'single_finance_manager' 
-      } 
+    navigate('/auth', {
+      state: {
+        signupType: 'single_finance_manager',
+      },
     });
   };
 
   const handleDealershipGroup = () => {
     navigate('/signup/dealership', {
       state: {
-        signupType: 'dealership_group'
-      }
+        signupType: 'dealership_group',
+      },
     });
   };
 
@@ -124,7 +124,8 @@ export default function SubscriptionsPage() {
             </span>
           </h1>
           <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
-            Select the option that best describes your needs. We'll customize your experience accordingly.
+            Select the option that best describes your needs. We'll customize your experience
+            accordingly.
           </p>
         </div>
       </section>
@@ -133,7 +134,6 @@ export default function SubscriptionsPage() {
       <section className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            
             {/* Single Finance Manager Option */}
             <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 hover:border-blue-500 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/20">
               <div className="text-center mb-8">
@@ -142,7 +142,8 @@ export default function SubscriptionsPage() {
                 </div>
                 <h2 className="text-2xl font-bold text-white mb-4">Single Finance Manager</h2>
                 <p className="text-gray-400 mb-6">
-                  Perfect for individual finance managers who want to track their personal performance and deals.
+                  Perfect for individual finance managers who want to track their personal
+                  performance and deals.
                 </p>
                 <div className="text-3xl font-bold text-blue-400 mb-2">FREE</div>
                 <div className="text-sm text-gray-500">Limited time offer</div>
@@ -194,7 +195,8 @@ export default function SubscriptionsPage() {
                 </div>
                 <h2 className="text-2xl font-bold text-white mb-4">Dealership / Dealer Group</h2>
                 <p className="text-gray-400 mb-6">
-                  Complete dealership management with role-specific dashboards, team management, and multi-location support.
+                  Complete dealership management with role-specific dashboards, team management, and
+                  multi-location support.
                 </p>
                 <div className="text-3xl font-bold text-white mb-2">Starting at $250/mo</div>
                 <div className="text-sm text-gray-500">per dealership</div>
@@ -231,11 +233,8 @@ export default function SubscriptionsPage() {
                 <ArrowRight className="w-5 h-5 ml-2" />
               </button>
 
-              <div className="mt-4 text-center text-sm text-gray-400">
-                Get started today
-              </div>
+              <div className="mt-4 text-center text-sm text-gray-400">Get started today</div>
             </div>
-
           </div>
         </div>
       </section>
@@ -244,7 +243,7 @@ export default function SubscriptionsPage() {
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-800/30">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-white mb-8">Transform Your Dealership Today</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
@@ -255,7 +254,7 @@ export default function SubscriptionsPage() {
                 Real-time insights help teams exceed goals and maximize profitability
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Users className="w-6 h-6 text-white" />
@@ -265,7 +264,7 @@ export default function SubscriptionsPage() {
                 Centralized management reduces admin time and improves efficiency
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Shield className="w-6 h-6 text-white" />
@@ -279,8 +278,9 @@ export default function SubscriptionsPage() {
 
           <div className="mt-12 p-6 bg-gray-800 rounded-lg border border-gray-700">
             <p className="text-gray-300 text-sm">
-              <strong>Not sure which option to choose?</strong> Start with the single finance manager option to try our platform, 
-              then easily upgrade to dealership features when you're ready to expand your team.
+              <strong>Not sure which option to choose?</strong> Start with the single finance
+              manager option to try our platform, then easily upgrade to dealership features when
+              you're ready to expand your team.
             </p>
           </div>
         </div>
@@ -293,7 +293,10 @@ export default function SubscriptionsPage() {
             <p>© 2025 The DAS Board. All rights reserved.</p>
             <p className="mt-2 text-sm">
               Questions? Contact us at{' '}
-              <a href="mailto:support@thedasboard.com" className="text-blue-400 hover:text-blue-300">
+              <a
+                href="mailto:support@thedasboard.com"
+                className="text-blue-400 hover:text-blue-300"
+              >
                 support@thedasboard.com
               </a>
             </p>
@@ -314,17 +317,22 @@ export default function SubscriptionsPage() {
 
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                {discountCodeRevealed ? <Percent className="w-8 h-8 text-white" /> : <Mail className="w-8 h-8 text-white" />}
+                {discountCodeRevealed ? (
+                  <Percent className="w-8 h-8 text-white" />
+                ) : (
+                  <Mail className="w-8 h-8 text-white" />
+                )}
               </div>
 
               <h3 className="text-3xl font-bold text-gray-800 mb-6">
                 {discountCodeRevealed ? 'Your Discount Code!' : 'Special Launch Offer!'}
               </h3>
-              
+
               {!discountCodeRevealed ? (
                 <>
                   <p className="text-lg text-gray-600 mb-6">
-                    Get <span className="text-blue-600 font-bold text-xl">10% off</span> your first 3 months with our dealership management solution.
+                    Get <span className="text-blue-600 font-bold text-xl">10% off</span> your first
+                    3 months with our dealership management solution.
                   </p>
 
                   <div className="mb-6">
@@ -336,7 +344,7 @@ export default function SubscriptionsPage() {
                       <input
                         type="email"
                         value={discountEmail}
-                        onChange={(e) => {
+                        onChange={e => {
                           setDiscountEmail(e.target.value);
                           if (emailError) setEmailError('');
                         }}
@@ -344,12 +352,10 @@ export default function SubscriptionsPage() {
                           emailError ? 'border-red-500' : 'border-blue-200'
                         }`}
                         placeholder="your@email.com"
-                        onKeyPress={(e) => e.key === 'Enter' && handleEmailSubmit()}
+                        onKeyPress={e => e.key === 'Enter' && handleEmailSubmit()}
                       />
                     </div>
-                    {emailError && (
-                      <p className="text-red-500 text-base mt-2">{emailError}</p>
-                    )}
+                    {emailError && <p className="text-red-500 text-base mt-2">{emailError}</p>}
                   </div>
 
                   <div className="flex space-x-3">
@@ -370,13 +376,16 @@ export default function SubscriptionsPage() {
               ) : (
                 <>
                   <p className="text-lg text-gray-600 mb-6">
-                    Thank you! Here's your <span className="text-blue-600 font-bold text-xl">10% off</span> discount code:
+                    Thank you! Here's your{' '}
+                    <span className="text-blue-600 font-bold text-xl">10% off</span> discount code:
                   </p>
 
                   <div className="bg-blue-50 rounded-lg p-6 mb-6 border-2 border-blue-500">
                     <p className="text-base text-gray-600 mb-3">Discount Code:</p>
                     <div className="flex items-center justify-between">
-                      <span className="text-3xl font-bold text-blue-600 tracking-wider">SAVE10</span>
+                      <span className="text-3xl font-bold text-blue-600 tracking-wider">
+                        SAVE10
+                      </span>
                       <button
                         onClick={copyDiscountCode}
                         className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg text-base transition-colors shadow-sm hover:shadow-md"

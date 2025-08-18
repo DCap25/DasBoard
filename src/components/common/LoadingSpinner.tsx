@@ -6,10 +6,10 @@ interface LoadingSpinnerProps {
   style?: CSSProperties;
 }
 
-export default function LoadingSpinner({ 
-  size = 40, 
-  color = '#007bff', 
-  style = {} 
+export default function LoadingSpinner({
+  size = 40,
+  color = '#007bff',
+  style = {},
 }: LoadingSpinnerProps) {
   const spinnerStyle: CSSProperties = {
     border: `4px solid rgba(0, 0, 0, 0.1)`,
@@ -18,7 +18,7 @@ export default function LoadingSpinner({
     width: `${size}px`,
     height: `${size}px`,
     animation: 'spin 1s linear infinite',
-    ...style
+    ...style,
   };
 
   return (
@@ -40,4 +40,4 @@ export default function LoadingSpinner({
       <div style={spinnerStyle}></div>
     </div>
   );
-} 
+}

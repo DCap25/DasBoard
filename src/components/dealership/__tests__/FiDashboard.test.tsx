@@ -65,7 +65,7 @@ describe('FiDashboard Component', () => {
   beforeEach(() => {
     // Reset all mocks before each test
     vi.clearAllMocks();
-    
+
     // Mock the auth context with a logged-in F&I manager
     (useAuth as jest.Mock).mockReturnValue({
       user: { id: 'test-user-id', name: 'Test User' },
@@ -131,7 +131,9 @@ describe('FiDashboard Component', () => {
 
     // Test sorting by total F&I profit
     fireEvent.click(screen.getByText('Total F&I Profit'));
-    expect(supabase.from('deals').order).toHaveBeenCalledWith('total_fi_profit', { ascending: true });
+    expect(supabase.from('deals').order).toHaveBeenCalledWith('total_fi_profit', {
+      ascending: true,
+    });
   });
 
   it('handles data fetching errors', async () => {
@@ -165,9 +167,6 @@ describe('FiDashboard Component', () => {
     );
 
     // Check if subscription was set up
-    expect(supabase.from('deals').subscribe).toHaveBeenCalledWith(
-      '*',
-      expect.any(Function)
-    );
+    expect(supabase.from('deals').subscribe).toHaveBeenCalledWith('*', expect.any(Function));
   });
-}); 
+});

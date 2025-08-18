@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  Building2, 
+import {
+  ArrowLeft,
+  Building2,
   MapPin,
   User,
   Mail,
@@ -14,7 +14,7 @@ import {
   Shield,
   Calculator,
   Eye,
-  EyeOff
+  EyeOff,
 } from 'lucide-react';
 import { useTranslation } from '../contexts/TranslationContext';
 import LanguageSelector from '../components/auth/LanguageSelector';
@@ -32,7 +32,7 @@ export default function DealershipSignup() {
     adminName: '',
     adminEmail: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -86,15 +86,15 @@ export default function DealershipSignup() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (validateForm()) {
       // Navigate to success page or admin dashboard
       navigate('/signup/success', {
         state: {
           organizationName: formData.organizationName,
           planName: 'Dealership Package',
-          setupComplete: true
-        }
+          setupComplete: true,
+        },
       });
     }
   };
@@ -114,7 +114,7 @@ export default function DealershipSignup() {
     'Flexible admin structure',
     'Schedule & goal management',
     'Performance reporting',
-    'Volume discounts available'
+    'Volume discounts available',
   ];
 
   const premiumFeatures = [
@@ -122,7 +122,7 @@ export default function DealershipSignup() {
     'Dedicated account manager',
     '24/7 phone support',
     'Advanced reporting',
-    'API access'
+    'API access',
   ];
 
   return (
@@ -149,15 +149,13 @@ export default function DealershipSignup() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          
           {/* Left Side - Pricing Information */}
           <div>
             <div className="mb-8">
-              <h1 className="text-4xl font-bold text-white mb-4">
-                Dealership Management
-              </h1>
+              <h1 className="text-4xl font-bold text-white mb-4">Dealership Management</h1>
               <p className="text-xl text-gray-300">
-                Complete solution for managing your dealership or dealer group with volume-based pricing.
+                Complete solution for managing your dealership or dealer group with volume-based
+                pricing.
               </p>
             </div>
 
@@ -167,10 +165,10 @@ export default function DealershipSignup() {
                 <Calculator className="w-6 h-6 text-blue-400 mr-3" />
                 <h2 className="text-xl font-bold text-white">Volume-Based Pricing</h2>
               </div>
-              
+
               <div className="space-y-3">
                 {pricingTiers.map((tier, index) => (
-                  <div 
+                  <div
                     key={index}
                     className={`flex justify-between items-center p-3 rounded-lg ${
                       tier.popular ? 'bg-green-600/20 border border-green-500' : 'bg-gray-700/50'
@@ -178,9 +176,7 @@ export default function DealershipSignup() {
                   >
                     <div className="flex items-center">
                       <span className="text-white font-medium">{tier.dealerships} dealerships</span>
-                      {tier.popular && (
-                        <Star className="w-4 h-4 text-blue-400 ml-2" />
-                      )}
+                      {tier.popular && <Star className="w-4 h-4 text-blue-400 ml-2" />}
                     </div>
                     <div className="text-right">
                       <span className="text-xl font-bold text-blue-400">${tier.price}</span>
@@ -189,11 +185,11 @@ export default function DealershipSignup() {
                   </div>
                 ))}
               </div>
-              
+
               <div className="mt-4 p-3 bg-blue-600/20 rounded-lg border border-blue-500">
                 <p className="text-blue-300 text-sm">
-                  <strong>Central Billing Discount:</strong> Pay for multiple dealerships under one account 
-                  and receive volume pricing automatically.
+                  <strong>Central Billing Discount:</strong> Pay for multiple dealerships under one
+                  account and receive volume pricing automatically.
                 </p>
               </div>
             </div>
@@ -241,7 +237,7 @@ export default function DealershipSignup() {
               <div className="absolute top-4 right-4">
                 <LanguageSelector variant="compact" />
               </div>
-              
+
               <div className="text-center mb-8">
                 <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Building2 className="w-8 h-8 text-white" />
@@ -255,8 +251,10 @@ export default function DealershipSignup() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Organization Information */}
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-4">Organization Information</h3>
-                  
+                  <h3 className="text-lg font-semibold text-white mb-4">
+                    Organization Information
+                  </h3>
+
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -311,9 +309,7 @@ export default function DealershipSignup() {
                           }`}
                           placeholder="Anytown"
                         />
-                        {errors.city && (
-                          <p className="text-red-400 text-sm mt-1">{errors.city}</p>
-                        )}
+                        {errors.city && <p className="text-red-400 text-sm mt-1">{errors.city}</p>}
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -358,8 +354,10 @@ export default function DealershipSignup() {
 
                 {/* Admin Contact Information */}
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-4">Admin Contact Information</h3>
-                  
+                  <h3 className="text-lg font-semibold text-white mb-4">
+                    Admin Contact Information
+                  </h3>
+
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -426,7 +424,11 @@ export default function DealershipSignup() {
                           onClick={() => setShowPassword(!showPassword)}
                           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
                         >
-                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          {showPassword ? (
+                            <EyeOff className="w-5 h-5" />
+                          ) : (
+                            <Eye className="w-5 h-5" />
+                          )}
                         </button>
                       </div>
                       {errors.password && (

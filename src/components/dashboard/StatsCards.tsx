@@ -7,7 +7,11 @@ type StatsCardsProps = {
   backEndGross: number;
 };
 
-export const StatsCards: React.FC<StatsCardsProps> = ({ dealsCount, frontEndGross, backEndGross }) => (
+export const StatsCards: React.FC<StatsCardsProps> = ({
+  dealsCount,
+  frontEndGross,
+  backEndGross,
+}) => (
   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
     <Card>
       <CardHeader>
@@ -34,4 +38,4 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ dealsCount, frontEndGros
       </CardContent>
     </Card>
   </div>
-); 
+);

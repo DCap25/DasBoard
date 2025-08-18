@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  Check, 
-  CreditCard, 
-  Building, 
-  Users, 
+import {
+  ArrowLeft,
+  Check,
+  CreditCard,
+  Building,
+  Users,
   Shield,
   AlertCircle,
-  Loader2
+  Loader2,
 } from 'lucide-react';
 
 interface SubscriptionSignupState {
@@ -49,7 +49,7 @@ export default function SubscriptionSignup() {
   const [orgType, setOrgType] = useState<'single' | 'group'>('single');
   const [organizationName, setOrganizationName] = useState('');
   const [dealerships, setDealerships] = useState<DealershipInfo[]>([
-    { name: '', address: '', city: '', state: '', zipCode: '', phone: '' }
+    { name: '', address: '', city: '', state: '', zipCode: '', phone: '' },
   ]);
 
   // Admin info based on structure
@@ -58,7 +58,7 @@ export default function SubscriptionSignup() {
     lastName: '',
     email: '',
     phone: '',
-    title: 'Group Administrator'
+    title: 'Group Administrator',
   });
   const [storeAdmins, setStoreAdmins] = useState<AdminInfo[]>([]);
   const [regionalAdmins, setRegionalAdmins] = useState<AdminInfo[]>([]);
@@ -75,12 +75,12 @@ export default function SubscriptionSignup() {
 
     // Initialize admins based on structure
     if (state.adminStructure === 'distributed') {
-      const admins = dealerships.map((dealership) => ({
+      const admins = dealerships.map(dealership => ({
         firstName: '',
         lastName: '',
         email: '',
         phone: '',
-        title: `${dealership.name || 'Store'} Administrator`
+        title: `${dealership.name || 'Store'} Administrator`,
       }));
       setStoreAdmins(admins);
     } else if (state.adminStructure === 'hybrid') {
@@ -97,9 +97,17 @@ export default function SubscriptionSignup() {
   };
 
   const addDealership = () => {
-    setDealerships([...dealerships, { 
-      name: '', address: '', city: '', state: '', zipCode: '', phone: '' 
-    }]);
+    setDealerships([
+      ...dealerships,
+      {
+        name: '',
+        address: '',
+        city: '',
+        state: '',
+        zipCode: '',
+        phone: '',
+      },
+    ]);
   };
 
   const removeDealership = (index: number) => {
@@ -131,7 +139,7 @@ export default function SubscriptionSignup() {
       if (!organizationName.trim()) {
         newErrors.organizationName = 'Organization name is required';
       }
-      
+
       dealerships.forEach((dealership, index) => {
         if (!dealership.name.trim()) {
           newErrors[`dealership_${index}_name`] = 'Dealership name is required';
@@ -217,7 +225,7 @@ export default function SubscriptionSignup() {
         centralAdmin: state.adminStructure === 'centralized' ? centralAdmin : null,
         storeAdmins: state.adminStructure === 'distributed' ? storeAdmins : [],
         regionalAdmins: state.adminStructure === 'hybrid' ? regionalAdmins : [],
-        paymentMethod
+        paymentMethod,
       };
 
       console.log('Subscription data:', subscriptionData);
@@ -226,14 +234,13 @@ export default function SubscriptionSignup() {
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Redirect to success page or dashboard
-      navigate('/subscription/success', { 
-        state: { 
+      navigate('/subscription/success', {
+        state: {
           planName: `${dealerships.length} Dealership${dealerships.length > 1 ? 's' : ''}`,
           organizationName,
-          setupComplete: true
-        } 
+          setupComplete: true,
+        },
       });
-
     } catch (error) {
       console.error('Subscription creation failed:', error);
       setErrors({ submit: 'Failed to create subscription. Please try again.' });
@@ -282,23 +289,27 @@ export default function SubscriptionSignup() {
                   {[
                     { step: 1, title: 'Organization Details', icon: Building },
                     { step: 2, title: 'Admin Setup', icon: Users },
-                    { step: 3, title: 'Payment & Review', icon: CreditCard }
+                    { step: 3, title: 'Payment & Review', icon: CreditCard },
                   ].map(({ step, title, icon: Icon }) => (
                     <div key={step} className="flex items-center">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${
-                        currentStep >= step 
-                          ? 'bg-blue-600 text-white' 
-                          : 'bg-gray-700 text-gray-400'
-                      }`}>
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${
+                          currentStep >= step
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-700 text-gray-400'
+                        }`}
+                      >
                         {currentStep > step ? (
                           <Check className="w-4 h-4" />
                         ) : (
                           <Icon className="w-4 h-4" />
                         )}
                       </div>
-                      <span className={`text-sm ${
-                        currentStep >= step ? 'text-white' : 'text-gray-400'
-                      }`}>
+                      <span
+                        className={`text-sm ${
+                          currentStep >= step ? 'text-white' : 'text-gray-400'
+                        }`}
+                      >
                         {title}
                       </span>
                     </div>
@@ -321,8 +332,11 @@ export default function SubscriptionSignup() {
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-400">Admin Structure:</span>
                     <span className="text-white">
-                      {state.adminStructure === 'centralized' ? 'Centralized' : 
-                       state.adminStructure === 'distributed' ? 'Store-Level' : 'Hybrid'}
+                      {state.adminStructure === 'centralized'
+                        ? 'Centralized'
+                        : state.adminStructure === 'distributed'
+                          ? 'Store-Level'
+                          : 'Hybrid'}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
@@ -361,16 +375,14 @@ export default function SubscriptionSignup() {
               {currentStep === 1 && (
                 <div>
                   <h2 className="text-2xl font-bold text-white mb-6">Organization Details</h2>
-                  
+
                   {/* Organization Name */}
                   <div className="mb-6">
-                    <label className="block text-white font-medium mb-2">
-                      Organization Name *
-                    </label>
+                    <label className="block text-white font-medium mb-2">Organization Name *</label>
                     <input
                       type="text"
                       value={organizationName}
-                      onChange={(e) => setOrganizationName(e.target.value)}
+                      onChange={e => setOrganizationName(e.target.value)}
                       className={`w-full p-3 bg-gray-700 border rounded-lg text-white ${
                         errors.organizationName ? 'border-red-500' : 'border-gray-600'
                       }`}
@@ -383,9 +395,7 @@ export default function SubscriptionSignup() {
 
                   {/* Organization Type */}
                   <div className="mb-6">
-                    <label className="block text-white font-medium mb-3">
-                      Organization Type
-                    </label>
+                    <label className="block text-white font-medium mb-3">Organization Type</label>
                     <div className="grid grid-cols-2 gap-4">
                       <button
                         onClick={() => setOrgType('single')}
@@ -417,9 +427,7 @@ export default function SubscriptionSignup() {
                   {/* Dealership Information */}
                   <div className="mb-6">
                     <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-lg font-semibold text-white">
-                        Dealership Information
-                      </h3>
+                      <h3 className="text-lg font-semibold text-white">Dealership Information</h3>
                       {orgType === 'group' && (
                         <button
                           onClick={addDealership}
@@ -433,9 +441,7 @@ export default function SubscriptionSignup() {
                     {dealerships.map((dealership, index) => (
                       <div key={index} className="mb-6 p-4 bg-gray-700/50 rounded-lg">
                         <div className="flex justify-between items-center mb-4">
-                          <h4 className="text-white font-medium">
-                            Dealership {index + 1}
-                          </h4>
+                          <h4 className="text-white font-medium">Dealership {index + 1}</h4>
                           {dealerships.length > 1 && (
                             <button
                               onClick={() => removeDealership(index)}
@@ -445,7 +451,7 @@ export default function SubscriptionSignup() {
                             </button>
                           )}
                         </div>
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-gray-300 text-sm mb-1">
@@ -454,100 +460,110 @@ export default function SubscriptionSignup() {
                             <input
                               type="text"
                               value={dealership.name}
-                              onChange={(e) => updateDealership(index, 'name', e.target.value)}
+                              onChange={e => updateDealership(index, 'name', e.target.value)}
                               className={`w-full p-2 bg-gray-700 border rounded text-white text-sm ${
-                                errors[`dealership_${index}_name`] ? 'border-red-500' : 'border-gray-600'
+                                errors[`dealership_${index}_name`]
+                                  ? 'border-red-500'
+                                  : 'border-gray-600'
                               }`}
                               placeholder="Toyota of Downtown"
                             />
                             {errors[`dealership_${index}_name`] && (
-                              <p className="text-red-400 text-xs mt-1">{errors[`dealership_${index}_name`]}</p>
+                              <p className="text-red-400 text-xs mt-1">
+                                {errors[`dealership_${index}_name`]}
+                              </p>
                             )}
                           </div>
-                          
+
                           <div>
-                            <label className="block text-gray-300 text-sm mb-1">
-                              Phone
-                            </label>
+                            <label className="block text-gray-300 text-sm mb-1">Phone</label>
                             <input
                               type="tel"
                               value={dealership.phone}
-                              onChange={(e) => updateDealership(index, 'phone', e.target.value)}
+                              onChange={e => updateDealership(index, 'phone', e.target.value)}
                               className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
                               placeholder="(555) 123-4567"
                             />
                           </div>
-                          
+
                           <div className="md:col-span-2">
-                            <label className="block text-gray-300 text-sm mb-1">
-                              Address *
-                            </label>
+                            <label className="block text-gray-300 text-sm mb-1">Address *</label>
                             <input
                               type="text"
                               value={dealership.address}
-                              onChange={(e) => updateDealership(index, 'address', e.target.value)}
+                              onChange={e => updateDealership(index, 'address', e.target.value)}
                               className={`w-full p-2 bg-gray-700 border rounded text-white text-sm ${
-                                errors[`dealership_${index}_address`] ? 'border-red-500' : 'border-gray-600'
+                                errors[`dealership_${index}_address`]
+                                  ? 'border-red-500'
+                                  : 'border-gray-600'
                               }`}
                               placeholder="123 Main Street"
                             />
                             {errors[`dealership_${index}_address`] && (
-                              <p className="text-red-400 text-xs mt-1">{errors[`dealership_${index}_address`]}</p>
+                              <p className="text-red-400 text-xs mt-1">
+                                {errors[`dealership_${index}_address`]}
+                              </p>
                             )}
                           </div>
-                          
+
                           <div>
-                            <label className="block text-gray-300 text-sm mb-1">
-                              City *
-                            </label>
+                            <label className="block text-gray-300 text-sm mb-1">City *</label>
                             <input
                               type="text"
                               value={dealership.city}
-                              onChange={(e) => updateDealership(index, 'city', e.target.value)}
+                              onChange={e => updateDealership(index, 'city', e.target.value)}
                               className={`w-full p-2 bg-gray-700 border rounded text-white text-sm ${
-                                errors[`dealership_${index}_city`] ? 'border-red-500' : 'border-gray-600'
+                                errors[`dealership_${index}_city`]
+                                  ? 'border-red-500'
+                                  : 'border-gray-600'
                               }`}
                               placeholder="Anytown"
                             />
                             {errors[`dealership_${index}_city`] && (
-                              <p className="text-red-400 text-xs mt-1">{errors[`dealership_${index}_city`]}</p>
+                              <p className="text-red-400 text-xs mt-1">
+                                {errors[`dealership_${index}_city`]}
+                              </p>
                             )}
                           </div>
-                          
+
                           <div className="grid grid-cols-2 gap-2">
                             <div>
-                              <label className="block text-gray-300 text-sm mb-1">
-                                State *
-                              </label>
+                              <label className="block text-gray-300 text-sm mb-1">State *</label>
                               <input
                                 type="text"
                                 value={dealership.state}
-                                onChange={(e) => updateDealership(index, 'state', e.target.value)}
+                                onChange={e => updateDealership(index, 'state', e.target.value)}
                                 className={`w-full p-2 bg-gray-700 border rounded text-white text-sm ${
-                                  errors[`dealership_${index}_state`] ? 'border-red-500' : 'border-gray-600'
+                                  errors[`dealership_${index}_state`]
+                                    ? 'border-red-500'
+                                    : 'border-gray-600'
                                 }`}
                                 placeholder="CA"
                                 maxLength={2}
                               />
                               {errors[`dealership_${index}_state`] && (
-                                <p className="text-red-400 text-xs mt-1">{errors[`dealership_${index}_state`]}</p>
+                                <p className="text-red-400 text-xs mt-1">
+                                  {errors[`dealership_${index}_state`]}
+                                </p>
                               )}
                             </div>
                             <div>
-                              <label className="block text-gray-300 text-sm mb-1">
-                                ZIP *
-                              </label>
+                              <label className="block text-gray-300 text-sm mb-1">ZIP *</label>
                               <input
                                 type="text"
                                 value={dealership.zipCode}
-                                onChange={(e) => updateDealership(index, 'zipCode', e.target.value)}
+                                onChange={e => updateDealership(index, 'zipCode', e.target.value)}
                                 className={`w-full p-2 bg-gray-700 border rounded text-white text-sm ${
-                                  errors[`dealership_${index}_zipCode`] ? 'border-red-500' : 'border-gray-600'
+                                  errors[`dealership_${index}_zipCode`]
+                                    ? 'border-red-500'
+                                    : 'border-gray-600'
                                 }`}
                                 placeholder="12345"
                               />
                               {errors[`dealership_${index}_zipCode`] && (
-                                <p className="text-red-400 text-xs mt-1">{errors[`dealership_${index}_zipCode`]}</p>
+                                <p className="text-red-400 text-xs mt-1">
+                                  {errors[`dealership_${index}_zipCode`]}
+                                </p>
                               )}
                             </div>
                           </div>
@@ -562,36 +578,47 @@ export default function SubscriptionSignup() {
               {currentStep === 2 && (
                 <div>
                   <h2 className="text-2xl font-bold text-white mb-6">Administrator Setup</h2>
-                  
+
                   <div className="mb-6 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
-                    <h3 className="text-sm font-semibold text-blue-400 mb-2">Admin Structure: {
-                      state.adminStructure === 'centralized' ? 'Centralized Admin' :
-                      state.adminStructure === 'distributed' ? 'Store-Level Admins' : 'Hybrid Structure'
-                    }</h3>
+                    <h3 className="text-sm font-semibold text-blue-400 mb-2">
+                      Admin Structure:{' '}
+                      {state.adminStructure === 'centralized'
+                        ? 'Centralized Admin'
+                        : state.adminStructure === 'distributed'
+                          ? 'Store-Level Admins'
+                          : 'Hybrid Structure'}
+                    </h3>
                     <p className="text-xs text-gray-300">
-                      {state.adminStructure === 'centralized' && 'One administrator will manage all dealerships'}
-                      {state.adminStructure === 'distributed' && 'Each dealership will have its own administrator'}
-                      {state.adminStructure === 'hybrid' && 'Mix of central and store-level administrators'}
+                      {state.adminStructure === 'centralized' &&
+                        'One administrator will manage all dealerships'}
+                      {state.adminStructure === 'distributed' &&
+                        'Each dealership will have its own administrator'}
+                      {state.adminStructure === 'hybrid' &&
+                        'Mix of central and store-level administrators'}
                     </p>
                   </div>
 
                   {/* Centralized Admin Form */}
                   {state.adminStructure === 'centralized' && (
                     <div className="p-4 bg-gray-700/50 rounded-lg">
-                      <h3 className="text-lg font-semibold text-white mb-4">Central Administrator</h3>
+                      <h3 className="text-lg font-semibold text-white mb-4">
+                        Central Administrator
+                      </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-gray-300 text-sm mb-1">First Name *</label>
                           <input
                             type="text"
                             value={centralAdmin.firstName}
-                            onChange={(e) => updateCentralAdmin('firstName', e.target.value)}
+                            onChange={e => updateCentralAdmin('firstName', e.target.value)}
                             className={`w-full p-2 bg-gray-700 border rounded text-white text-sm ${
                               errors.centralAdmin_firstName ? 'border-red-500' : 'border-gray-600'
                             }`}
                           />
                           {errors.centralAdmin_firstName && (
-                            <p className="text-red-400 text-xs mt-1">{errors.centralAdmin_firstName}</p>
+                            <p className="text-red-400 text-xs mt-1">
+                              {errors.centralAdmin_firstName}
+                            </p>
                           )}
                         </div>
                         <div>
@@ -599,13 +626,15 @@ export default function SubscriptionSignup() {
                           <input
                             type="text"
                             value={centralAdmin.lastName}
-                            onChange={(e) => updateCentralAdmin('lastName', e.target.value)}
+                            onChange={e => updateCentralAdmin('lastName', e.target.value)}
                             className={`w-full p-2 bg-gray-700 border rounded text-white text-sm ${
                               errors.centralAdmin_lastName ? 'border-red-500' : 'border-gray-600'
                             }`}
                           />
                           {errors.centralAdmin_lastName && (
-                            <p className="text-red-400 text-xs mt-1">{errors.centralAdmin_lastName}</p>
+                            <p className="text-red-400 text-xs mt-1">
+                              {errors.centralAdmin_lastName}
+                            </p>
                           )}
                         </div>
                         <div>
@@ -613,7 +642,7 @@ export default function SubscriptionSignup() {
                           <input
                             type="email"
                             value={centralAdmin.email}
-                            onChange={(e) => updateCentralAdmin('email', e.target.value)}
+                            onChange={e => updateCentralAdmin('email', e.target.value)}
                             className={`w-full p-2 bg-gray-700 border rounded text-white text-sm ${
                               errors.centralAdmin_email ? 'border-red-500' : 'border-gray-600'
                             }`}
@@ -627,7 +656,7 @@ export default function SubscriptionSignup() {
                           <input
                             type="tel"
                             value={centralAdmin.phone}
-                            onChange={(e) => updateCentralAdmin('phone', e.target.value)}
+                            onChange={e => updateCentralAdmin('phone', e.target.value)}
                             className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
                           />
                         </div>
@@ -636,7 +665,7 @@ export default function SubscriptionSignup() {
                           <input
                             type="text"
                             value={centralAdmin.title}
-                            onChange={(e) => updateCentralAdmin('title', e.target.value)}
+                            onChange={e => updateCentralAdmin('title', e.target.value)}
                             className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
                             placeholder="e.g., VP of Operations, Owner"
                           />
@@ -644,8 +673,9 @@ export default function SubscriptionSignup() {
                       </div>
                       <div className="mt-4 p-3 bg-blue-900/20 rounded border border-blue-500/30">
                         <p className="text-xs text-blue-300">
-                          This admin will have full access to manage all {dealerships.length} dealerships, 
-                          including adding/removing users, setting schedules, and configuring pay plans.
+                          This admin will have full access to manage all {dealerships.length}{' '}
+                          dealerships, including adding/removing users, setting schedules, and
+                          configuring pay plans.
                         </p>
                       </div>
                     </div>
@@ -661,31 +691,43 @@ export default function SubscriptionSignup() {
                           </h3>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <label className="block text-gray-300 text-sm mb-1">First Name *</label>
+                              <label className="block text-gray-300 text-sm mb-1">
+                                First Name *
+                              </label>
                               <input
                                 type="text"
                                 value={storeAdmins[index]?.firstName || ''}
-                                onChange={(e) => updateStoreAdmin(index, 'firstName', e.target.value)}
+                                onChange={e => updateStoreAdmin(index, 'firstName', e.target.value)}
                                 className={`w-full p-2 bg-gray-700 border rounded text-white text-sm ${
-                                  errors[`storeAdmin_${index}_firstName`] ? 'border-red-500' : 'border-gray-600'
+                                  errors[`storeAdmin_${index}_firstName`]
+                                    ? 'border-red-500'
+                                    : 'border-gray-600'
                                 }`}
                               />
                               {errors[`storeAdmin_${index}_firstName`] && (
-                                <p className="text-red-400 text-xs mt-1">{errors[`storeAdmin_${index}_firstName`]}</p>
+                                <p className="text-red-400 text-xs mt-1">
+                                  {errors[`storeAdmin_${index}_firstName`]}
+                                </p>
                               )}
                             </div>
                             <div>
-                              <label className="block text-gray-300 text-sm mb-1">Last Name *</label>
+                              <label className="block text-gray-300 text-sm mb-1">
+                                Last Name *
+                              </label>
                               <input
                                 type="text"
                                 value={storeAdmins[index]?.lastName || ''}
-                                onChange={(e) => updateStoreAdmin(index, 'lastName', e.target.value)}
+                                onChange={e => updateStoreAdmin(index, 'lastName', e.target.value)}
                                 className={`w-full p-2 bg-gray-700 border rounded text-white text-sm ${
-                                  errors[`storeAdmin_${index}_lastName`] ? 'border-red-500' : 'border-gray-600'
+                                  errors[`storeAdmin_${index}_lastName`]
+                                    ? 'border-red-500'
+                                    : 'border-gray-600'
                                 }`}
                               />
                               {errors[`storeAdmin_${index}_lastName`] && (
-                                <p className="text-red-400 text-xs mt-1">{errors[`storeAdmin_${index}_lastName`]}</p>
+                                <p className="text-red-400 text-xs mt-1">
+                                  {errors[`storeAdmin_${index}_lastName`]}
+                                </p>
                               )}
                             </div>
                             <div>
@@ -693,13 +735,17 @@ export default function SubscriptionSignup() {
                               <input
                                 type="email"
                                 value={storeAdmins[index]?.email || ''}
-                                onChange={(e) => updateStoreAdmin(index, 'email', e.target.value)}
+                                onChange={e => updateStoreAdmin(index, 'email', e.target.value)}
                                 className={`w-full p-2 bg-gray-700 border rounded text-white text-sm ${
-                                  errors[`storeAdmin_${index}_email`] ? 'border-red-500' : 'border-gray-600'
+                                  errors[`storeAdmin_${index}_email`]
+                                    ? 'border-red-500'
+                                    : 'border-gray-600'
                                 }`}
                               />
                               {errors[`storeAdmin_${index}_email`] && (
-                                <p className="text-red-400 text-xs mt-1">{errors[`storeAdmin_${index}_email`]}</p>
+                                <p className="text-red-400 text-xs mt-1">
+                                  {errors[`storeAdmin_${index}_email`]}
+                                </p>
                               )}
                             </div>
                             <div>
@@ -707,7 +753,7 @@ export default function SubscriptionSignup() {
                               <input
                                 type="tel"
                                 value={storeAdmins[index]?.phone || ''}
-                                onChange={(e) => updateStoreAdmin(index, 'phone', e.target.value)}
+                                onChange={e => updateStoreAdmin(index, 'phone', e.target.value)}
                                 className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
                               />
                             </div>
@@ -722,20 +768,23 @@ export default function SubscriptionSignup() {
                     <div className="space-y-6">
                       <div className="p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-lg">
                         <p className="text-sm text-yellow-300">
-                          For hybrid structures, please contact our team to configure your custom admin hierarchy. 
-                          You can start with a central admin and add store/regional admins later.
+                          For hybrid structures, please contact our team to configure your custom
+                          admin hierarchy. You can start with a central admin and add store/regional
+                          admins later.
                         </p>
                       </div>
-                      
+
                       <div className="p-4 bg-gray-700/50 rounded-lg">
-                        <h3 className="text-lg font-semibold text-white mb-4">Initial Central Administrator</h3>
+                        <h3 className="text-lg font-semibold text-white mb-4">
+                          Initial Central Administrator
+                        </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-gray-300 text-sm mb-1">First Name *</label>
                             <input
                               type="text"
                               value={centralAdmin.firstName}
-                              onChange={(e) => updateCentralAdmin('firstName', e.target.value)}
+                              onChange={e => updateCentralAdmin('firstName', e.target.value)}
                               className={`w-full p-2 bg-gray-700 border rounded text-white text-sm ${
                                 errors.centralAdmin_firstName ? 'border-red-500' : 'border-gray-600'
                               }`}
@@ -746,7 +795,7 @@ export default function SubscriptionSignup() {
                             <input
                               type="text"
                               value={centralAdmin.lastName}
-                              onChange={(e) => updateCentralAdmin('lastName', e.target.value)}
+                              onChange={e => updateCentralAdmin('lastName', e.target.value)}
                               className={`w-full p-2 bg-gray-700 border rounded text-white text-sm ${
                                 errors.centralAdmin_lastName ? 'border-red-500' : 'border-gray-600'
                               }`}
@@ -757,7 +806,7 @@ export default function SubscriptionSignup() {
                             <input
                               type="email"
                               value={centralAdmin.email}
-                              onChange={(e) => updateCentralAdmin('email', e.target.value)}
+                              onChange={e => updateCentralAdmin('email', e.target.value)}
                               className={`w-full p-2 bg-gray-700 border rounded text-white text-sm ${
                                 errors.centralAdmin_email ? 'border-red-500' : 'border-gray-600'
                               }`}
@@ -768,7 +817,7 @@ export default function SubscriptionSignup() {
                             <input
                               type="tel"
                               value={centralAdmin.phone}
-                              onChange={(e) => updateCentralAdmin('phone', e.target.value)}
+                              onChange={e => updateCentralAdmin('phone', e.target.value)}
                               className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
                             />
                           </div>
@@ -783,7 +832,7 @@ export default function SubscriptionSignup() {
               {currentStep === 3 && (
                 <div>
                   <h2 className="text-2xl font-bold text-white mb-6">Payment & Review</h2>
-                  
+
                   {/* Subscription Summary */}
                   <div className="mb-8 p-6 bg-gray-700/50 rounded-lg">
                     <h3 className="text-lg font-semibold text-white mb-4">Subscription Summary</h3>
@@ -803,7 +852,9 @@ export default function SubscriptionSignup() {
                       <div className="flex justify-between">
                         <span className="text-gray-400">Admin Structure:</span>
                         <span className="text-white">
-                          {adminStructure === 'group_admin' ? 'Single Group Admin' : 'Individual Store Admins'}
+                          {adminStructure === 'group_admin'
+                            ? 'Single Group Admin'
+                            : 'Individual Store Admins'}
                         </span>
                       </div>
                       <div className="flex justify-between">
@@ -848,11 +899,12 @@ export default function SubscriptionSignup() {
                           and{' '}
                           <button className="text-blue-400 hover:text-blue-300 underline">
                             Privacy Policy
-                          </button>.
+                          </button>
+                          .
                         </p>
                         <p>
-                          Your subscription will begin immediately with a 14-day free trial. 
-                          You can cancel anytime before the trial ends.
+                          Your subscription will begin immediately with a 14-day free trial. You can
+                          cancel anytime before the trial ends.
                         </p>
                       </div>
                     </div>

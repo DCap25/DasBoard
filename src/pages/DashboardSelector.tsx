@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
+import { getSecureSupabaseClient } from '../lib/supabaseClient';
 
 /**
  * Dashboard Selector - Access to All Dashboards
@@ -123,6 +123,9 @@ const DashboardSelector: React.FC = () => {
     setMessage(`Accessing ${dashboard.name} dashboard...`);
 
     try {
+      // Get Supabase client first
+      const supabase = await getSecureSupabaseClient();
+      
       // 1. Clear existing session and storage
       console.log('[DashboardSelector] Clearing existing session...');
       await supabase.auth.signOut();

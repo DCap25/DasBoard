@@ -18,7 +18,7 @@ export const Dashboard: React.FC = () => {
         const [salesData, metricsData, fniData] = await Promise.all([
           getSales(),
           getMetricsData(),
-          getFniData()
+          getFniData(),
         ]);
 
         setSales(salesData);
@@ -48,7 +48,8 @@ export const Dashboard: React.FC = () => {
           <h1 className="text-3xl font-bold text-white">Dashboard</h1>
           {profile && (
             <p className="text-gray-400">
-              Welcome, {profile.email} | Role: {profile.role} | Dealership ID: {profile.dealership_id}
+              Welcome, {profile.email} | Role: {profile.role} | Dealership ID:{' '}
+              {profile.dealership_id}
             </p>
           )}
         </div>
@@ -73,7 +74,9 @@ export const Dashboard: React.FC = () => {
           <h2 className="text-lg font-semibold mb-2">Metrics</h2>
           {metrics.map((metric, index) => (
             <div key={index}>
-              <p>{metric.type}: {metric.value}</p>
+              <p>
+                {metric.type}: {metric.value}
+              </p>
             </div>
           ))}
         </div>
@@ -82,7 +85,9 @@ export const Dashboard: React.FC = () => {
         <div className="bg-white p-4 rounded shadow">
           <h2 className="text-lg font-semibold mb-2">F&I Details</h2>
           <p>Total Products: {fniDetails.length}</p>
-          <p>Total Amount: ${fniDetails.reduce((sum, detail) => sum + detail.amount, 0).toFixed(2)}</p>
+          <p>
+            Total Amount: ${fniDetails.reduce((sum, detail) => sum + detail.amount, 0).toFixed(2)}
+          </p>
         </div>
       </div>
 
@@ -102,10 +107,10 @@ export const Dashboard: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {sales.slice(0, 5).map((sale) => {
+                {sales.slice(0, 5).map(sale => {
                   const saleFniDetails = fniDetails.filter(fni => fni.sale_id === sale.id);
                   const fniTotal = saleFniDetails.reduce((sum, fni) => sum + fni.amount, 0);
-                  
+
                   return (
                     <tr key={sale.id} className="hover:bg-gray-800">
                       <td className="p-3 border-b border-gray-700">{sale.customer_name}</td>
@@ -113,10 +118,14 @@ export const Dashboard: React.FC = () => {
                       <td className="p-3 border-b border-gray-700">
                         {new Date(sale.sale_date).toLocaleDateString()}
                       </td>
-                      <td className="p-3 border-b border-gray-700">${sale.amount?.toLocaleString()}</td>
                       <td className="p-3 border-b border-gray-700">
-                        ${fniTotal.toLocaleString()} 
-                        <span className="text-xs text-gray-400 ml-1">({saleFniDetails.length} products)</span>
+                        ${sale.amount?.toLocaleString()}
+                      </td>
+                      <td className="p-3 border-b border-gray-700">
+                        ${fniTotal.toLocaleString()}
+                        <span className="text-xs text-gray-400 ml-1">
+                          ({saleFniDetails.length} products)
+                        </span>
                       </td>
                     </tr>
                   );
@@ -128,4 +137,4 @@ export const Dashboard: React.FC = () => {
       )}
     </div>
   );
-}; 
+};

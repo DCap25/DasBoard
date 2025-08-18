@@ -94,7 +94,9 @@ export default function SingleFinanceSignup() {
     const rateLimitCheck = rateLimiter.isLimited('passwordReset', loginData.email);
     if (rateLimitCheck.limited) {
       const minutes = Math.ceil((rateLimitCheck.retryAfterMs || 0) / (1000 * 60));
-      setError(`Too many password reset attempts. Please try again in ${minutes} minute${minutes !== 1 ? 's' : ''}.`);
+      setError(
+        `Too many password reset attempts. Please try again in ${minutes} minute${minutes !== 1 ? 's' : ''}.`
+      );
       return;
     }
 
@@ -116,7 +118,7 @@ export default function SingleFinanceSignup() {
     } catch (err: any) {
       // Record failed attempt
       rateLimiter.recordAttempt('passwordReset', false, loginData.email);
-      
+
       console.error('Password reset error:', err);
       setError(err.message || 'Failed to send password reset email');
     } finally {
@@ -283,11 +285,16 @@ export default function SingleFinanceSignup() {
       let errorMessage = err.message || 'Failed to create account';
 
       // Handle duplicate key constraint violations (user already exists)
-      if (err.code === '23505' || err.message?.includes('duplicate key') || err.message?.includes('unique constraint')) {
+      if (
+        err.code === '23505' ||
+        err.message?.includes('duplicate key') ||
+        err.message?.includes('unique constraint')
+      ) {
         console.log('[SingleFinanceSignup] Duplicate email detected, showing login form');
         setLoginData({ email: formState.email, password: '' });
         setShowExistingUserLogin(true);
-        errorMessage = 'An account with this email already exists. Please login below or reset your password.';
+        errorMessage =
+          'An account with this email already exists. Please login below or reset your password.';
         setLoading(false);
         setError(errorMessage);
         return;
@@ -456,13 +463,15 @@ export default function SingleFinanceSignup() {
         <div className="max-w-lg w-full text-center">
           <CheckCircle2 className="h-24 w-24 text-green-500 mx-auto mb-8" />
           <h1 className="text-4xl font-bold mb-6 text-white">Welcome to The DAS Board!</h1>
-          
+
           <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 mb-8">
-            <h2 className="text-2xl font-semibold text-white mb-4">🎉 Account Created Successfully!</h2>
+            <h2 className="text-2xl font-semibold text-white mb-4">
+              🎉 Account Created Successfully!
+            </h2>
             <p className="text-gray-300 text-lg mb-6">
               Your Single Finance Manager account has been set up and is ready to use.
             </p>
-            
+
             <div className="bg-blue-900/30 border border-blue-500 rounded-lg p-4 mb-6">
               <p className="text-blue-200 text-lg font-medium">
                 Welcome! You will soon be redirected to your Dashboard.
@@ -488,7 +497,8 @@ export default function SingleFinanceSignup() {
             </div>
 
             <p className="text-yellow-200 text-sm">
-              💡 <strong>Tip:</strong> Save your login details and consider changing your password after first login.
+              💡 <strong>Tip:</strong> Save your login details and consider changing your password
+              after first login.
             </p>
           </div>
 

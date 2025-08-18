@@ -34,7 +34,9 @@ export function useProfileCompletionCheck() {
     // Calculate days since signup
     const signupDate = new Date(signupDateStr);
     const currentDate = new Date();
-    const daysDifference = Math.floor((currentDate.getTime() - signupDate.getTime()) / (1000 * 60 * 60 * 24));
+    const daysDifference = Math.floor(
+      (currentDate.getTime() - signupDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
 
     // Show popup if 7 or more days have passed
     if (daysDifference >= DAYS_UNTIL_PROMPT) {

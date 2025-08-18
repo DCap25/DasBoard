@@ -1,6 +1,13 @@
 import React from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
 
 type ScheduleEntry = {
   id: string;
@@ -23,11 +30,18 @@ function ScheduleTable({ schedule }: { schedule: ScheduleEntry[] }) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {schedule.map((s) => (
+        {schedule.map(s => (
           <TableRow key={s.id}>
             <TableCell>{new Date(s.start_time).toLocaleDateString()}</TableCell>
-            <TableCell>{new Date(s.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</TableCell>
-            <TableCell>{new Date(s.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</TableCell>
+            <TableCell>
+              {new Date(s.start_time).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </TableCell>
+            <TableCell>
+              {new Date(s.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -52,4 +66,4 @@ export const ScheduleTabs: React.FC<ScheduleTabsProps> = ({ schedule }) => (
       <ScheduleTable schedule={schedule.slice(0, 31)} />
     </TabsContent>
   </Tabs>
-); 
+);

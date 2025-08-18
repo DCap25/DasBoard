@@ -1,9 +1,9 @@
 /**
  * Secure Environment Configuration Manager
- * 
+ *
  * This module provides secure access to environment variables with
  * validation, sanitization, and type safety for The DAS Board application.
- * 
+ *
  * Security Features:
  * - Environment variable validation and sanitization
  * - Type-safe access to configuration values
@@ -19,20 +19,20 @@ interface AppEnvironment {
   isDevelopment: boolean;
   isProduction: boolean;
   isStaging: boolean;
-  
+
   // Supabase configuration
   supabase: {
     url: string;
     anonKey: string;
     isValid: boolean;
   };
-  
+
   // API configuration
   api: {
     url: string;
     isHttps: boolean;
   };
-  
+
   // Application URLs
   app: {
     url: string;
@@ -40,7 +40,7 @@ interface AppEnvironment {
     baseUrl: string;
     basePath: string;
   };
-  
+
   // Feature flags
   features: {
     debugMode: boolean;
@@ -50,7 +50,7 @@ interface AppEnvironment {
     maintenanceMode: boolean;
     betaFeatures: boolean;
   };
-  
+
   // Build information
   build: {
     version: string;
@@ -63,21 +63,26 @@ const ALLOWED_ENV_VARS = {
   // Required variables
   VITE_SUPABASE_URL: { required: true, type: 'url' as const },
   VITE_SUPABASE_ANON_KEY: { required: true, type: 'string' as const },
-  
+
   // Optional variables with defaults
   VITE_API_URL: { required: false, type: 'url' as const, default: 'http://localhost:3001' },
   VITE_APP_URL: { required: false, type: 'url' as const, default: 'http://localhost:5173' },
   VITE_MARKETING_URL: { required: false, type: 'url' as const, default: 'http://localhost:5173' },
-  VITE_ENVIRONMENT: { required: false, type: 'enum' as const, default: 'development', values: ['development', 'staging', 'production'] },
+  VITE_ENVIRONMENT: {
+    required: false,
+    type: 'enum' as const,
+    default: 'development',
+    values: ['development', 'staging', 'production'],
+  },
   VITE_DEPLOYMENT_VERSION: { required: false, type: 'string' as const, default: '1.0.0' },
   VITE_BASE_PATH: { required: false, type: 'string' as const, default: '/' },
-  
+
   // Feature flags
   VITE_DEBUG_MODE: { required: false, type: 'boolean' as const, default: 'false' },
   VITE_SKIP_EMAIL_VERIFICATION: { required: false, type: 'boolean' as const, default: 'false' },
   VITE_ENABLE_DEVTOOLS: { required: false, type: 'boolean' as const, default: 'true' },
   VITE_RATE_LIMIT_ENABLED: { required: false, type: 'boolean' as const, default: 'true' },
-  VITE_FEATURE_FLAGS: { required: false, type: 'json' as const, default: '{}' }
+  VITE_FEATURE_FLAGS: { required: false, type: 'json' as const, default: '{}' },
 } as const;
 
 type AllowedEnvVar = keyof typeof ALLOWED_ENV_VARS;
@@ -88,23 +93,23 @@ type AllowedEnvVar = keyof typeof ALLOWED_ENV_VARS;
 function validateUrl(url: string, requireHttps: boolean = false): boolean {
   try {
     const urlObj = new URL(url);
-    
+
     // Security: Check for dangerous protocols
     const allowedProtocols = ['http:', 'https:'];
     if (!allowedProtocols.includes(urlObj.protocol)) {
       return false;
     }
-    
+
     // Security: Require HTTPS in production
     if (requireHttps && urlObj.protocol !== 'https:') {
       return false;
     }
-    
+
     // Security: Basic hostname validation
     if (!urlObj.hostname || urlObj.hostname.length === 0) {
       return false;
     }
-    
+
     return true;
   } catch {
     return false;
@@ -118,7 +123,7 @@ function validateSupabaseUrl(url: string): boolean {
   if (!validateUrl(url, true)) {
     return false;
   }
-  
+
   // Security: Validate Supabase URL pattern
   const supabasePattern = /^https:\/\/[a-zA-Z0-9-]+\.supabase\.co$/;
   return supabasePattern.test(url);
@@ -163,58 +168,63 @@ function parseJsonSafely(value: string): Record<string, unknown> {
 function getEnvVar(name: AllowedEnvVar): string | undefined {
   // Security: Only access allowed environment variables
   if (!(name in ALLOWED_ENV_VARS)) {
-    console.error(`[SecureEnvironment] Attempted to access disallowed environment variable: ${name}`);
+    console.error(
+      `[SecureEnvironment] Attempted to access disallowed environment variable: ${name}`
+    );
     return undefined;
   }
-  
+
   return import.meta.env[name];
 }
 
 /**
  * Security: Validate environment variable value
  */
-function validateEnvValue(name: AllowedEnvVar, value: string): { isValid: boolean; sanitizedValue: string; error?: string } {
+function validateEnvValue(
+  name: AllowedEnvVar,
+  value: string
+): { isValid: boolean; sanitizedValue: string; error?: string } {
   const config = ALLOWED_ENV_VARS[name];
-  
+
   switch (config.type) {
     case 'url':
       const isProduction = import.meta.env.VITE_ENVIRONMENT === 'production';
       if (!validateUrl(value, isProduction)) {
-        return { 
-          isValid: false, 
-          sanitizedValue: value, 
-          error: `Invalid URL format${isProduction ? ' (HTTPS required in production)' : ''}` 
+        return {
+          isValid: false,
+          sanitizedValue: value,
+          error: `Invalid URL format${isProduction ? ' (HTTPS required in production)' : ''}`,
         };
       }
-      
+
       // Additional validation for Supabase URL
       if (name === 'VITE_SUPABASE_URL' && !validateSupabaseUrl(value)) {
-        return { 
-          isValid: false, 
-          sanitizedValue: value, 
-          error: 'Invalid Supabase URL format. Expected: https://[project].supabase.co' 
+        return {
+          isValid: false,
+          sanitizedValue: value,
+          error: 'Invalid Supabase URL format. Expected: https://[project].supabase.co',
         };
       }
-      
+
       return { isValid: true, sanitizedValue: value };
-      
+
     case 'enum':
       if ('values' in config && config.values && !config.values.includes(value as never)) {
-        return { 
-          isValid: false, 
-          sanitizedValue: value, 
-          error: `Invalid value. Must be one of: ${config.values.join(', ')}` 
+        return {
+          isValid: false,
+          sanitizedValue: value,
+          error: `Invalid value. Must be one of: ${config.values.join(', ')}`,
         };
       }
       return { isValid: true, sanitizedValue: value };
-      
+
     case 'boolean':
       return { isValid: true, sanitizedValue: value };
-      
+
     case 'json':
       const parsed = parseJsonSafely(value);
       return { isValid: true, sanitizedValue: JSON.stringify(parsed) };
-      
+
     case 'string':
     default:
       return { isValid: true, sanitizedValue: sanitizeString(value) };
@@ -227,14 +237,14 @@ function validateEnvValue(name: AllowedEnvVar, value: string): { isValid: boolea
 function loadEnvironmentConfig(): AppEnvironment {
   const errors: string[] = [];
   const warnings: string[] = [];
-  
+
   // Security: Process each allowed environment variable
   const envValues: Record<string, string> = {};
-  
+
   for (const [name, config] of Object.entries(ALLOWED_ENV_VARS)) {
     const envName = name as AllowedEnvVar;
     let value = getEnvVar(envName);
-    
+
     // Security: Use default if value is missing
     if (!value) {
       if (config.required) {
@@ -245,7 +255,7 @@ function loadEnvironmentConfig(): AppEnvironment {
         warnings.push(`Using default value for ${envName}`);
       }
     }
-    
+
     if (value) {
       // Security: Validate the value
       const validation = validateEnvValue(envName, value);
@@ -253,11 +263,11 @@ function loadEnvironmentConfig(): AppEnvironment {
         errors.push(`Invalid ${envName}: ${validation.error}`);
         continue;
       }
-      
+
       envValues[envName] = validation.sanitizedValue;
     }
   }
-  
+
   // Security: Handle validation errors
   if (errors.length > 0) {
     console.error('[SecureEnvironment] Environment validation errors:', errors);
@@ -265,55 +275,56 @@ function loadEnvironmentConfig(): AppEnvironment {
       throw new Error(`Environment validation failed: ${errors.join(', ')}`);
     }
   }
-  
+
   // Security: Log warnings in development
   if (warnings.length > 0 && envValues.VITE_ENVIRONMENT === 'development') {
     console.warn('[SecureEnvironment] Environment warnings:', warnings);
   }
-  
+
   // Security: Parse feature flags safely
   const featureFlags = parseJsonSafely(envValues.VITE_FEATURE_FLAGS || '{}');
-  
+
   // Security: Build secure configuration object
-  const environment = (envValues.VITE_ENVIRONMENT as AppEnvironment['environment']) || 'development';
-  
+  const environment =
+    (envValues.VITE_ENVIRONMENT as AppEnvironment['environment']) || 'development';
+
   return {
     environment,
     isDevelopment: environment === 'development',
     isProduction: environment === 'production',
     isStaging: environment === 'staging',
-    
+
     supabase: {
       url: envValues.VITE_SUPABASE_URL || '',
       anonKey: envValues.VITE_SUPABASE_ANON_KEY || '',
-      isValid: !!(envValues.VITE_SUPABASE_URL && envValues.VITE_SUPABASE_ANON_KEY)
+      isValid: !!(envValues.VITE_SUPABASE_URL && envValues.VITE_SUPABASE_ANON_KEY),
     },
-    
+
     api: {
       url: envValues.VITE_API_URL || 'http://localhost:3001',
-      isHttps: (envValues.VITE_API_URL || '').startsWith('https://')
+      isHttps: (envValues.VITE_API_URL || '').startsWith('https://'),
     },
-    
+
     app: {
       url: envValues.VITE_APP_URL || 'http://localhost:5173',
       marketingUrl: envValues.VITE_MARKETING_URL || 'http://localhost:5173',
       baseUrl: new URL(envValues.VITE_APP_URL || 'http://localhost:5173').origin,
-      basePath: envValues.VITE_BASE_PATH || '/'
+      basePath: envValues.VITE_BASE_PATH || '/',
     },
-    
+
     features: {
       debugMode: parseBoolean(envValues.VITE_DEBUG_MODE || 'false'),
       skipEmailVerification: parseBoolean(envValues.VITE_SKIP_EMAIL_VERIFICATION || 'false'),
       enableDevtools: parseBoolean(envValues.VITE_ENABLE_DEVTOOLS || 'true'),
       rateLimitEnabled: parseBoolean(envValues.VITE_RATE_LIMIT_ENABLED || 'true'),
       maintenanceMode: parseBoolean(String(featureFlags.maintenance_mode || false)),
-      betaFeatures: parseBoolean(String(featureFlags.beta_features || false))
+      betaFeatures: parseBoolean(String(featureFlags.beta_features || false)),
     },
-    
+
     build: {
       version: envValues.VITE_DEPLOYMENT_VERSION || '1.0.0',
-      timestamp: new Date().toISOString()
-    }
+      timestamp: new Date().toISOString(),
+    },
   };
 }
 
@@ -326,13 +337,15 @@ if (config.isProduction) {
   if (!config.api.isHttps) {
     throw new Error('API URL must use HTTPS in production');
   }
-  
+
   if (config.features.skipEmailVerification) {
     throw new Error('Email verification cannot be skipped in production');
   }
-  
+
   if (config.features.debugMode) {
-    console.warn('[SecureEnvironment] Debug mode is enabled in production - this is not recommended');
+    console.warn(
+      '[SecureEnvironment] Debug mode is enabled in production - this is not recommended'
+    );
   }
 }
 
@@ -362,7 +375,7 @@ export function getApiUrl(path: string = ''): string {
   // Security: Sanitize path
   const sanitizedPath = path.replace(/[<>"']/g, '').replace(/^\/+/, '');
   const baseUrl = config.api.url.replace(/\/+$/, '');
-  
+
   return sanitizedPath ? `${baseUrl}/${sanitizedPath}` : baseUrl;
 }
 
@@ -375,7 +388,7 @@ export function getAppUrl(path: string = ''): string {
   // Security: Sanitize path
   const sanitizedPath = path.replace(/[<>"']/g, '').replace(/^\/+/, '');
   const baseUrl = config.app.url.replace(/\/+$/, '');
-  
+
   return sanitizedPath ? `${baseUrl}/${sanitizedPath}` : baseUrl;
 }
 
@@ -385,37 +398,37 @@ export function getAppUrl(path: string = ''): string {
  */
 export function validateEnvironment(): { isValid: boolean; issues: string[] } {
   const issues: string[] = [];
-  
+
   // Security: Check Supabase configuration
   if (!config.supabase.isValid) {
     issues.push('Supabase configuration is incomplete');
   }
-  
+
   // Security: Check URL protocols in production
   if (config.isProduction) {
     if (!config.api.isHttps) {
       issues.push('API URL must use HTTPS in production');
     }
-    
+
     if (!config.app.url.startsWith('https://')) {
       issues.push('App URL must use HTTPS in production');
     }
   }
-  
+
   // Security: Check for insecure development settings in production
   if (config.isProduction) {
     if (config.features.skipEmailVerification) {
       issues.push('Email verification cannot be skipped in production');
     }
-    
+
     if (config.features.debugMode) {
       issues.push('Debug mode should not be enabled in production');
     }
   }
-  
+
   return {
     isValid: issues.length === 0,
-    issues
+    issues,
   };
 }
 

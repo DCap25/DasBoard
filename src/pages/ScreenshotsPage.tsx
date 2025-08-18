@@ -72,7 +72,8 @@ export default function ScreenshotsPage() {
             Dashboard Screenshots
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Explore our role-specific dashboard solutions designed for every level of your dealership
+            Explore our role-specific dashboard solutions designed for every level of your
+            dealership
           </p>
         </div>
 
@@ -89,7 +90,8 @@ export default function ScreenshotsPage() {
               />
             </div>
             <p className="text-gray-300 mt-4">
-              Comprehensive financial tracking, deal management, and PVR analytics for finance managers.
+              Comprehensive financial tracking, deal management, and PVR analytics for finance
+              managers.
             </p>
           </div>
 
@@ -119,7 +121,8 @@ export default function ScreenshotsPage() {
               />
             </div>
             <p className="text-gray-300 mt-4">
-              Individual performance tracking, deal logging, and personal goal management for sales staff.
+              Individual performance tracking, deal logging, and personal goal management for sales
+              staff.
             </p>
           </div>
 
@@ -155,7 +158,9 @@ export default function ScreenshotsPage() {
 
           {/* Area Vice President Dashboard */}
           <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 transition-all duration-300 hover:scale-[1.01] relative z-0">
-            <h3 className="text-xl font-semibold mb-4 text-blue-400">Area Vice President Dashboard</h3>
+            <h3 className="text-xl font-semibold mb-4 text-blue-400">
+              Area Vice President Dashboard
+            </h3>
             <div className="relative overflow-hidden rounded-lg border border-gray-600">
               <img
                 src="/images/AVP_DASH.JPG"

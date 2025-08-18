@@ -7,8 +7,8 @@ import {
   testSupabaseConnection,
   testSupabaseConnectionHttp,
   quickHasSupabaseSessionToken,
+  getSecureSupabaseClient,
 } from '../lib/supabaseClient';
-import { supabase } from '../lib/supabaseClient';
 import { AlertCircle } from 'lucide-react';
 import AuthDebugButton from '../components/debug/AuthDebugButton';
 import { useTranslation } from '../contexts/TranslationContext';
@@ -54,8 +54,9 @@ const AuthPage: React.FC = () => {
           testSupabaseConnection(),
           testSupabaseConnectionHttp(4000),
         ]);
-        const hasToken = quickHasSupabaseSessionToken();
-        if (!cancelled) setConnectivity({ ok: rpc.success && http.success && hasToken });
+        // Don't require a token for connectivity check on auth page
+        // Users on login/signup page won't have tokens yet
+        if (!cancelled) setConnectivity({ ok: rpc.success && http.success });
       } catch (e) {
         if (!cancelled) setConnectivity({ ok: false, message: 'Connection failed' });
       }
@@ -97,7 +98,12 @@ const AuthPage: React.FC = () => {
       return '/dashboard/sales';
     };
 
-    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+    let subscription: { unsubscribe: () => void } | null = null;
+    
+    const setupAuthListener = async () => {
+      try {
+        const supabase = await getSecureSupabaseClient();
+        const { data } = supabase.auth.onAuthStateChange((event, session) => {
       if (noRedirect || forceLogin) return;
       if (event === 'SIGNED_IN' && session?.user) {
         const metaRole = (session.user.user_metadata as any)?.role as string | undefined;
@@ -125,14 +131,25 @@ const AuthPage: React.FC = () => {
         }
       }
     });
+        subscription = data.subscription;
+      } catch (error) {
+        console.error('[AuthPage] Failed to setup auth listener:', error);
+      }
+    };
+    
+    setupAuthListener();
+    
     // As a safety, if a token already exists, redirect after short delay
     const tokenCheck = setTimeout(() => {
       if (!noRedirect && !forceLogin && quickHasSupabaseSessionToken()) {
         window.location.href = '/dashboard';
       }
     }, 1500);
+    
     return () => {
-      data.subscription.unsubscribe();
+      if (subscription) {
+        subscription.unsubscribe();
+      }
       clearTimeout(tokenCheck);
     };
   }, [noRedirect, forceLogin]);

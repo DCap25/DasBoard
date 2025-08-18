@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 export const EnvTest: React.FC = () => {
-  const [fetchTest, setFetchTest] = useState<any>(null);
+  const [fetchTest, setFetchTest] = useState<{ status: string; data?: unknown; error?: string } | null>(null);
   const [fetchLoading, setFetchLoading] = useState(false);
-  const [supabaseTest, setSupabaseTest] = useState<any>(null);
+  const [supabaseTest, setSupabaseTest] = useState<{ status: string; data?: unknown; error?: string } | null>(null);
   const [supabaseLoading, setSupabaseLoading] = useState(false);
 
   const envVars = {

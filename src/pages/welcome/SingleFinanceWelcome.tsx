@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { 
-  ArrowRight, 
-  FileText, 
-  TrendingUp, 
-  DollarSign, 
+import {
+  ArrowRight,
+  FileText,
+  TrendingUp,
+  DollarSign,
   CheckCircle,
   BarChart3,
   Calculator,
-  Target
+  Target,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent } from '../../components/ui/card';
@@ -20,40 +20,46 @@ export default function SingleFinanceWelcome() {
 
   const handleGetStarted = () => {
     console.log('[SingleFinanceWelcome] Get Started clicked, navigating to dashboard...');
-    
+
     // Mark that this user has seen the welcome page (use a generic key if user.id not available yet)
     const welcomeKey = user?.id ? `welcome_seen_${user.id}` : 'welcome_seen_current_user';
     localStorage.setItem(welcomeKey, 'true');
-    
+
     // Set up direct authentication for single finance manager to bypass auth issues
-    localStorage.setItem('directauth_user', JSON.stringify({
-      email: user?.email || 'finance@demo.com',
-      role: 'single_finance_manager',
-      dealershipId: 1,
-      name: user?.user_metadata?.full_name || 'Finance Manager'
-    }));
+    localStorage.setItem(
+      'directauth_user',
+      JSON.stringify({
+        email: user?.email || 'finance@demo.com',
+        role: 'single_finance_manager',
+        dealershipId: 1,
+        name: user?.user_metadata?.full_name || 'Finance Manager',
+      })
+    );
     localStorage.setItem('directauth_timestamp', Date.now().toString());
-    
+
     // Navigate directly to dashboard - user is already authenticated if they're on welcome page
     navigate('/dashboard/single-finance');
   };
 
   const handleSkipToDashboard = () => {
     console.log('[SingleFinanceWelcome] Skip to Dashboard clicked, navigating to dashboard...');
-    
+
     // Mark that this user has seen the welcome page (use a generic key if user.id not available yet)
     const welcomeKey = user?.id ? `welcome_seen_${user.id}` : 'welcome_seen_current_user';
     localStorage.setItem(welcomeKey, 'true');
-    
+
     // Set up direct authentication for single finance manager to bypass auth issues
-    localStorage.setItem('directauth_user', JSON.stringify({
-      email: user?.email || 'finance@demo.com',
-      role: 'single_finance_manager',
-      dealershipId: 1,
-      name: user?.user_metadata?.full_name || 'Finance Manager'
-    }));
+    localStorage.setItem(
+      'directauth_user',
+      JSON.stringify({
+        email: user?.email || 'finance@demo.com',
+        role: 'single_finance_manager',
+        dealershipId: 1,
+        name: user?.user_metadata?.full_name || 'Finance Manager',
+      })
+    );
     localStorage.setItem('directauth_timestamp', Date.now().toString());
-    
+
     // Navigate directly to dashboard - user is already authenticated if they're on welcome page
     navigate('/dashboard/single-finance');
   };
@@ -62,41 +68,41 @@ export default function SingleFinanceWelcome() {
     {
       icon: FileText,
       title: 'Log Your Deals',
-      description: 'Track every F&I product sale with our streamlined deal logging system'
+      description: 'Track every F&I product sale with our streamlined deal logging system',
     },
     {
       icon: TrendingUp,
       title: 'Monitor Performance',
-      description: 'Real-time metrics on penetration rates, PVR, and product performance'
+      description: 'Real-time metrics on penetration rates, PVR, and product performance',
     },
     {
       icon: DollarSign,
       title: 'Track Earnings',
-      description: 'Automatic commission calculations and monthly pay tracking'
+      description: 'Automatic commission calculations and monthly pay tracking',
     },
     {
       icon: Target,
       title: 'Hit Your Goals',
-      description: 'Visual goal tracking to help you achieve your monthly targets'
-    }
+      description: 'Visual goal tracking to help you achieve your monthly targets',
+    },
   ];
 
   const steps = [
     {
       number: '1',
       title: 'Log Your First Deal',
-      description: 'Click "Log New Deal" to start tracking your F&I performance'
+      description: 'Click "Log New Deal" to start tracking your F&I performance',
     },
     {
       number: '2',
       title: 'Add Product Details',
-      description: 'Enter VSC, GAP, PPM, and other product profits for each deal'
+      description: 'Enter VSC, GAP, PPM, and other product profits for each deal',
     },
     {
       number: '3',
       title: 'Track Your Progress',
-      description: 'Watch your metrics update in real-time as you log deals'
-    }
+      description: 'Watch your metrics update in real-time as you log deals',
+    },
   ];
 
   return (
@@ -124,7 +130,8 @@ export default function SingleFinanceWelcome() {
             Welcome to Your Finance Manager Dashboard!
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            You're all set to start tracking your F&I performance. Let's show you how to get the most out of your new dashboard.
+            You're all set to start tracking your F&I performance. Let's show you how to get the
+            most out of your new dashboard.
           </p>
         </div>
 
@@ -135,9 +142,9 @@ export default function SingleFinanceWelcome() {
               <BarChart3 className="mr-3 h-6 w-6 text-blue-600" />
               Quick Start Guide
             </h2>
-            
+
             <div className="grid md:grid-cols-3 gap-6 mb-8">
-              {steps.map((step) => (
+              {steps.map(step => (
                 <div key={step.number} className="relative">
                   <div className="flex items-start">
                     <div className="flex-shrink-0">
@@ -160,7 +167,8 @@ export default function SingleFinanceWelcome() {
                 Pro Tip: Log Deals Daily
               </h3>
               <p className="text-gray-700">
-                For the most accurate tracking and insights, log your deals as they happen. This ensures your metrics are always up-to-date and helps you spot trends quickly.
+                For the most accurate tracking and insights, log your deals as they happen. This
+                ensures your metrics are always up-to-date and helps you spot trends quickly.
               </p>
             </div>
           </CardContent>
@@ -168,7 +176,7 @@ export default function SingleFinanceWelcome() {
 
         {/* Features Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {features.map((feature) => {
+          {features.map(feature => {
             const IconComponent = feature.icon;
             return (
               <Card key={feature.title} className="bg-white hover:shadow-lg transition-shadow">
@@ -257,7 +265,7 @@ export default function SingleFinanceWelcome() {
         <div className="mt-12 text-center text-sm text-gray-500">
           <p>
             Need help? Check out our{' '}
-            <button 
+            <button
               onClick={() => navigate('/help')}
               className="text-blue-600 hover:text-blue-700 underline"
             >

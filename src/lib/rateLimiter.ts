@@ -11,8 +11,8 @@ interface RateLimitEntry {
 }
 
 interface RateLimitConfig {
-  windowMs: number;        // Time window in milliseconds
-  maxAttempts: number;     // Maximum attempts per window
+  windowMs: number; // Time window in milliseconds
+  maxAttempts: number; // Maximum attempts per window
   blockDurationMs: number; // How long to block after limit exceeded
 }
 
@@ -23,7 +23,7 @@ class RateLimiter {
     signIn: { windowMs: 15 * 60 * 1000, maxAttempts: 5, blockDurationMs: 15 * 60 * 1000 }, // 5 attempts per 15 minutes, block for 15 minutes
     signUp: { windowMs: 10 * 60 * 1000, maxAttempts: 3, blockDurationMs: 30 * 60 * 1000 }, // 3 attempts per 10 minutes, block for 30 minutes
     passwordReset: { windowMs: 5 * 60 * 1000, maxAttempts: 3, blockDurationMs: 10 * 60 * 1000 }, // 3 attempts per 5 minutes, block for 10 minutes
-    
+
     // General endpoints - more lenient
     api: { windowMs: 1 * 60 * 1000, maxAttempts: 30, blockDurationMs: 5 * 60 * 1000 }, // 30 attempts per minute, block for 5 minutes
   };
@@ -40,7 +40,7 @@ class RateLimiter {
    */
   private getClientId(userId?: string): string {
     if (userId) return userId;
-    
+
     // Use session storage to create a persistent client ID for anonymous users
     let clientId = sessionStorage.getItem('client_id');
     if (!clientId) {
@@ -53,7 +53,10 @@ class RateLimiter {
   /**
    * Check if action is rate limited
    */
-  isLimited(action: keyof typeof this.defaultConfigs, userId?: string): {
+  isLimited(
+    action: keyof typeof this.defaultConfigs,
+    userId?: string
+  ): {
     limited: boolean;
     retryAfterMs?: number;
     remainingAttempts?: number;
@@ -62,43 +65,43 @@ class RateLimiter {
     const clientId = this.getClientId(userId);
     const key = this.getKey(action, clientId);
     const now = Date.now();
-    
+
     let entry = this.storage.get(key);
-    
+
     // Clean up expired entries
-    if (entry && (now - entry.firstAttempt) > config.windowMs) {
+    if (entry && now - entry.firstAttempt > config.windowMs) {
       entry = undefined;
       this.storage.delete(key);
     }
-    
+
     // Check if currently blocked
     if (entry?.blockUntil && now < entry.blockUntil) {
       return {
         limited: true,
-        retryAfterMs: entry.blockUntil - now
+        retryAfterMs: entry.blockUntil - now,
       };
     }
-    
+
     // If no entry or block expired, allow the request
     if (!entry || (entry.blockUntil && now >= entry.blockUntil)) {
       return {
         limited: false,
-        remainingAttempts: config.maxAttempts - 1
+        remainingAttempts: config.maxAttempts - 1,
       };
     }
-    
+
     // Check if within rate limit
     if (entry.attempts < config.maxAttempts) {
       return {
         limited: false,
-        remainingAttempts: config.maxAttempts - entry.attempts - 1
+        remainingAttempts: config.maxAttempts - entry.attempts - 1,
       };
     }
-    
+
     // Rate limit exceeded - this shouldn't happen if recordAttempt is called properly
     return {
       limited: true,
-      retryAfterMs: config.blockDurationMs
+      retryAfterMs: config.blockDurationMs,
     };
   }
 
@@ -110,38 +113,38 @@ class RateLimiter {
     const clientId = this.getClientId(userId);
     const key = this.getKey(action, clientId);
     const now = Date.now();
-    
+
     let entry = this.storage.get(key);
-    
+
     // Clean up expired entries
-    if (entry && (now - entry.firstAttempt) > config.windowMs) {
+    if (entry && now - entry.firstAttempt > config.windowMs) {
       entry = undefined;
     }
-    
+
     if (!entry) {
       entry = {
         attempts: 1,
         firstAttempt: now,
-        lastAttempt: now
+        lastAttempt: now,
       };
     } else {
       entry.attempts++;
       entry.lastAttempt = now;
     }
-    
+
     // If this attempt exceeded the limit, set block time
     if (entry.attempts >= config.maxAttempts && !success) {
       entry.blockUntil = now + config.blockDurationMs;
     }
-    
+
     // If successful, reset the counter (for failed login attempts)
     if (success && action === 'signIn') {
       this.storage.delete(key);
       return;
     }
-    
+
     this.storage.set(key, entry);
-    
+
     // Clean up old entries periodically
     this.cleanup();
   }
@@ -154,20 +157,20 @@ class RateLimiter {
     const clientId = this.getClientId(userId);
     const key = this.getKey(action, clientId);
     const entry = this.storage.get(key);
-    
+
     if (!entry) return null;
-    
+
     const now = Date.now();
     const windowEnd = entry.firstAttempt + config.windowMs;
-    
+
     if (entry.blockUntil && now < entry.blockUntil) {
       return entry.blockUntil - now;
     }
-    
+
     if (now < windowEnd) {
       return windowEnd - now;
     }
-    
+
     return null;
   }
 
@@ -177,15 +180,18 @@ class RateLimiter {
   private cleanup(): void {
     const now = Date.now();
     const entriesToDelete: string[] = [];
-    
+
     for (const [key, entry] of this.storage.entries()) {
       // Remove entries that are expired and not blocked
-      if ((!entry.blockUntil || now >= entry.blockUntil) && 
-          (now - entry.firstAttempt) > Math.max(...Object.values(this.defaultConfigs).map(c => c.windowMs))) {
+      if (
+        (!entry.blockUntil || now >= entry.blockUntil) &&
+        now - entry.firstAttempt >
+          Math.max(...Object.values(this.defaultConfigs).map(c => c.windowMs))
+      ) {
         entriesToDelete.push(key);
       }
     }
-    
+
     entriesToDelete.forEach(key => this.storage.delete(key));
   }
 
@@ -199,7 +205,10 @@ class RateLimiter {
   /**
    * Get current rate limit status for debugging
    */
-  getStatus(action: keyof typeof this.defaultConfigs, userId?: string): {
+  getStatus(
+    action: keyof typeof this.defaultConfigs,
+    userId?: string
+  ): {
     attempts: number;
     isBlocked: boolean;
     blockUntilMs?: number;
@@ -210,22 +219,22 @@ class RateLimiter {
     const key = this.getKey(action, clientId);
     const entry = this.storage.get(key);
     const now = Date.now();
-    
+
     if (!entry) {
       return {
         attempts: 0,
         isBlocked: false,
-        remainingAttempts: config.maxAttempts
+        remainingAttempts: config.maxAttempts,
       };
     }
-    
+
     const isBlocked = !!(entry.blockUntil && now < entry.blockUntil);
-    
+
     return {
       attempts: entry.attempts,
       isBlocked,
       blockUntilMs: entry.blockUntil,
-      remainingAttempts: Math.max(0, config.maxAttempts - entry.attempts)
+      remainingAttempts: Math.max(0, config.maxAttempts - entry.attempts),
     };
   }
 }

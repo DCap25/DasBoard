@@ -1596,15 +1596,16 @@ const MasterAdminPage: React.FC = () => {
         dealerGroupDetails[`${dealerKey}_brands`] = storedDealer?.brands
           ? storedDealer.brands.join(', ')
           : Array.isArray(dealership.brands)
-          ? dealership.brands.join(', ')
-          : '';
+            ? dealership.brands.join(', ')
+            : '';
 
         // Calculate individual dealer revenue
         const dealerTier =
           storedDealer?.subscription_tier || dealership.subscription_tier || 'base';
         let dealerCost = 250; // Use single dealership pricing for consistency
 
-        if (dealerTier === 'plus') dealerCost = 350; // Single dealership plus pricing
+        if (dealerTier === 'plus')
+          dealerCost = 350; // Single dealership plus pricing
         else if (dealerTier === 'premium') dealerCost = 750; // Single dealership premium pricing
 
         individualDealerRevenues.push({
@@ -1795,8 +1796,8 @@ const MasterAdminPage: React.FC = () => {
             dealerGroupDetails[`${dealerKey}_brands`] = storedDealer?.brands
               ? storedDealer.brands.join(', ')
               : Array.isArray(selectedDealership.brands)
-              ? selectedDealership.brands.join(', ')
-              : '';
+                ? selectedDealership.brands.join(', ')
+                : '';
           }
         }
 
@@ -1923,8 +1924,8 @@ const MasterAdminPage: React.FC = () => {
             editData.dealership_id === 'none'
               ? null
               : editData.dealership_id
-              ? parseInt(editData.dealership_id)
-              : null,
+                ? parseInt(editData.dealership_id)
+                : null,
         };
 
         console.log('[handleSaveEdit] User update data:', updateData);
@@ -4027,8 +4028,8 @@ const MasterAdminPage: React.FC = () => {
               {viewAllType === 'dealerships'
                 ? 'These are all the single dealerships in the system.'
                 : viewAllType === 'groups'
-                ? 'These are all the dealer groups in the system.'
-                : 'These are all the finance managers in the system.'}
+                  ? 'These are all the dealer groups in the system.'
+                  : 'These are all the finance managers in the system.'}
             </DialogDescription>
           </DialogHeader>
 

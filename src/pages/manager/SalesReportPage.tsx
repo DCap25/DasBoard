@@ -744,20 +744,20 @@ const SalesPerformanceSummary = ({ data }) => {
                       {metric.key === 'lastUpdated'
                         ? 'Various'
                         : metric.format === 'currency' &&
-                          !['avgFront', 'avgBack', 'pvr'].includes(metric.key)
-                        ? formatCurrency(
-                            dealerships.reduce((sum, dealer) => sum + dealer[metric.key], 0)
-                          )
-                        : metric.format === 'number'
-                        ? formatNumber(
-                            dealerships.reduce((sum, dealer) => sum + dealer[metric.key], 0)
-                          )
-                        : ['avgFront', 'avgBack', 'pvr'].includes(metric.key)
-                        ? formatCurrency(
-                            dealerships.reduce((sum, dealer) => sum + dealer[metric.key], 0) /
-                              dealerships.length
-                          )
-                        : '--'}
+                            !['avgFront', 'avgBack', 'pvr'].includes(metric.key)
+                          ? formatCurrency(
+                              dealerships.reduce((sum, dealer) => sum + dealer[metric.key], 0)
+                            )
+                          : metric.format === 'number'
+                            ? formatNumber(
+                                dealerships.reduce((sum, dealer) => sum + dealer[metric.key], 0)
+                              )
+                            : ['avgFront', 'avgBack', 'pvr'].includes(metric.key)
+                              ? formatCurrency(
+                                  dealerships.reduce((sum, dealer) => sum + dealer[metric.key], 0) /
+                                    dealerships.length
+                                )
+                              : '--'}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -954,8 +954,8 @@ const DealerGroupSummary = ({ dealerGroup }) => {
                   dealerGroup.storeType === 'new'
                     ? 'blue'
                     : dealerGroup.storeType === 'used'
-                    ? 'green'
-                    : 'gray'
+                      ? 'green'
+                      : 'gray'
                 }
               />
               <MetricCard
@@ -966,8 +966,8 @@ const DealerGroupSummary = ({ dealerGroup }) => {
                   dealerGroup.storeType === 'new'
                     ? 'blue'
                     : dealerGroup.storeType === 'used'
-                    ? 'green'
-                    : 'gray'
+                      ? 'green'
+                      : 'gray'
                 }
               />
               <MetricCard
@@ -978,8 +978,8 @@ const DealerGroupSummary = ({ dealerGroup }) => {
                   dealerGroup.storeType === 'new'
                     ? 'blue'
                     : dealerGroup.storeType === 'used'
-                    ? 'green'
-                    : 'gray'
+                      ? 'green'
+                      : 'gray'
                 }
               />
               <MetricCard
@@ -990,8 +990,8 @@ const DealerGroupSummary = ({ dealerGroup }) => {
                   dealerGroup.storeType === 'new'
                     ? 'blue'
                     : dealerGroup.storeType === 'used'
-                    ? 'green'
-                    : 'gray'
+                      ? 'green'
+                      : 'gray'
                 }
               />
               <MetricCard
@@ -1002,8 +1002,8 @@ const DealerGroupSummary = ({ dealerGroup }) => {
                   dealerGroup.storeType === 'new'
                     ? 'blue'
                     : dealerGroup.storeType === 'used'
-                    ? 'green'
-                    : 'gray'
+                      ? 'green'
+                      : 'gray'
                 }
               />
             </div>

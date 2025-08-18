@@ -164,7 +164,7 @@ export default function SingleFinanceSettings() {
       console.log('[Settings] Immediate verification - retrieved team members:', {
         saved: members.length,
         retrieved: verificationData.length,
-        match: members.length === verificationData.length
+        match: members.length === verificationData.length,
       });
 
       // Update component state only after successful save verification
@@ -174,18 +174,18 @@ export default function SingleFinanceSettings() {
         // Enhanced event dispatch with retry mechanism
         const dispatchEvent = () => {
           const event = new CustomEvent('teamMembersUpdated', {
-            detail: { 
-              teamMembers: members, 
+            detail: {
+              teamMembers: members,
               userId: userId,
               timestamp: new Date().toISOString(),
-              source: 'SingleFinanceSettings'
+              source: 'SingleFinanceSettings',
             },
           });
           window.dispatchEvent(event);
           console.log('[Settings] teamMembersUpdated event dispatched:', {
             memberCount: members.length,
             userId,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         };
 
@@ -195,8 +195,12 @@ export default function SingleFinanceSettings() {
         // Also dispatch after a small delay to catch any late listeners
         setTimeout(dispatchEvent, 100);
 
-        console.log('[Settings] Team members saved and verified successfully:', members.length, 'members');
-        
+        console.log(
+          '[Settings] Team members saved and verified successfully:',
+          members.length,
+          'members'
+        );
+
         toast({
           title: 'Success',
           description: `Team members updated successfully (${members.length} total)`,
@@ -299,7 +303,10 @@ export default function SingleFinanceSettings() {
     console.log('[Settings] Team member added successfully:', member);
     toast({
       title: t('common.success'),
-      description: t('dashboard.settings.memberAdded', { firstName: member.firstName, lastName: member.lastName }),
+      description: t('dashboard.settings.memberAdded', {
+        firstName: member.firstName,
+        lastName: member.lastName,
+      }),
     });
   };
 
@@ -308,7 +315,10 @@ export default function SingleFinanceSettings() {
     const member = teamMembers.find(m => m.id === memberId);
     if (
       confirm(
-        t('dashboard.settings.confirmRemove', { firstName: member?.firstName, lastName: member?.lastName })
+        t('dashboard.settings.confirmRemove', {
+          firstName: member?.firstName,
+          lastName: member?.lastName,
+        })
       )
     ) {
       const updatedMembers = teamMembers.filter(m => m.id !== memberId);
@@ -344,7 +354,8 @@ export default function SingleFinanceSettings() {
 
       <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-blue-800 text-sm">
-          <strong>{t('dashboard.settings.note.title')}:</strong> {t('dashboard.settings.note.description')}
+          <strong>{t('dashboard.settings.note.title')}:</strong>{' '}
+          {t('dashboard.settings.note.description')}
         </p>
       </div>
 
@@ -438,7 +449,9 @@ export default function SingleFinanceSettings() {
                     className="w-full p-2 border rounded-md"
                   >
                     <option value="salesperson">{t('dashboard.settings.roles.salesperson')}</option>
-                    <option value="sales_manager">{t('dashboard.settings.roles.salesManager')}</option>
+                    <option value="sales_manager">
+                      {t('dashboard.settings.roles.salesManager')}
+                    </option>
                   </select>
                 </div>
                 <Button onClick={handleAddTeamMember} className="bg-green-500 hover:bg-green-600">
@@ -493,7 +506,9 @@ export default function SingleFinanceSettings() {
                                 <p className="font-medium">
                                   {member.firstName} {member.lastName}
                                 </p>
-                                <p className="text-sm text-blue-600">{t('dashboard.settings.roles.salesperson')}</p>
+                                <p className="text-sm text-blue-600">
+                                  {t('dashboard.settings.roles.salesperson')}
+                                </p>
                               </div>
                             </div>
                             <div className="flex items-center space-x-2">
@@ -505,7 +520,9 @@ export default function SingleFinanceSettings() {
                                     : 'bg-gray-100 text-gray-600'
                                 }`}
                               >
-                                {member.active ? t('dashboard.settings.active') : t('dashboard.settings.inactive')}
+                                {member.active
+                                  ? t('dashboard.settings.active')
+                                  : t('dashboard.settings.inactive')}
                               </button>
                               <Button
                                 onClick={() => handleRemoveTeamMember(member.id)}
@@ -549,7 +566,9 @@ export default function SingleFinanceSettings() {
                                 <p className="font-medium">
                                   {member.firstName} {member.lastName}
                                 </p>
-                                <p className="text-sm text-purple-600">{t('dashboard.settings.roles.salesManager')}</p>
+                                <p className="text-sm text-purple-600">
+                                  {t('dashboard.settings.roles.salesManager')}
+                                </p>
                               </div>
                             </div>
                             <div className="flex items-center space-x-2">
@@ -561,7 +580,9 @@ export default function SingleFinanceSettings() {
                                     : 'bg-gray-100 text-gray-600'
                                 }`}
                               >
-                                {member.active ? t('dashboard.settings.active') : t('dashboard.settings.inactive')}
+                                {member.active
+                                  ? t('dashboard.settings.active')
+                                  : t('dashboard.settings.inactive')}
                               </button>
                               <Button
                                 onClick={() => handleRemoveTeamMember(member.id)}
@@ -610,7 +631,9 @@ export default function SingleFinanceSettings() {
                       }))
                     }
                   />
-                  <p className="text-xs text-gray-600">{t('dashboard.settings.commissionRateDescription')}</p>
+                  <p className="text-xs text-gray-600">
+                    {t('dashboard.settings.commissionRateDescription')}
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="baseRate">{t('dashboard.settings.baseRate')}</Label>
@@ -627,7 +650,9 @@ export default function SingleFinanceSettings() {
                       }))
                     }
                   />
-                  <p className="text-xs text-gray-600">{t('dashboard.settings.baseRateDescription')}</p>
+                  <p className="text-xs text-gray-600">
+                    {t('dashboard.settings.baseRateDescription')}
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -714,7 +739,9 @@ export default function SingleFinanceSettings() {
                       }))
                     }
                   />
-                  <p className="text-xs text-gray-600">{t('dashboard.settings.totalThresholdDescription')}</p>
+                  <p className="text-xs text-gray-600">
+                    {t('dashboard.settings.totalThresholdDescription')}
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -758,7 +785,7 @@ export default function SingleFinanceSettings() {
                     {language === 'gr' && 'Ελληνικά'}
                   </p>
                 </div>
-                
+
                 <div>
                   <Label htmlFor="languageSelector">{t('dashboard.settings.selectLanguage')}</Label>
                   <div className="mt-2">
@@ -767,9 +794,7 @@ export default function SingleFinanceSettings() {
                 </div>
 
                 <div className="pt-4 border-t">
-                  <p className="text-sm text-gray-500">
-                    {t('dashboard.settings.languageUpdated')}
-                  </p>
+                  <p className="text-sm text-gray-500">{t('dashboard.settings.languageUpdated')}</p>
                 </div>
               </div>
             </CardContent>

@@ -44,14 +44,14 @@ export default function SubscriptionPage() {
 
             <div className="space-y-8 text-gray-300">
               <section>
-                <p>
-                  {t('legal.subscription.intro')}
-                </p>
+                <p>{t('legal.subscription.intro')}</p>
               </section>
 
               {/* Subscription Plans */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.subscription.sections.plans.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.subscription.sections.plans.title')}
+                </h2>
                 <p className="mb-4">{t('legal.subscription.sections.plans.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
                   {(t('legal.subscription.sections.plans.items') as string[]).map((item, index) => (
@@ -63,30 +63,40 @@ export default function SubscriptionPage() {
 
               {/* Payment Terms */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.subscription.sections.payment.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.subscription.sections.payment.title')}
+                </h2>
                 <p>{t('legal.subscription.sections.payment.content')}</p>
               </section>
 
               {/* Trial Period */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.subscription.sections.trial.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.subscription.sections.trial.title')}
+                </h2>
                 <p>{t('legal.subscription.sections.trial.content')}</p>
               </section>
 
               {/* Cancellation */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.subscription.sections.cancellation.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.subscription.sections.cancellation.title')}
+                </h2>
                 <p className="mb-4">{t('legal.subscription.sections.cancellation.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
-                  {(t('legal.subscription.sections.cancellation.items') as string[]).map((item, index) => (
-                    <li key={index}>{item}</li>
-                  ))}
+                  {(t('legal.subscription.sections.cancellation.items') as string[]).map(
+                    (item, index) => (
+                      <li key={index}>{item}</li>
+                    )
+                  )}
                 </ul>
               </section>
 
               {/* Service Level Agreement */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.subscription.sections.sla.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.subscription.sections.sla.title')}
+                </h2>
                 <p className="mb-4">{t('legal.subscription.sections.sla.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
                   {(t('legal.subscription.sections.sla.items') as string[]).map((item, index) => (
@@ -97,7 +107,9 @@ export default function SubscriptionPage() {
 
               {/* Data and Security */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.subscription.sections.data.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.subscription.sections.data.title')}
+                </h2>
                 <p className="mb-4">{t('legal.subscription.sections.data.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
                   {(t('legal.subscription.sections.data.items') as string[]).map((item, index) => (
@@ -108,18 +120,24 @@ export default function SubscriptionPage() {
 
               {/* Support and Training */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.subscription.sections.support.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.subscription.sections.support.title')}
+                </h2>
                 <p className="mb-4">{t('legal.subscription.sections.support.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
-                  {(t('legal.subscription.sections.support.items') as string[]).map((item, index) => (
-                    <li key={index}>{item}</li>
-                  ))}
+                  {(t('legal.subscription.sections.support.items') as string[]).map(
+                    (item, index) => (
+                      <li key={index}>{item}</li>
+                    )
+                  )}
                 </ul>
               </section>
 
               {/* Modifications */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.subscription.sections.modifications.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.subscription.sections.modifications.title')}
+                </h2>
                 <p>{t('legal.subscription.sections.modifications.content')}</p>
               </section>
             </div>

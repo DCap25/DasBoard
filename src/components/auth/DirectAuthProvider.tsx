@@ -55,8 +55,8 @@ const DirectAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       '/dashboard-selector',
       '/deal-log',
       '/finance-deal-log',
-      '/single-finance-deal-log',
       '/finance-manager/log-deal',
+      '/single-finance-deal-log',
     ];
     if (excludedPaths.includes(location.pathname)) {
       console.log(`[DirectAuthProvider] Skipping redirect for excluded path: ${location.pathname}`);
@@ -95,7 +95,8 @@ const DirectAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             location.pathname === '/master-admin' ||
             location.pathname === '/group-admin' ||
             location.pathname === '/avp-full-dashboard' ||
-            location.pathname === '/deal-log'
+            location.pathname === '/deal-log' ||
+            location.pathname.startsWith('/single-finance-deal-log')
           ) {
             console.log('[DirectAuthProvider] Allowing access to path:', location.pathname);
             setChecking(false);

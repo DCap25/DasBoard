@@ -18,7 +18,7 @@ class StorageMigration {
     'singleFinanceTeamMembers',
     'singleFinancePayConfig',
     'singleFinancePayPrivacy',
-    'singleFinanceLastResetMonth'
+    'singleFinanceLastResetMonth',
   ];
 
   /**
@@ -28,7 +28,7 @@ class StorageMigration {
     const result: MigrationResult = {
       success: true,
       migratedKeys: [],
-      errors: []
+      errors: [],
     };
 
     // Get all localStorage keys
@@ -40,8 +40,8 @@ class StorageMigration {
 
     // Filter for sensitive keys (including user-specific ones)
     const sensitiveKeys = allKeys.filter(key => {
-      return this.SENSITIVE_KEYS.some(sensitiveKey => 
-        key.includes(sensitiveKey) && !key.startsWith('enc_')
+      return this.SENSITIVE_KEYS.some(
+        sensitiveKey => key.includes(sensitiveKey) && !key.startsWith('enc_')
       );
     });
 
@@ -57,7 +57,7 @@ class StorageMigration {
         const errorMsg = `Failed to migrate ${key}: ${error instanceof Error ? error.message : 'Unknown error'}`;
         result.errors.push(errorMsg);
         console.error(`✗ ${errorMsg}`);
-        
+
         // Don't mark the entire migration as failed for individual key failures
         // This allows the migration to continue with other keys
       }
@@ -68,7 +68,9 @@ class StorageMigration {
       result.success = false;
     }
 
-    console.log(`Migration complete. Migrated: ${result.migratedKeys.length}, Errors: ${result.errors.length}`);
+    console.log(
+      `Migration complete. Migrated: ${result.migratedKeys.length}, Errors: ${result.errors.length}`
+    );
     return result;
   }
 
@@ -77,7 +79,7 @@ class StorageMigration {
    */
   private static async migrateKey(key: string): Promise<void> {
     const unencryptedData = localStorage.getItem(key);
-    
+
     if (!unencryptedData) return;
 
     try {
@@ -96,25 +98,25 @@ class StorageMigration {
         localStorage.removeItem(key); // Remove unparseable data
         return;
       }
-      
+
       // Validate the parsed data structure
       if (!this.isValidMigrationData(parsedData)) {
         console.warn(`Skipping migration for ${key}: invalid data structure`);
         localStorage.removeItem(key); // Remove invalid data
         return;
       }
-      
+
       // Store it encrypted (this will create enc_${key})
       await EncryptedStorage.setItem(key, parsedData);
-      
+
       // Remove the unencrypted version
       localStorage.removeItem(key);
-      
+
       console.log(`Successfully migrated key: ${key}`);
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Unknown error';
       console.error(`Migration failed for ${key}: ${errorMsg}`);
-      
+
       // Don't throw - continue with other keys
       // Instead, mark this key for cleanup
       try {
@@ -136,10 +138,16 @@ class StorageMigration {
 
     // Security: Check for potential injection patterns
     const dangerousPatterns = [
-      '<script', 'javascript:', 'data:text/html', 'vbscript:',
-      'on[a-z]+\\s*=', '\\.constructor', '__proto__', 'eval\\s*\\('
+      '<script',
+      'javascript:',
+      'data:text/html',
+      'vbscript:',
+      'on[a-z]+\\s*=',
+      '\\.constructor',
+      '__proto__',
+      'eval\\s*\\(',
     ];
-    
+
     const lowerData = data.toLowerCase();
     for (const pattern of dangerousPatterns) {
       if (new RegExp(pattern, 'i').test(lowerData)) {
@@ -150,21 +158,21 @@ class StorageMigration {
 
     // Fix common JSON formatting issues
     let sanitized = data.trim();
-    
+
     // Remove BOM if present
-    if (sanitized.charCodeAt(0) === 0xFEFF) {
+    if (sanitized.charCodeAt(0) === 0xfeff) {
       sanitized = sanitized.slice(1);
     }
-    
+
     // Remove null characters
     sanitized = sanitized.replace(/\0/g, '');
-    
+
     // Fix escaped quotes issues
     sanitized = sanitized.replace(/\\"/g, '"');
-    
+
     // Remove control characters except newlines and tabs
     sanitized = sanitized.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
-    
+
     return sanitized;
   }
 
@@ -198,13 +206,13 @@ class StorageMigration {
     // Strategy 4: Try to fix common JSON issues
     try {
       let fixed = data;
-      
+
       // Fix trailing commas
       fixed = fixed.replace(/,(\s*[}\]])/g, '$1');
-      
+
       // Fix single quotes
       fixed = fixed.replace(/'/g, '"');
-      
+
       // Try parsing the fixed version
       return JSON.parse(fixed);
     } catch (error) {
@@ -243,20 +251,20 @@ class StorageMigration {
       try {
         // Security: Ensure we can stringify it (prevents circular references)
         JSON.stringify(data);
-        
+
         // Check for suspicious properties
         if (Array.isArray(data)) {
           return data.every(item => this.isValidMigrationData(item));
         } else {
           const obj = data as Record<string, unknown>;
           const suspiciousKeys = ['__proto__', 'constructor', 'prototype'];
-          
+
           for (const key of Object.keys(obj)) {
             if (suspiciousKeys.includes(key.toLowerCase())) {
               return false;
             }
           }
-          
+
           return Object.values(obj).every(value => this.isValidMigrationData(value));
         }
       } catch (error) {
@@ -279,8 +287,8 @@ class StorageMigration {
 
     // Check for any unencrypted sensitive keys
     return allKeys.some(key => {
-      return this.SENSITIVE_KEYS.some(sensitiveKey => 
-        key.includes(sensitiveKey) && !key.startsWith('enc_')
+      return this.SENSITIVE_KEYS.some(
+        sensitiveKey => key.includes(sensitiveKey) && !key.startsWith('enc_')
       );
     });
   }
@@ -300,8 +308,8 @@ class StorageMigration {
     }
 
     const unencryptedKeys = allKeys.filter(key => {
-      return this.SENSITIVE_KEYS.some(sensitiveKey => 
-        key.includes(sensitiveKey) && !key.startsWith('enc_')
+      return this.SENSITIVE_KEYS.some(
+        sensitiveKey => key.includes(sensitiveKey) && !key.startsWith('enc_')
       );
     });
 
@@ -310,7 +318,7 @@ class StorageMigration {
     return {
       needsMigration: unencryptedKeys.length > 0,
       unencryptedKeys,
-      encryptedKeys
+      encryptedKeys,
     };
   }
 
@@ -325,13 +333,13 @@ class StorageMigration {
     }
 
     const keysToRemove = allKeys.filter(key => {
-      return this.SENSITIVE_KEYS.some(sensitiveKey => 
-        key.includes(sensitiveKey) && !key.startsWith('enc_')
+      return this.SENSITIVE_KEYS.some(
+        sensitiveKey => key.includes(sensitiveKey) && !key.startsWith('enc_')
       );
     });
 
     keysToRemove.forEach(key => localStorage.removeItem(key));
-    
+
     console.log(`Cleared ${keysToRemove.length} unencrypted sensitive keys`);
     return keysToRemove.length;
   }
@@ -351,9 +359,9 @@ class StorageMigration {
       if (storageKey) allKeys.push(storageKey);
     }
 
-    const keysToInspect = key ? [key] : allKeys.filter(k => 
-      this.SENSITIVE_KEYS.some(sensitiveKey => k.includes(sensitiveKey))
-    );
+    const keysToInspect = key
+      ? [key]
+      : allKeys.filter(k => this.SENSITIVE_KEYS.some(sensitiveKey => k.includes(sensitiveKey)));
 
     console.log(`Inspecting ${keysToInspect.length} storage keys:`, keysToInspect);
 
@@ -368,7 +376,7 @@ class StorageMigration {
       console.log('Raw data length:', rawData.length);
       console.log('First 100 chars:', rawData.substring(0, 100));
       console.log('Last 50 chars:', rawData.substring(Math.max(0, rawData.length - 50)));
-      
+
       // Show character codes for the first few characters to identify issues
       const firstChars = rawData.substring(0, 10);
       const charCodes = Array.from(firstChars).map(char => `'${char}'(${char.charCodeAt(0)})`);
@@ -377,17 +385,17 @@ class StorageMigration {
       // Test sanitization
       const sanitized = this.sanitizeStorageData(rawData);
       console.log('Sanitization result:', sanitized ? 'OK' : 'FAILED');
-      
+
       if (sanitized) {
         const parsed = this.parseWithFallback(sanitized);
         console.log('Parse result:', parsed !== null ? 'OK' : 'FAILED');
-        
+
         if (parsed !== null) {
           const isValid = this.isValidMigrationData(parsed);
           console.log('Validation result:', isValid ? 'OK' : 'FAILED');
         }
       }
-      
+
       console.groupEnd();
     });
   }
@@ -397,7 +405,7 @@ class StorageMigration {
    */
   static async forceCleanMigration(): Promise<MigrationResult> {
     console.log('Starting force clean migration...');
-    
+
     // First, get a list of all problematic keys
     const allKeys: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
@@ -406,8 +414,8 @@ class StorageMigration {
     }
 
     const sensitiveKeys = allKeys.filter(key => {
-      return this.SENSITIVE_KEYS.some(sensitiveKey => 
-        key.includes(sensitiveKey) && !key.startsWith('enc_')
+      return this.SENSITIVE_KEYS.some(
+        sensitiveKey => key.includes(sensitiveKey) && !key.startsWith('enc_')
       );
     });
 
@@ -435,7 +443,7 @@ class StorageMigration {
     }
 
     console.log(`Found ${validKeys.length} valid keys and ${invalidKeys.length} invalid keys`);
-    
+
     // Remove invalid keys
     invalidKeys.forEach(key => {
       localStorage.removeItem(key);

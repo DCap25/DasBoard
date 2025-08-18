@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { useToast } from '../../lib/use-toast';
 import { useSupabaseQuery } from '../../hooks/use-supabase-query';
@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import {
   Dialog,
   DialogContent,
@@ -42,7 +42,6 @@ import {
   TableHeader,
   TableRow,
 } from '../../components/ui/table';
-import { Alert, AlertDescription } from '../../components/ui/alert';
 import { Badge } from '../../components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import {
@@ -52,13 +51,11 @@ import {
   Edit,
   Trash2,
   Save,
-  AlertTriangle,
   Users,
 } from 'lucide-react';
 import {
   format,
   parseISO,
-  addDays,
   startOfWeek,
   endOfWeek,
   eachDayOfInterval,
@@ -158,7 +155,6 @@ export function ScheduleEditor() {
   const {
     data: schedules = [],
     isLoading: isSchedulesLoading,
-    refetch: refetchSchedules,
   } = useSupabaseQuery<Schedule[]>(
     ['schedules', formattedStartDate, formattedEndDate],
     async () => {
@@ -252,7 +248,7 @@ export function ScheduleEditor() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editMode === 'create') {
-      const { id, ...createData } = formData;
+      const { ...createData } = formData;
       createScheduleMutation.mutate(createData);
     } else {
       updateScheduleMutation.mutate(formData);
@@ -341,9 +337,9 @@ export function ScheduleEditor() {
   const isLoading = isSalesPeopleLoading || isSchedulesLoading;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <Card>
-        <CardHeader>
+        <CardHeader className="px-3 sm:px-6">
           <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
             <div>
               <CardTitle>Schedule Management</CardTitle>
@@ -352,7 +348,7 @@ export function ScheduleEditor() {
 
             <div className="flex flex-col sm:flex-row gap-3">
               <Tabs value={viewMode} onValueChange={(v: 'day' | 'week') => setViewMode(v)}>
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-2 h-10 sm:h-9">
                   <TabsTrigger value="day">Day View</TabsTrigger>
                   <TabsTrigger value="week">Week View</TabsTrigger>
                 </TabsList>
@@ -362,7 +358,7 @@ export function ScheduleEditor() {
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-[240px] justify-start text-left font-normal"
+                    className="w-full sm:w-[240px] justify-start text-left font-normal"
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {format(selectedDate, 'PPP')}
@@ -575,7 +571,7 @@ export function ScheduleEditor() {
           </div>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="px-3 sm:px-6">
           {isLoading ? (
             <div className="h-[400px] w-full flex items-center justify-center">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -611,22 +607,32 @@ export function ScheduleEditor() {
                       </Button>
                     </div>
                   ) : (
-                    <Table>
+                    <Table className="min-w-[640px]">
+                      {' '}
+                      {/* Minimum width for scrollable table */}
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Salesperson</TableHead>
-                          <TableHead>Team</TableHead>
-                          <TableHead>Shift Time</TableHead>
-                          <TableHead>Notes</TableHead>
-                          <TableHead className="w-[100px]">Actions</TableHead>
+                          <TableHead className="text-xs sm:text-sm">Salesperson</TableHead>
+                          <TableHead className="text-xs sm:text-sm hidden sm:table-cell">
+                            Team
+                          </TableHead>
+                          <TableHead className="text-xs sm:text-sm">Shift Time</TableHead>
+                          <TableHead className="text-xs sm:text-sm hidden md:table-cell">
+                            Notes
+                          </TableHead>
+                          <TableHead className="text-xs sm:text-sm w-[80px] sm:w-[100px]">
+                            Actions
+                          </TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {getSchedulesForDate(selectedDate).map(schedule => (
                           <TableRow key={schedule.id}>
-                            <TableCell>
+                            <TableCell className="text-xs sm:text-sm">
                               <div className="flex items-center">
-                                <Avatar className="h-8 w-8 mr-2">
+                                <Avatar className="h-6 w-6 sm:h-8 sm:w-8 mr-2">
+                                  {' '}
+                                  {/* Smaller avatar on mobile */}
                                   <AvatarImage src={schedule.salesperson?.profile_image_url} />
                                   <AvatarFallback>
                                     {getInitials(
@@ -641,16 +647,21 @@ export function ScheduleEditor() {
                                 </span>
                               </div>
                             </TableCell>
-                            <TableCell>{getTeamBadge(schedule.team)}</TableCell>
-                            <TableCell>
+                            <TableCell className="text-xs sm:text-sm hidden sm:table-cell">
+                              {getTeamBadge(schedule.team)}
+                            </TableCell>
+                            <TableCell className="text-xs sm:text-sm">
                               {formatTime(schedule.shift_start)} - {formatTime(schedule.shift_end)}
                             </TableCell>
-                            <TableCell>{schedule.notes || '-'}</TableCell>
+                            <TableCell className="text-xs sm:text-sm hidden md:table-cell">
+                              {schedule.notes || '-'}
+                            </TableCell>
                             <TableCell>
                               <div className="flex items-center space-x-2">
                                 <Button
                                   variant="ghost"
                                   size="icon"
+                                  className="h-8 w-8 sm:h-10 sm:w-10"
                                   onClick={() => handleEditSchedule(schedule)}
                                 >
                                   <Edit className="h-4 w-4" />
@@ -658,6 +669,7 @@ export function ScheduleEditor() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
+                                  className="h-8 w-8 sm:h-10 sm:w-10"
                                   onClick={() => handleDeleteSchedule(schedule.id)}
                                 >
                                   <Trash2 className="h-4 w-4" />
@@ -677,7 +689,9 @@ export function ScheduleEditor() {
                     Week of {format(startDate, 'MMMM d')} - {format(endDate, 'MMMM d, yyyy')}
                   </h3>
 
-                  <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-2 sm:gap-4">
+                    {' '}
+                    {/* 2 cols on mobile, 3 on tablet */}
                     {dateRange.map(date => (
                       <Card
                         key={date.toString()}

@@ -159,14 +159,17 @@ const FinanceSchedulePage: React.FC = () => {
   );
 
   // Count appointments per day for the calendar
-  const appointmentsByDay = APPOINTMENTS.reduce((acc, appointment) => {
-    const date = appointment.date;
-    if (!acc[date]) {
-      acc[date] = 0;
-    }
-    acc[date]++;
-    return acc;
-  }, {} as Record<string, number>);
+  const appointmentsByDay = APPOINTMENTS.reduce(
+    (acc, appointment) => {
+      const date = appointment.date;
+      if (!acc[date]) {
+        acc[date] = 0;
+      }
+      acc[date]++;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   return (
     <div className="space-y-6">

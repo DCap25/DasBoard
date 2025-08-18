@@ -16,7 +16,18 @@ interface TranslationProviderProps {
 }
 
 // Available languages with metadata for better UX
-const AVAILABLE_LANGUAGES: Language[] = ['en', 'es', 'fr', 'de', 'cs', 'it', 'pl', 'pt', 'nl', 'gr'];
+const AVAILABLE_LANGUAGES: Language[] = [
+  'en',
+  'es',
+  'fr',
+  'de',
+  'cs',
+  'it',
+  'pl',
+  'pt',
+  'nl',
+  'gr',
+];
 
 export function TranslationProvider({ children }: TranslationProviderProps) {
   const [language, setLanguageState] = useState<Language>('en');

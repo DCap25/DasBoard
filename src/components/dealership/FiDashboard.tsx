@@ -52,14 +52,16 @@ export default function FiDashboard() {
       setIsLoading(true);
       const { data, error } = await supabase
         .from('deals')
-        .select(`
+        .select(
+          `
           fi_manager_id,
           users!deals_fi_manager_id_fkey(name),
           count(*) as total_deals,
           sum(vsc_profit + ppm_profit + tire_wheel_profit + paint_fabric_profit + other_profit) as total_fi_profit,
           sum(case when vsc_profit > 0 then 1 else 0 end) as deals_with_vsc,
           sum(case when vsc_profit > 0 or ppm_profit > 0 or tire_wheel_profit > 0 or paint_fabric_profit > 0 or other_profit > 0 then 1 else 0 end) as total_products_sold
-        `)
+        `
+        )
         .group('fi_manager_id, users.name');
 
       if (error) throw error;
@@ -137,25 +139,25 @@ export default function FiDashboard() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     F&I Manager
                   </th>
-                  <th 
+                  <th
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('total_fi_profit')}
                   >
                     Total F&I Gross
                   </th>
-                  <th 
+                  <th
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('pvr')}
                   >
                     PVR
                   </th>
-                  <th 
+                  <th
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('ppd')}
                   >
                     PPD
                   </th>
-                  <th 
+                  <th
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('vsc_percentage')}
                   >
@@ -164,7 +166,7 @@ export default function FiDashboard() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {sortedStats.map((stat) => (
+                {sortedStats.map(stat => (
                   <tr key={stat.fi_manager_id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {stat.fi_manager_name}
@@ -190,4 +192,4 @@ export default function FiDashboard() {
       </div>
     </div>
   );
-} 
+}

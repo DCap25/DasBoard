@@ -86,4 +86,4 @@ export interface FniDetail {
   commission_amount: number;
   created_at: string;
   updated_at: string;
-} 
+}

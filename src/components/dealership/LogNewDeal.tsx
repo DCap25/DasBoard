@@ -8,7 +8,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 
@@ -37,7 +43,9 @@ export default function LogNewDeal() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [totalFiProfit, setTotalFiProfit] = useState(0);
   const [isFiManager, setIsFiManager] = useState(false);
-  const [salespeople, setSalespeople] = useState<{ id: string; first_name: string; last_name: string }[]>([]);
+  const [salespeople, setSalespeople] = useState<
+    { id: string; first_name: string; last_name: string }[]
+  >([]);
 
   useEffect(() => {
     const checkFiManagerRole = async () => {
@@ -99,7 +107,13 @@ export default function LogNewDeal() {
   });
 
   // Watch profit fields to calculate total F&I profit
-  const watchProfitFields = watch(['vsc_profit', 'ppm_profit', 'tire_wheel_profit', 'paint_fabric_profit', 'other_profit']);
+  const watchProfitFields = watch([
+    'vsc_profit',
+    'ppm_profit',
+    'tire_wheel_profit',
+    'paint_fabric_profit',
+    'other_profit',
+  ]);
 
   // Calculate total F&I profit whenever profit fields change
   useEffect(() => {
@@ -121,9 +135,7 @@ export default function LogNewDeal() {
     try {
       // Find the salesperson to get their initials
       const salesperson = salespeople.find(person => person.id === data.salesperson_id);
-      const initials = salesperson 
-        ? `${salesperson.first_name[0]}${salesperson.last_name[0]}` 
-        : '';
+      const initials = salesperson ? `${salesperson.first_name[0]}${salesperson.last_name[0]}` : '';
 
       const newDeal: Deal = {
         ...data,
@@ -133,9 +145,7 @@ export default function LogNewDeal() {
         fi_manager_id: user.id,
       };
 
-      const { error } = await supabase
-        .from('deals')
-        .insert(newDeal);
+      const { error } = await supabase.from('deals').insert(newDeal);
 
       if (error) throw error;
 
@@ -240,9 +250,7 @@ export default function LogNewDeal() {
               {/* Salesperson */}
               <div className="space-y-2">
                 <Label htmlFor="salesperson_id">Salesperson</Label>
-                <Select
-                  onValueChange={(value: string) => setValue('salesperson_id', value)}
-                >
+                <Select onValueChange={(value: string) => setValue('salesperson_id', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select salesperson" />
                   </SelectTrigger>
@@ -362,7 +370,9 @@ export default function LogNewDeal() {
 
             {/* Total F&I Profit Display */}
             <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="text-lg font-semibold">Total F&I Profit: ${totalFiProfit.toFixed(2)}</h3>
+              <h3 className="text-lg font-semibold">
+                Total F&I Profit: ${totalFiProfit.toFixed(2)}
+              </h3>
             </div>
 
             {/* Submit Button */}

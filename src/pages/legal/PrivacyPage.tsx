@@ -45,20 +45,20 @@ export default function PrivacyPage() {
 
             <div className="space-y-8 text-gray-300">
               <section>
-                <p>
-                  {t('legal.privacy.intro')}
-                </p>
+                <p>{t('legal.privacy.intro')}</p>
               </section>
 
               {/* Information Collection */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.collection.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.privacy.sections.collection.title')}
+                </h2>
                 <p className="mb-4">{t('legal.privacy.sections.collection.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
                   {(t('legal.privacy.sections.collection.items') as string[]).map((item, index) => (
                     <li key={index}>
-                      <SafeHtml 
-                        html={item} 
+                      <SafeHtml
+                        html={item}
                         allowedTags={['strong', 'em', 'code', 'a']}
                         allowedAttributes={['href', 'target', 'rel']}
                         maxLength={500}
@@ -71,7 +71,9 @@ export default function PrivacyPage() {
 
               {/* Information Usage */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.usage.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.privacy.sections.usage.title')}
+                </h2>
                 <p className="mb-4">{t('legal.privacy.sections.usage.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
                   {(t('legal.privacy.sections.usage.items') as string[]).map((item, index) => (
@@ -82,13 +84,15 @@ export default function PrivacyPage() {
 
               {/* Information Sharing */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.sharing.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.privacy.sections.sharing.title')}
+                </h2>
                 <p className="mb-4">{t('legal.privacy.sections.sharing.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
                   {(t('legal.privacy.sections.sharing.items') as string[]).map((item, index) => (
                     <li key={index}>
-                      <SafeHtml 
-                        html={item} 
+                      <SafeHtml
+                        html={item}
                         allowedTags={['strong', 'em', 'code', 'a']}
                         allowedAttributes={['href', 'target', 'rel']}
                         maxLength={500}
@@ -101,7 +105,9 @@ export default function PrivacyPage() {
 
               {/* Data Retention */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.retention.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.privacy.sections.retention.title')}
+                </h2>
                 <p className="mb-4">{t('legal.privacy.sections.retention.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
                   {(t('legal.privacy.sections.retention.items') as string[]).map((item, index) => (
@@ -112,13 +118,15 @@ export default function PrivacyPage() {
 
               {/* Rights and Choices */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.rights.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.privacy.sections.rights.title')}
+                </h2>
                 <p className="mb-4">{t('legal.privacy.sections.rights.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
                   {(t('legal.privacy.sections.rights.items') as string[]).map((item, index) => (
                     <li key={index}>
-                      <SafeHtml 
-                        html={item} 
+                      <SafeHtml
+                        html={item}
                         allowedTags={['strong', 'em', 'code', 'a']}
                         allowedAttributes={['href', 'target', 'rel']}
                         maxLength={500}
@@ -131,13 +139,15 @@ export default function PrivacyPage() {
 
               {/* Cookies */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.cookies.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.privacy.sections.cookies.title')}
+                </h2>
                 <p className="mb-4">{t('legal.privacy.sections.cookies.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
                   {(t('legal.privacy.sections.cookies.items') as string[]).map((item, index) => (
                     <li key={index}>
-                      <SafeHtml 
-                        html={item} 
+                      <SafeHtml
+                        html={item}
                         allowedTags={['strong', 'em', 'code', 'a']}
                         allowedAttributes={['href', 'target', 'rel']}
                         maxLength={500}
@@ -151,7 +161,9 @@ export default function PrivacyPage() {
 
               {/* Security */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.security.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.privacy.sections.security.title')}
+                </h2>
                 <p className="mb-4">{t('legal.privacy.sections.security.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
                   {(t('legal.privacy.sections.security.items') as string[]).map((item, index) => (
@@ -162,25 +174,33 @@ export default function PrivacyPage() {
 
               {/* International */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.international.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.privacy.sections.international.title')}
+                </h2>
                 <p>{t('legal.privacy.sections.international.content')}</p>
               </section>
 
               {/* Children */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.children.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.privacy.sections.children.title')}
+                </h2>
                 <p>{t('legal.privacy.sections.children.content')}</p>
               </section>
 
               {/* Changes */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.changes.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.privacy.sections.changes.title')}
+                </h2>
                 <p>{t('legal.privacy.sections.changes.content')}</p>
               </section>
 
               {/* Contact */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.privacy.sections.contact.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.privacy.sections.contact.title')}
+                </h2>
                 <p>{t('legal.privacy.sections.contact.content')}</p>
                 <div className="mt-2 bg-gray-700/50 p-4 rounded-lg">
                   <p>

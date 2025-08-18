@@ -232,8 +232,8 @@ export default function GeneralManagerDashboard() {
                     data.salesPerformance >= 100
                       ? 'bg-white border-r border-blue-500'
                       : data.salesPerformance >= 80
-                      ? 'bg-blue-500'
-                      : 'bg-blue-500'
+                        ? 'bg-blue-500'
+                        : 'bg-blue-500'
                   }`}
                   style={{ width: `${Math.min(data.salesPerformance, 100)}%` }}
                 ></div>

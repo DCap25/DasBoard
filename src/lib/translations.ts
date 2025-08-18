@@ -482,32 +482,34 @@ export const translations: Record<Language, Translations | Partial<Translations>
           name: 'Single Finance Manager',
           price: '$20/mo limited time',
           originalPrice: '$29.99/mo',
-          description: 'Perfect for individual finance managers who want to track their personal performance',
+          description:
+            'Perfect for individual finance managers who want to track their personal performance',
           features: [
             'Personal deal tracking',
-            'PVR & product profit analytics', 
+            'PVR & product profit analytics',
             'Pay calculator',
             'Performance metrics',
-            'May be tax deductible'
+            'May be tax deductible',
           ],
           buttonText: 'Get Started Now!',
-          setupTime: 'Try risk free for one calendar month'
+          setupTime: 'Try risk free for one calendar month',
         },
         dealership: {
           name: 'Dealership / Dealer Group',
           price: '$250/mo base',
-          description: 'Complete dealership management with role-specific dashboards and team management',
+          description:
+            'Complete dealership management with role-specific dashboards and team management',
           popular: 'Most Popular',
           features: [
             'All single manager features',
             'Team dashboards for all roles',
             'Multi-location analytics',
-            'Flexible admin structures'
+            'Flexible admin structures',
           ],
           buttonText: 'Configure Your Package',
-          setupTime: 'Get started today'
+          setupTime: 'Get started today',
         },
-        priceSubtext: 'per dealership + add-ons'
+        priceSubtext: 'per dealership + add-ons',
       },
       cta: {
         title: 'Ready to transform your dealership operations?',
@@ -600,7 +602,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
         emailPlaceholder: 'your@email.com',
         getDiscountCode: 'Get Discount Code',
         maybeWater: 'Maybe Later',
-        thankYouMessage: 'Thank you! Here\'s your',
+        thankYouMessage: "Thank you! Here's your",
         discountCodeLabel: 'Discount Code:',
         copied: 'Copied!',
         copy: 'Copy',
@@ -613,10 +615,12 @@ export const translations: Record<Language, Translations | Partial<Translations>
       pricingPage: {
         title: 'Select Your',
         titleHighlight: 'Solution',
-        subtitle: 'Select the option that best describes your needs. We\'ll customize your experience accordingly.',
+        subtitle:
+          "Select the option that best describes your needs. We'll customize your experience accordingly.",
         singleFinance: {
           title: 'Single Finance Manager',
-          description: 'Perfect for individual finance managers who want to track their personal performance and deals.',
+          description:
+            'Perfect for individual finance managers who want to track their personal performance and deals.',
           originalPrice: '$29.99/mo',
           price: '$20/mo limited time',
           features: [
@@ -624,14 +628,15 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'PVR & product profit analytics',
             'Pay calculator',
             'Performance metrics',
-            'May be tax deductible'
+            'May be tax deductible',
           ],
           buttonText: 'Get Started Now!',
-          setupTime: 'Try risk free for one calendar month'
+          setupTime: 'Try risk free for one calendar month',
         },
         dealership: {
           title: 'Dealership / Dealer Group',
-          description: 'Complete dealership management with role-specific dashboards, team management, and multi-location support.',
+          description:
+            'Complete dealership management with role-specific dashboards, team management, and multi-location support.',
           price: '$250/mo base',
           priceSubtext: 'per dealership + add-ons',
           popular: 'Most Popular',
@@ -640,35 +645,36 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'Team dashboards for all roles',
             'Multi-location analytics',
             'Flexible admin structures',
-            'Volume discounts available'
+            'Volume discounts available',
           ],
           buttonText: 'View Dynamic Package Pricing',
-          setupTime: 'Get started today'
+          setupTime: 'Get started today',
         },
         benefits: {
           title: 'Transform Your Dealership Today',
           performance: {
             title: 'Increase Performance',
-            description: 'Real-time insights help teams exceed goals and maximize profitability'
+            description: 'Real-time insights help teams exceed goals and maximize profitability',
           },
           operations: {
             title: 'Streamline Operations',
-            description: 'Centralized management reduces admin time and improves efficiency'
+            description: 'Centralized management reduces admin time and improves efficiency',
           },
           security: {
             title: 'Secure & Reliable',
-            description: 'Enterprise-grade security with 99.9% uptime guarantee'
-          }
+            description: 'Enterprise-grade security with 99.9% uptime guarantee',
+          },
         },
         helpText: {
           title: 'Not sure which option to choose?',
-          description: 'Start with the single finance manager option to try our platform, then easily upgrade to dealership features when you\'re ready to expand your team.'
+          description:
+            "Start with the single finance manager option to try our platform, then easily upgrade to dealership features when you're ready to expand your team.",
         },
         footer: {
           copyright: '© 2025 The DAS Board. All rights reserved.',
           support: 'Questions? Contact us at',
-          email: 'support@thedasboard.com'
-        }
+          email: 'support@thedasboard.com',
+        },
       },
     },
     about: {
@@ -752,7 +758,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
           'Track your personal performance metrics',
           'Calculate your pay with real-time data',
           'Monitor your PVR and product penetration',
-          'Completely FREE for individual use'
+          'Completely FREE for individual use',
         ],
       },
       form: {
@@ -802,7 +808,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
         useDiscountCode: 'Use code SAVE10 for 10% off first 3 months',
         pricing: {
           dealershipManagement: 'Dealership Management',
-          buildCustomPackage: 'Build your custom package with flexible pricing tailored to your dealership\'s needs.',
+          buildCustomPackage:
+            "Build your custom package with flexible pricing tailored to your dealership's needs.",
           dynamicPackagePricing: 'Dynamic Package Pricing',
           basePricePerDealership: 'Base Price per Dealership',
           includesDashboardAccess: 'Includes dashboard access for standard team',
@@ -816,7 +823,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
           performanceAnalytics: 'Performance analytics',
           scheduleManagement: 'Schedule management',
           goalTracking: 'Goal tracking',
-          whatsIncluded: 'What\'s Included:',
+          whatsIncluded: "What's Included:",
           completeDashboardSuite: 'Complete dashboard suite for all roles',
           realTimeDealTrackingAnalytics: 'Real-time deal tracking & analytics',
           multiLocationManagement: 'Multi-location management',
@@ -826,9 +833,11 @@ export const translations: Record<Language, Translations | Partial<Translations>
           volumeDiscountsAvailable: 'Volume discounts available',
           specialBundleOffers: 'Special Bundle Offers',
           sellMoreBundle: 'Sell More Bundle (+$50/mo):',
-          sellMoreBundleDesc: '10 Additional Sales People, 2 Additional Finance Managers, 2 Additional Sales Managers',
+          sellMoreBundleDesc:
+            '10 Additional Sales People, 2 Additional Finance Managers, 2 Additional Sales Managers',
           sellMostBundle: 'Sell Most Bundle (+$100/mo):',
-          sellMostBundleDesc: '20 Additional Sales People, 4 Sales Managers, 1 GSM, 1 Finance Director',
+          sellMostBundleDesc:
+            '20 Additional Sales People, 4 Sales Managers, 1 GSM, 1 Finance Director',
           aLaCarteAddons: 'À La Carte Add-ons',
           additionalSalesPerson: 'Additional Sales Person',
           additionalFinanceManager: 'Additional Finance Manager',
@@ -904,8 +913,10 @@ export const translations: Record<Language, Translations | Partial<Translations>
           failedToDelete: 'Failed to delete deal',
         },
         confirmations: {
-          deleteWarning: '⚠️ DELETE CONFIRMATION\n\nAre you sure you want to delete this deal?\n\nThis action will:\n• Permanently remove all deal data\n• Update your dashboard metrics\n• Cannot be undone\n\nClick OK to delete or Cancel to keep the deal.',
-          finalConfirmation: '🚨 FINAL CONFIRMATION\n\nThis is your last chance!\n\nClick OK to permanently delete this deal, or Cancel to keep it.',
+          deleteWarning:
+            '⚠️ DELETE CONFIRMATION\n\nAre you sure you want to delete this deal?\n\nThis action will:\n• Permanently remove all deal data\n• Update your dashboard metrics\n• Cannot be undone\n\nClick OK to delete or Cancel to keep the deal.',
+          finalConfirmation:
+            '🚨 FINAL CONFIRMATION\n\nThis is your last chance!\n\nClick OK to permanently delete this deal, or Cancel to keep it.',
         },
         dealTypes: {
           finance: 'Finance',
@@ -1059,8 +1070,10 @@ export const translations: Record<Language, Translations | Partial<Translations>
         showingDeals: 'Showing {count} of {total} deals',
         totalGross: 'Total Gross:',
         backEndTotal: 'Back End Total:',
-        confirmDelete: '⚠️ DELETE CONFIRMATION\n\nAre you sure you want to delete this deal?\n\nThis action will:\n• Permanently remove all deal data\n• Update your dashboard metrics\n• Cannot be undone\n\nClick OK to delete or Cancel to keep the deal.',
-        finalConfirmDelete: '🚨 FINAL CONFIRMATION\n\nThis is your last chance!\n\nClick OK to permanently delete this deal, or Cancel to keep it.',
+        confirmDelete:
+          '⚠️ DELETE CONFIRMATION\n\nAre you sure you want to delete this deal?\n\nThis action will:\n• Permanently remove all deal data\n• Update your dashboard metrics\n• Cannot be undone\n\nClick OK to delete or Cancel to keep the deal.',
+        finalConfirmDelete:
+          '🚨 FINAL CONFIRMATION\n\nThis is your last chance!\n\nClick OK to permanently delete this deal, or Cancel to keep it.',
         editButton: 'Edit',
       },
       dealLog: {
@@ -1160,7 +1173,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
         memberRemoved: 'Team member removed',
         note: {
           title: 'Note',
-          description: 'These settings are specific to your Single Finance Manager Dashboard and will be used for deal logging and pay calculations.',
+          description:
+            'These settings are specific to your Single Finance Manager Dashboard and will be used for deal logging and pay calculations.',
         },
         roles: {
           salesperson: 'Salesperson',
@@ -1206,75 +1220,85 @@ export const translations: Record<Language, Translations | Partial<Translations>
       terms: {
         title: 'Terms of Service',
         lastUpdated: 'Last Updated: 6/28/2025',
-        intro: 'Welcome to The DAS Board. These Terms of Service ("Terms") govern your access to and use of our dealership management software platform. By accessing or using our services, you agree to be bound by these Terms.',
+        intro:
+          'Welcome to The DAS Board. These Terms of Service ("Terms") govern your access to and use of our dealership management software platform. By accessing or using our services, you agree to be bound by these Terms.',
         sections: {
           acceptance: {
             title: '1. Acceptance of Terms',
-            content: 'By creating an account, accessing, or using The DAS Board, you acknowledge that you have read, understood, and agree to be bound by these Terms and our Privacy Policy. If you do not agree to these Terms, you may not use our services. You must be at least 18 years old and have the authority to enter into these Terms on behalf of your organization.'
+            content:
+              'By creating an account, accessing, or using The DAS Board, you acknowledge that you have read, understood, and agree to be bound by these Terms and our Privacy Policy. If you do not agree to these Terms, you may not use our services. You must be at least 18 years old and have the authority to enter into these Terms on behalf of your organization.',
           },
           service: {
             title: '2. Description of Service',
-            content: 'The DAS Board is a cloud-based dealership management software platform that provides tools for inventory management, sales tracking, customer relationship management, financial reporting, and related automotive industry services. We reserve the right to modify, suspend, or discontinue any aspect of our service with reasonable notice.'
+            content:
+              'The DAS Board is a cloud-based dealership management software platform that provides tools for inventory management, sales tracking, customer relationship management, financial reporting, and related automotive industry services. We reserve the right to modify, suspend, or discontinue any aspect of our service with reasonable notice.',
           },
           account: {
             title: '3. Account Registration and Security',
-            content: 'To use our services, you must create an account with accurate and complete information. You are responsible for:',
+            content:
+              'To use our services, you must create an account with accurate and complete information. You are responsible for:',
             items: [
               'Maintaining the confidentiality of your account credentials',
               'All activities that occur under your account',
               'Notifying us immediately of any unauthorized use',
               'Ensuring your account information remains current and accurate',
-              'Complying with our security requirements and best practices'
-            ]
+              'Complying with our security requirements and best practices',
+            ],
           },
           subscription: {
             title: '4. Subscription and Payment Terms',
-            content: 'The DAS Board operates on a subscription basis. By subscribing, you agree to:',
+            content:
+              'The DAS Board operates on a subscription basis. By subscribing, you agree to:',
             items: [
               'Pay all fees associated with your subscription plan',
               'Automatic renewal unless cancelled before the renewal date',
-              'Fee changes with 30 days\' advance notice',
+              "Fee changes with 30 days' advance notice",
               'No refunds for partial subscription periods',
-              'Suspension of service for non-payment after reasonable notice'
-            ]
+              'Suspension of service for non-payment after reasonable notice',
+            ],
           },
           usage: {
             title: '5. Acceptable Use Policy',
-            content: 'You agree to use The DAS Board only for lawful purposes and in accordance with these Terms. You may not:',
+            content:
+              'You agree to use The DAS Board only for lawful purposes and in accordance with these Terms. You may not:',
             items: [
               'Violate any applicable laws, regulations, or third-party rights',
               'Upload harmful, offensive, or inappropriate content',
-              'Attempt to gain unauthorized access to our systems or other users\' accounts',
+              "Attempt to gain unauthorized access to our systems or other users' accounts",
               'Use the service to send spam, malware, or other malicious content',
               'Reverse engineer, decompile, or attempt to extract source code',
               'Interfere with or disrupt the integrity or performance of our services',
-              'Use the platform for any fraudulent or illegal activities'
-            ]
+              'Use the platform for any fraudulent or illegal activities',
+            ],
           },
           intellectual: {
             title: '6. Intellectual Property Rights',
-            content: 'The DAS Board and all related technology, content, and materials are owned by us or our licensors. This includes:',
+            content:
+              'The DAS Board and all related technology, content, and materials are owned by us or our licensors. This includes:',
             items: [
               'Software, algorithms, and user interfaces',
               'Trademarks, logos, and branding materials',
               'Documentation, tutorials, and support materials',
-              'Analytics, reports, and aggregated data insights'
+              'Analytics, reports, and aggregated data insights',
             ],
-            footer: 'You retain ownership of your data but grant us a license to use it to provide our services. We may use anonymized, aggregated data for industry research and platform improvement.'
+            footer:
+              'You retain ownership of your data but grant us a license to use it to provide our services. We may use anonymized, aggregated data for industry research and platform improvement.',
           },
           privacy: {
             title: '7. Data Protection and Privacy',
-            content: 'You are responsible for ensuring that any personal data you process through our platform complies with applicable privacy laws. We will process data in accordance with our Privacy Policy and applicable data protection regulations, including GDPR and CCPA where applicable.'
+            content:
+              'You are responsible for ensuring that any personal data you process through our platform complies with applicable privacy laws. We will process data in accordance with our Privacy Policy and applicable data protection regulations, including GDPR and CCPA where applicable.',
           },
           availability: {
             title: '8. Service Availability and Support',
-            content: 'While we strive for high availability, we do not guarantee uninterrupted service. We provide:',
+            content:
+              'While we strive for high availability, we do not guarantee uninterrupted service. We provide:',
             items: [
               '99.9% uptime SLA for paid subscriptions',
               'Regular maintenance windows with advance notice',
               'Technical support based on your subscription level',
-              'Security monitoring and incident response'
-            ]
+              'Security monitoring and incident response',
+            ],
           },
           termination: {
             title: '9. Termination',
@@ -1284,64 +1308,72 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'We may terminate for breach of these Terms with reasonable notice',
               'We may suspend service immediately for serious violations or security threats',
               'Upon termination, you will lose access to the platform and your data',
-              'We will provide a reasonable opportunity to export your data before deletion'
-            ]
+              'We will provide a reasonable opportunity to export your data before deletion',
+            ],
           },
           disclaimers: {
             title: '10. Disclaimers and Limitations of Liability',
-            content: 'THE DAS BOARD IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND. TO THE MAXIMUM EXTENT PERMITTED BY LAW:',
+            content:
+              'THE DAS BOARD IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND. TO THE MAXIMUM EXTENT PERMITTED BY LAW:',
             items: [
               'We disclaim all warranties, express or implied, including merchantability and fitness for a particular purpose',
               'We are not liable for indirect, incidental, special, or consequential damages',
               'Our total liability shall not exceed the fees paid by you in the 12 months preceding the claim',
-              'You acknowledge that software may contain bugs and agree to report them promptly'
-            ]
+              'You acknowledge that software may contain bugs and agree to report them promptly',
+            ],
           },
           indemnification: {
             title: '11. Indemnification',
-            content: 'You agree to indemnify and hold us harmless from any claims, losses, or damages arising from your use of our services, violation of these Terms, or infringement of any third-party rights.'
+            content:
+              'You agree to indemnify and hold us harmless from any claims, losses, or damages arising from your use of our services, violation of these Terms, or infringement of any third-party rights.',
           },
           governing: {
             title: '12. Governing Law and Dispute Resolution',
-            content: 'These Terms are governed by the laws of [Jurisdiction] without regard to conflict of law principles. Any disputes will be resolved through binding arbitration, except for injunctive relief claims which may be brought in appropriate courts.'
+            content:
+              'These Terms are governed by the laws of [Jurisdiction] without regard to conflict of law principles. Any disputes will be resolved through binding arbitration, except for injunctive relief claims which may be brought in appropriate courts.',
           },
           changes: {
             title: '13. Changes to Terms',
-            content: 'We may modify these Terms from time to time. We will provide notice of material changes at least 30 days in advance. Continued use of our services after changes take effect constitutes acceptance of the revised Terms.'
+            content:
+              'We may modify these Terms from time to time. We will provide notice of material changes at least 30 days in advance. Continued use of our services after changes take effect constitutes acceptance of the revised Terms.',
           },
           entire: {
             title: '14. Entire Agreement',
-            content: 'These Terms, together with our Privacy Policy and any additional agreements, constitute the entire agreement between you and The DAS Board regarding your use of our services.'
+            content:
+              'These Terms, together with our Privacy Policy and any additional agreements, constitute the entire agreement between you and The DAS Board regarding your use of our services.',
           },
           contact: {
             title: '15. Contact Information',
             content: 'If you have questions about these Terms, please contact us:',
             email: 'legal@thedasboard.com',
             address: '[Company Address]',
-            phone: '[Support Phone Number]'
-          }
-        }
+            phone: '[Support Phone Number]',
+          },
+        },
       },
       privacy: {
         title: 'Privacy Policy',
         lastUpdated: 'Last Updated: 6/28/2025',
-        intro: 'This Privacy Policy describes how The DAS Board ("we," "us," or "our") collects, uses, and protects your personal information when you use our dealership management software platform. We are committed to protecting your privacy and handling your data responsibly.',
+        intro:
+          'This Privacy Policy describes how The DAS Board ("we," "us," or "our") collects, uses, and protects your personal information when you use our dealership management software platform. We are committed to protecting your privacy and handling your data responsibly.',
         sections: {
           collection: {
             title: '1. Information We Collect',
-            content: 'When you use The DAS Board, we collect several types of information to provide and improve our services:',
+            content:
+              'When you use The DAS Board, we collect several types of information to provide and improve our services:',
             items: [
               '<strong>Account Information:</strong> Name, email address, phone number, company name, job title, and billing information',
               '<strong>Dealership Data:</strong> Vehicle inventory, sales records, customer information, and financial transactions',
               '<strong>Usage Data:</strong> Features accessed, time spent on platform, user interactions, and performance metrics',
               '<strong>Technical Data:</strong> IP address, browser type, device information, operating system, and access logs',
               '<strong>Communication Data:</strong> Support requests, feedback, and correspondence with our team',
-              '<strong>Location Data:</strong> Dealership addresses and, with consent, device location for mobile features'
-            ]
+              '<strong>Location Data:</strong> Dealership addresses and, with consent, device location for mobile features',
+            ],
           },
           usage: {
             title: '2. How We Use Your Information',
-            content: 'We use the collected information for legitimate business purposes, including:',
+            content:
+              'We use the collected information for legitimate business purposes, including:',
             items: [
               'Providing, maintaining, and improving The DAS Board platform and features',
               'Processing subscriptions, payments, and managing your account',
@@ -1350,41 +1382,44 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Sending service updates, security alerts, and administrative messages',
               'Detecting, preventing, and addressing technical issues and security threats',
               'Complying with legal obligations and industry regulations',
-              'Improving user experience through product development and research'
-            ]
+              'Improving user experience through product development and research',
+            ],
           },
           sharing: {
             title: '3. Sharing Your Information',
-            content: 'We do not sell, rent, or trade your personal information. We may share your information only in the following circumstances:',
+            content:
+              'We do not sell, rent, or trade your personal information. We may share your information only in the following circumstances:',
             items: [
               '<strong>Service Providers:</strong> Third-party vendors who help us operate our platform (hosting, analytics, payment processing)',
               '<strong>Business Partners:</strong> Authorized integrations and automotive industry partners with your explicit consent',
               '<strong>Legal Requirements:</strong> When required by law, regulation, or valid legal process',
               '<strong>Business Transfers:</strong> In connection with mergers, acquisitions, or asset sales (with notice to you)',
-              '<strong>Safety and Security:</strong> To protect the rights, property, or safety of our users or the public'
-            ]
+              '<strong>Safety and Security:</strong> To protect the rights, property, or safety of our users or the public',
+            ],
           },
           retention: {
             title: '4. Data Retention',
-            content: 'We retain your personal information for as long as necessary to provide our services and comply with legal obligations. Specifically:',
+            content:
+              'We retain your personal information for as long as necessary to provide our services and comply with legal obligations. Specifically:',
             items: [
               'Account data is retained while your subscription is active and for 3 years after termination',
               'Transaction records are kept for 7 years to comply with financial regulations',
               'Usage logs are retained for 2 years for security and performance analysis',
-              'Communication records are kept for 5 years for customer service purposes'
-            ]
+              'Communication records are kept for 5 years for customer service purposes',
+            ],
           },
           rights: {
             title: '5. Your Rights and Choices',
-            content: 'Depending on your location, you may have the following rights regarding your personal information:',
+            content:
+              'Depending on your location, you may have the following rights regarding your personal information:',
             items: [
               '<strong>Access:</strong> Request a copy of your personal information we hold',
               '<strong>Correction:</strong> Update or correct inaccurate personal information',
               '<strong>Deletion:</strong> Request deletion of your personal information (subject to legal obligations)',
               '<strong>Portability:</strong> Receive your data in a machine-readable format',
               '<strong>Restriction:</strong> Limit how we process your personal information',
-              '<strong>Objection:</strong> Object to processing based on legitimate interests'
-            ]
+              '<strong>Objection:</strong> Object to processing based on legitimate interests',
+            ],
           },
           cookies: {
             title: '6. Cookies and Tracking Technologies',
@@ -1393,75 +1428,87 @@ export const translations: Record<Language, Translations | Partial<Translations>
               '<strong>Essential Cookies:</strong> Required for platform functionality and security',
               '<strong>Analytics Cookies:</strong> Help us understand how you use our platform',
               '<strong>Preference Cookies:</strong> Remember your settings and customizations',
-              '<strong>Marketing Cookies:</strong> Used for targeted communications (with your consent)'
+              '<strong>Marketing Cookies:</strong> Used for targeted communications (with your consent)',
             ],
-            footer: 'You can control cookie preferences through your browser settings or our cookie management tool.'
+            footer:
+              'You can control cookie preferences through your browser settings or our cookie management tool.',
           },
           security: {
             title: '7. Security Measures',
-            content: 'We implement industry-standard security measures to protect your information, including:',
+            content:
+              'We implement industry-standard security measures to protect your information, including:',
             items: [
               'Encryption of data in transit and at rest using AES-256 standards',
               'Regular security audits and penetration testing',
               'Multi-factor authentication and access controls',
               'SOC 2 Type II compliance and regular security assessments',
-              'Employee training on data protection and security best practices'
-            ]
+              'Employee training on data protection and security best practices',
+            ],
           },
           international: {
             title: '8. International Data Transfers',
-            content: 'Your information may be transferred to and processed in countries other than your own. We ensure appropriate safeguards are in place, including Standard Contractual Clauses and adequacy decisions, to protect your data during international transfers.'
+            content:
+              'Your information may be transferred to and processed in countries other than your own. We ensure appropriate safeguards are in place, including Standard Contractual Clauses and adequacy decisions, to protect your data during international transfers.',
           },
           children: {
-            title: '9. Children\'s Privacy',
-            content: 'The DAS Board is not intended for use by individuals under 18 years of age. We do not knowingly collect personal information from children under 18. If we become aware of such collection, we will delete the information promptly.'
+            title: "9. Children's Privacy",
+            content:
+              'The DAS Board is not intended for use by individuals under 18 years of age. We do not knowingly collect personal information from children under 18. If we become aware of such collection, we will delete the information promptly.',
           },
           changes: {
             title: '10. Changes to This Privacy Policy',
-            content: 'We may update this Privacy Policy periodically to reflect changes in our practices or legal requirements. We will notify you of significant changes via email or platform notification at least 30 days before they take effect.'
+            content:
+              'We may update this Privacy Policy periodically to reflect changes in our practices or legal requirements. We will notify you of significant changes via email or platform notification at least 30 days before they take effect.',
           },
           contact: {
             title: '11. Contact Us',
-            content: 'If you have questions about this Privacy Policy or wish to exercise your rights, please contact us:',
+            content:
+              'If you have questions about this Privacy Policy or wish to exercise your rights, please contact us:',
             email: 'privacy@thedasboard.com',
             address: '[Company Address]',
-            phone: '[Support Phone Number]'
-          }
-        }
+            phone: '[Support Phone Number]',
+          },
+        },
       },
       subscription: {
         title: 'Subscription Agreement',
         lastUpdated: 'Last Updated: 6/28/2025',
-        intro: 'This Subscription Agreement governs your subscription to and use of The DAS Board dealership management platform.',
+        intro:
+          'This Subscription Agreement governs your subscription to and use of The DAS Board dealership management platform.',
         sections: {
           plans: {
             title: '1. Subscription Plans',
-            content: 'The DAS Board offers subscription tiers designed for different dealership needs:',
+            content:
+              'The DAS Board offers subscription tiers designed for different dealership needs:',
             items: [
               '<strong>60-Day Free Trial:</strong> Full platform access with no credit card required',
               '<strong>Finance Manager:</strong> Individual user access with core financial tools',
               '<strong>Dealership:</strong> Multi-user access with full inventory and sales management',
-              '<strong>Dealer Group:</strong> Enterprise-level access across multiple locations'
+              '<strong>Dealer Group:</strong> Enterprise-level access across multiple locations',
             ],
-            footer: 'Subscriptions are billed monthly in advance. You may upgrade or downgrade your subscription at any time, with changes taking effect at the next billing cycle.'
+            footer:
+              'Subscriptions are billed monthly in advance. You may upgrade or downgrade your subscription at any time, with changes taking effect at the next billing cycle.',
           },
           payment: {
             title: '2. Payment Terms',
-            content: 'Payment is due upon subscription commencement and on the same day each month thereafter. We accept major credit cards and ACH transfers for enterprise accounts. If payment fails, we may suspend your access to The DAS Board after reasonable notice.'
+            content:
+              'Payment is due upon subscription commencement and on the same day each month thereafter. We accept major credit cards and ACH transfers for enterprise accounts. If payment fails, we may suspend your access to The DAS Board after reasonable notice.',
           },
           trial: {
             title: '3. Trial Period',
-            content: 'The 60-day trial provides full access to The DAS Board platform. No credit card is required to start your trial. At the end of the trial period, you will need to select a paid plan to continue using the platform. Trial data will be preserved for 30 days after trial expiration.'
+            content:
+              'The 60-day trial provides full access to The DAS Board platform. No credit card is required to start your trial. At the end of the trial period, you will need to select a paid plan to continue using the platform. Trial data will be preserved for 30 days after trial expiration.',
           },
           cancellation: {
             title: '4. Cancellation and Refunds',
-            content: 'You may cancel your subscription at any time through your account settings or by contacting our support team. Upon cancellation:',
+            content:
+              'You may cancel your subscription at any time through your account settings or by contacting our support team. Upon cancellation:',
             items: [
               'You will maintain access until the end of your current billing period',
               'No refunds are provided for partial months of service',
               'Your data will be available for export for 90 days after cancellation',
-              'Automatic renewal will be disabled'
-            ]
+              'Automatic renewal will be disabled',
+            ],
           },
           sla: {
             title: '5. Service Level Agreement',
@@ -1470,8 +1517,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
               '99.9% platform uptime availability',
               'Scheduled maintenance windows with 48-hour advance notice',
               'Customer support response within 24 hours for standard requests',
-              'Priority support for Dealer Group subscribers'
-            ]
+              'Priority support for Dealer Group subscribers',
+            ],
           },
           data: {
             title: '6. Data and Security',
@@ -1480,8 +1527,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Daily automated backups with 30-day retention',
               'Bank-level encryption and security protocols',
               'GDPR and CCPA compliance for data protection',
-              'Data export capabilities in standard formats'
-            ]
+              'Data export capabilities in standard formats',
+            ],
           },
           support: {
             title: '7. Support and Training',
@@ -1490,14 +1537,15 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Comprehensive onboarding and setup assistance',
               'Online training resources and documentation',
               'Email and chat support during business hours',
-              'Regular platform updates and new feature releases'
-            ]
+              'Regular platform updates and new feature releases',
+            ],
           },
           modifications: {
             title: '8. Modifications to Service',
-            content: 'We may modify or update The DAS Board platform to improve functionality, security, or compliance. We will provide reasonable notice of significant changes that may affect your usage.'
-          }
-        }
+            content:
+              'We may modify or update The DAS Board platform to improve functionality, security, or compliance. We will provide reasonable notice of significant changes that may affect your usage.',
+          },
+        },
       },
     },
     demoPage: {
@@ -1526,27 +1574,33 @@ export const translations: Record<Language, Translations | Partial<Translations>
       hotspots: {
         productTracking: {
           title: 'Product Tracking',
-          description: 'Monitor product sales performance, track warranties, GAP, and other F&I products to maximize profitability per deal.',
+          description:
+            'Monitor product sales performance, track warranties, GAP, and other F&I products to maximize profitability per deal.',
         },
         performanceMetrics: {
           title: 'Performance Metrics',
-          description: 'Monitor your personal performance with key metrics like PVR (Per Vehicle Retailed), products per deal, and monthly targets.',
+          description:
+            'Monitor your personal performance with key metrics like PVR (Per Vehicle Retailed), products per deal, and monthly targets.',
         },
         teamPerformance: {
           title: 'Team Performance',
-          description: 'Compare your performance with team averages and see how you rank among your colleagues.',
+          description:
+            'Compare your performance with team averages and see how you rank among your colleagues.',
         },
         recentDealsLog: {
           title: 'Recent Deals Log',
-          description: 'View and manage your most recent deals with quick access to customer details and deal profitability.',
+          description:
+            'View and manage your most recent deals with quick access to customer details and deal profitability.',
         },
         pvr: {
           title: 'PVR',
-          description: 'Per Vehicle Retailed - Track your average profit per vehicle and see how it compares to targets and team averages.',
+          description:
+            'Per Vehicle Retailed - Track your average profit per vehicle and see how it compares to targets and team averages.',
         },
         payCalculator: {
           title: 'Pay Calculator',
-          description: 'Calculate your commission and bonuses based on deal profitability and product sales.',
+          description:
+            'Calculate your commission and bonuses based on deal profitability and product sales.',
         },
         schedule: {
           title: 'Schedule',
@@ -1554,7 +1608,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
         },
         teamSchedule: {
           title: 'Team Schedule',
-          description: 'Easily view team schedules, track attendance, and manage shift assignments for optimal coverage.',
+          description:
+            'Easily view team schedules, track attendance, and manage shift assignments for optimal coverage.',
         },
         grossProfitIndicator: {
           title: 'Gross Profit Indicator',
@@ -1562,63 +1617,78 @@ export const translations: Record<Language, Translations | Partial<Translations>
         },
         salesReports: {
           title: 'Sales Reports, Scheduler, Goals',
-          description: 'Access comprehensive sales reports, manage team schedules, and set/track monthly and yearly goals for your sales team.',
+          description:
+            'Access comprehensive sales reports, manage team schedules, and set/track monthly and yearly goals for your sales team.',
         },
         dasBoard: {
           title: 'The DAS Board',
-          description: 'View Sales Leaderboard to stay on top of your salespeople performance and rankings.',
+          description:
+            'View Sales Leaderboard to stay on top of your salespeople performance and rankings.',
         },
         salesPerformance: {
           title: 'Sales Performance',
-          description: 'Quick view to stay on top of sales goals, track team progress, and monitor key performance indicators.',
+          description:
+            'Quick view to stay on top of sales goals, track team progress, and monitor key performance indicators.',
         },
         unitsSold: {
           title: 'Units Sold',
-          description: 'Track total units sold including new and used vehicles with daily, weekly, and monthly breakdowns.',
+          description:
+            'Track total units sold including new and used vehicles with daily, weekly, and monthly breakdowns.',
         },
         unitCount: {
           title: 'Unit Count',
-          description: 'Track your new car and used car totals with daily, weekly, and monthly breakdowns to monitor sales volume.',
+          description:
+            'Track your new car and used car totals with daily, weekly, and monthly breakdowns to monitor sales volume.',
         },
         dealLog: {
           title: 'Deal Log',
-          description: 'Stay on top of all of your deals with detailed customer information, deal status, and transaction history.',
+          description:
+            'Stay on top of all of your deals with detailed customer information, deal status, and transaction history.',
         },
         goalTracker: {
           title: 'Goal Tracker and Pay Calculator',
-          description: 'Stay on top of your goals and MTD pay estimator to track progress and maximize earnings.',
+          description:
+            'Stay on top of your goals and MTD pay estimator to track progress and maximize earnings.',
         },
         goalQuickView: {
           title: 'Goal Quick View',
-          description: 'Easily know where you are at with your goals and track progress towards monthly and yearly targets.',
+          description:
+            'Easily know where you are at with your goals and track progress towards monthly and yearly targets.',
         },
         grossTracker: {
           title: 'Gross Tracker',
-          description: 'Stay on top of your gross with quick view front and back gross tracking to maximize every deal.',
+          description:
+            'Stay on top of your gross with quick view front and back gross tracking to maximize every deal.',
         },
         fiManagerPerformance: {
           title: 'F&I Manager Performance',
-          description: 'Compare F&I Manager performance with team averages and benchmark against industry standards for maximum profitability.',
+          description:
+            'Compare F&I Manager performance with team averages and benchmark against industry standards for maximum profitability.',
         },
         salesManagerPerformance: {
           title: 'Sales Manager Performance',
-          description: 'View Sales Manager performance against teammates and compare individual metrics across the sales management team.',
+          description:
+            'View Sales Manager performance against teammates and compare individual metrics across the sales management team.',
         },
         salesDasBoard: {
           title: 'Sales DAS Board',
-          description: 'View your sales person leaders and track top performers for maximum productivity while monitoring team dynamics and individual goal achievement.',
+          description:
+            'View your sales person leaders and track top performers for maximum productivity while monitoring team dynamics and individual goal achievement.',
         },
         pvrDealership: {
           title: 'PVR',
-          description: "Per Vehicle Retailed - Track the dealership's average profit per vehicle both front end and back end to see results fast.",
+          description:
+            "Per Vehicle Retailed - Track the dealership's average profit per vehicle both front end and back end to see results fast.",
         },
         goalTracking: {
           title: 'Goal Tracking',
-          description: 'Quickly determine unit sales progress MTD and track performance against monthly targets.',
+          description:
+            'Quickly determine unit sales progress MTD and track performance against monthly targets.',
         },
         unitsSoldDealer: {
           title: 'Units Sold',
-          description: 'Quickly track total units sold including new and used vehicles with MTD sales.',
+          description:
+            'Quickly track total units sold including new and used vehicles with MTD sales.',
         },
       },
     },
@@ -1657,32 +1727,34 @@ export const translations: Record<Language, Translations | Partial<Translations>
           name: 'Gerente Financiero Individual',
           price: '$20/mes tiempo limitado',
           originalPrice: '$29.99/mes',
-          description: 'Perfecto para gerentes financieros individuales que quieren rastrear su rendimiento personal',
+          description:
+            'Perfecto para gerentes financieros individuales que quieren rastrear su rendimiento personal',
           features: [
             'Seguimiento de ofertas personales',
             'Análisis de PVR y ganancias de productos',
             'Calculadora de pagos',
             'Métricas de rendimiento',
-            'Puede ser deducible de impuestos'
+            'Puede ser deducible de impuestos',
           ],
           buttonText: '¡Comienza Ahora!',
-          setupTime: 'Prueba sin riesgo por un mes calendario completo'
+          setupTime: 'Prueba sin riesgo por un mes calendario completo',
         },
         dealership: {
           name: 'Concesionario / Grupo de Concesionarios',
           price: '$250/mes base',
-          description: 'Gestión completa de concesionarios con tableros específicos para roles y gestión de equipos',
+          description:
+            'Gestión completa de concesionarios con tableros específicos para roles y gestión de equipos',
           popular: 'Más Popular',
           features: [
             'Todas las características del gerente individual',
             'Tableros de equipo para todos los roles',
             'Análisis de múltiples ubicaciones',
-            'Estructuras administrativas flexibles'
+            'Estructuras administrativas flexibles',
           ],
           buttonText: 'Configurar Su Paquete',
-          setupTime: 'Comience hoy'
+          setupTime: 'Comience hoy',
         },
-        priceSubtext: 'por concesionario + complementos'
+        priceSubtext: 'por concesionario + complementos',
       },
       cta: {
         title: '¿Listo para transformar las operaciones de su concesionario?',
@@ -1849,7 +1921,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
           'Rastrea tus métricas de rendimiento personal',
           'Calcula tu pago con datos en tiempo real',
           'Monitorea tu PVR y penetración de productos',
-          'Completamente GRATIS para uso individual'
+          'Completamente GRATIS para uso individual',
         ],
       },
       form: {
@@ -1978,12 +2050,15 @@ export const translations: Record<Language, Translations | Partial<Translations>
           deadDeal: 'Oferta Muerta',
         },
         noDealsFound: 'No se encontraron ofertas que coincidan con sus criterios de búsqueda.',
-        noDealsYet: "Aún no se han registrado ofertas. Use el botón 'Registrar Nueva Oferta' para agregar ofertas.",
+        noDealsYet:
+          "Aún no se han registrado ofertas. Use el botón 'Registrar Nueva Oferta' para agregar ofertas.",
         showingDeals: 'Mostrando {count} de {total} ofertas',
         totalGross: 'Total Bruto:',
         backEndTotal: 'Total Back End:',
-        confirmDelete: '⚠️ CONFIRMACIÓN DE ELIMINACIÓN\n\n¿Está seguro de que desea eliminar esta oferta?\n\nEsta acción:\n• Eliminará permanentemente todos los datos de la oferta\n• Actualizará las métricas de su panel de control\n• No se puede deshacer\n\nHaga clic en Aceptar para eliminar o Cancelar para mantener la oferta.',
-        finalConfirmDelete: '🚨 CONFIRMACIÓN FINAL\n\n¡Esta es su última oportunidad!\n\nHaga clic en Aceptar para eliminar permanentemente esta oferta, o Cancelar para mantenerla.',
+        confirmDelete:
+          '⚠️ CONFIRMACIÓN DE ELIMINACIÓN\n\n¿Está seguro de que desea eliminar esta oferta?\n\nEsta acción:\n• Eliminará permanentemente todos los datos de la oferta\n• Actualizará las métricas de su panel de control\n• No se puede deshacer\n\nHaga clic en Aceptar para eliminar o Cancelar para mantener la oferta.',
+        finalConfirmDelete:
+          '🚨 CONFIRMACIÓN FINAL\n\n¡Esta es su última oportunidad!\n\nHaga clic en Aceptar para eliminar permanentemente esta oferta, o Cancelar para mantenerla.',
         editButton: 'Editar',
       },
       dealLog: {
@@ -1991,8 +2066,10 @@ export const translations: Record<Language, Translations | Partial<Translations>
         editDeal: 'Editar Oferta - Panel Financiero Individual',
         backToDashboard: 'Volver al Panel',
         note: 'Nota',
-        editingNote: 'Está editando una oferta existente. Los cambios se reflejarán inmediatamente en su panel de control.',
-        dashboardNote: 'Esta oferta solo aparecerá en su Panel de Control del Gerente Financiero Individual y no afectará otros paneles en el sistema.',
+        editingNote:
+          'Está editando una oferta existente. Los cambios se reflejarán inmediatamente en su panel de control.',
+        dashboardNote:
+          'Esta oferta solo aparecerá en su Panel de Control del Gerente Financiero Individual y no afectará otros paneles en el sistema.',
         dealInformation: 'Información de la Oferta',
         dealNumber: '# de Oferta',
         enterDealNumber: 'Ingrese el número de oferta',
@@ -2121,26 +2198,30 @@ export const translations: Record<Language, Translations | Partial<Translations>
       terms: {
         title: 'Términos de Servicio',
         lastUpdated: 'Última actualización: 6/28/2025',
-        intro: 'Bienvenido a The DAS Board. Estos Términos de Servicio ("Términos") rigen su acceso y uso de nuestra plataforma de software de gestión de concesionarios. Al acceder o utilizar nuestros servicios, acepta estar sujeto a estos Términos.',
+        intro:
+          'Bienvenido a The DAS Board. Estos Términos de Servicio ("Términos") rigen su acceso y uso de nuestra plataforma de software de gestión de concesionarios. Al acceder o utilizar nuestros servicios, acepta estar sujeto a estos Términos.',
         sections: {
           acceptance: {
             title: '1. Aceptación de Términos',
-            content: 'Al crear una cuenta, acceder o utilizar The DAS Board, reconoce que ha leído, entendido y acepta estar sujeto a estos Términos y nuestra Política de Privacidad. Si no está de acuerdo con estos Términos, no puede utilizar nuestros servicios. Debe tener al menos 18 años y tener la autoridad para celebrar estos Términos en nombre de su organización.'
+            content:
+              'Al crear una cuenta, acceder o utilizar The DAS Board, reconoce que ha leído, entendido y acepta estar sujeto a estos Términos y nuestra Política de Privacidad. Si no está de acuerdo con estos Términos, no puede utilizar nuestros servicios. Debe tener al menos 18 años y tener la autoridad para celebrar estos Términos en nombre de su organización.',
           },
           service: {
             title: '2. Descripción del Servicio',
-            content: 'The DAS Board es una plataforma de software de gestión de concesionarios basada en la nube que proporciona herramientas para gestión de inventario, seguimiento de ventas, gestión de relaciones con clientes, informes financieros y servicios relacionados con la industria automotriz. Nos reservamos el derecho de modificar, suspender o discontinuar cualquier aspecto de nuestro servicio con notificación razonable.'
+            content:
+              'The DAS Board es una plataforma de software de gestión de concesionarios basada en la nube que proporciona herramientas para gestión de inventario, seguimiento de ventas, gestión de relaciones con clientes, informes financieros y servicios relacionados con la industria automotriz. Nos reservamos el derecho de modificar, suspender o discontinuar cualquier aspecto de nuestro servicio con notificación razonable.',
           },
           account: {
             title: '3. Registro de Cuenta y Seguridad',
-            content: 'Para utilizar nuestros servicios, debe crear una cuenta con información precisa y completa. Usted es responsable de:',
+            content:
+              'Para utilizar nuestros servicios, debe crear una cuenta con información precisa y completa. Usted es responsable de:',
             items: [
               'Mantener la confidencialidad de las credenciales de su cuenta',
               'Todas las actividades que ocurran bajo su cuenta',
               'Notificarnos inmediatamente de cualquier uso no autorizado',
               'Asegurar que la información de su cuenta permanezca actualizada y precisa',
-              'Cumplir con nuestros requisitos de seguridad y mejores prácticas'
-            ]
+              'Cumplir con nuestros requisitos de seguridad y mejores prácticas',
+            ],
           },
           subscription: {
             title: '4. Términos de Suscripción y Pago',
@@ -2150,12 +2231,13 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Renovación automática a menos que se cancele antes de la fecha de renovación',
               'Cambios en las tarifas con aviso de 30 días',
               'Sin reembolsos por períodos de suscripción parciales',
-              'Suspensión del servicio por falta de pago después de notificación razonable'
-            ]
+              'Suspensión del servicio por falta de pago después de notificación razonable',
+            ],
           },
           usage: {
             title: '5. Política de Uso Aceptable',
-            content: 'Acepta utilizar The DAS Board solo para propósitos legales y de acuerdo con estos Términos. No puede:',
+            content:
+              'Acepta utilizar The DAS Board solo para propósitos legales y de acuerdo con estos Términos. No puede:',
             items: [
               'Violar leyes, regulaciones o derechos de terceros aplicables',
               'Cargar contenido dañino, ofensivo o inapropiado',
@@ -2163,33 +2245,37 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Usar el servicio para enviar spam, malware u otro contenido malicioso',
               'Realizar ingeniería inversa, descompilar o intentar extraer código fuente',
               'Interferir o interrumpir la integridad o rendimiento de nuestros servicios',
-              'Usar la plataforma para actividades fraudulentas o ilegales'
-            ]
+              'Usar la plataforma para actividades fraudulentas o ilegales',
+            ],
           },
           intellectual: {
             title: '6. Derechos de Propiedad Intelectual',
-            content: 'The DAS Board y toda la tecnología, contenido y materiales relacionados son propiedad nuestra o de nuestros licenciantes. Esto incluye:',
+            content:
+              'The DAS Board y toda la tecnología, contenido y materiales relacionados son propiedad nuestra o de nuestros licenciantes. Esto incluye:',
             items: [
               'Software, algoritmos e interfaces de usuario',
               'Marcas comerciales, logotipos y materiales de marca',
               'Documentación, tutoriales y materiales de soporte',
-              'Análisis, informes y perspectivas de datos agregados'
+              'Análisis, informes y perspectivas de datos agregados',
             ],
-            footer: 'Usted retiene la propiedad de sus datos pero nos otorga una licencia para usarlos para proporcionar nuestros servicios. Podemos usar datos anonimizados y agregados para investigación de la industria y mejora de la plataforma.'
+            footer:
+              'Usted retiene la propiedad de sus datos pero nos otorga una licencia para usarlos para proporcionar nuestros servicios. Podemos usar datos anonimizados y agregados para investigación de la industria y mejora de la plataforma.',
           },
           privacy: {
             title: '7. Protección de Datos y Privacidad',
-            content: 'Usted es responsable de asegurar que cualquier dato personal que procese a través de nuestra plataforma cumpla con las leyes de privacidad aplicables. Procesaremos datos de acuerdo con nuestra Política de Privacidad y regulaciones de protección de datos aplicables, incluyendo GDPR y CCPA donde sea aplicable.'
+            content:
+              'Usted es responsable de asegurar que cualquier dato personal que procese a través de nuestra plataforma cumpla con las leyes de privacidad aplicables. Procesaremos datos de acuerdo con nuestra Política de Privacidad y regulaciones de protección de datos aplicables, incluyendo GDPR y CCPA donde sea aplicable.',
           },
           availability: {
             title: '8. Disponibilidad del Servicio y Soporte',
-            content: 'Aunque nos esforzamos por alta disponibilidad, no garantizamos servicio ininterrumpido. Proporcionamos:',
+            content:
+              'Aunque nos esforzamos por alta disponibilidad, no garantizamos servicio ininterrumpido. Proporcionamos:',
             items: [
               '99.9% SLA de tiempo de actividad para suscripciones pagadas',
               'Ventanas de mantenimiento regulares con aviso previo',
               'Soporte técnico basado en su nivel de suscripción',
-              'Monitoreo de seguridad y respuesta a incidentes'
-            ]
+              'Monitoreo de seguridad y respuesta a incidentes',
+            ],
           },
           termination: {
             title: '9. Terminación',
@@ -2199,64 +2285,72 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Podemos terminar por incumplimiento de estos Términos con notificación razonable',
               'Podemos suspender el servicio inmediatamente por violaciones graves o amenazas de seguridad',
               'Al terminar, perderá acceso a la plataforma y sus datos',
-              'Proporcionaremos una oportunidad razonable para exportar sus datos antes de la eliminación'
-            ]
+              'Proporcionaremos una oportunidad razonable para exportar sus datos antes de la eliminación',
+            ],
           },
           disclaimers: {
             title: '10. Exenciones de Responsabilidad y Limitaciones de Responsabilidad',
-            content: 'THE DAS BOARD SE PROPORCIONA "TAL COMO ESTÁ" SIN GARANTÍAS DE NINGÚN TIPO. HASTA EL MÁXIMO PERMITIDO POR LA LEY:',
+            content:
+              'THE DAS BOARD SE PROPORCIONA "TAL COMO ESTÁ" SIN GARANTÍAS DE NINGÚN TIPO. HASTA EL MÁXIMO PERMITIDO POR LA LEY:',
             items: [
               'Renunciamos a todas las garantías, expresas o implícitas, incluyendo comerciabilidad e idoneidad para un propósito particular',
               'No somos responsables por daños indirectos, incidentales, especiales o consecuentes',
               'Nuestra responsabilidad total no excederá las tarifas pagadas por usted en los 12 meses anteriores al reclamo',
-              'Reconoce que el software puede contener errores y acepta reportarlos prontamente'
-            ]
+              'Reconoce que el software puede contener errores y acepta reportarlos prontamente',
+            ],
           },
           indemnification: {
             title: '11. Indemnización',
-            content: 'Acepta indemnizar y eximirnos de cualquier reclamo, pérdida o daño que surja de su uso de nuestros servicios, violación de estos Términos o infracción de derechos de terceros.'
+            content:
+              'Acepta indemnizar y eximirnos de cualquier reclamo, pérdida o daño que surja de su uso de nuestros servicios, violación de estos Términos o infracción de derechos de terceros.',
           },
           governing: {
             title: '12. Ley Aplicable y Resolución de Disputas',
-            content: 'Estos Términos se rigen por las leyes de [Jurisdicción] sin considerar principios de conflicto de leyes. Cualquier disputa se resolverá a través de arbitraje vinculante, excepto por reclamos de medidas cautelares que pueden presentarse en tribunales apropiados.'
+            content:
+              'Estos Términos se rigen por las leyes de [Jurisdicción] sin considerar principios de conflicto de leyes. Cualquier disputa se resolverá a través de arbitraje vinculante, excepto por reclamos de medidas cautelares que pueden presentarse en tribunales apropiados.',
           },
           changes: {
             title: '13. Cambios en los Términos',
-            content: 'Podemos modificar estos Términos de vez en cuando. Proporcionaremos notificación de cambios materiales con al menos 30 días de anticipación. El uso continuado de nuestros servicios después de que los cambios entren en vigor constituye aceptación de los Términos revisados.'
+            content:
+              'Podemos modificar estos Términos de vez en cuando. Proporcionaremos notificación de cambios materiales con al menos 30 días de anticipación. El uso continuado de nuestros servicios después de que los cambios entren en vigor constituye aceptación de los Términos revisados.',
           },
           entire: {
             title: '14. Acuerdo Completo',
-            content: 'Estos Términos, junto con nuestra Política de Privacidad y cualquier acuerdo adicional, constituyen el acuerdo completo entre usted y The DAS Board con respecto al uso de nuestros servicios.'
+            content:
+              'Estos Términos, junto con nuestra Política de Privacidad y cualquier acuerdo adicional, constituyen el acuerdo completo entre usted y The DAS Board con respecto al uso de nuestros servicios.',
           },
           contact: {
             title: '15. Información de Contacto',
             content: 'Si tiene preguntas sobre estos Términos, por favor contáctenos:',
             email: 'legal@thedasboard.com',
             address: '[Dirección de la Empresa]',
-            phone: '[Número de Teléfono de Soporte]'
-          }
-        }
+            phone: '[Número de Teléfono de Soporte]',
+          },
+        },
       },
       privacy: {
         title: 'Política de Privacidad',
         lastUpdated: 'Última Actualización: 28/6/2025',
-        intro: 'Esta Política de Privacidad describe cómo The DAS Board ("nosotros", "nos" o "nuestro") recopila, utiliza y protege su información personal cuando utiliza nuestra plataforma de software de gestión de concesionarios. Estamos comprometidos a proteger su privacidad y manejar sus datos de manera responsable.',
+        intro:
+          'Esta Política de Privacidad describe cómo The DAS Board ("nosotros", "nos" o "nuestro") recopila, utiliza y protege su información personal cuando utiliza nuestra plataforma de software de gestión de concesionarios. Estamos comprometidos a proteger su privacidad y manejar sus datos de manera responsable.',
         sections: {
           collection: {
             title: '1. Información que Recopilamos',
-            content: 'Cuando utiliza The DAS Board, recopilamos varios tipos de información para proporcionar y mejorar nuestros servicios:',
+            content:
+              'Cuando utiliza The DAS Board, recopilamos varios tipos de información para proporcionar y mejorar nuestros servicios:',
             items: [
               '<strong>Información de Cuenta:</strong> Nombre, dirección de correo electrónico, número de teléfono, nombre de la empresa, cargo y información de facturación',
               '<strong>Datos del Concesionario:</strong> Inventario de vehículos, registros de ventas, información del cliente y transacciones financieras',
               '<strong>Datos de Uso:</strong> Funciones accedidas, tiempo pasado en la plataforma, interacciones del usuario y métricas de rendimiento',
               '<strong>Datos Técnicos:</strong> Dirección IP, tipo de navegador, información del dispositivo, sistema operativo y registros de acceso',
               '<strong>Datos de Comunicación:</strong> Solicitudes de soporte, comentarios y correspondencia con nuestro equipo',
-              '<strong>Datos de Ubicación:</strong> Direcciones del concesionario y, con consentimiento, ubicación del dispositivo para funciones móviles'
-            ]
+              '<strong>Datos de Ubicación:</strong> Direcciones del concesionario y, con consentimiento, ubicación del dispositivo para funciones móviles',
+            ],
           },
           usage: {
             title: '2. Cómo Utilizamos Su Información',
-            content: 'Utilizamos la información recopilada para propósitos comerciales legítimos, incluyendo:',
+            content:
+              'Utilizamos la información recopilada para propósitos comerciales legítimos, incluyendo:',
             items: [
               'Proporcionar, mantener y mejorar la plataforma y funciones de The DAS Board',
               'Procesar suscripciones, pagos y gestionar su cuenta',
@@ -2265,41 +2359,44 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Enviar actualizaciones de servicio, alertas de seguridad y mensajes administrativos',
               'Detectar, prevenir y abordar problemas técnicos y amenazas de seguridad',
               'Cumplir con obligaciones legales y regulaciones de la industria',
-              'Mejorar la experiencia del usuario a través del desarrollo e investigación de productos'
-            ]
+              'Mejorar la experiencia del usuario a través del desarrollo e investigación de productos',
+            ],
           },
           sharing: {
             title: '3. Compartir Su Información',
-            content: 'No vendemos, alquilamos ni intercambiamos su información personal. Podemos compartir su información solo en las siguientes circunstancias:',
+            content:
+              'No vendemos, alquilamos ni intercambiamos su información personal. Podemos compartir su información solo en las siguientes circunstancias:',
             items: [
               '<strong>Proveedores de Servicios:</strong> Vendedores terceros que nos ayudan a operar nuestra plataforma (hosting, análisis, procesamiento de pagos)',
               '<strong>Socios Comerciales:</strong> Integraciones autorizadas y socios de la industria automotriz con su consentimiento explícito',
               '<strong>Requisitos Legales:</strong> Cuando sea requerido por ley, regulación o proceso legal válido',
               '<strong>Transferencias Comerciales:</strong> En conexión con fusiones, adquisiciones o ventas de activos (con aviso previo)',
-              '<strong>Seguridad y Protección:</strong> Para proteger los derechos, propiedad o seguridad de nuestros usuarios o el público'
-            ]
+              '<strong>Seguridad y Protección:</strong> Para proteger los derechos, propiedad o seguridad de nuestros usuarios o el público',
+            ],
           },
           retention: {
             title: '4. Retención de Datos',
-            content: 'Retenemos su información personal durante el tiempo necesario para proporcionar nuestros servicios y cumplir con obligaciones legales. Específicamente:',
+            content:
+              'Retenemos su información personal durante el tiempo necesario para proporcionar nuestros servicios y cumplir con obligaciones legales. Específicamente:',
             items: [
               'Los datos de cuenta se retienen mientras su suscripción esté activa y por 3 años después de la terminación',
               'Los registros de transacciones se mantienen por 7 años para cumplir con regulaciones financieras',
               'Los registros de uso se retienen por 2 años para análisis de seguridad y rendimiento',
-              'Los registros de comunicación se mantienen por 5 años para propósitos de servicio al cliente'
-            ]
+              'Los registros de comunicación se mantienen por 5 años para propósitos de servicio al cliente',
+            ],
           },
           rights: {
             title: '5. Sus Derechos y Opciones',
-            content: 'Dependiendo de su ubicación, puede tener los siguientes derechos con respecto a su información personal:',
+            content:
+              'Dependiendo de su ubicación, puede tener los siguientes derechos con respecto a su información personal:',
             items: [
               '<strong>Acceso:</strong> Solicitar una copia de su información personal que mantenemos',
               '<strong>Corrección:</strong> Actualizar o corregir información personal inexacta',
               '<strong>Eliminación:</strong> Solicitar la eliminación de su información personal (sujeto a obligaciones legales)',
               '<strong>Portabilidad:</strong> Recibir sus datos en un formato legible por máquina',
               '<strong>Restricción:</strong> Limitar cómo procesamos su información personal',
-              '<strong>Objeción:</strong> Objetar el procesamiento basado en intereses legítimos'
-            ]
+              '<strong>Objeción:</strong> Objetar el procesamiento basado en intereses legítimos',
+            ],
           },
           cookies: {
             title: '6. Cookies y Tecnologías de Seguimiento',
@@ -2308,75 +2405,87 @@ export const translations: Record<Language, Translations | Partial<Translations>
               '<strong>Cookies Esenciales:</strong> Requeridas para la funcionalidad y seguridad de la plataforma',
               '<strong>Cookies de Análisis:</strong> Nos ayudan a entender cómo utiliza nuestra plataforma',
               '<strong>Cookies de Preferencia:</strong> Recuerdan sus configuraciones y personalizaciones',
-              '<strong>Cookies de Marketing:</strong> Utilizadas para comunicaciones dirigidas (con su consentimiento)'
+              '<strong>Cookies de Marketing:</strong> Utilizadas para comunicaciones dirigidas (con su consentimiento)',
             ],
-            footer: 'Puede controlar las preferencias de cookies a través de la configuración de su navegador o nuestra herramienta de gestión de cookies.'
+            footer:
+              'Puede controlar las preferencias de cookies a través de la configuración de su navegador o nuestra herramienta de gestión de cookies.',
           },
           security: {
             title: '7. Medidas de Seguridad',
-            content: 'Implementamos medidas de seguridad estándar de la industria para proteger su información, incluyendo:',
+            content:
+              'Implementamos medidas de seguridad estándar de la industria para proteger su información, incluyendo:',
             items: [
               'Cifrado de datos en tránsito y en reposo utilizando estándares AES-256',
               'Auditorías de seguridad regulares y pruebas de penetración',
               'Autenticación multifactor y controles de acceso',
               'Cumplimiento SOC 2 Type II y evaluaciones de seguridad regulares',
-              'Capacitación de empleados sobre protección de datos y mejores prácticas de seguridad'
-            ]
+              'Capacitación de empleados sobre protección de datos y mejores prácticas de seguridad',
+            ],
           },
           international: {
             title: '8. Transferencias Internacionales de Datos',
-            content: 'Su información puede ser transferida y procesada en países distintos al suyo. Garantizamos que se implementen las salvaguardas apropiadas, incluyendo Cláusulas Contractuales Estándar y decisiones de adecuación, para proteger sus datos durante las transferencias internacionales.'
+            content:
+              'Su información puede ser transferida y procesada en países distintos al suyo. Garantizamos que se implementen las salvaguardas apropiadas, incluyendo Cláusulas Contractuales Estándar y decisiones de adecuación, para proteger sus datos durante las transferencias internacionales.',
           },
           children: {
             title: '9. Privacidad de Menores',
-            content: 'The DAS Board no está destinado para uso por individuos menores de 18 años. No recopilamos conscientemente información personal de menores de 18 años. Si nos enteramos de tal recopilación, eliminaremos la información inmediatamente.'
+            content:
+              'The DAS Board no está destinado para uso por individuos menores de 18 años. No recopilamos conscientemente información personal de menores de 18 años. Si nos enteramos de tal recopilación, eliminaremos la información inmediatamente.',
           },
           changes: {
             title: '10. Cambios a Esta Política de Privacidad',
-            content: 'Podemos actualizar esta Política de Privacidad periódicamente para reflejar cambios en nuestras prácticas o requisitos legales. Le notificaremos sobre cambios significativos por correo electrónico o notificación en la plataforma al menos 30 días antes de que entren en vigor.'
+            content:
+              'Podemos actualizar esta Política de Privacidad periódicamente para reflejar cambios en nuestras prácticas o requisitos legales. Le notificaremos sobre cambios significativos por correo electrónico o notificación en la plataforma al menos 30 días antes de que entren en vigor.',
           },
           contact: {
             title: '11. Contáctenos',
-            content: 'Si tiene preguntas sobre esta Política de Privacidad o desea ejercer sus derechos, por favor contáctenos:',
+            content:
+              'Si tiene preguntas sobre esta Política de Privacidad o desea ejercer sus derechos, por favor contáctenos:',
             email: 'privacy@thedasboard.com',
             address: '[Company Address]',
-            phone: '[Support Phone Number]'
-          }
-        }
+            phone: '[Support Phone Number]',
+          },
+        },
       },
       subscription: {
         title: 'Acuerdo de Suscripción',
         lastUpdated: 'Última Actualización: 6/28/2025',
-        intro: 'Este Acuerdo de Suscripción rige su suscripción y uso de la plataforma de gestión de concesionarios The DAS Board.',
+        intro:
+          'Este Acuerdo de Suscripción rige su suscripción y uso de la plataforma de gestión de concesionarios The DAS Board.',
         sections: {
           plans: {
             title: '1. Planes de Suscripción',
-            content: 'The DAS Board ofrece niveles de suscripción diseñados para diferentes necesidades de concesionarios:',
+            content:
+              'The DAS Board ofrece niveles de suscripción diseñados para diferentes necesidades de concesionarios:',
             items: [
               '<strong>Prueba Gratuita de 60 Días:</strong> Acceso completo a la plataforma sin tarjeta de crédito requerida',
               '<strong>Gerente Financiero:</strong> Acceso individual de usuario con herramientas financieras centrales',
               '<strong>Concesionario:</strong> Acceso multiusuario con gestión completa de inventario y ventas',
-              '<strong>Grupo de Concesionarios:</strong> Acceso a nivel empresarial en múltiples ubicaciones'
+              '<strong>Grupo de Concesionarios:</strong> Acceso a nivel empresarial en múltiples ubicaciones',
             ],
-            footer: 'Las suscripciones se facturan mensualmente por adelantado. Puede actualizar o degradar su suscripción en cualquier momento, con cambios que toman efecto en el próximo ciclo de facturación.'
+            footer:
+              'Las suscripciones se facturan mensualmente por adelantado. Puede actualizar o degradar su suscripción en cualquier momento, con cambios que toman efecto en el próximo ciclo de facturación.',
           },
           payment: {
             title: '2. Términos de Pago',
-            content: 'El pago vence al comienzo de la suscripción y el mismo día de cada mes posterior. Aceptamos las principales tarjetas de crédito y transferencias ACH para cuentas empresariales. Si el pago falla, podemos suspender su acceso a The DAS Board después de un aviso razonable.'
+            content:
+              'El pago vence al comienzo de la suscripción y el mismo día de cada mes posterior. Aceptamos las principales tarjetas de crédito y transferencias ACH para cuentas empresariales. Si el pago falla, podemos suspender su acceso a The DAS Board después de un aviso razonable.',
           },
           trial: {
             title: '3. Período de Prueba',
-            content: 'La prueba de 60 días proporciona acceso completo a la plataforma The DAS Board. No se requiere tarjeta de crédito para comenzar su prueba. Al final del período de prueba, necesitará seleccionar un plan pagado para continuar usando la plataforma. Los datos de prueba se conservarán durante 30 días después de la expiración de la prueba.'
+            content:
+              'La prueba de 60 días proporciona acceso completo a la plataforma The DAS Board. No se requiere tarjeta de crédito para comenzar su prueba. Al final del período de prueba, necesitará seleccionar un plan pagado para continuar usando la plataforma. Los datos de prueba se conservarán durante 30 días después de la expiración de la prueba.',
           },
           cancellation: {
             title: '4. Cancelación y Reembolsos',
-            content: 'Puede cancelar su suscripción en cualquier momento a través de la configuración de su cuenta o contactando a nuestro equipo de soporte. Tras la cancelación:',
+            content:
+              'Puede cancelar su suscripción en cualquier momento a través de la configuración de su cuenta o contactando a nuestro equipo de soporte. Tras la cancelación:',
             items: [
               'Mantendrá acceso hasta el final de su período de facturación actual',
               'No se proporcionan reembolsos por meses parciales de servicio',
               'Sus datos estarán disponibles para exportación durante 90 días después de la cancelación',
-              'La renovación automática será deshabilitada'
-            ]
+              'La renovación automática será deshabilitada',
+            ],
           },
           sla: {
             title: '5. Acuerdo de Nivel de Servicio',
@@ -2385,8 +2494,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
               '99.9% de disponibilidad de tiempo de actividad de la plataforma',
               'Ventanas de mantenimiento programadas con aviso de 48 horas',
               'Respuesta de soporte al cliente dentro de 24 horas para solicitudes estándar',
-              'Soporte prioritario para suscriptores de Grupo de Concesionarios'
-            ]
+              'Soporte prioritario para suscriptores de Grupo de Concesionarios',
+            ],
           },
           data: {
             title: '6. Datos y Seguridad',
@@ -2395,8 +2504,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Copias de seguridad automatizadas diarias con retención de 30 días',
               'Protocolos de cifrado y seguridad a nivel bancario',
               'Cumplimiento GDPR y CCPA para protección de datos',
-              'Capacidades de exportación de datos en formatos estándar'
-            ]
+              'Capacidades de exportación de datos en formatos estándar',
+            ],
           },
           support: {
             title: '7. Soporte y Capacitación',
@@ -2405,22 +2514,25 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Asistencia integral de incorporación y configuración',
               'Recursos de capacitación en línea y documentación',
               'Soporte por email y chat durante horario comercial',
-              'Actualizaciones regulares de la plataforma y lanzamientos de nuevas funciones'
-            ]
+              'Actualizaciones regulares de la plataforma y lanzamientos de nuevas funciones',
+            ],
           },
           modifications: {
             title: '8. Modificaciones al Servicio',
-            content: 'Podemos modificar o actualizar la plataforma The DAS Board para mejorar la funcionalidad, seguridad o cumplimiento. Proporcionaremos aviso razonable de cambios significativos que puedan afectar su uso.'
-          }
-        }
+            content:
+              'Podemos modificar o actualizar la plataforma The DAS Board para mejorar la funcionalidad, seguridad o cumplimiento. Proporcionaremos aviso razonable de cambios significativos que puedan afectar su uso.',
+          },
+        },
       },
       pricingPage: {
         title: 'Selecciona Tu',
         titleHighlight: 'Solución',
-        subtitle: 'Selecciona la opción que mejor describe tus necesidades. Personalizaremos tu experiencia en consecuencia.',
+        subtitle:
+          'Selecciona la opción que mejor describe tus necesidades. Personalizaremos tu experiencia en consecuencia.',
         singleFinance: {
           title: 'Gerente Financiero Individual',
-          description: 'Perfecto para gerentes financieros individuales que quieren rastrear su rendimiento personal y ofertas.',
+          description:
+            'Perfecto para gerentes financieros individuales que quieren rastrear su rendimiento personal y ofertas.',
           originalPrice: '$29.99/mes',
           price: '$20/mes tiempo limitado',
           features: [
@@ -2428,14 +2540,15 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'Análisis de PVR y ganancias de productos',
             'Calculadora de pagos',
             'Métricas de rendimiento',
-            'Puede ser deducible de impuestos'
+            'Puede ser deducible de impuestos',
           ],
           buttonText: '¡Comienza Ahora!',
-          setupTime: 'Prueba sin riesgo por un mes calendario completo'
+          setupTime: 'Prueba sin riesgo por un mes calendario completo',
         },
         dealership: {
           title: 'Concesionario / Grupo de Concesionarios',
-          description: 'Gestión completa de concesionarios con tableros específicos para roles, gestión de equipos y soporte multi-ubicación.',
+          description:
+            'Gestión completa de concesionarios con tableros específicos para roles, gestión de equipos y soporte multi-ubicación.',
           price: '$250/mes base',
           priceSubtext: 'por concesionario + complementos',
           popular: 'Más Popular',
@@ -2444,42 +2557,47 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'Tableros de equipo para todos los roles',
             'Análisis de múltiples ubicaciones',
             'Estructuras administrativas flexibles',
-            'Descuentos por volumen disponibles'
+            'Descuentos por volumen disponibles',
           ],
           buttonText: 'Ver Precios de Paquete Dinámico',
-          setupTime: 'Comience hoy'
+          setupTime: 'Comience hoy',
         },
         benefits: {
           title: 'Transforma Tu Concesionario Hoy',
           performance: {
             title: 'Aumenta el Rendimiento',
-            description: 'Los insights en tiempo real ayudan a los equipos a superar metas y maximizar la rentabilidad'
+            description:
+              'Los insights en tiempo real ayudan a los equipos a superar metas y maximizar la rentabilidad',
           },
           operations: {
             title: 'Optimiza las Operaciones',
-            description: 'La gestión centralizada reduce el tiempo administrativo y mejora la eficiencia'
+            description:
+              'La gestión centralizada reduce el tiempo administrativo y mejora la eficiencia',
           },
           security: {
             title: 'Seguro y Confiable',
-            description: 'Seguridad de nivel empresarial con garantía de 99.9% de tiempo de actividad'
-          }
+            description:
+              'Seguridad de nivel empresarial con garantía de 99.9% de tiempo de actividad',
+          },
         },
         helpText: {
           title: '¿No estás seguro de qué opción elegir?',
-          description: 'Comienza con la opción de gerente financiero individual para probar nuestra plataforma, luego actualiza fácilmente a características de concesionario cuando estés listo para expandir tu equipo.'
+          description:
+            'Comienza con la opción de gerente financiero individual para probar nuestra plataforma, luego actualiza fácilmente a características de concesionario cuando estés listo para expandir tu equipo.',
         },
         footer: {
           copyright: '© 2025 The DAS Board. Todos los derechos reservados.',
           support: '¿Preguntas? Contáctanos en',
-          email: 'support@thedasboard.com'
-        }
+          email: 'support@thedasboard.com',
+        },
       },
     },
     demoPage: {
       backToHome: 'Volver al Inicio',
       title: 'Experimente El DAS Board',
       startFreeTrial: 'Iniciar Prueba Gratuita',
-      subtitle: 'Explore nuestra demostración interactiva para ver cómo diferentes roles usan nuestro tablero',
+      subtitle:
+        'Explore nuestra demostración interactiva para ver cómo diferentes roles usan nuestro tablero',
       dashboards: {
         salesperson: {
           title: 'Tablero del Vendedor',
@@ -2501,27 +2619,33 @@ export const translations: Record<Language, Translations | Partial<Translations>
       hotspots: {
         productTracking: {
           title: 'Seguimiento de Productos',
-          description: 'Monitoree el rendimiento de ventas de productos, rastree garantías, GAP y otros productos F&I para maximizar la rentabilidad por oferta.',
+          description:
+            'Monitoree el rendimiento de ventas de productos, rastree garantías, GAP y otros productos F&I para maximizar la rentabilidad por oferta.',
         },
         performanceMetrics: {
           title: 'Métricas de Rendimiento',
-          description: 'Monitoree su rendimiento personal con métricas clave como PVR (Por Vehículo Vendido), productos por oferta y objetivos mensuales.',
+          description:
+            'Monitoree su rendimiento personal con métricas clave como PVR (Por Vehículo Vendido), productos por oferta y objetivos mensuales.',
         },
         teamPerformance: {
           title: 'Rendimiento del Equipo',
-          description: 'Compare su rendimiento con los promedios del equipo y vea cómo se clasifica entre sus colegas.',
+          description:
+            'Compare su rendimiento con los promedios del equipo y vea cómo se clasifica entre sus colegas.',
         },
         recentDealsLog: {
           title: 'Registro de Ofertas Recientes',
-          description: 'Vea y gestione sus ofertas más recientes con acceso rápido a detalles del cliente y rentabilidad de la oferta.',
+          description:
+            'Vea y gestione sus ofertas más recientes con acceso rápido a detalles del cliente y rentabilidad de la oferta.',
         },
         pvr: {
           title: 'PVR',
-          description: 'Por Vehículo Vendido - Rastree su ganancia promedio por vehículo y vea cómo se compara con los objetivos y promedios del equipo.',
+          description:
+            'Por Vehículo Vendido - Rastree su ganancia promedio por vehículo y vea cómo se compara con los objetivos y promedios del equipo.',
         },
         payCalculator: {
           title: 'Calculadora de Pagos',
-          description: 'Calcule su comisión y bonificaciones basadas en la rentabilidad de la oferta y ventas de productos.',
+          description:
+            'Calcule su comisión y bonificaciones basadas en la rentabilidad de la oferta y ventas de productos.',
         },
         schedule: {
           title: 'Horario',
@@ -2529,7 +2653,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
         },
         teamSchedule: {
           title: 'Horario del Equipo',
-          description: 'Vea fácilmente los horarios del equipo, rastree la asistencia y gestione asignaciones de turnos para cobertura óptima.',
+          description:
+            'Vea fácilmente los horarios del equipo, rastree la asistencia y gestione asignaciones de turnos para cobertura óptima.',
         },
         grossProfitIndicator: {
           title: 'Indicador de Ganancia Bruta',
@@ -2537,63 +2662,78 @@ export const translations: Record<Language, Translations | Partial<Translations>
         },
         salesReports: {
           title: 'Informes de Ventas, Programador, Objetivos',
-          description: 'Acceda a informes de ventas completos, gestione horarios del equipo y establezca/rastree objetivos mensuales y anuales para su equipo de ventas.',
+          description:
+            'Acceda a informes de ventas completos, gestione horarios del equipo y establezca/rastree objetivos mensuales y anuales para su equipo de ventas.',
         },
         dasBoard: {
           title: 'El DAS Board',
-          description: 'Vea la Tabla de Clasificación de Ventas para mantenerse al tanto del rendimiento y clasificaciones de sus vendedores.',
+          description:
+            'Vea la Tabla de Clasificación de Ventas para mantenerse al tanto del rendimiento y clasificaciones de sus vendedores.',
         },
         salesPerformance: {
           title: 'Rendimiento de Ventas',
-          description: 'Vista rápida para mantenerse al tanto de los objetivos de ventas, rastrear el progreso del equipo y monitorear indicadores clave de rendimiento.',
+          description:
+            'Vista rápida para mantenerse al tanto de los objetivos de ventas, rastrear el progreso del equipo y monitorear indicadores clave de rendimiento.',
         },
         unitsSold: {
           title: 'Unidades Vendidas',
-          description: 'Rastree el total de unidades vendidas incluyendo vehículos nuevos y usados con desgloses diarios, semanales y mensuales.',
+          description:
+            'Rastree el total de unidades vendidas incluyendo vehículos nuevos y usados con desgloses diarios, semanales y mensuales.',
         },
         unitCount: {
           title: 'Conteo de Unidades',
-          description: 'Rastree sus totales de autos nuevos y usados con desgloses diarios, semanales y mensuales para monitorear el volumen de ventas.',
+          description:
+            'Rastree sus totales de autos nuevos y usados con desgloses diarios, semanales y mensuales para monitorear el volumen de ventas.',
         },
         dealLog: {
           title: 'Registro de Ofertas',
-          description: 'Manténgase al tanto de todas sus ofertas con información detallada del cliente, estado de la oferta e historial de transacciones.',
+          description:
+            'Manténgase al tanto de todas sus ofertas con información detallada del cliente, estado de la oferta e historial de transacciones.',
         },
         goalTracker: {
           title: 'Rastreador de Objetivos y Calculadora de Pagos',
-          description: 'Manténgase al tanto de sus objetivos y estimador de pagos MTD para rastrear el progreso y maximizar ganancias.',
+          description:
+            'Manténgase al tanto de sus objetivos y estimador de pagos MTD para rastrear el progreso y maximizar ganancias.',
         },
         goalQuickView: {
           title: 'Vista Rápida de Objetivos',
-          description: 'Sepa fácilmente dónde está con sus objetivos y rastree el progreso hacia objetivos mensuales y anuales.',
+          description:
+            'Sepa fácilmente dónde está con sus objetivos y rastree el progreso hacia objetivos mensuales y anuales.',
         },
         grossTracker: {
           title: 'Rastreador de Ganancias',
-          description: 'Manténgase al tanto de sus ganancias con vista rápida del rastreo de ganancias frontal y trasera para maximizar cada oferta.',
+          description:
+            'Manténgase al tanto de sus ganancias con vista rápida del rastreo de ganancias frontal y trasera para maximizar cada oferta.',
         },
         fiManagerPerformance: {
           title: 'Rendimiento del Gerente F&I',
-          description: 'Compare el rendimiento del Gerente F&I con los promedios del equipo y compare con los estándares de la industria para máxima rentabilidad.',
+          description:
+            'Compare el rendimiento del Gerente F&I con los promedios del equipo y compare con los estándares de la industria para máxima rentabilidad.',
         },
         salesManagerPerformance: {
           title: 'Rendimiento del Gerente de Ventas',
-          description: 'Vea el rendimiento del Gerente de Ventas contra compañeros de equipo y compare métricas individuales en el equipo de gestión de ventas.',
+          description:
+            'Vea el rendimiento del Gerente de Ventas contra compañeros de equipo y compare métricas individuales en el equipo de gestión de ventas.',
         },
         salesDasBoard: {
           title: 'DAS Board de Ventas',
-          description: 'Vea a sus líderes de vendedores y rastree a los mejores para máxima productividad mientras monitorea la dinámica del equipo y el logro de objetivos individuales.',
+          description:
+            'Vea a sus líderes de vendedores y rastree a los mejores para máxima productividad mientras monitorea la dinámica del equipo y el logro de objetivos individuales.',
         },
         pvrDealership: {
           title: 'PVR',
-          description: 'Por Vehículo Vendido - Rastree la ganancia promedio del concesionario por vehículo tanto frontal como trasera para ver resultados rápidos.',
+          description:
+            'Por Vehículo Vendido - Rastree la ganancia promedio del concesionario por vehículo tanto frontal como trasera para ver resultados rápidos.',
         },
         goalTracking: {
           title: 'Seguimiento de Objetivos',
-          description: 'Determine rápidamente el progreso de ventas de unidades MTD y rastree el rendimiento contra objetivos mensuales.',
+          description:
+            'Determine rápidamente el progreso de ventas de unidades MTD y rastree el rendimiento contra objetivos mensuales.',
         },
         unitsSoldDealer: {
           title: 'Unidades Vendidas',
-          description: 'Rastree rápidamente el total de unidades vendidas incluyendo vehículos nuevos y usados con ventas MTD.',
+          description:
+            'Rastree rápidamente el total de unidades vendidas incluyendo vehículos nuevos y usados con ventas MTD.',
         },
       },
     },
@@ -2632,32 +2772,34 @@ export const translations: Record<Language, Translations | Partial<Translations>
           name: 'Gestionnaire Financier Individuel',
           price: '$20/mois temps limité',
           originalPrice: '$29.99/mois',
-          description: 'Parfait pour les gestionnaires financiers individuels qui souhaitent suivre leurs performances personnelles',
+          description:
+            'Parfait pour les gestionnaires financiers individuels qui souhaitent suivre leurs performances personnelles',
           features: [
             'Suivi des affaires personnelles',
             'Analyses PVR et profits des produits',
             'Calculateur de paiements',
             'Métriques de performance',
-            'Peut être déductible des impôts'
+            'Peut être déductible des impôts',
           ],
           buttonText: 'Commencez Maintenant !',
-          setupTime: 'Essai sans risque pendant un mois calendaire complet'
+          setupTime: 'Essai sans risque pendant un mois calendaire complet',
         },
         dealership: {
           name: 'Concession / Groupe de Concessionnaires',
           price: '$250/mo base',
-          description: 'Gestion complète de concession avec tableaux de bord spécifiques aux rôles et gestion d\'équipe',
+          description:
+            "Gestion complète de concession avec tableaux de bord spécifiques aux rôles et gestion d'équipe",
           popular: 'Le Plus Populaire',
           features: [
             'Toutes les fonctionnalités du gestionnaire individuel',
-            'Tableaux de bord d\'équipe pour tous les rôles',
+            "Tableaux de bord d'équipe pour tous les rôles",
             'Analyses multi-sites',
-            'Structures administratives flexibles'
+            'Structures administratives flexibles',
           ],
           buttonText: 'Configurer Votre Package',
-          setupTime: 'Commencez dès aujourd\'hui'
+          setupTime: "Commencez dès aujourd'hui",
         },
-        priceSubtext: 'par concession + modules complémentaires'
+        priceSubtext: 'par concession + modules complémentaires',
       },
       cta: {
         title: 'Prêt à transformer les opérations de votre concessionnaire?',
@@ -2835,7 +2977,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
         kpi: {
           fiGross: 'Brut F&I',
           dealsProcessed: 'Affaires Traitées',
-          dealTypes: 'Types d\'Affaires',
+          dealTypes: "Types d'Affaires",
           productsPerDeal: 'Produits par Affaire',
           pvr: 'PVR',
           pvrFull: 'PVR (Par Véhicule Vendu)',
@@ -2937,12 +3079,15 @@ export const translations: Record<Language, Translations | Partial<Translations>
           deadDeal: 'Affaire Morte',
         },
         noDealsFound: 'Aucune affaire ne correspond à vos critères de recherche.',
-        noDealsYet: "Aucune affaire enregistrée encore. Utilisez le bouton 'Enregistrer Nouvelle Affaire' pour ajouter des affaires.",
+        noDealsYet:
+          "Aucune affaire enregistrée encore. Utilisez le bouton 'Enregistrer Nouvelle Affaire' pour ajouter des affaires.",
         showingDeals: 'Affichage de {count} sur {total} affaires',
         totalGross: 'Brut Total:',
         backEndTotal: 'Total Back End:',
-        confirmDelete: '⚠️ CONFIRMATION DE SUPPRESSION\n\nÊtes-vous sûr de vouloir supprimer cette affaire?\n\nCette action va:\n• Supprimer définitivement toutes les données de l\'affaire\n• Mettre à jour vos métriques du tableau de bord\n• Ne peut pas être annulée\n\nCliquez OK pour supprimer ou Annuler pour garder l\'affaire.',
-        finalConfirmDelete: '🚨 CONFIRMATION FINALE\n\nC\'est votre dernière chance!\n\nCliquez OK pour supprimer définitivement cette affaire, ou Annuler pour la garder.',
+        confirmDelete:
+          "⚠️ CONFIRMATION DE SUPPRESSION\n\nÊtes-vous sûr de vouloir supprimer cette affaire?\n\nCette action va:\n• Supprimer définitivement toutes les données de l'affaire\n• Mettre à jour vos métriques du tableau de bord\n• Ne peut pas être annulée\n\nCliquez OK pour supprimer ou Annuler pour garder l'affaire.",
+        finalConfirmDelete:
+          "🚨 CONFIRMATION FINALE\n\nC'est votre dernière chance!\n\nCliquez OK pour supprimer définitivement cette affaire, ou Annuler pour la garder.",
         editButton: 'Modifier',
       },
       dealLog: {
@@ -2950,11 +3095,13 @@ export const translations: Record<Language, Translations | Partial<Translations>
         editDeal: 'Modifier Affaire - Tableau de Bord Financier Individuel',
         backToDashboard: 'Retour au Tableau de Bord',
         note: 'Note',
-        editingNote: 'Vous modifiez une affaire existante. Les changements seront reflétés immédiatement sur votre tableau de bord.',
-        dashboardNote: 'Cette affaire apparaîtra seulement sur votre Tableau de Bord du Gestionnaire Financier Individuel et n\'affectera pas les autres tableaux de bord du système.',
-        dealInformation: 'Informations de l\'Affaire',
+        editingNote:
+          'Vous modifiez une affaire existante. Les changements seront reflétés immédiatement sur votre tableau de bord.',
+        dashboardNote:
+          "Cette affaire apparaîtra seulement sur votre Tableau de Bord du Gestionnaire Financier Individuel et n'affectera pas les autres tableaux de bord du système.",
+        dealInformation: "Informations de l'Affaire",
         dealNumber: '# Affaire',
-        enterDealNumber: 'Entrez le numéro d\'affaire',
+        enterDealNumber: "Entrez le numéro d'affaire",
         saleDate: 'Date de Vente',
         stockNumber: '# Stock',
         vinLast8: 'VIN # (8 Derniers)',
@@ -2977,7 +3124,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
         selectManager: 'Sélectionner Directeur',
         lender: 'Prêteur',
         selectLender: 'Sélectionner Prêteur',
-        dealType: 'Type d\'Affaire',
+        dealType: "Type d'Affaire",
         dealTypes: {
           cash: 'Comptant',
           finance: 'Financement',
@@ -3018,10 +3165,10 @@ export const translations: Record<Language, Translations | Partial<Translations>
       },
       settings: {
         title: 'Paramètres',
-        teamManagement: 'Membres de l\'Équipe',
+        teamManagement: "Membres de l'Équipe",
         payConfiguration: 'Configurateur de Paie',
         languageSettings: 'Paramètres de Langue',
-        addNewMember: 'Ajouter Nouveau Membre d\'Équipe',
+        addNewMember: "Ajouter Nouveau Membre d'Équipe",
         firstName: 'Prénom',
         lastName: 'Nom de Famille',
         role: 'Rôle',
@@ -3080,142 +3227,160 @@ export const translations: Record<Language, Translations | Partial<Translations>
       terms: {
         title: 'Conditions de service',
         lastUpdated: 'Dernière mise à jour : 6/28/2025',
-        intro: 'Bienvenue sur The DAS Board. Ces Conditions de Service ("Conditions") régissent votre accès et votre utilisation de notre plateforme logicielle de gestion de concessionnaire. En accédant ou en utilisant nos services, vous acceptez d\'être lié par ces Conditions.',
+        intro:
+          'Bienvenue sur The DAS Board. Ces Conditions de Service ("Conditions") régissent votre accès et votre utilisation de notre plateforme logicielle de gestion de concessionnaire. En accédant ou en utilisant nos services, vous acceptez d\'être lié par ces Conditions.',
         sections: {
           acceptance: {
             title: '1. Acceptation des Conditions',
-            content: 'En créant un compte, en accédant ou en utilisant The DAS Board, vous reconnaissez avoir lu, compris et accepté d\'être lié par ces Conditions et notre Politique de Confidentialité. Si vous n\'acceptez pas ces Conditions, vous ne pouvez pas utiliser nos services. Vous devez avoir au moins 18 ans et avoir l\'autorité de conclure ces Conditions au nom de votre organisation.'
+            content:
+              "En créant un compte, en accédant ou en utilisant The DAS Board, vous reconnaissez avoir lu, compris et accepté d'être lié par ces Conditions et notre Politique de Confidentialité. Si vous n'acceptez pas ces Conditions, vous ne pouvez pas utiliser nos services. Vous devez avoir au moins 18 ans et avoir l'autorité de conclure ces Conditions au nom de votre organisation.",
           },
           service: {
             title: '2. Description du Service',
-            content: 'The DAS Board est une plateforme logicielle de gestion de concessionnaire basée sur le cloud qui fournit des outils pour la gestion des stocks, le suivi des ventes, la gestion de la relation client, les rapports financiers et les services connexes de l\'industrie automobile. Nous nous réservons le droit de modifier, suspendre ou interrompre tout aspect de notre service avec un préavis raisonnable.'
+            content:
+              "The DAS Board est une plateforme logicielle de gestion de concessionnaire basée sur le cloud qui fournit des outils pour la gestion des stocks, le suivi des ventes, la gestion de la relation client, les rapports financiers et les services connexes de l'industrie automobile. Nous nous réservons le droit de modifier, suspendre ou interrompre tout aspect de notre service avec un préavis raisonnable.",
           },
           account: {
             title: '3. Inscription de Compte et Sécurité',
-            content: 'Pour utiliser nos services, vous devez créer un compte avec des informations précises et complètes. Vous êtes responsable de :',
+            content:
+              'Pour utiliser nos services, vous devez créer un compte avec des informations précises et complètes. Vous êtes responsable de :',
             items: [
               'Maintenir la confidentialité de vos identifiants de compte',
               'Toutes les activités qui se produisent sous votre compte',
               'Nous notifier immédiatement de toute utilisation non autorisée',
               'Veiller à ce que les informations de votre compte restent à jour et exactes',
-              'Respecter nos exigences de sécurité et les meilleures pratiques'
-            ]
+              'Respecter nos exigences de sécurité et les meilleures pratiques',
+            ],
           },
           subscription: {
-            title: '4. Conditions d\'Abonnement et de Paiement',
-            content: 'The DAS Board fonctionne sur une base d\'abonnement. En vous abonnant, vous acceptez :',
+            title: "4. Conditions d'Abonnement et de Paiement",
+            content:
+              "The DAS Board fonctionne sur une base d'abonnement. En vous abonnant, vous acceptez :",
             items: [
-              'Payer tous les frais associés à votre plan d\'abonnement',
+              "Payer tous les frais associés à votre plan d'abonnement",
               'Le renouvellement automatique sauf annulation avant la date de renouvellement',
               'Les changements de tarifs avec un préavis de 30 jours',
-              'Aucun remboursement pour les périodes d\'abonnement partielles',
-              'La suspension du service pour non-paiement après un préavis raisonnable'
-            ]
+              "Aucun remboursement pour les périodes d'abonnement partielles",
+              'La suspension du service pour non-paiement après un préavis raisonnable',
+            ],
           },
           usage: {
-            title: '5. Politique d\'Utilisation Acceptable',
-            content: 'Vous acceptez d\'utiliser The DAS Board uniquement à des fins légales et conformément à ces Conditions. Vous ne pouvez pas :',
+            title: "5. Politique d'Utilisation Acceptable",
+            content:
+              "Vous acceptez d'utiliser The DAS Board uniquement à des fins légales et conformément à ces Conditions. Vous ne pouvez pas :",
             items: [
               'Violer les lois, réglementations ou droits de tiers applicables',
               'Télécharger du contenu nuisible, offensant ou inapproprié',
-              'Tenter d\'obtenir un accès non autorisé à nos systèmes ou aux comptes d\'autres utilisateurs',
-              'Utiliser le service pour envoyer du spam, des logiciels malveillants ou d\'autres contenus malveillants',
-              'Faire de l\'ingénierie inverse, décompiler ou tenter d\'extraire le code source',
-              'Interférer ou perturber l\'intégrité ou les performances de nos services',
-              'Utiliser la plateforme pour des activités frauduleuses ou illégales'
-            ]
+              "Tenter d'obtenir un accès non autorisé à nos systèmes ou aux comptes d'autres utilisateurs",
+              "Utiliser le service pour envoyer du spam, des logiciels malveillants ou d'autres contenus malveillants",
+              "Faire de l'ingénierie inverse, décompiler ou tenter d'extraire le code source",
+              "Interférer ou perturber l'intégrité ou les performances de nos services",
+              'Utiliser la plateforme pour des activités frauduleuses ou illégales',
+            ],
           },
           intellectual: {
             title: '6. Droits de Propriété Intellectuelle',
-            content: 'The DAS Board et toutes les technologies, contenus et matériaux connexes sont la propriété de nous ou de nos concédants de licence. Cela inclut :',
+            content:
+              'The DAS Board et toutes les technologies, contenus et matériaux connexes sont la propriété de nous ou de nos concédants de licence. Cela inclut :',
             items: [
               'Logiciels, algorithmes et interfaces utilisateur',
               'Marques commerciales, logos et matériaux de marque',
               'Documentation, tutoriels et matériaux de support',
-              'Analyses, rapports et informations sur les données agrégées'
+              'Analyses, rapports et informations sur les données agrégées',
             ],
-            footer: 'Vous conservez la propriété de vos données mais nous accordez une licence pour les utiliser afin de fournir nos services. Nous pouvons utiliser des données anonymisées et agrégées pour la recherche industrielle et l\'amélioration de la plateforme.'
+            footer:
+              "Vous conservez la propriété de vos données mais nous accordez une licence pour les utiliser afin de fournir nos services. Nous pouvons utiliser des données anonymisées et agrégées pour la recherche industrielle et l'amélioration de la plateforme.",
           },
           privacy: {
             title: '7. Protection des Données et Confidentialité',
-            content: 'Vous êtes responsable de vous assurer que toutes les données personnelles que vous traitez via notre plateforme sont conformes aux lois de confidentialité applicables. Nous traiterons les données conformément à notre Politique de Confidentialité et aux réglementations de protection des données applicables, y compris le RGPD et le CCPA le cas échéant.'
+            content:
+              'Vous êtes responsable de vous assurer que toutes les données personnelles que vous traitez via notre plateforme sont conformes aux lois de confidentialité applicables. Nous traiterons les données conformément à notre Politique de Confidentialité et aux réglementations de protection des données applicables, y compris le RGPD et le CCPA le cas échéant.',
           },
           availability: {
             title: '8. Disponibilité du Service et Support',
-            content: 'Bien que nous nous efforcions d\'assurer une haute disponibilité, nous ne garantissons pas un service ininterrompu. Nous fournissons :',
+            content:
+              "Bien que nous nous efforcions d'assurer une haute disponibilité, nous ne garantissons pas un service ininterrompu. Nous fournissons :",
             items: [
               '99,9% de SLA de temps de fonctionnement pour les abonnements payants',
               'Fenêtres de maintenance régulières avec préavis',
-              'Support technique basé sur votre niveau d\'abonnement',
-              'Surveillance de la sécurité et réponse aux incidents'
-            ]
+              "Support technique basé sur votre niveau d'abonnement",
+              'Surveillance de la sécurité et réponse aux incidents',
+            ],
           },
           termination: {
             title: '9. Résiliation',
-            content: 'L\'une ou l\'autre partie peut résilier ces Conditions :',
+            content: "L'une ou l'autre partie peut résilier ces Conditions :",
             items: [
               'Vous pouvez annuler votre abonnement à tout moment via les paramètres de votre compte',
               'Nous pouvons résilier pour violation de ces Conditions avec un préavis raisonnable',
               'Nous pouvons suspendre le service immédiatement pour des violations graves ou des menaces de sécurité',
-              'En cas de résiliation, vous perdrez l\'accès à la plateforme et à vos données',
-              'Nous fournirons une opportunité raisonnable d\'exporter vos données avant la suppression'
-            ]
+              "En cas de résiliation, vous perdrez l'accès à la plateforme et à vos données",
+              "Nous fournirons une opportunité raisonnable d'exporter vos données avant la suppression",
+            ],
           },
           disclaimers: {
             title: '10. Dénis de Responsabilité et Limitations de Responsabilité',
-            content: 'THE DAS BOARD EST FOURNI "TEL QUEL" SANS GARANTIES D\'AUCUNE SORTE. DANS TOUTE LA MESURE PERMISE PAR LA LOI :',
+            content:
+              'THE DAS BOARD EST FOURNI "TEL QUEL" SANS GARANTIES D\'AUCUNE SORTE. DANS TOUTE LA MESURE PERMISE PAR LA LOI :',
             items: [
-              'Nous déclinons toutes les garanties, expresses ou implicites, y compris la qualité marchande et l\'adéquation à un usage particulier',
+              "Nous déclinons toutes les garanties, expresses ou implicites, y compris la qualité marchande et l'adéquation à un usage particulier",
               'Nous ne sommes pas responsables des dommages indirects, accessoires, spéciaux ou consécutifs',
               'Notre responsabilité totale ne dépassera pas les frais que vous avez payés au cours des 12 mois précédant la réclamation',
-              'Vous reconnaissez que le logiciel peut contenir des bugs et acceptez de les signaler rapidement'
-            ]
+              'Vous reconnaissez que le logiciel peut contenir des bugs et acceptez de les signaler rapidement',
+            ],
           },
           indemnification: {
             title: '11. Indemnisation',
-            content: 'Vous acceptez de nous indemniser et de nous dégager de toute responsabilité concernant les réclamations, pertes ou dommages découlant de votre utilisation de nos services, de la violation de ces Conditions ou de l\'atteinte aux droits de tiers.'
+            content:
+              "Vous acceptez de nous indemniser et de nous dégager de toute responsabilité concernant les réclamations, pertes ou dommages découlant de votre utilisation de nos services, de la violation de ces Conditions ou de l'atteinte aux droits de tiers.",
           },
           governing: {
             title: '12. Loi Applicable et Résolution des Litiges',
-            content: 'Ces Conditions sont régies par les lois de [Juridiction] sans égard aux principes de conflit de lois. Tout litige sera résolu par arbitrage contraignant, à l\'exception des réclamations de mesures injonctives qui peuvent être portées devant les tribunaux appropriés.'
+            content:
+              "Ces Conditions sont régies par les lois de [Juridiction] sans égard aux principes de conflit de lois. Tout litige sera résolu par arbitrage contraignant, à l'exception des réclamations de mesures injonctives qui peuvent être portées devant les tribunaux appropriés.",
           },
           changes: {
             title: '13. Modifications des Conditions',
-            content: 'Nous pouvons modifier ces Conditions de temps à autre. Nous fournirons un préavis des changements importants au moins 30 jours à l\'avance. L\'utilisation continue de nos services après l\'entrée en vigueur des changements constitue une acceptation des Conditions révisées.'
+            content:
+              "Nous pouvons modifier ces Conditions de temps à autre. Nous fournirons un préavis des changements importants au moins 30 jours à l'avance. L'utilisation continue de nos services après l'entrée en vigueur des changements constitue une acceptation des Conditions révisées.",
           },
           entire: {
             title: '14. Accord Complet',
-            content: 'Ces Conditions, ainsi que notre Politique de Confidentialité et tout accord supplémentaire, constituent l\'accord complet entre vous et The DAS Board concernant votre utilisation de nos services.'
+            content:
+              "Ces Conditions, ainsi que notre Politique de Confidentialité et tout accord supplémentaire, constituent l'accord complet entre vous et The DAS Board concernant votre utilisation de nos services.",
           },
           contact: {
             title: '15. Informations de Contact',
             content: 'Si vous avez des questions sur ces Conditions, veuillez nous contacter :',
             email: 'legal@thedasboard.com',
-            address: '[Adresse de l\'Entreprise]',
-            phone: '[Numéro de Téléphone du Support]'
-          }
-        }
+            address: "[Adresse de l'Entreprise]",
+            phone: '[Numéro de Téléphone du Support]',
+          },
+        },
       },
       privacy: {
         title: 'Politique de confidentialité',
         lastUpdated: 'Dernière mise à jour : 28/6/2025',
-        intro: 'Cette Politique de confidentialité décrit comment The DAS Board (« nous », « notre » ou « nos ») collecte, utilise et protège vos informations personnelles lorsque vous utilisez notre plateforme logicielle de gestion de concessions. Nous nous engageons à protéger votre vie privée et à traiter vos données de manière responsable.',
+        intro:
+          'Cette Politique de confidentialité décrit comment The DAS Board (« nous », « notre » ou « nos ») collecte, utilise et protège vos informations personnelles lorsque vous utilisez notre plateforme logicielle de gestion de concessions. Nous nous engageons à protéger votre vie privée et à traiter vos données de manière responsable.',
         sections: {
           collection: {
             title: '1. Informations que nous collectons',
-            content: 'Lorsque vous utilisez The DAS Board, nous collectons plusieurs types d\'informations pour fournir et améliorer nos services :',
+            content:
+              "Lorsque vous utilisez The DAS Board, nous collectons plusieurs types d'informations pour fournir et améliorer nos services :",
             items: [
-              '<strong>Informations de compte :</strong> Nom, adresse e-mail, numéro de téléphone, nom de l\'entreprise, fonction et informations de facturation',
+              "<strong>Informations de compte :</strong> Nom, adresse e-mail, numéro de téléphone, nom de l'entreprise, fonction et informations de facturation",
               '<strong>Données de concession :</strong> Inventaire de véhicules, registres de ventes, informations clients et transactions financières',
-              '<strong>Données d\'utilisation :</strong> Fonctionnalités accédées, temps passé sur la plateforme, interactions utilisateur et métriques de performance',
-              '<strong>Données techniques :</strong> Adresse IP, type de navigateur, informations de l\'appareil, système d\'exploitation et journaux d\'accès',
+              "<strong>Données d'utilisation :</strong> Fonctionnalités accédées, temps passé sur la plateforme, interactions utilisateur et métriques de performance",
+              "<strong>Données techniques :</strong> Adresse IP, type de navigateur, informations de l'appareil, système d'exploitation et journaux d'accès",
               '<strong>Données de communication :</strong> Demandes de support, commentaires et correspondance avec notre équipe',
-              '<strong>Données de localisation :</strong> Adresses de concession et, avec consentement, localisation de l\'appareil pour les fonctionnalités mobiles'
-            ]
+              "<strong>Données de localisation :</strong> Adresses de concession et, avec consentement, localisation de l'appareil pour les fonctionnalités mobiles",
+            ],
           },
           usage: {
             title: '2. Comment nous utilisons vos informations',
-            content: 'Nous utilisons les informations collectées à des fins commerciales légitimes, notamment :',
+            content:
+              'Nous utilisons les informations collectées à des fins commerciales légitimes, notamment :',
             items: [
               'Fournir, maintenir et améliorer la plateforme et les fonctionnalités de The DAS Board',
               'Traiter les abonnements, paiements et gérer votre compte',
@@ -3223,119 +3388,135 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Fournir un support client et répondre à vos demandes',
               'Envoyer des mises à jour de service, alertes de sécurité et messages administratifs',
               'Détecter, prévenir et traiter les problèmes techniques et menaces de sécurité',
-              'Se conformer aux obligations légales et réglementations de l\'industrie',
-              'Améliorer l\'expérience utilisateur grâce au développement et à la recherche de produits'
-            ]
+              "Se conformer aux obligations légales et réglementations de l'industrie",
+              "Améliorer l'expérience utilisateur grâce au développement et à la recherche de produits",
+            ],
           },
           sharing: {
             title: '3. Partage de vos informations',
-            content: 'Nous ne vendons, ne louons ni n\'échangeons vos informations personnelles. Nous pouvons partager vos informations uniquement dans les circonstances suivantes :',
+            content:
+              "Nous ne vendons, ne louons ni n'échangeons vos informations personnelles. Nous pouvons partager vos informations uniquement dans les circonstances suivantes :",
             items: [
               '<strong>Fournisseurs de services :</strong> Vendeurs tiers qui nous aident à exploiter notre plateforme (hébergement, analyses, traitement des paiements)',
-              '<strong>Partenaires commerciaux :</strong> Intégrations autorisées et partenaires de l\'industrie automobile avec votre consentement explicite',
+              "<strong>Partenaires commerciaux :</strong> Intégrations autorisées et partenaires de l'industrie automobile avec votre consentement explicite",
               '<strong>Exigences légales :</strong> Lorsque requis par la loi, la réglementation ou un processus juridique valide',
-              '<strong>Transferts commerciaux :</strong> En rapport avec des fusions, acquisitions ou ventes d\'actifs (avec préavis)',
-              '<strong>Sûreté et sécurité :</strong> Pour protéger les droits, la propriété ou la sécurité de nos utilisateurs ou du public'
-            ]
+              "<strong>Transferts commerciaux :</strong> En rapport avec des fusions, acquisitions ou ventes d'actifs (avec préavis)",
+              '<strong>Sûreté et sécurité :</strong> Pour protéger les droits, la propriété ou la sécurité de nos utilisateurs ou du public',
+            ],
           },
           retention: {
             title: '4. Conservation des données',
-            content: 'Nous conservons vos informations personnelles aussi longtemps que nécessaire pour fournir nos services et nous conformer aux obligations légales. Spécifiquement :',
+            content:
+              'Nous conservons vos informations personnelles aussi longtemps que nécessaire pour fournir nos services et nous conformer aux obligations légales. Spécifiquement :',
             items: [
               'Les données de compte sont conservées pendant que votre abonnement est actif et pendant 3 ans après la résiliation',
               'Les registres de transactions sont conservés pendant 7 ans pour se conformer aux réglementations financières',
-              'Les journaux d\'utilisation sont conservés pendant 2 ans pour l\'analyse de sécurité et de performance',
-              'Les registres de communication sont conservés pendant 5 ans à des fins de service client'
-            ]
+              "Les journaux d'utilisation sont conservés pendant 2 ans pour l'analyse de sécurité et de performance",
+              'Les registres de communication sont conservés pendant 5 ans à des fins de service client',
+            ],
           },
           rights: {
             title: '5. Vos droits et choix',
-            content: 'Selon votre localisation, vous pouvez avoir les droits suivants concernant vos informations personnelles :',
+            content:
+              'Selon votre localisation, vous pouvez avoir les droits suivants concernant vos informations personnelles :',
             items: [
               '<strong>Accès :</strong> Demander une copie de vos informations personnelles que nous détenons',
               '<strong>Correction :</strong> Mettre à jour ou corriger des informations personnelles inexactes',
-              '<strong>Suppression :</strong> Demander la suppression de vos informations personnelles (sous réserve d\'obligations légales)',
+              "<strong>Suppression :</strong> Demander la suppression de vos informations personnelles (sous réserve d'obligations légales)",
               '<strong>Portabilité :</strong> Recevoir vos données dans un format lisible par machine',
               '<strong>Restriction :</strong> Limiter la façon dont nous traitons vos informations personnelles',
-              '<strong>Objection :</strong> S\'opposer au traitement basé sur des intérêts légitimes'
-            ]
+              "<strong>Objection :</strong> S'opposer au traitement basé sur des intérêts légitimes",
+            ],
           },
           cookies: {
             title: '6. Cookies et technologies de suivi',
-            content: 'Nous utilisons des cookies et technologies similaires pour améliorer votre expérience :',
+            content:
+              'Nous utilisons des cookies et technologies similaires pour améliorer votre expérience :',
             items: [
               '<strong>Cookies essentiels :</strong> Requis pour la fonctionnalité et la sécurité de la plateforme',
-              '<strong>Cookies d\'analyse :</strong> Nous aident à comprendre comment vous utilisez notre plateforme',
+              "<strong>Cookies d'analyse :</strong> Nous aident à comprendre comment vous utilisez notre plateforme",
               '<strong>Cookies de préférence :</strong> Se souviennent de vos paramètres et personnalisations',
-              '<strong>Cookies marketing :</strong> Utilisés pour les communications ciblées (avec votre consentement)'
+              '<strong>Cookies marketing :</strong> Utilisés pour les communications ciblées (avec votre consentement)',
             ],
-            footer: 'Vous pouvez contrôler les préférences de cookies via les paramètres de votre navigateur ou notre outil de gestion des cookies.'
+            footer:
+              'Vous pouvez contrôler les préférences de cookies via les paramètres de votre navigateur ou notre outil de gestion des cookies.',
           },
           security: {
             title: '7. Mesures de sécurité',
-            content: 'Nous mettons en œuvre des mesures de sécurité standard de l\'industrie pour protéger vos informations, notamment :',
+            content:
+              "Nous mettons en œuvre des mesures de sécurité standard de l'industrie pour protéger vos informations, notamment :",
             items: [
               'Chiffrement des données en transit et au repos utilisant les standards AES-256',
               'Audits de sécurité réguliers et tests de pénétration',
-              'Authentification multifacteur et contrôles d\'accès',
+              "Authentification multifacteur et contrôles d'accès",
               'Conformité SOC 2 Type II et évaluations de sécurité régulières',
-              'Formation des employés sur la protection des données et les meilleures pratiques de sécurité'
-            ]
+              'Formation des employés sur la protection des données et les meilleures pratiques de sécurité',
+            ],
           },
           international: {
             title: '8. Transferts internationaux de données',
-            content: 'Vos informations peuvent être transférées et traitées dans des pays autres que le vôtre. Nous veillons à ce que des garanties appropriées soient en place, notamment les Clauses contractuelles types et les décisions d\'adéquation, pour protéger vos données lors des transferts internationaux.'
+            content:
+              "Vos informations peuvent être transférées et traitées dans des pays autres que le vôtre. Nous veillons à ce que des garanties appropriées soient en place, notamment les Clauses contractuelles types et les décisions d'adéquation, pour protéger vos données lors des transferts internationaux.",
           },
           children: {
             title: '9. Confidentialité des enfants',
-            content: 'The DAS Board n\'est pas destiné à être utilisé par des personnes de moins de 18 ans. Nous ne collectons pas sciemment d\'informations personnelles d\'enfants de moins de 18 ans. Si nous prenons connaissance d\'une telle collecte, nous supprimerons les informations rapidement.'
+            content:
+              "The DAS Board n'est pas destiné à être utilisé par des personnes de moins de 18 ans. Nous ne collectons pas sciemment d'informations personnelles d'enfants de moins de 18 ans. Si nous prenons connaissance d'une telle collecte, nous supprimerons les informations rapidement.",
           },
           changes: {
             title: '10. Modifications de cette politique de confidentialité',
-            content: 'Nous pouvons mettre à jour cette Politique de confidentialité périodiquement pour refléter les changements dans nos pratiques ou exigences légales. Nous vous notifierons des changements significatifs par e-mail ou notification sur la plateforme au moins 30 jours avant qu\'ils n\'entrent en vigueur.'
+            content:
+              "Nous pouvons mettre à jour cette Politique de confidentialité périodiquement pour refléter les changements dans nos pratiques ou exigences légales. Nous vous notifierons des changements significatifs par e-mail ou notification sur la plateforme au moins 30 jours avant qu'ils n'entrent en vigueur.",
           },
           contact: {
             title: '11. Nous contacter',
-            content: 'Si vous avez des questions sur cette Politique de confidentialité ou souhaitez exercer vos droits, veuillez nous contacter :',
+            content:
+              'Si vous avez des questions sur cette Politique de confidentialité ou souhaitez exercer vos droits, veuillez nous contacter :',
             email: 'privacy@thedasboard.com',
             address: '[Company Address]',
-            phone: '[Support Phone Number]'
-          }
-        }
+            phone: '[Support Phone Number]',
+          },
+        },
       },
       subscription: {
         title: "Accord d'abonnement",
         lastUpdated: 'Dernière mise à jour : 6/28/2025',
-        intro: 'Cet Accord d\'abonnement régit votre abonnement et votre utilisation de la plateforme de gestion de concession The DAS Board.',
+        intro:
+          "Cet Accord d'abonnement régit votre abonnement et votre utilisation de la plateforme de gestion de concession The DAS Board.",
         sections: {
           plans: {
-            title: '1. Plans d\'abonnement',
-            content: 'The DAS Board propose des niveaux d\'abonnement conçus pour différents besoins de concession :',
+            title: "1. Plans d'abonnement",
+            content:
+              "The DAS Board propose des niveaux d'abonnement conçus pour différents besoins de concession :",
             items: [
               '<strong>Essai gratuit de 60 jours :</strong> Accès complet à la plateforme sans carte de crédit requise',
               '<strong>Gestionnaire financier :</strong> Accès utilisateur individuel avec outils financiers centraux',
-              '<strong>Concession :</strong> Accès multi-utilisateurs avec gestion complète d\'inventaire et de ventes',
-              '<strong>Groupe de concessionnaires :</strong> Accès niveau entreprise sur plusieurs emplacements'
+              "<strong>Concession :</strong> Accès multi-utilisateurs avec gestion complète d'inventaire et de ventes",
+              '<strong>Groupe de concessionnaires :</strong> Accès niveau entreprise sur plusieurs emplacements',
             ],
-            footer: 'Les abonnements sont facturés mensuellement à l\'avance. Vous pouvez mettre à niveau ou rétrograder votre abonnement à tout moment, les modifications prenant effet au prochain cycle de facturation.'
+            footer:
+              "Les abonnements sont facturés mensuellement à l'avance. Vous pouvez mettre à niveau ou rétrograder votre abonnement à tout moment, les modifications prenant effet au prochain cycle de facturation.",
           },
           payment: {
             title: '2. Conditions de paiement',
-            content: 'Le paiement est dû au début de l\'abonnement et le même jour chaque mois par la suite. Nous acceptons les principales cartes de crédit et les virements ACH pour les comptes d\'entreprise. Si le paiement échoue, nous pouvons suspendre votre accès à The DAS Board après un préavis raisonnable.'
+            content:
+              "Le paiement est dû au début de l'abonnement et le même jour chaque mois par la suite. Nous acceptons les principales cartes de crédit et les virements ACH pour les comptes d'entreprise. Si le paiement échoue, nous pouvons suspendre votre accès à The DAS Board après un préavis raisonnable.",
           },
           trial: {
-            title: '3. Période d\'essai',
-            content: 'L\'essai de 60 jours fournit un accès complet à la plateforme The DAS Board. Aucune carte de crédit n\'est requise pour commencer votre essai. À la fin de la période d\'essai, vous devrez sélectionner un plan payant pour continuer à utiliser la plateforme. Les données d\'essai seront conservées pendant 30 jours après l\'expiration de l\'essai.'
+            title: "3. Période d'essai",
+            content:
+              "L'essai de 60 jours fournit un accès complet à la plateforme The DAS Board. Aucune carte de crédit n'est requise pour commencer votre essai. À la fin de la période d'essai, vous devrez sélectionner un plan payant pour continuer à utiliser la plateforme. Les données d'essai seront conservées pendant 30 jours après l'expiration de l'essai.",
           },
           cancellation: {
             title: '4. Annulation et remboursements',
-            content: 'Vous pouvez annuler votre abonnement à tout moment via les paramètres de votre compte ou en contactant notre équipe de support. Lors de l\'annulation :',
+            content:
+              "Vous pouvez annuler votre abonnement à tout moment via les paramètres de votre compte ou en contactant notre équipe de support. Lors de l'annulation :",
             items: [
-              'Vous maintiendrez l\'accès jusqu\'à la fin de votre période de facturation actuelle',
-              'Aucun remboursement n\'est fourni pour les mois partiels de service',
-              'Vos données seront disponibles pour exportation pendant 90 jours après l\'annulation',
-              'Le renouvellement automatique sera désactivé'
-            ]
+              "Vous maintiendrez l'accès jusqu'à la fin de votre période de facturation actuelle",
+              "Aucun remboursement n'est fourni pour les mois partiels de service",
+              "Vos données seront disponibles pour exportation pendant 90 jours après l'annulation",
+              'Le renouvellement automatique sera désactivé',
+            ],
           },
           sla: {
             title: '5. Accord de niveau de service',
@@ -3344,8 +3525,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
               '99,9% de disponibilité de la plateforme',
               'Fenêtres de maintenance programmées avec préavis de 48 heures',
               'Réponse du support client dans les 24 heures pour les demandes standard',
-              'Support prioritaire pour les abonnés Groupe de concessionnaires'
-            ]
+              'Support prioritaire pour les abonnés Groupe de concessionnaires',
+            ],
           },
           data: {
             title: '6. Données et sécurité',
@@ -3354,32 +3535,35 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Sauvegardes automatisées quotidiennes avec rétention de 30 jours',
               'Protocoles de chiffrement et de sécurité de niveau bancaire',
               'Conformité RGPD et CCPA pour la protection des données',
-              'Capacités d\'exportation de données dans des formats standard'
-            ]
+              "Capacités d'exportation de données dans des formats standard",
+            ],
           },
           support: {
             title: '7. Support et formation',
             content: 'Tous les abonnements payants incluent :',
             items: [
-              'Assistance complète d\'intégration et de configuration',
+              "Assistance complète d'intégration et de configuration",
               'Ressources de formation en ligne et documentation',
               'Support par email et chat pendant les heures ouvrables',
-              'Mises à jour régulières de la plateforme et sorties de nouvelles fonctionnalités'
-            ]
+              'Mises à jour régulières de la plateforme et sorties de nouvelles fonctionnalités',
+            ],
           },
           modifications: {
             title: '8. Modifications du service',
-            content: 'Nous pouvons modifier ou mettre à jour la plateforme The DAS Board pour améliorer la fonctionnalité, la sécurité ou la conformité. Nous fournirons un préavis raisonnable des changements significatifs qui peuvent affecter votre utilisation.'
-          }
-        }
+            content:
+              'Nous pouvons modifier ou mettre à jour la plateforme The DAS Board pour améliorer la fonctionnalité, la sécurité ou la conformité. Nous fournirons un préavis raisonnable des changements significatifs qui peuvent affecter votre utilisation.',
+          },
+        },
       },
       pricingPage: {
         title: 'Sélectionnez Votre',
         titleHighlight: 'Solution',
-        subtitle: 'Sélectionnez l\'option qui décrit le mieux vos besoins. Nous personnaliserons votre expérience en conséquence.',
+        subtitle:
+          "Sélectionnez l'option qui décrit le mieux vos besoins. Nous personnaliserons votre expérience en conséquence.",
         singleFinance: {
           title: 'Gestionnaire Financier Individuel',
-          description: 'Parfait pour les gestionnaires financiers individuels qui souhaitent suivre leurs performances personnelles et leurs affaires.',
+          description:
+            'Parfait pour les gestionnaires financiers individuels qui souhaitent suivre leurs performances personnelles et leurs affaires.',
           originalPrice: '$29.99/mois',
           price: '$20/mois temps limité',
           features: [
@@ -3387,58 +3571,63 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'Analyses PVR et profits des produits',
             'Calculateur de paiements',
             'Métriques de performance',
-            'Peut être déductible des impôts'
+            'Peut être déductible des impôts',
           ],
           buttonText: 'Commencez Maintenant !',
-          setupTime: 'Essai sans risque pendant un mois calendaire complet'
+          setupTime: 'Essai sans risque pendant un mois calendaire complet',
         },
         dealership: {
           title: 'Concession / Groupe de Concessionnaires',
-          description: 'Gestion complète de concession avec tableaux de bord spécifiques aux rôles, gestion d\'équipe et support multi-sites.',
+          description:
+            "Gestion complète de concession avec tableaux de bord spécifiques aux rôles, gestion d'équipe et support multi-sites.",
           price: '$250/mois base',
           priceSubtext: 'par concession + modules complémentaires',
           popular: 'Le Plus Populaire',
           features: [
             'Toutes les fonctionnalités du gestionnaire individuel',
-            'Tableaux de bord d\'équipe pour tous les rôles',
+            "Tableaux de bord d'équipe pour tous les rôles",
             'Analyses multi-sites',
             'Structures administratives flexibles',
-            'Remises sur volume disponibles'
+            'Remises sur volume disponibles',
           ],
           buttonText: 'Voir les Prix de Package Dynamique',
-          setupTime: 'Commencez dès aujourd\'hui'
+          setupTime: "Commencez dès aujourd'hui",
         },
         benefits: {
-          title: 'Transformez Votre Concession Aujourd\'hui',
+          title: "Transformez Votre Concession Aujourd'hui",
           performance: {
             title: 'Augmentez la Performance',
-            description: 'Les insights en temps réel aident les équipes à dépasser les objectifs et maximiser la rentabilité'
+            description:
+              'Les insights en temps réel aident les équipes à dépasser les objectifs et maximiser la rentabilité',
           },
           operations: {
             title: 'Optimisez les Opérations',
-            description: 'La gestion centralisée réduit le temps administratif et améliore l\'efficacité'
+            description:
+              "La gestion centralisée réduit le temps administratif et améliore l'efficacité",
           },
           security: {
             title: 'Sécurisé et Fiable',
-            description: 'Sécurité de niveau entreprise avec garantie de disponibilité de 99,9%'
-          }
+            description: 'Sécurité de niveau entreprise avec garantie de disponibilité de 99,9%',
+          },
         },
         helpText: {
           title: 'Vous ne savez pas quelle option choisir ?',
-          description: 'Commencez avec l\'option gestionnaire financier individuel pour essayer notre plateforme, puis passez facilement aux fonctionnalités de concession quand vous êtes prêt à développer votre équipe.'
+          description:
+            "Commencez avec l'option gestionnaire financier individuel pour essayer notre plateforme, puis passez facilement aux fonctionnalités de concession quand vous êtes prêt à développer votre équipe.",
         },
         footer: {
           copyright: '© 2025 The DAS Board. Tous droits réservés.',
           support: 'Des questions ? Contactez-nous à',
-          email: 'support@thedasboard.com'
-        }
+          email: 'support@thedasboard.com',
+        },
       },
     },
     demoPage: {
       backToHome: "Retour à l'accueil",
       title: 'Découvrez Le DAS Board',
-      startFreeTrial: 'Commencer l\'essai gratuit',
-      subtitle: 'Explorez notre démo interactive pour voir comment différents rôles utilisent notre tableau de bord',
+      startFreeTrial: "Commencer l'essai gratuit",
+      subtitle:
+        'Explorez notre démo interactive pour voir comment différents rôles utilisent notre tableau de bord',
       dashboards: {
         salesperson: {
           title: 'Tableau de Bord du Vendeur',
@@ -3446,49 +3635,57 @@ export const translations: Record<Language, Translations | Partial<Translations>
         },
         finance: {
           title: 'Tableau de Bord du Directeur Financier',
-          description: 'Suivi des performances et des transactions du directeur financier individuel',
+          description:
+            'Suivi des performances et des transactions du directeur financier individuel',
         },
         salesManager: {
           title: 'Tableau de Bord du Directeur des Ventes',
-          description: 'Gestion d\'équipe et aperçu des performances commerciales',
+          description: "Gestion d'équipe et aperçu des performances commerciales",
         },
         generalManager: {
           title: 'Tableau de Bord du Directeur Général',
-          description: 'Vue d\'ensemble complète de la concession et analyses',
+          description: "Vue d'ensemble complète de la concession et analyses",
         },
       },
       hotspots: {
         productTracking: {
           title: 'Suivi des Produits',
-          description: 'Surveillez les performances de vente des produits, suivez les garanties, GAP et autres produits F&I pour maximiser la rentabilité par transaction.',
+          description:
+            'Surveillez les performances de vente des produits, suivez les garanties, GAP et autres produits F&I pour maximiser la rentabilité par transaction.',
         },
         performanceMetrics: {
           title: 'Métriques de Performance',
-          description: 'Surveillez vos performances personnelles avec des métriques clés comme PVR (Par Véhicule Vendu), produits par transaction et objectifs mensuels.',
+          description:
+            'Surveillez vos performances personnelles avec des métriques clés comme PVR (Par Véhicule Vendu), produits par transaction et objectifs mensuels.',
         },
         teamPerformance: {
-          title: 'Performance de l\'Équipe',
-          description: 'Comparez vos performances avec les moyennes de l\'équipe et voyez votre classement parmi vos collègues.',
+          title: "Performance de l'Équipe",
+          description:
+            "Comparez vos performances avec les moyennes de l'équipe et voyez votre classement parmi vos collègues.",
         },
         recentDealsLog: {
           title: 'Journal des Transactions Récentes',
-          description: 'Visualisez et gérez vos transactions les plus récentes avec un accès rapide aux détails clients et à la rentabilité des transactions.',
+          description:
+            'Visualisez et gérez vos transactions les plus récentes avec un accès rapide aux détails clients et à la rentabilité des transactions.',
         },
         pvr: {
           title: 'PVR',
-          description: 'Par Véhicule Vendu - Suivez votre profit moyen par véhicule et comparez avec les objectifs et moyennes de l\'équipe.',
+          description:
+            "Par Véhicule Vendu - Suivez votre profit moyen par véhicule et comparez avec les objectifs et moyennes de l'équipe.",
         },
         payCalculator: {
           title: 'Calculateur de Paie',
-          description: 'Calculez vos commissions et bonus basés sur la rentabilité des transactions et les ventes de produits.',
+          description:
+            'Calculez vos commissions et bonus basés sur la rentabilité des transactions et les ventes de produits.',
         },
         schedule: {
           title: 'Horaire',
           description: 'Consultez votre horaire pour la semaine et le mois',
         },
         teamSchedule: {
-          title: 'Horaire de l\'Équipe',
-          description: 'Visualisez facilement les horaires de l\'équipe, suivez les présences et gérez les affectations de quarts pour une couverture optimale.',
+          title: "Horaire de l'Équipe",
+          description:
+            "Visualisez facilement les horaires de l'équipe, suivez les présences et gérez les affectations de quarts pour une couverture optimale.",
         },
         grossProfitIndicator: {
           title: 'Indicateur de Profit Brut',
@@ -3496,63 +3693,78 @@ export const translations: Record<Language, Translations | Partial<Translations>
         },
         salesReports: {
           title: 'Rapports de Ventes, Planificateur, Objectifs',
-          description: 'Accédez aux rapports de ventes complets, gérez les horaires de l\'équipe et fixez/suivez les objectifs mensuels et annuels pour votre équipe de vente.',
+          description:
+            "Accédez aux rapports de ventes complets, gérez les horaires de l'équipe et fixez/suivez les objectifs mensuels et annuels pour votre équipe de vente.",
         },
         dasBoard: {
           title: 'Le DAS Board',
-          description: 'Consultez le Classement des Ventes pour rester au courant des performances et classements de vos vendeurs.',
+          description:
+            'Consultez le Classement des Ventes pour rester au courant des performances et classements de vos vendeurs.',
         },
         salesPerformance: {
           title: 'Performance des Ventes',
-          description: 'Vue rapide pour rester au courant des objectifs de vente, suivre les progrès de l\'équipe et surveiller les indicateurs clés de performance.',
+          description:
+            "Vue rapide pour rester au courant des objectifs de vente, suivre les progrès de l'équipe et surveiller les indicateurs clés de performance.",
         },
         unitsSold: {
           title: 'Unités Vendues',
-          description: 'Suivez le total des unités vendues incluant véhicules neufs et d\'occasion avec répartitions quotidiennes, hebdomadaires et mensuelles.',
+          description:
+            "Suivez le total des unités vendues incluant véhicules neufs et d'occasion avec répartitions quotidiennes, hebdomadaires et mensuelles.",
         },
         unitCount: {
-          title: 'Comptage d\'Unités',
-          description: 'Suivez vos totaux de voitures neuves et d\'occasion avec répartitions quotidiennes, hebdomadaires et mensuelles pour surveiller le volume des ventes.',
+          title: "Comptage d'Unités",
+          description:
+            "Suivez vos totaux de voitures neuves et d'occasion avec répartitions quotidiennes, hebdomadaires et mensuelles pour surveiller le volume des ventes.",
         },
         dealLog: {
           title: 'Journal des Transactions',
-          description: 'Restez au courant de toutes vos transactions avec informations détaillées sur les clients, statut des transactions et historique.',
+          description:
+            'Restez au courant de toutes vos transactions avec informations détaillées sur les clients, statut des transactions et historique.',
         },
         goalTracker: {
           title: 'Suivi des Objectifs et Calculateur de Paie',
-          description: 'Restez au courant de vos objectifs et estimateur de paie MTD pour suivre les progrès et maximiser les gains.',
+          description:
+            'Restez au courant de vos objectifs et estimateur de paie MTD pour suivre les progrès et maximiser les gains.',
         },
         goalQuickView: {
           title: 'Vue Rapide des Objectifs',
-          description: 'Sachez facilement où vous en êtes avec vos objectifs et suivez les progrès vers les objectifs mensuels et annuels.',
+          description:
+            'Sachez facilement où vous en êtes avec vos objectifs et suivez les progrès vers les objectifs mensuels et annuels.',
         },
         grossTracker: {
           title: 'Suivi du Profit Brut',
-          description: 'Restez au courant de votre profit brut avec vue rapide du suivi du profit avant et arrière pour maximiser chaque transaction.',
+          description:
+            'Restez au courant de votre profit brut avec vue rapide du suivi du profit avant et arrière pour maximiser chaque transaction.',
         },
         fiManagerPerformance: {
           title: 'Performance du Directeur F&I',
-          description: 'Comparez les performances du Directeur F&I avec les moyennes de l\'équipe et comparez aux normes de l\'industrie pour une rentabilité maximale.',
+          description:
+            "Comparez les performances du Directeur F&I avec les moyennes de l'équipe et comparez aux normes de l'industrie pour une rentabilité maximale.",
         },
         salesManagerPerformance: {
           title: 'Performance du Directeur des Ventes',
-          description: 'Visualisez les performances du Directeur des Ventes par rapport aux collègues et comparez les métriques individuelles dans l\'équipe de gestion des ventes.',
+          description:
+            "Visualisez les performances du Directeur des Ventes par rapport aux collègues et comparez les métriques individuelles dans l'équipe de gestion des ventes.",
         },
         salesDasBoard: {
           title: 'DAS Board des Ventes',
-          description: 'Visualisez vos leaders vendeurs et suivez les meilleurs performeurs pour une productivité maximale tout en surveillant la dynamique de l\'équipe et la réalisation des objectifs individuels.',
+          description:
+            "Visualisez vos leaders vendeurs et suivez les meilleurs performeurs pour une productivité maximale tout en surveillant la dynamique de l'équipe et la réalisation des objectifs individuels.",
         },
         pvrDealership: {
           title: 'PVR',
-          description: 'Par Véhicule Vendu - Suivez le profit moyen de la concession par véhicule avant et arrière pour voir les résultats rapidement.',
+          description:
+            'Par Véhicule Vendu - Suivez le profit moyen de la concession par véhicule avant et arrière pour voir les résultats rapidement.',
         },
         goalTracking: {
           title: 'Suivi des Objectifs',
-          description: 'Déterminez rapidement le progrès des ventes d\'unités MTD et suivez les performances par rapport aux objectifs mensuels.',
+          description:
+            "Déterminez rapidement le progrès des ventes d'unités MTD et suivez les performances par rapport aux objectifs mensuels.",
         },
         unitsSoldDealer: {
           title: 'Unités Vendues',
-          description: 'Suivez rapidement le total des unités vendues incluant véhicules neufs et d\'occasion avec ventes MTD.',
+          description:
+            "Suivez rapidement le total des unités vendues incluant véhicules neufs et d'occasion avec ventes MTD.",
         },
       },
     },
@@ -3590,32 +3802,34 @@ export const translations: Record<Language, Translations | Partial<Translations>
           name: 'Einzelner Finanzmanager',
           price: '$20/Monat begrenzte Zeit',
           originalPrice: '$29.99/Monat',
-          description: 'Perfekt für individuelle Finanzmanager, die ihre persönliche Leistung verfolgen möchten',
+          description:
+            'Perfekt für individuelle Finanzmanager, die ihre persönliche Leistung verfolgen möchten',
           features: [
             'Persönliche Geschäftsverfolgung',
             'PVR & Produktgewinn-Analysen',
             'Zahlungsrechner',
             'Leistungsmetriken',
-            'Kann steuerlich absetzbar sein'
+            'Kann steuerlich absetzbar sein',
           ],
           buttonText: 'Jetzt Loslegen!',
-          setupTime: 'Risikolos für einen ganzen Kalendermonat testen'
+          setupTime: 'Risikolos für einen ganzen Kalendermonat testen',
         },
         dealership: {
           name: 'Autohaus / Händlergruppe',
           price: '$250/mo base',
-          description: 'Vollständiges Autohaus-Management mit rollenspezifischen Dashboards und Teamverwaltung',
+          description:
+            'Vollständiges Autohaus-Management mit rollenspezifischen Dashboards und Teamverwaltung',
           popular: 'Am Beliebtesten',
           features: [
             'Alle Einzelmanager-Funktionen',
             'Team-Dashboards für alle Rollen',
             'Mehrstandort-Analysen',
-            'Flexible Verwaltungsstrukturen'
+            'Flexible Verwaltungsstrukturen',
           ],
           buttonText: 'Ihr Paket Konfigurieren',
-          setupTime: 'Starten Sie noch heute'
+          setupTime: 'Starten Sie noch heute',
         },
-        priceSubtext: 'pro Autohaus + Add-ons'
+        priceSubtext: 'pro Autohaus + Add-ons',
       },
       cta: {
         title: 'Bereit, Ihre Autohaus-Operationen zu transformieren?',
@@ -3777,7 +3991,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
     },
     contact: {
       title: 'Kontaktieren Sie uns',
-      subtitle: 'Bereit zu sehen, wie The DAS Board Ihre Autohausoperationen transformieren kann? Wir würden gerne von Ihnen hören.',
+      subtitle:
+        'Bereit zu sehen, wie The DAS Board Ihre Autohausoperationen transformieren kann? Wir würden gerne von Ihnen hören.',
       email: 'E-mail',
       phone: 'Telefon',
     },
@@ -3789,41 +4004,47 @@ export const translations: Record<Language, Translations | Partial<Translations>
       terms: {
         title: 'Nutzungsbedingungen',
         lastUpdated: 'Letzte Aktualisierung: 6/28/2025',
-        intro: 'Willkommen bei The DAS Board. Diese Nutzungsbedingungen ("Bedingungen") regeln Ihren Zugang zu und die Nutzung unserer Autohausmanagement-Software-Plattform. Durch den Zugriff auf oder die Nutzung unserer Dienste stimmen Sie zu, an diese Bedingungen gebunden zu sein.',
+        intro:
+          'Willkommen bei The DAS Board. Diese Nutzungsbedingungen ("Bedingungen") regeln Ihren Zugang zu und die Nutzung unserer Autohausmanagement-Software-Plattform. Durch den Zugriff auf oder die Nutzung unserer Dienste stimmen Sie zu, an diese Bedingungen gebunden zu sein.',
         sections: {
           acceptance: {
             title: '1. Annahme der Bedingungen',
-            content: 'Durch die Erstellung eines Kontos, den Zugriff auf oder die Nutzung von The DAS Board bestätigen Sie, dass Sie diese Bedingungen und unsere Datenschutzrichtlinie gelesen, verstanden und zugestimmt haben, daran gebunden zu sein. Wenn Sie diesen Bedingungen nicht zustimmen, dürfen Sie unsere Dienste nicht nutzen. Sie müssen mindestens 18 Jahre alt sein und die Befugnis haben, diese Bedingungen im Namen Ihrer Organisation einzugehen.'
+            content:
+              'Durch die Erstellung eines Kontos, den Zugriff auf oder die Nutzung von The DAS Board bestätigen Sie, dass Sie diese Bedingungen und unsere Datenschutzrichtlinie gelesen, verstanden und zugestimmt haben, daran gebunden zu sein. Wenn Sie diesen Bedingungen nicht zustimmen, dürfen Sie unsere Dienste nicht nutzen. Sie müssen mindestens 18 Jahre alt sein und die Befugnis haben, diese Bedingungen im Namen Ihrer Organisation einzugehen.',
           },
           service: {
             title: '2. Servicebeschreibung',
-            content: 'The DAS Board ist eine cloudbasierte Autohausmanagement-Software-Plattform, die Tools für Bestandsmanagement, Verkaufsverfolgung, Kundenbeziehungsmanagement, Finanzberichterstattung und verwandte Dienstleistungen der Automobilindustrie bereitstellt. Wir behalten uns das Recht vor, jeden Aspekt unseres Dienstes mit angemessener Ankündigung zu ändern, auszusetzen oder einzustellen.'
+            content:
+              'The DAS Board ist eine cloudbasierte Autohausmanagement-Software-Plattform, die Tools für Bestandsmanagement, Verkaufsverfolgung, Kundenbeziehungsmanagement, Finanzberichterstattung und verwandte Dienstleistungen der Automobilindustrie bereitstellt. Wir behalten uns das Recht vor, jeden Aspekt unseres Dienstes mit angemessener Ankündigung zu ändern, auszusetzen oder einzustellen.',
           },
           account: {
             title: '3. Kontoregistrierung und Sicherheit',
-            content: 'Um unsere Dienste zu nutzen, müssen Sie ein Konto mit genauen und vollständigen Informationen erstellen. Sie sind verantwortlich für:',
+            content:
+              'Um unsere Dienste zu nutzen, müssen Sie ein Konto mit genauen und vollständigen Informationen erstellen. Sie sind verantwortlich für:',
             items: [
               'Die Vertraulichkeit Ihrer Kontoanmeldedaten zu wahren',
               'Alle Aktivitäten, die unter Ihrem Konto auftreten',
               'Uns sofort über jede unbefugte Nutzung zu benachrichtigen',
               'Sicherzustellen, dass Ihre Kontoinformationen aktuell und genau bleiben',
-              'Die Einhaltung unserer Sicherheitsanforderungen und bewährten Praktiken'
-            ]
+              'Die Einhaltung unserer Sicherheitsanforderungen und bewährten Praktiken',
+            ],
           },
           subscription: {
             title: '4. Abonnement- und Zahlungsbedingungen',
-            content: 'The DAS Board arbeitet auf Abonnementbasis. Durch ein Abonnement stimmen Sie zu:',
+            content:
+              'The DAS Board arbeitet auf Abonnementbasis. Durch ein Abonnement stimmen Sie zu:',
             items: [
               'Alle mit Ihrem Abonnementplan verbundenen Gebühren zu zahlen',
               'Automatische Verlängerung, es sei denn, vor dem Verlängerungsdatum gekündigt',
               'Gebührenänderungen mit 30-tägiger Vorankündigung',
               'Keine Rückerstattungen für Teilabonnementzeiträume',
-              'Aussetzung des Dienstes bei Nichtzahlung nach angemessener Ankündigung'
-            ]
+              'Aussetzung des Dienstes bei Nichtzahlung nach angemessener Ankündigung',
+            ],
           },
           usage: {
             title: '5. Richtlinie für akzeptable Nutzung',
-            content: 'Sie stimmen zu, The DAS Board nur für rechtmäßige Zwecke und in Übereinstimmung mit diesen Bedingungen zu verwenden. Sie dürfen nicht:',
+            content:
+              'Sie stimmen zu, The DAS Board nur für rechtmäßige Zwecke und in Übereinstimmung mit diesen Bedingungen zu verwenden. Sie dürfen nicht:',
             items: [
               'Anwendbare Gesetze, Vorschriften oder Rechte Dritter verletzen',
               'Schädliche, beleidigende oder unangemessene Inhalte hochladen',
@@ -3831,33 +4052,37 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Den Dienst verwenden, um Spam, Malware oder andere bösartige Inhalte zu senden',
               'Reverse Engineering betreiben, dekompilieren oder versuchen, Quellcode zu extrahieren',
               'Die Integrität oder Leistung unserer Dienste stören oder beeinträchtigen',
-              'Die Plattform für betrügerische oder illegale Aktivitäten verwenden'
-            ]
+              'Die Plattform für betrügerische oder illegale Aktivitäten verwenden',
+            ],
           },
           intellectual: {
             title: '6. Rechte an geistigem Eigentum',
-            content: 'The DAS Board und alle verwandten Technologien, Inhalte und Materialien sind Eigentum von uns oder unseren Lizenzgebern. Dies umfasst:',
+            content:
+              'The DAS Board und alle verwandten Technologien, Inhalte und Materialien sind Eigentum von uns oder unseren Lizenzgebern. Dies umfasst:',
             items: [
               'Software, Algorithmen und Benutzeroberflächen',
               'Marken, Logos und Markenmaterialien',
               'Dokumentation, Tutorials und Supportmaterialien',
-              'Analysen, Berichte und aggregierte Dateneinblicke'
+              'Analysen, Berichte und aggregierte Dateneinblicke',
             ],
-            footer: 'Sie behalten das Eigentum an Ihren Daten, gewähren uns jedoch eine Lizenz, diese zur Bereitstellung unserer Dienste zu verwenden. Wir können anonymisierte, aggregierte Daten für Branchenforschung und Plattformverbesserung verwenden.'
+            footer:
+              'Sie behalten das Eigentum an Ihren Daten, gewähren uns jedoch eine Lizenz, diese zur Bereitstellung unserer Dienste zu verwenden. Wir können anonymisierte, aggregierte Daten für Branchenforschung und Plattformverbesserung verwenden.',
           },
           privacy: {
             title: '7. Datenschutz und Privatsphäre',
-            content: 'Sie sind dafür verantwortlich sicherzustellen, dass alle personenbezogenen Daten, die Sie über unsere Plattform verarbeiten, den anwendbaren Datenschutzgesetzen entsprechen. Wir werden Daten in Übereinstimmung mit unserer Datenschutzrichtlinie und anwendbaren Datenschutzbestimmungen verarbeiten, einschließlich DSGVO und CCPA, wo anwendbar.'
+            content:
+              'Sie sind dafür verantwortlich sicherzustellen, dass alle personenbezogenen Daten, die Sie über unsere Plattform verarbeiten, den anwendbaren Datenschutzgesetzen entsprechen. Wir werden Daten in Übereinstimmung mit unserer Datenschutzrichtlinie und anwendbaren Datenschutzbestimmungen verarbeiten, einschließlich DSGVO und CCPA, wo anwendbar.',
           },
           availability: {
             title: '8. Dienstverfügbarkeit und Support',
-            content: 'Obwohl wir eine hohe Verfügbarkeit anstreben, garantieren wir keinen ununterbrochenen Service. Wir bieten:',
+            content:
+              'Obwohl wir eine hohe Verfügbarkeit anstreben, garantieren wir keinen ununterbrochenen Service. Wir bieten:',
             items: [
               '99,9% Betriebszeit-SLA für kostenpflichtige Abonnements',
               'Regelmäßige Wartungsfenster mit Vorankündigung',
               'Technischen Support basierend auf Ihrem Abonnementlevel',
-              'Sicherheitsüberwachung und Incident Response'
-            ]
+              'Sicherheitsüberwachung und Incident Response',
+            ],
           },
           termination: {
             title: '9. Kündigung',
@@ -3867,64 +4092,72 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Wir können bei Verletzung dieser Bedingungen mit angemessener Ankündigung kündigen',
               'Wir können den Service sofort bei schwerwiegenden Verletzungen oder Sicherheitsbedrohungen aussetzen',
               'Bei Kündigung verlieren Sie den Zugang zur Plattform und Ihren Daten',
-              'Wir werden eine angemessene Gelegenheit bieten, Ihre Daten vor der Löschung zu exportieren'
-            ]
+              'Wir werden eine angemessene Gelegenheit bieten, Ihre Daten vor der Löschung zu exportieren',
+            ],
           },
           disclaimers: {
             title: '10. Haftungsausschlüsse und Haftungsbeschränkungen',
-            content: 'THE DAS BOARD WIRD "WIE BESEHEN" OHNE GEWÄHRLEISTUNGEN JEGLICHER ART BEREITGESTELLT. IM MAXIMAL GESETZLICH ZULÄSSIGEN UMFANG:',
+            content:
+              'THE DAS BOARD WIRD "WIE BESEHEN" OHNE GEWÄHRLEISTUNGEN JEGLICHER ART BEREITGESTELLT. IM MAXIMAL GESETZLICH ZULÄSSIGEN UMFANG:',
             items: [
               'Wir schließen alle Gewährleistungen aus, ausdrücklich oder stillschweigend, einschließlich Marktgängigkeit und Eignung für einen bestimmten Zweck',
               'Wir haften nicht für indirekte, zufällige, besondere oder Folgeschäden',
               'Unsere Gesamthaftung übersteigt nicht die von Ihnen in den 12 Monaten vor der Forderung gezahlten Gebühren',
-              'Sie erkennen an, dass Software Fehler enthalten kann und stimmen zu, diese umgehend zu melden'
-            ]
+              'Sie erkennen an, dass Software Fehler enthalten kann und stimmen zu, diese umgehend zu melden',
+            ],
           },
           indemnification: {
             title: '11. Schadloshaltung',
-            content: 'Sie stimmen zu, uns von allen Ansprüchen, Verlusten oder Schäden freizustellen und schadlos zu halten, die sich aus Ihrer Nutzung unserer Dienste, der Verletzung dieser Bedingungen oder der Verletzung von Rechten Dritter ergeben.'
+            content:
+              'Sie stimmen zu, uns von allen Ansprüchen, Verlusten oder Schäden freizustellen und schadlos zu halten, die sich aus Ihrer Nutzung unserer Dienste, der Verletzung dieser Bedingungen oder der Verletzung von Rechten Dritter ergeben.',
           },
           governing: {
             title: '12. Anwendbares Recht und Streitbeilegung',
-            content: 'Diese Bedingungen unterliegen den Gesetzen von [Gerichtsbarkeit] ohne Berücksichtigung von Kollisionsnormen. Alle Streitigkeiten werden durch verbindliche Schiedsgerichtsbarkeit beigelegt, außer bei Ansprüchen auf einstweilige Verfügung, die vor entsprechenden Gerichten geltend gemacht werden können.'
+            content:
+              'Diese Bedingungen unterliegen den Gesetzen von [Gerichtsbarkeit] ohne Berücksichtigung von Kollisionsnormen. Alle Streitigkeiten werden durch verbindliche Schiedsgerichtsbarkeit beigelegt, außer bei Ansprüchen auf einstweilige Verfügung, die vor entsprechenden Gerichten geltend gemacht werden können.',
           },
           changes: {
             title: '13. Änderungen der Bedingungen',
-            content: 'Wir können diese Bedingungen von Zeit zu Zeit ändern. Wir werden mindestens 30 Tage im Voraus über wesentliche Änderungen informieren. Die fortgesetzte Nutzung unserer Dienste nach Inkrafttreten der Änderungen stellt eine Annahme der überarbeiteten Bedingungen dar.'
+            content:
+              'Wir können diese Bedingungen von Zeit zu Zeit ändern. Wir werden mindestens 30 Tage im Voraus über wesentliche Änderungen informieren. Die fortgesetzte Nutzung unserer Dienste nach Inkrafttreten der Änderungen stellt eine Annahme der überarbeiteten Bedingungen dar.',
           },
           entire: {
             title: '14. Vollständige Vereinbarung',
-            content: 'Diese Bedingungen bilden zusammen mit unserer Datenschutzrichtlinie und zusätzlichen Vereinbarungen die vollständige Vereinbarung zwischen Ihnen und The DAS Board bezüglich Ihrer Nutzung unserer Dienste.'
+            content:
+              'Diese Bedingungen bilden zusammen mit unserer Datenschutzrichtlinie und zusätzlichen Vereinbarungen die vollständige Vereinbarung zwischen Ihnen und The DAS Board bezüglich Ihrer Nutzung unserer Dienste.',
           },
           contact: {
             title: '15. Kontaktinformationen',
             content: 'Wenn Sie Fragen zu diesen Bedingungen haben, kontaktieren Sie uns bitte:',
             email: 'legal@thedasboard.com',
             address: '[Firmenadresse]',
-            phone: '[Support-Telefonnummer]'
-          }
-        }
+            phone: '[Support-Telefonnummer]',
+          },
+        },
       },
       privacy: {
         title: 'Datenschutzrichtlinie',
         lastUpdated: 'Letzte Aktualisierung: 28.6.2025',
-        intro: 'Diese Datenschutzrichtlinie beschreibt, wie The DAS Board („wir", „uns" oder „unser") Ihre persönlichen Informationen sammelt, verwendet und schützt, wenn Sie unsere Dealership-Management-Software-Plattform nutzen. Wir verpflichten uns, Ihre Privatsphäre zu schützen und Ihre Daten verantwortungsvoll zu behandeln.',
+        intro:
+          'Diese Datenschutzrichtlinie beschreibt, wie The DAS Board („wir", „uns" oder „unser") Ihre persönlichen Informationen sammelt, verwendet und schützt, wenn Sie unsere Dealership-Management-Software-Plattform nutzen. Wir verpflichten uns, Ihre Privatsphäre zu schützen und Ihre Daten verantwortungsvoll zu behandeln.',
         sections: {
           collection: {
             title: '1. Informationen, die wir sammeln',
-            content: 'Wenn Sie The DAS Board verwenden, sammeln wir verschiedene Arten von Informationen, um unsere Dienste bereitzustellen und zu verbessern:',
+            content:
+              'Wenn Sie The DAS Board verwenden, sammeln wir verschiedene Arten von Informationen, um unsere Dienste bereitzustellen und zu verbessern:',
             items: [
               '<strong>Kontoinformationen:</strong> Name, E-Mail-Adresse, Telefonnummer, Firmenname, Berufsbezeichnung und Rechnungsinformationen',
               '<strong>Händlerdaten:</strong> Fahrzeuginventar, Verkaufsaufzeichnungen, Kundeninformationen und Finanztransaktionen',
               '<strong>Nutzungsdaten:</strong> Aufgerufene Funktionen, auf der Plattform verbrachte Zeit, Benutzerinteraktionen und Leistungsmetriken',
               '<strong>Technische Daten:</strong> IP-Adresse, Browsertyp, Geräteinformationen, Betriebssystem und Zugriffsprotokolle',
               '<strong>Kommunikationsdaten:</strong> Support-Anfragen, Feedback und Korrespondenz mit unserem Team',
-              '<strong>Standortdaten:</strong> Händleradressen und, mit Zustimmung, Gerätestandort für mobile Funktionen'
-            ]
+              '<strong>Standortdaten:</strong> Händleradressen und, mit Zustimmung, Gerätestandort für mobile Funktionen',
+            ],
           },
           usage: {
             title: '2. Wie wir Ihre Informationen verwenden',
-            content: 'Wir verwenden die gesammelten Informationen für legitime Geschäftszwecke, einschließlich:',
+            content:
+              'Wir verwenden die gesammelten Informationen für legitime Geschäftszwecke, einschließlich:',
             items: [
               'Bereitstellung, Wartung und Verbesserung der The DAS Board Plattform und Funktionen',
               'Verarbeitung von Abonnements, Zahlungen und Verwaltung Ihres Kontos',
@@ -3933,89 +4166,100 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Versendung von Service-Updates, Sicherheitswarnungen und administrativen Nachrichten',
               'Erkennung, Verhinderung und Behebung technischer Probleme und Sicherheitsbedrohungen',
               'Einhaltung gesetzlicher Verpflichtungen und Branchenvorschriften',
-              'Verbesserung der Benutzererfahrung durch Produktentwicklung und -forschung'
-            ]
+              'Verbesserung der Benutzererfahrung durch Produktentwicklung und -forschung',
+            ],
           },
           sharing: {
             title: '3. Weitergabe Ihrer Informationen',
-            content: 'Wir verkaufen, vermieten oder tauschen Ihre persönlichen Informationen nicht. Wir können Ihre Informationen nur unter folgenden Umständen weitergeben:',
+            content:
+              'Wir verkaufen, vermieten oder tauschen Ihre persönlichen Informationen nicht. Wir können Ihre Informationen nur unter folgenden Umständen weitergeben:',
             items: [
               '<strong>Dienstanbieter:</strong> Drittanbieter, die uns beim Betrieb unserer Plattform helfen (Hosting, Analysen, Zahlungsverarbeitung)',
               '<strong>Geschäftspartner:</strong> Autorisierte Integrationen und Automobilbranchenpartner mit Ihrer ausdrücklichen Zustimmung',
               '<strong>Gesetzliche Anforderungen:</strong> Wenn gesetzlich, durch Vorschriften oder gültige Gerichtsverfahren erforderlich',
               '<strong>Geschäftsübertragungen:</strong> Im Zusammenhang mit Fusionen, Übernahmen oder Vermögensverkäufen (mit Benachrichtigung an Sie)',
-              '<strong>Sicherheit und Schutz:</strong> Zum Schutz der Rechte, des Eigentums oder der Sicherheit unserer Benutzer oder der Öffentlichkeit'
-            ]
+              '<strong>Sicherheit und Schutz:</strong> Zum Schutz der Rechte, des Eigentums oder der Sicherheit unserer Benutzer oder der Öffentlichkeit',
+            ],
           },
           retention: {
             title: '4. Datenaufbewahrung',
-            content: 'Wir bewahren Ihre persönlichen Informationen so lange auf, wie es zur Bereitstellung unserer Dienste und zur Erfüllung gesetzlicher Verpflichtungen erforderlich ist. Konkret:',
+            content:
+              'Wir bewahren Ihre persönlichen Informationen so lange auf, wie es zur Bereitstellung unserer Dienste und zur Erfüllung gesetzlicher Verpflichtungen erforderlich ist. Konkret:',
             items: [
               'Kontodaten werden aufbewahrt, solange Ihr Abonnement aktiv ist und 3 Jahre nach Kündigung',
               'Transaktionsaufzeichnungen werden 7 Jahre lang aufbewahrt, um Finanzvorschriften zu entsprechen',
               'Nutzungsprotokolle werden 2 Jahre lang für Sicherheits- und Leistungsanalysen aufbewahrt',
-              'Kommunikationsaufzeichnungen werden 5 Jahre lang für Kundenservice-Zwecke aufbewahrt'
-            ]
+              'Kommunikationsaufzeichnungen werden 5 Jahre lang für Kundenservice-Zwecke aufbewahrt',
+            ],
           },
           rights: {
             title: '5. Ihre Rechte und Wahlmöglichkeiten',
-            content: 'Je nach Ihrem Standort haben Sie möglicherweise die folgenden Rechte bezüglich Ihrer persönlichen Informationen:',
+            content:
+              'Je nach Ihrem Standort haben Sie möglicherweise die folgenden Rechte bezüglich Ihrer persönlichen Informationen:',
             items: [
               '<strong>Zugang:</strong> Anfordern einer Kopie Ihrer persönlichen Informationen, die wir besitzen',
               '<strong>Berichtigung:</strong> Aktualisierung oder Korrektur ungenauer persönlicher Informationen',
               '<strong>Löschung:</strong> Anfordern der Löschung Ihrer persönlichen Informationen (vorbehaltlich gesetzlicher Verpflichtungen)',
               '<strong>Portabilität:</strong> Erhalt Ihrer Daten in einem maschinenlesbaren Format',
               '<strong>Einschränkung:</strong> Begrenzung der Verarbeitung Ihrer persönlichen Informationen',
-              '<strong>Widerspruch:</strong> Widerspruch gegen die Verarbeitung basierend auf berechtigten Interessen'
-            ]
+              '<strong>Widerspruch:</strong> Widerspruch gegen die Verarbeitung basierend auf berechtigten Interessen',
+            ],
           },
           cookies: {
             title: '6. Cookies und Tracking-Technologien',
-            content: 'Wir verwenden Cookies und ähnliche Technologien, um Ihre Erfahrung zu verbessern:',
+            content:
+              'Wir verwenden Cookies und ähnliche Technologien, um Ihre Erfahrung zu verbessern:',
             items: [
               '<strong>Wesentliche Cookies:</strong> Erforderlich für Plattformfunktionalität und Sicherheit',
               '<strong>Analyse-Cookies:</strong> Helfen uns zu verstehen, wie Sie unsere Plattform nutzen',
               '<strong>Präferenz-Cookies:</strong> Merken sich Ihre Einstellungen und Anpassungen',
-              '<strong>Marketing-Cookies:</strong> Verwendet für gezielte Kommunikation (mit Ihrer Zustimmung)'
+              '<strong>Marketing-Cookies:</strong> Verwendet für gezielte Kommunikation (mit Ihrer Zustimmung)',
             ],
-            footer: 'Sie können Cookie-Präferenzen über Ihre Browser-Einstellungen oder unser Cookie-Management-Tool steuern.'
+            footer:
+              'Sie können Cookie-Präferenzen über Ihre Browser-Einstellungen oder unser Cookie-Management-Tool steuern.',
           },
           security: {
             title: '7. Sicherheitsmaßnahmen',
-            content: 'Wir implementieren branchenübliche Sicherheitsmaßnahmen zum Schutz Ihrer Informationen, einschließlich:',
+            content:
+              'Wir implementieren branchenübliche Sicherheitsmaßnahmen zum Schutz Ihrer Informationen, einschließlich:',
             items: [
               'Verschlüsselung von Daten während der Übertragung und im Ruhezustand mit AES-256-Standards',
               'Regelmäßige Sicherheitsaudits und Penetrationstests',
               'Multi-Faktor-Authentifizierung und Zugriffskontrollen',
               'SOC 2 Type II Compliance und regelmäßige Sicherheitsbewertungen',
-              'Mitarbeiterschulungen zu Datenschutz und Sicherheits-Best-Practices'
-            ]
+              'Mitarbeiterschulungen zu Datenschutz und Sicherheits-Best-Practices',
+            ],
           },
           international: {
             title: '8. Internationale Datenübertragungen',
-            content: 'Ihre Informationen können in andere Länder als Ihr eigenes übertragen und verarbeitet werden. Wir stellen sicher, dass angemessene Schutzmaßnahmen vorhanden sind, einschließlich Standardvertragsklauseln und Angemessenheitsbeschlüssen, um Ihre Daten bei internationalen Übertragungen zu schützen.'
+            content:
+              'Ihre Informationen können in andere Länder als Ihr eigenes übertragen und verarbeitet werden. Wir stellen sicher, dass angemessene Schutzmaßnahmen vorhanden sind, einschließlich Standardvertragsklauseln und Angemessenheitsbeschlüssen, um Ihre Daten bei internationalen Übertragungen zu schützen.',
           },
           children: {
             title: '9. Privatsphäre von Kindern',
-            content: 'The DAS Board ist nicht für die Nutzung durch Personen unter 18 Jahren bestimmt. Wir sammeln wissentlich keine persönlichen Informationen von Kindern unter 18 Jahren. Wenn wir von einer solchen Sammlung erfahren, löschen wir die Informationen umgehend.'
+            content:
+              'The DAS Board ist nicht für die Nutzung durch Personen unter 18 Jahren bestimmt. Wir sammeln wissentlich keine persönlichen Informationen von Kindern unter 18 Jahren. Wenn wir von einer solchen Sammlung erfahren, löschen wir die Informationen umgehend.',
           },
           changes: {
             title: '10. Änderungen an dieser Datenschutzrichtlinie',
-            content: 'Wir können diese Datenschutzrichtlinie regelmäßig aktualisieren, um Änderungen in unseren Praktiken oder gesetzlichen Anforderungen zu reflektieren. Wir werden Sie über wesentliche Änderungen per E-Mail oder Plattform-Benachrichtigung mindestens 30 Tage vor Inkrafttreten informieren.'
+            content:
+              'Wir können diese Datenschutzrichtlinie regelmäßig aktualisieren, um Änderungen in unseren Praktiken oder gesetzlichen Anforderungen zu reflektieren. Wir werden Sie über wesentliche Änderungen per E-Mail oder Plattform-Benachrichtigung mindestens 30 Tage vor Inkrafttreten informieren.',
           },
           contact: {
             title: '11. Kontakt',
-            content: 'Wenn Sie Fragen zu dieser Datenschutzrichtlinie haben oder Ihre Rechte ausüben möchten, kontaktieren Sie uns bitte:',
+            content:
+              'Wenn Sie Fragen zu dieser Datenschutzrichtlinie haben oder Ihre Rechte ausüben möchten, kontaktieren Sie uns bitte:',
             email: 'privacy@thedasboard.com',
             address: '[Company Address]',
-            phone: '[Support Phone Number]'
-          }
-        }
+            phone: '[Support Phone Number]',
+          },
+        },
       },
       subscription: {
         title: 'Abonnementvereinbarung',
         lastUpdated: 'Letzte Aktualisierung: 6/28/2025',
-        intro: 'Diese Abonnementvereinbarung regelt Ihr Abonnement und die Nutzung der Autohaus-Verwaltungsplattform The DAS Board.',
+        intro:
+          'Diese Abonnementvereinbarung regelt Ihr Abonnement und die Nutzung der Autohaus-Verwaltungsplattform The DAS Board.',
         sections: {
           plans: {
             title: '1. Abonnementpläne',
@@ -4024,27 +4268,31 @@ export const translations: Record<Language, Translations | Partial<Translations>
               '<strong>60-Tage kostenlose Testversion:</strong> Vollzugriff auf die Plattform ohne erforderliche Kreditkarte',
               '<strong>Finanzmanager:</strong> Individueller Benutzerzugang mit zentralen Finanztools',
               '<strong>Autohaus:</strong> Multi-User-Zugang mit vollständiger Inventar- und Verkaufsverwaltung',
-              '<strong>Händlergruppe:</strong> Unternehmenszugang auf mehreren Standorten'
+              '<strong>Händlergruppe:</strong> Unternehmenszugang auf mehreren Standorten',
             ],
-            footer: 'Abonnements werden monatlich im Voraus abgerechnet. Sie können Ihr Abonnement jederzeit upgraden oder downgraden, Änderungen treten im nächsten Abrechnungszyklus in Kraft.'
+            footer:
+              'Abonnements werden monatlich im Voraus abgerechnet. Sie können Ihr Abonnement jederzeit upgraden oder downgraden, Änderungen treten im nächsten Abrechnungszyklus in Kraft.',
           },
           payment: {
             title: '2. Zahlungsbedingungen',
-            content: 'Die Zahlung ist bei Abonnementbeginn und am selben Tag jeden Monat danach fällig. Wir akzeptieren Hauptkreditkarten und ACH-Überweisungen für Unternehmenskonten. Bei fehlgeschlagener Zahlung können wir Ihren Zugang zu The DAS Board nach angemessener Benachrichtigung sperren.'
+            content:
+              'Die Zahlung ist bei Abonnementbeginn und am selben Tag jeden Monat danach fällig. Wir akzeptieren Hauptkreditkarten und ACH-Überweisungen für Unternehmenskonten. Bei fehlgeschlagener Zahlung können wir Ihren Zugang zu The DAS Board nach angemessener Benachrichtigung sperren.',
           },
           trial: {
             title: '3. Testperiode',
-            content: 'Die 60-Tage-Testversion bietet vollständigen Zugang zur The DAS Board Plattform. Keine Kreditkarte erforderlich, um Ihre Testversion zu starten. Am Ende der Testperiode müssen Sie einen kostenpflichtigen Plan auswählen, um die Plattform weiter zu nutzen. Testdaten werden 30 Tage nach Ablauf der Testversion gespeichert.'
+            content:
+              'Die 60-Tage-Testversion bietet vollständigen Zugang zur The DAS Board Plattform. Keine Kreditkarte erforderlich, um Ihre Testversion zu starten. Am Ende der Testperiode müssen Sie einen kostenpflichtigen Plan auswählen, um die Plattform weiter zu nutzen. Testdaten werden 30 Tage nach Ablauf der Testversion gespeichert.',
           },
           cancellation: {
             title: '4. Kündigung und Rückerstattungen',
-            content: 'Sie können Ihr Abonnement jederzeit über Ihre Kontoeinstellungen oder durch Kontaktaufnahme mit unserem Support-Team kündigen. Bei Kündigung:',
+            content:
+              'Sie können Ihr Abonnement jederzeit über Ihre Kontoeinstellungen oder durch Kontaktaufnahme mit unserem Support-Team kündigen. Bei Kündigung:',
             items: [
               'Sie behalten Zugang bis zum Ende Ihrer aktuellen Abrechnungsperiode',
               'Keine Rückerstattungen für Teilmonate des Service',
               'Ihre Daten stehen 90 Tage nach Kündigung zum Export zur Verfügung',
-              'Automatische Verlängerung wird deaktiviert'
-            ]
+              'Automatische Verlängerung wird deaktiviert',
+            ],
           },
           sla: {
             title: '5. Service Level Agreement',
@@ -4053,8 +4301,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
               '99,9% Plattform-Betriebszeit-Verfügbarkeit',
               'Geplante Wartungsfenster mit 48-Stunden-Vorankündigung',
               'Kundensupport-Antwort innerhalb von 24 Stunden für Standardanfragen',
-              'Prioritätssupport für Händlergruppen-Abonnenten'
-            ]
+              'Prioritätssupport für Händlergruppen-Abonnenten',
+            ],
           },
           data: {
             title: '6. Daten und Sicherheit',
@@ -4063,8 +4311,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Tägliche automatisierte Backups mit 30-tägiger Aufbewahrung',
               'Verschlüsselung und Sicherheitsprotokolle auf Bankniveau',
               'DSGVO- und CCPA-Konformität für Datenschutz',
-              'Datenexport-Funktionen in Standardformaten'
-            ]
+              'Datenexport-Funktionen in Standardformaten',
+            ],
           },
           support: {
             title: '7. Support und Schulung',
@@ -4073,22 +4321,25 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Umfassende Onboarding- und Setup-Unterstützung',
               'Online-Schulungsressourcen und Dokumentation',
               'E-Mail- und Chat-Support während der Geschäftszeiten',
-              'Regelmäßige Plattform-Updates und neue Feature-Releases'
-            ]
+              'Regelmäßige Plattform-Updates und neue Feature-Releases',
+            ],
           },
           modifications: {
             title: '8. Service-Modifikationen',
-            content: 'Wir können die The DAS Board Plattform modifizieren oder aktualisieren, um Funktionalität, Sicherheit oder Compliance zu verbessern. Wir werden angemessene Benachrichtigung über wesentliche Änderungen geben, die Ihre Nutzung beeinträchtigen können.'
-          }
-        }
+            content:
+              'Wir können die The DAS Board Plattform modifizieren oder aktualisieren, um Funktionalität, Sicherheit oder Compliance zu verbessern. Wir werden angemessene Benachrichtigung über wesentliche Änderungen geben, die Ihre Nutzung beeinträchtigen können.',
+          },
+        },
       },
       pricingPage: {
         title: 'Wählen Sie Ihre',
         titleHighlight: 'Lösung',
-        subtitle: 'Wählen Sie die Option, die Ihre Bedürfnisse am besten beschreibt. Wir passen Ihre Erfahrung entsprechend an.',
+        subtitle:
+          'Wählen Sie die Option, die Ihre Bedürfnisse am besten beschreibt. Wir passen Ihre Erfahrung entsprechend an.',
         singleFinance: {
           title: 'Einzelner Finanzmanager',
-          description: 'Perfekt für individuelle Finanzmanager, die ihre persönliche Leistung und Geschäfte verfolgen möchten.',
+          description:
+            'Perfekt für individuelle Finanzmanager, die ihre persönliche Leistung und Geschäfte verfolgen möchten.',
           originalPrice: '$29.99/Monat',
           price: '$20/Monat begrenzte Zeit',
           features: [
@@ -4096,14 +4347,15 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'PVR & Produktgewinn-Analysen',
             'Zahlungsrechner',
             'Leistungsmetriken',
-            'Kann steuerlich absetzbar sein'
+            'Kann steuerlich absetzbar sein',
           ],
           buttonText: 'Jetzt Loslegen!',
-          setupTime: 'Risikolos für einen ganzen Kalendermonat testen'
+          setupTime: 'Risikolos für einen ganzen Kalendermonat testen',
         },
         dealership: {
           title: 'Autohaus / Händlergruppe',
-          description: 'Vollständiges Autohaus-Management mit rollenspezifischen Dashboards, Teamverwaltung und Multi-Standort-Support.',
+          description:
+            'Vollständiges Autohaus-Management mit rollenspezifischen Dashboards, Teamverwaltung und Multi-Standort-Support.',
           price: '$250/Monat Basis',
           priceSubtext: 'pro Autohaus + Add-ons',
           popular: 'Am Beliebtesten',
@@ -4112,42 +4364,46 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'Team-Dashboards für alle Rollen',
             'Mehrstandort-Analysen',
             'Flexible Verwaltungsstrukturen',
-            'Mengenrabatte verfügbar'
+            'Mengenrabatte verfügbar',
           ],
           buttonText: 'Dynamische Paketpreise Anzeigen',
-          setupTime: 'Starten Sie noch heute'
+          setupTime: 'Starten Sie noch heute',
         },
         benefits: {
           title: 'Transformieren Sie Ihr Autohaus Heute',
           performance: {
             title: 'Leistung Steigern',
-            description: 'Echtzeit-Einblicke helfen Teams, Ziele zu übertreffen und Rentabilität zu maximieren'
+            description:
+              'Echtzeit-Einblicke helfen Teams, Ziele zu übertreffen und Rentabilität zu maximieren',
           },
           operations: {
             title: 'Abläufe Optimieren',
-            description: 'Zentralisiertes Management reduziert Verwaltungszeit und verbessert Effizienz'
+            description:
+              'Zentralisiertes Management reduziert Verwaltungszeit und verbessert Effizienz',
           },
           security: {
             title: 'Sicher & Zuverlässig',
-            description: 'Unternehmenssicherheit mit 99,9% Verfügbarkeitsgarantie'
-          }
+            description: 'Unternehmenssicherheit mit 99,9% Verfügbarkeitsgarantie',
+          },
         },
         helpText: {
           title: 'Nicht sicher, welche Option Sie wählen sollen?',
-          description: 'Beginnen Sie mit der Einzelfinanzmanager-Option, um unsere Plattform zu testen, und aktualisieren Sie dann einfach auf Autohaus-Funktionen, wenn Sie bereit sind, Ihr Team zu erweitern.'
+          description:
+            'Beginnen Sie mit der Einzelfinanzmanager-Option, um unsere Plattform zu testen, und aktualisieren Sie dann einfach auf Autohaus-Funktionen, wenn Sie bereit sind, Ihr Team zu erweitern.',
         },
         footer: {
           copyright: '© 2025 The DAS Board. Alle Rechte vorbehalten.',
           support: 'Fragen? Kontaktieren Sie uns unter',
-          email: 'support@thedasboard.com'
-        }
+          email: 'support@thedasboard.com',
+        },
       },
     },
     demoPage: {
       backToHome: 'Zurück zur Startseite',
       title: 'Erleben Sie Das DAS Board',
       startFreeTrial: 'Kostenlose Testversion starten',
-      subtitle: 'Erkunden Sie unsere interaktive Demo, um zu sehen, wie verschiedene Rollen unser Dashboard nutzen',
+      subtitle:
+        'Erkunden Sie unsere interaktive Demo, um zu sehen, wie verschiedene Rollen unser Dashboard nutzen',
       dashboards: {
         salesperson: {
           title: 'Verkäufer-Dashboard',
@@ -4169,27 +4425,33 @@ export const translations: Record<Language, Translations | Partial<Translations>
       hotspots: {
         productTracking: {
           title: 'Produktverfolgung',
-          description: 'Überwachen Sie die Verkaufsleistung von Produkten, verfolgen Sie Garantien, GAP und andere F&I-Produkte zur Maximierung der Rentabilität pro Geschäft.',
+          description:
+            'Überwachen Sie die Verkaufsleistung von Produkten, verfolgen Sie Garantien, GAP und andere F&I-Produkte zur Maximierung der Rentabilität pro Geschäft.',
         },
         performanceMetrics: {
           title: 'Leistungsmetriken',
-          description: 'Überwachen Sie Ihre persönliche Leistung mit wichtigen Metriken wie PVR (Pro verkauftem Fahrzeug), Produkte pro Geschäft und monatliche Ziele.',
+          description:
+            'Überwachen Sie Ihre persönliche Leistung mit wichtigen Metriken wie PVR (Pro verkauftem Fahrzeug), Produkte pro Geschäft und monatliche Ziele.',
         },
         teamPerformance: {
           title: 'Teamleistung',
-          description: 'Vergleichen Sie Ihre Leistung mit Teamdurchschnitten und sehen Sie, wie Sie unter Ihren Kollegen rangieren.',
+          description:
+            'Vergleichen Sie Ihre Leistung mit Teamdurchschnitten und sehen Sie, wie Sie unter Ihren Kollegen rangieren.',
         },
         recentDealsLog: {
           title: 'Protokoll der letzten Geschäfte',
-          description: 'Anzeigen und Verwalten Ihrer neuesten Geschäfte mit schnellem Zugriff auf Kundendetails und Geschäftsrentabilität.',
+          description:
+            'Anzeigen und Verwalten Ihrer neuesten Geschäfte mit schnellem Zugriff auf Kundendetails und Geschäftsrentabilität.',
         },
         pvr: {
           title: 'PVR',
-          description: 'Pro verkauftem Fahrzeug - Verfolgen Sie Ihren durchschnittlichen Gewinn pro Fahrzeug und vergleichen Sie mit Zielen und Teamdurchschnitten.',
+          description:
+            'Pro verkauftem Fahrzeug - Verfolgen Sie Ihren durchschnittlichen Gewinn pro Fahrzeug und vergleichen Sie mit Zielen und Teamdurchschnitten.',
         },
         payCalculator: {
           title: 'Gehaltsrechner',
-          description: 'Berechnen Sie Ihre Provision und Boni basierend auf Geschäftsrentabilität und Produktverkäufen.',
+          description:
+            'Berechnen Sie Ihre Provision und Boni basierend auf Geschäftsrentabilität und Produktverkäufen.',
         },
         schedule: {
           title: 'Zeitplan',
@@ -4197,7 +4459,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
         },
         teamSchedule: {
           title: 'Team-Zeitplan',
-          description: 'Einfache Ansicht von Teamzeitplänen, Anwesenheitsverfolgung und Schichtzuweisungsverwaltung für optimale Abdeckung.',
+          description:
+            'Einfache Ansicht von Teamzeitplänen, Anwesenheitsverfolgung und Schichtzuweisungsverwaltung für optimale Abdeckung.',
         },
         grossProfitIndicator: {
           title: 'Bruttogewinn-Indikator',
@@ -4205,63 +4468,78 @@ export const translations: Record<Language, Translations | Partial<Translations>
         },
         salesReports: {
           title: 'Verkaufsberichte, Planer, Ziele',
-          description: 'Zugriff auf umfassende Verkaufsberichte, Teamzeitpläne verwalten und monatliche/jährliche Ziele für Ihr Verkaufsteam festlegen/verfolgen.',
+          description:
+            'Zugriff auf umfassende Verkaufsberichte, Teamzeitpläne verwalten und monatliche/jährliche Ziele für Ihr Verkaufsteam festlegen/verfolgen.',
         },
         dasBoard: {
           title: 'Das DAS Board',
-          description: 'Sehen Sie die Verkaufs-Bestenliste, um über die Leistung und Rankings Ihrer Verkäufer auf dem Laufenden zu bleiben.',
+          description:
+            'Sehen Sie die Verkaufs-Bestenliste, um über die Leistung und Rankings Ihrer Verkäufer auf dem Laufenden zu bleiben.',
         },
         salesPerformance: {
           title: 'Verkaufsleistung',
-          description: 'Schnellansicht zur Verfolgung von Verkaufszielen, Teamfortschritt und wichtigen Leistungsindikatoren.',
+          description:
+            'Schnellansicht zur Verfolgung von Verkaufszielen, Teamfortschritt und wichtigen Leistungsindikatoren.',
         },
         unitsSold: {
           title: 'Verkaufte Einheiten',
-          description: 'Verfolgen Sie die Gesamtzahl verkaufter Einheiten einschließlich Neu- und Gebrauchtwagen mit täglichen, wöchentlichen und monatlichen Aufschlüsselungen.',
+          description:
+            'Verfolgen Sie die Gesamtzahl verkaufter Einheiten einschließlich Neu- und Gebrauchtwagen mit täglichen, wöchentlichen und monatlichen Aufschlüsselungen.',
         },
         unitCount: {
           title: 'Einheitenzählung',
-          description: 'Verfolgen Sie Ihre Neuwagen- und Gebrauchtwagenzahlen mit täglichen, wöchentlichen und monatlichen Aufschlüsselungen zur Überwachung des Verkaufsvolumens.',
+          description:
+            'Verfolgen Sie Ihre Neuwagen- und Gebrauchtwagenzahlen mit täglichen, wöchentlichen und monatlichen Aufschlüsselungen zur Überwachung des Verkaufsvolumens.',
         },
         dealLog: {
           title: 'Geschäftsprotokoll',
-          description: 'Bleiben Sie über alle Ihre Geschäfte mit detaillierten Kundeninformationen, Geschäftsstatus und Transaktionsverlauf auf dem Laufenden.',
+          description:
+            'Bleiben Sie über alle Ihre Geschäfte mit detaillierten Kundeninformationen, Geschäftsstatus und Transaktionsverlauf auf dem Laufenden.',
         },
         goalTracker: {
           title: 'Zielverfolgung und Gehaltsrechner',
-          description: 'Bleiben Sie über Ihre Ziele und MTD-Gehaltsschätzer auf dem Laufenden, um Fortschritte zu verfolgen und Einnahmen zu maximieren.',
+          description:
+            'Bleiben Sie über Ihre Ziele und MTD-Gehaltsschätzer auf dem Laufenden, um Fortschritte zu verfolgen und Einnahmen zu maximieren.',
         },
         goalQuickView: {
           title: 'Ziel-Schnellansicht',
-          description: 'Wissen Sie leicht, wo Sie mit Ihren Zielen stehen und verfolgen Sie Fortschritte zu monatlichen und jährlichen Zielen.',
+          description:
+            'Wissen Sie leicht, wo Sie mit Ihren Zielen stehen und verfolgen Sie Fortschritte zu monatlichen und jährlichen Zielen.',
         },
         grossTracker: {
           title: 'Bruttogewinn-Tracker',
-          description: 'Bleiben Sie über Ihren Bruttogewinn mit Schnellansicht der Front- und Back-Bruttogewinnverfolgung auf dem Laufenden, um jedes Geschäft zu maximieren.',
+          description:
+            'Bleiben Sie über Ihren Bruttogewinn mit Schnellansicht der Front- und Back-Bruttogewinnverfolgung auf dem Laufenden, um jedes Geschäft zu maximieren.',
         },
         fiManagerPerformance: {
           title: 'F&I-Manager-Leistung',
-          description: 'Vergleichen Sie die F&I-Manager-Leistung mit Teamdurchschnitten und benchmarken Sie gegen Branchenstandards für maximale Rentabilität.',
+          description:
+            'Vergleichen Sie die F&I-Manager-Leistung mit Teamdurchschnitten und benchmarken Sie gegen Branchenstandards für maximale Rentabilität.',
         },
         salesManagerPerformance: {
           title: 'Verkaufsleiter-Leistung',
-          description: 'Sehen Sie die Verkaufsleiter-Leistung im Vergleich zu Teamkollegen und vergleichen Sie individuelle Metriken im Vertriebsmanagement-Team.',
+          description:
+            'Sehen Sie die Verkaufsleiter-Leistung im Vergleich zu Teamkollegen und vergleichen Sie individuelle Metriken im Vertriebsmanagement-Team.',
         },
         salesDasBoard: {
           title: 'Verkaufs-DAS-Board',
-          description: 'Sehen Sie Ihre Verkaufsleiter und verfolgen Sie Top-Performer für maximale Produktivität bei gleichzeitiger Überwachung der Teamdynamik und individuellen Zielerreichung.',
+          description:
+            'Sehen Sie Ihre Verkaufsleiter und verfolgen Sie Top-Performer für maximale Produktivität bei gleichzeitiger Überwachung der Teamdynamik und individuellen Zielerreichung.',
         },
         pvrDealership: {
           title: 'PVR',
-          description: 'Pro verkauftem Fahrzeug - Verfolgen Sie den durchschnittlichen Gewinn des Händlers pro Fahrzeug sowohl Front-End als auch Back-End für schnelle Ergebnisse.',
+          description:
+            'Pro verkauftem Fahrzeug - Verfolgen Sie den durchschnittlichen Gewinn des Händlers pro Fahrzeug sowohl Front-End als auch Back-End für schnelle Ergebnisse.',
         },
         goalTracking: {
           title: 'Zielverfolgung',
-          description: 'Bestimmen Sie schnell den MTD-Einheitenverkaufsfortschritt und verfolgen Sie die Leistung gegen monatliche Ziele.',
+          description:
+            'Bestimmen Sie schnell den MTD-Einheitenverkaufsfortschritt und verfolgen Sie die Leistung gegen monatliche Ziele.',
         },
         unitsSoldDealer: {
           title: 'Verkaufte Einheiten',
-          description: 'Verfolgen Sie schnell die Gesamtzahl verkaufter Einheiten einschließlich Neu- und Gebrauchtwagen mit MTD-Verkäufen.',
+          description:
+            'Verfolgen Sie schnell die Gesamtzahl verkaufter Einheiten einschließlich Neu- und Gebrauchtwagen mit MTD-Verkäufen.',
         },
       },
     },
@@ -4299,32 +4577,34 @@ export const translations: Record<Language, Translations | Partial<Translations>
           name: 'Individuální Finanční Manažer',
           price: '$20/měsíc omezený čas',
           originalPrice: '$29.99/měsíc',
-          description: 'Perfektní pro individuální finanční manažery, kteří chtějí sledovat svůj osobní výkon',
+          description:
+            'Perfektní pro individuální finanční manažery, kteří chtějí sledovat svůj osobní výkon',
           features: [
             'Sledování osobních obchodů',
             'PVR a analýzy zisku z produktů',
             'Kalkulačka plateb',
             'Výkonnostní metriky',
-            'Může být daňově odečitatelné'
+            'Může být daňově odečitatelné',
           ],
           buttonText: 'Začněte Nyní!',
-          setupTime: 'Vyzkoušejte bez rizika na celý kalendářní měsíc'
+          setupTime: 'Vyzkoušejte bez rizika na celý kalendářní měsíc',
         },
         dealership: {
           name: 'Dealerství / Skupina Dealerství',
           price: '$250/mo base',
-          description: 'Kompletní řízení dealerství s dashboardy specifickými pro role a správou týmu',
+          description:
+            'Kompletní řízení dealerství s dashboardy specifickými pro role a správou týmu',
           popular: 'Nejpopulárnější',
           features: [
             'Všechny funkce individuálního manažera',
             'Týmové dashboardy pro všechny role',
             'Analýzy více lokalit',
-            'Flexibilní administrativní struktury'
+            'Flexibilní administrativní struktury',
           ],
           buttonText: 'Nakonfigurovat Váš Balíček',
-          setupTime: 'Začněte ještě dnes'
+          setupTime: 'Začněte ještě dnes',
         },
-        priceSubtext: 'za prodejnu + doplňky'
+        priceSubtext: 'za prodejnu + doplňky',
       },
       cta: {
         title: 'Připraveni začít?',
@@ -4579,7 +4859,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
           lastName: 'Příjmení',
           role: 'Role',
           addMember: 'Přidat člena',
-          noMembers: 'Zatím nebyly přidáni žádní členové týmu. Přidejte svého prvního člena týmu výše.',
+          noMembers:
+            'Zatím nebyly přidáni žádní členové týmu. Přidejte svého prvního člena týmu výše.',
           salespeople: 'Obchodníci',
           salesManagers: 'Manažeři prodeje',
           active: 'Aktivní',
@@ -4608,7 +4889,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
           memberRemoved: 'Člen týmu odstraněn',
           note: {
             title: 'Poznámka',
-            description: 'Tato nastavení jsou specifická pro váš dashboard jednoduchého finančního manažera a budou použita pro logování obchodů a výpočty platů.',
+            description:
+              'Tato nastavení jsou specifická pro váš dashboard jednoduchého finančního manažera a budou použita pro logování obchodů a výpočty platů.',
           },
           roles: {
             salesperson: 'Obchodník',
@@ -4620,8 +4902,10 @@ export const translations: Record<Language, Translations | Partial<Translations>
           editDeal: 'Upravit obchod - Dashboard jednoduchého finančního manažera',
           backToDashboard: 'Zpět na dashboard',
           note: 'Poznámka',
-          editingNote: 'Upravujete existující obchod. Změny se okamžitě zobrazí na vašem dashboardu.',
-          dashboardNote: 'Tento obchod se zobrazí pouze na vašem dashboardu jednoduchého finančního manažera a neovlivní ostatní dashboardy v systému.',
+          editingNote:
+            'Upravujete existující obchod. Změny se okamžitě zobrazí na vašem dashboardu.',
+          dashboardNote:
+            'Tento obchod se zobrazí pouze na vašem dashboardu jednoduchého finančního manažera a neovlivní ostatní dashboardy v systému.',
           dealInformation: 'Informace o obchodu',
           dealNumber: 'Číslo obchodu',
           stockNumber: 'Skladové číslo',
@@ -4756,41 +5040,47 @@ export const translations: Record<Language, Translations | Partial<Translations>
       terms: {
         title: 'Podmínky služby',
         lastUpdated: 'Poslední aktualizace: 6/28/2025',
-        intro: 'Vítejte v The DAS Board. Tyto Podmínky služby ("Podmínky") upravují váš přístup k naší platformě softwaru pro správu autosalonů a její používání. Přístupem nebo používáním našich služeb souhlasíte s tím, že budete vázáni těmito Podmínkami.',
+        intro:
+          'Vítejte v The DAS Board. Tyto Podmínky služby ("Podmínky") upravují váš přístup k naší platformě softwaru pro správu autosalonů a její používání. Přístupem nebo používáním našich služeb souhlasíte s tím, že budete vázáni těmito Podmínkami.',
         sections: {
           acceptance: {
             title: '1. Přijetí podmínek',
-            content: 'Vytvořením účtu, přístupem nebo používáním The DAS Board potvrzujete, že jste si přečetli, porozuměli a souhlasíte s tím, že budete vázáni těmito Podmínkami a našimi Zásadami ochrany osobních údajů. Pokud s těmito Podmínkami nesouhlasíte, nesmíte naše služby používat. Musíte být nejméně 18 let a mít oprávnění uzavřít tyto Podmínky jménem vaší organizace.'
+            content:
+              'Vytvořením účtu, přístupem nebo používáním The DAS Board potvrzujete, že jste si přečetli, porozuměli a souhlasíte s tím, že budete vázáni těmito Podmínkami a našimi Zásadami ochrany osobních údajů. Pokud s těmito Podmínkami nesouhlasíte, nesmíte naše služby používat. Musíte být nejméně 18 let a mít oprávnění uzavřít tyto Podmínky jménem vaší organizace.',
           },
           service: {
             title: '2. Popis služby',
-            content: 'The DAS Board je cloudová platforma softwaru pro správu autosalonů, která poskytuje nástroje pro správu zásob, sledování prodeje, správu vztahů se zákazníky, finanční hlášení a související služby v automobilovém průmyslu. Vyhrazujeme si právo upravit, pozastavit nebo ukončit jakýkoli aspekt naší služby s přiměřeným oznámením.'
+            content:
+              'The DAS Board je cloudová platforma softwaru pro správu autosalonů, která poskytuje nástroje pro správu zásob, sledování prodeje, správu vztahů se zákazníky, finanční hlášení a související služby v automobilovém průmyslu. Vyhrazujeme si právo upravit, pozastavit nebo ukončit jakýkoli aspekt naší služby s přiměřeným oznámením.',
           },
           account: {
             title: '3. Registrace účtu a bezpečnost',
-            content: 'Pro používání našich služeb musíte vytvořit účet s přesnými a úplnými informacemi. Jste zodpovědní za:',
+            content:
+              'Pro používání našich služeb musíte vytvořit účet s přesnými a úplnými informacemi. Jste zodpovědní za:',
             items: [
               'Zachování důvěrnosti přihlašovacích údajů vašeho účtu',
               'Všechny aktivity, které se odehrávají pod vaším účtem',
               'Okamžité oznámení jakéhokoli neoprávněného použití',
               'Zajištění, aby informace o vašem účtu zůstaly aktuální a přesné',
-              'Dodržování našich bezpečnostních požadavků a osvědčených postupů'
-            ]
+              'Dodržování našich bezpečnostních požadavků a osvědčených postupů',
+            ],
           },
           subscription: {
             title: '4. Podmínky předplatného a platby',
-            content: 'The DAS Board funguje na základě předplatného. Přihlášením k odběru souhlasíte s:',
+            content:
+              'The DAS Board funguje na základě předplatného. Přihlášením k odběru souhlasíte s:',
             items: [
               'Zaplacením všech poplatků spojených s vaším plánem předplatného',
               'Automatickým obnovením, pokud nebude zrušeno před datem obnovení',
               'Změnami poplatků s 30denním předchozím oznámením',
               'Žádnými vrácenými penězi za částečná období předplatného',
-              'Pozastavením služby za neplacení po přiměřeném oznámení'
-            ]
+              'Pozastavením služby za neplacení po přiměřeném oznámení',
+            ],
           },
           usage: {
             title: '5. Zásady přijatelného používání',
-            content: 'Souhlasíte s používáním The DAS Board pouze pro zákonné účely a v souladu s těmito Podmínkami. Nesmíte:',
+            content:
+              'Souhlasíte s používáním The DAS Board pouze pro zákonné účely a v souladu s těmito Podmínkami. Nesmíte:',
             items: [
               'Porušovat platné zákony, předpisy nebo práva třetích stran',
               'Nahrávat škodlivý, urážlivý nebo nevhodný obsah',
@@ -4798,33 +5088,37 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Používat službu k odesílání spamu, malwaru nebo jiného škodlivého obsahu',
               'Provádět reverzní inženýrství, dekompilovat nebo se pokoušet extrahovat zdrojový kód',
               'Narušovat nebo rušit integritu nebo výkon našich služeb',
-              'Používat platformu pro podvodné nebo nezákonné aktivity'
-            ]
+              'Používat platformu pro podvodné nebo nezákonné aktivity',
+            ],
           },
           intellectual: {
             title: '6. Práva duševního vlastnictví',
-            content: 'The DAS Board a všechny související technologie, obsah a materiály jsou vlastnictvím naším nebo našich poskytovatelů licencí. To zahrnuje:',
+            content:
+              'The DAS Board a všechny související technologie, obsah a materiály jsou vlastnictvím naším nebo našich poskytovatelů licencí. To zahrnuje:',
             items: [
               'Software, algoritmy a uživatelská rozhraní',
               'Ochranné známky, loga a brandové materiály',
               'Dokumentaci, návody a podpůrné materiály',
-              'Analýzy, zprávy a agregované datové poznatky'
+              'Analýzy, zprávy a agregované datové poznatky',
             ],
-            footer: 'Zachováváte si vlastnictví svých dat, ale udělujete nám licenci k jejich použití pro poskytování našich služeb. Můžeme používat anonymizovaná, agregovaná data pro průmyslový výzkum a zlepšování platformy.'
+            footer:
+              'Zachováváte si vlastnictví svých dat, ale udělujete nám licenci k jejich použití pro poskytování našich služeb. Můžeme používat anonymizovaná, agregovaná data pro průmyslový výzkum a zlepšování platformy.',
           },
           privacy: {
             title: '7. Ochrana údajů a soukromí',
-            content: 'Jste zodpovědní za to, aby všechny osobní údaje, které zpracováváte prostřednictvím naší platformy, byly v souladu s platnými zákony o ochraně soukromí. Budeme zpracovávat údaje v souladu s našimi Zásadami ochrany osobních údajů a platnými předpisy o ochraně údajů, včetně GDPR a CCPA, kde je to možné.'
+            content:
+              'Jste zodpovědní za to, aby všechny osobní údaje, které zpracováváte prostřednictvím naší platformy, byly v souladu s platnými zákony o ochraně soukromí. Budeme zpracovávat údaje v souladu s našimi Zásadami ochrany osobních údajů a platnými předpisy o ochraně údajů, včetně GDPR a CCPA, kde je to možné.',
           },
           availability: {
             title: '8. Dostupnost služby a podpora',
-            content: 'Ačkoli se snažíme o vysokou dostupnost, nezaručujeme nepřerušovanou službu. Poskytujeme:',
+            content:
+              'Ačkoli se snažíme o vysokou dostupnost, nezaručujeme nepřerušovanou službu. Poskytujeme:',
             items: [
               '99,9% SLA provozu pro placená předplatná',
               'Pravidelná okna údržby s předchozím oznámením',
               'Technickou podporu založenou na vaší úrovni předplatného',
-              'Bezpečnostní monitorování a reakci na incidenty'
-            ]
+              'Bezpečnostní monitorování a reakci na incidenty',
+            ],
           },
           termination: {
             title: '9. Ukončení',
@@ -4834,60 +5128,67 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Můžeme ukončit za porušení těchto Podmínek s přiměřeným oznámením',
               'Můžeme okamžitě pozastavit službu při závažných porušeních nebo bezpečnostních hrozbách',
               'Po ukončení ztratíte přístup k platformě a svým datům',
-              'Poskytneme přiměřenou příležitost k exportu vašich dat před smazáním'
-            ]
+              'Poskytneme přiměřenou příležitost k exportu vašich dat před smazáním',
+            ],
           },
           disclaimers: {
             title: '10. Vyloučení odpovědnosti a omezení odpovědnosti',
-            content: 'THE DAS BOARD JE POSKYTOVÁNO "TAK, JAK JE" BEZ JAKÝCHKOLI ZÁRUK. V MAXIMÁLNÍM ROZSAHU POVOLENÉM ZÁKONEM:',
+            content:
+              'THE DAS BOARD JE POSKYTOVÁNO "TAK, JAK JE" BEZ JAKÝCHKOLI ZÁRUK. V MAXIMÁLNÍM ROZSAHU POVOLENÉM ZÁKONEM:',
             items: [
               'Vylučujeme všechny záruky, výslovné nebo předpokládané, včetně obchodovatelnosti a vhodnosti pro konkrétní účel',
               'Neneseme odpovědnost za nepřímé, náhodné, zvláštní nebo následné škody',
               'Naše celková odpovědnost nepřekročí poplatky, které jste zaplatili za 12 měsíců předcházejících nároku',
-              'Uznáváte, že software může obsahovat chyby a souhlasíte s jejich rychlým nahlášením'
-            ]
+              'Uznáváte, že software může obsahovat chyby a souhlasíte s jejich rychlým nahlášením',
+            ],
           },
           indemnification: {
             title: '11. Odškodnění',
-            content: 'Souhlasíte s tím, že nás odškodníte a zbavíte odpovědnosti za jakékoli nároky, ztráty nebo škody vyplývající z vašeho používání našich služeb, porušení těchto Podmínek nebo porušení práv třetích stran.'
+            content:
+              'Souhlasíte s tím, že nás odškodníte a zbavíte odpovědnosti za jakékoli nároky, ztráty nebo škody vyplývající z vašeho používání našich služeb, porušení těchto Podmínek nebo porušení práv třetích stran.',
           },
           governing: {
             title: '12. Rozhodné právo a řešení sporů',
-            content: 'Tyto Podmínky se řídí zákony [Jurisdikce] bez ohledu na principy kolize zákonů. Všechny spory budou řešeny prostřednictvím závazného rozhodčího řízení, s výjimkou nároků na předběžné opatření, které mohou být podány u příslušných soudů.'
+            content:
+              'Tyto Podmínky se řídí zákony [Jurisdikce] bez ohledu na principy kolize zákonů. Všechny spory budou řešeny prostřednictvím závazného rozhodčího řízení, s výjimkou nároků na předběžné opatření, které mohou být podány u příslušných soudů.',
           },
           changes: {
             title: '13. Změny podmínek',
-            content: 'Můžeme tyto Podmínky čas od času upravit. Poskytneme oznámení o podstatných změnách nejméně 30 dní předem. Pokračování v používání našich služeb po vstoupení změn v platnost představuje přijetí revidovaných Podmínek.'
+            content:
+              'Můžeme tyto Podmínky čas od času upravit. Poskytneme oznámení o podstatných změnách nejméně 30 dní předem. Pokračování v používání našich služeb po vstoupení změn v platnost představuje přijetí revidovaných Podmínek.',
           },
           entire: {
             title: '14. Celá smlouva',
-            content: 'Tyto Podmínky spolu s našimi Zásadami ochrany osobních údajů a jakýmikoli dodatečnými dohodami tvoří celou smlouvu mezi vámi a The DAS Board týkající se vašeho používání našich služeb.'
+            content:
+              'Tyto Podmínky spolu s našimi Zásadami ochrany osobních údajů a jakýmikoli dodatečnými dohodami tvoří celou smlouvu mezi vámi a The DAS Board týkající se vašeho používání našich služeb.',
           },
           contact: {
             title: '15. Kontaktní informace',
             content: 'Pokud máte otázky o těchto Podmínkách, kontaktujte nás prosím:',
             email: 'legal@thedasboard.com',
             address: '[Adresa společnosti]',
-            phone: '[Telefonní číslo podpory]'
-          }
-        }
+            phone: '[Telefonní číslo podpory]',
+          },
+        },
       },
       privacy: {
         title: 'Zásady ochrany osobních údajů',
         lastUpdated: 'Poslední aktualizace: 28.6.2025',
-        intro: 'Tyto Zásady ochrany osobních údajů popisují, jak The DAS Board („my", „nás" nebo „naše") shromažďuje, používá a chrání vaše osobní údaje při používání naší softwarové platformy pro správu autosalonů. Zavazujeme se chránit vaše soukromí a zacházet s vašimi daty odpovědně.',
+        intro:
+          'Tyto Zásady ochrany osobních údajů popisují, jak The DAS Board („my", „nás" nebo „naše") shromažďuje, používá a chrání vaše osobní údaje při používání naší softwarové platformy pro správu autosalonů. Zavazujeme se chránit vaše soukromí a zacházet s vašimi daty odpovědně.',
         sections: {
           collection: {
             title: '1. Informace, které shromažďujeme',
-            content: 'Při používání The DAS Board shromažďujeme několik typů informací pro poskytování a zlepšování našich služeb:',
+            content:
+              'Při používání The DAS Board shromažďujeme několik typů informací pro poskytování a zlepšování našich služeb:',
             items: [
               '<strong>Informace o účtu:</strong> Jméno, e-mailová adresa, telefonní číslo, název společnosti, pracovní pozice a fakturační údaje',
               '<strong>Data autosalonu:</strong> Inventář vozidel, záznamy o prodeji, informace o zákaznících a finanční transakce',
               '<strong>Data o používání:</strong> Přistupované funkce, čas strávený na platformě, interakce uživatelů a metriky výkonu',
               '<strong>Technická data:</strong> IP adresa, typ prohlížeče, informace o zařízení, operační systém a přístupové protokoly',
               '<strong>Komunikační data:</strong> Požadavky na podporu, zpětná vazba a korespondence s naším týmem',
-              '<strong>Data o poloze:</strong> Adresy autosalonu a, se souhlasem, poloha zařízení pro mobilní funkce'
-            ]
+              '<strong>Data o poloze:</strong> Adresy autosalonu a, se souhlasem, poloha zařízení pro mobilní funkce',
+            ],
           },
           usage: {
             title: '2. Jak používáme vaše informace',
@@ -4900,41 +5201,44 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Odesílání aktualizací služeb, bezpečnostních upozornění a administrativních zpráv',
               'Detekce, prevence a řešení technických problémů a bezpečnostních hrozeb',
               'Dodržování právních povinností a průmyslových předpisů',
-              'Zlepšování uživatelské zkušenosti prostřednictvím vývoje produktů a výzkumu'
-            ]
+              'Zlepšování uživatelské zkušenosti prostřednictvím vývoje produktů a výzkumu',
+            ],
           },
           sharing: {
             title: '3. Sdílení vašich informací',
-            content: 'Neprodáváme, nepronajímáme ani nevyměňujeme vaše osobní údaje. Vaše informace můžeme sdílet pouze za následujících okolností:',
+            content:
+              'Neprodáváme, nepronajímáme ani nevyměňujeme vaše osobní údaje. Vaše informace můžeme sdílet pouze za následujících okolností:',
             items: [
               '<strong>Poskytovatelé služeb:</strong> Třetí strany, které nám pomáhají provozovat naši platformu (hosting, analýzy, zpracování plateb)',
               '<strong>Obchodní partneři:</strong> Autorizované integrace a partneři z automobilového průmyslu s vaším výslovným souhlasem',
               '<strong>Právní požadavky:</strong> Pokud to vyžaduje zákon, předpis nebo platný právní proces',
               '<strong>Obchodní převody:</strong> V souvislosti s fúzemi, akvizicemi nebo prodejem aktiv (s oznámením)',
-              '<strong>Bezpečnost a ochrana:</strong> K ochraně práv, majetku nebo bezpečnosti našich uživatelů nebo veřejnosti'
-            ]
+              '<strong>Bezpečnost a ochrana:</strong> K ochraně práv, majetku nebo bezpečnosti našich uživatelů nebo veřejnosti',
+            ],
           },
           retention: {
             title: '4. Uchovávání dat',
-            content: 'Vaše osobní údaje uchováváme tak dlouho, jak je to nezbytné pro poskytování našich služeb a dodržování právních povinností. Konkrétně:',
+            content:
+              'Vaše osobní údaje uchováváme tak dlouho, jak je to nezbytné pro poskytování našich služeb a dodržování právních povinností. Konkrétně:',
             items: [
               'Data účtu jsou uchovávána po dobu aktivního předplatného a 3 roky po ukončení',
               'Záznamy transakcí jsou uchovávány 7 let pro dodržování finančních předpisů',
               'Protokoly používání jsou uchovávány 2 roky pro bezpečnostní analýzy a analýzy výkonu',
-              'Záznamy komunikace jsou uchovávány 5 let pro účely zákaznického servisu'
-            ]
+              'Záznamy komunikace jsou uchovávány 5 let pro účely zákaznického servisu',
+            ],
           },
           rights: {
             title: '5. Vaše práva a možnosti',
-            content: 'V závislosti na vaší poloze můžete mít následující práva týkající se vašich osobních údajů:',
+            content:
+              'V závislosti na vaší poloze můžete mít následující práva týkající se vašich osobních údajů:',
             items: [
               '<strong>Přístup:</strong> Požádat o kopii vašich osobních údajů, které uchováváme',
               '<strong>Oprava:</strong> Aktualizovat nebo opravit nepřesné osobní údaje',
               '<strong>Výmaz:</strong> Požádat o vymazání vašich osobních údajů (s výhradou právních povinností)',
               '<strong>Přenositelnost:</strong> Obdržet vaše data ve strojově čitelném formátu',
               '<strong>Omezení:</strong> Omezit způsob zpracování vašich osobních údajů',
-              '<strong>Námitka:</strong> Namítat proti zpracování založenému na oprávněných zájmech'
-            ]
+              '<strong>Námitka:</strong> Namítat proti zpracování založenému na oprávněných zájmech',
+            ],
           },
           cookies: {
             title: '6. Cookies a sledovací technologie',
@@ -4943,75 +5247,87 @@ export const translations: Record<Language, Translations | Partial<Translations>
               '<strong>Základní cookies:</strong> Vyžadované pro funkčnost a bezpečnost platformy',
               '<strong>Analytické cookies:</strong> Pomáhají nám pochopit, jak používáte naši platformu',
               '<strong>Preferenční cookies:</strong> Pamatují si vaše nastavení a přizpůsobení',
-              '<strong>Marketingové cookies:</strong> Používané pro cílenou komunikaci (s vaším souhlasem)'
+              '<strong>Marketingové cookies:</strong> Používané pro cílenou komunikaci (s vaším souhlasem)',
             ],
-            footer: 'Můžete ovládat preference cookies prostřednictvím nastavení prohlížeče nebo našeho nástroje pro správu cookies.'
+            footer:
+              'Můžete ovládat preference cookies prostřednictvím nastavení prohlížeče nebo našeho nástroje pro správu cookies.',
           },
           security: {
             title: '7. Bezpečnostní opatření',
-            content: 'Implementujeme průmyslové standardní bezpečnostní opatření k ochraně vašich informací, včetně:',
+            content:
+              'Implementujeme průmyslové standardní bezpečnostní opatření k ochraně vašich informací, včetně:',
             items: [
               'Šifrování dat při přenosu a v klidu pomocí standardů AES-256',
               'Pravidelné bezpečnostní audity a penetrační testování',
               'Vícefaktorová autentizace a kontroly přístupu',
               'SOC 2 Type II compliance a pravidelná bezpečnostní hodnocení',
-              'Školení zaměstnanců o ochraně dat a osvědčených bezpečnostních postupech'
-            ]
+              'Školení zaměstnanců o ochraně dat a osvědčených bezpečnostních postupech',
+            ],
           },
           international: {
             title: '8. Mezinárodní přenosy dat',
-            content: 'Vaše informace mohou být přeneseny a zpracovávány v jiných zemích než je vaše vlastní. Zajišťujeme, aby byla zavedena vhodná ochranná opatření, včetně Standardních smluvních doložek a rozhodnutí o přiměřenosti, k ochraně vašich dat během mezinárodních přenosů.'
+            content:
+              'Vaše informace mohou být přeneseny a zpracovávány v jiných zemích než je vaše vlastní. Zajišťujeme, aby byla zavedena vhodná ochranná opatření, včetně Standardních smluvních doložek a rozhodnutí o přiměřenosti, k ochraně vašich dat během mezinárodních přenosů.',
           },
           children: {
             title: '9. Soukromí dětí',
-            content: 'The DAS Board není určen pro používání osobami mladšími 18 let. Vědomě neshromažďujeme osobní údaje od dětí mladších 18 let. Pokud se o takovém shromažďování dozvíme, informace okamžitě smažeme.'
+            content:
+              'The DAS Board není určen pro používání osobami mladšími 18 let. Vědomě neshromažďujeme osobní údaje od dětí mladších 18 let. Pokud se o takovém shromažďování dozvíme, informace okamžitě smažeme.',
           },
           changes: {
             title: '10. Změny těchto Zásad ochrany osobních údajů',
-            content: 'Tyto Zásady ochrany osobních údajů můžeme pravidelně aktualizovat, abychom odráželi změny v našich postupech nebo právních požadavcích. O významných změnách vás budeme informovat e-mailem nebo oznámením na platformě nejméně 30 dní před jejich účinností.'
+            content:
+              'Tyto Zásady ochrany osobních údajů můžeme pravidelně aktualizovat, abychom odráželi změny v našich postupech nebo právních požadavcích. O významných změnách vás budeme informovat e-mailem nebo oznámením na platformě nejméně 30 dní před jejich účinností.',
           },
           contact: {
             title: '11. Kontaktujte nás',
-            content: 'Máte-li otázky k těmto Zásadám ochrany osobních údajů nebo si přejete uplatnit svá práva, kontaktujte nás prosím:',
+            content:
+              'Máte-li otázky k těmto Zásadám ochrany osobních údajů nebo si přejete uplatnit svá práva, kontaktujte nás prosím:',
             email: 'privacy@thedasboard.com',
             address: '[Company Address]',
-            phone: '[Support Phone Number]'
-          }
-        }
+            phone: '[Support Phone Number]',
+          },
+        },
       },
       subscription: {
         title: 'Dohoda o předplatném',
         lastUpdated: 'Poslední aktualizace: 6/28/2025',
-        intro: 'Tato Dohoda o předplatném upravuje vaše předplatné a používání platformy pro správu autosalonů The DAS Board.',
+        intro:
+          'Tato Dohoda o předplatném upravuje vaše předplatné a používání platformy pro správu autosalonů The DAS Board.',
         sections: {
           plans: {
             title: '1. Plány předplatného',
-            content: 'The DAS Board nabízí úrovně předplatného navržené pro různé potřeby autosalonů:',
+            content:
+              'The DAS Board nabízí úrovně předplatného navržené pro různé potřeby autosalonů:',
             items: [
               '<strong>60denní bezplatná zkušební verze:</strong> Plný přístup k platformě bez nutnosti kreditní karty',
               '<strong>Finanční manažer:</strong> Individuální uživatelský přístup se základními finančními nástroji',
               '<strong>Autosalon:</strong> Přístup pro více uživatelů s kompletní správou inventáře a prodeje',
-              '<strong>Skupina autosalonů:</strong> Přístup na podnikové úrovni na více lokalitách'
+              '<strong>Skupina autosalonů:</strong> Přístup na podnikové úrovni na více lokalitách',
             ],
-            footer: 'Předplatné se účtuje měsíčně předem. Můžete kdykoliv upgradovat nebo downgradovat své předplatné, změny budou platit od následujícího fakturačního cyklu.'
+            footer:
+              'Předplatné se účtuje měsíčně předem. Můžete kdykoliv upgradovat nebo downgradovat své předplatné, změny budou platit od následujícího fakturačního cyklu.',
           },
           payment: {
             title: '2. Platební podmínky',
-            content: 'Platba je splatná při začátku předplatného a stejný den každý měsíc poté. Přijímáme hlavní kreditní karty a ACH převody pro podnikové účty. Pokud platba selže, můžeme pozastavit váš přístup k The DAS Board po přiměřeném upozornění.'
+            content:
+              'Platba je splatná při začátku předplatného a stejný den každý měsíc poté. Přijímáme hlavní kreditní karty a ACH převody pro podnikové účty. Pokud platba selže, můžeme pozastavit váš přístup k The DAS Board po přiměřeném upozornění.',
           },
           trial: {
             title: '3. Zkušební období',
-            content: '60denní zkušební verze poskytuje plný přístup k platformě The DAS Board. Pro začátek zkušební verze není potřeba kreditní karta. Na konci zkušebního období budete muset vybrat placený plán pro pokračování v používání platformy. Data ze zkušební verze budou zachována po dobu 30 dnů po vypršení zkušební verze.'
+            content:
+              '60denní zkušební verze poskytuje plný přístup k platformě The DAS Board. Pro začátek zkušební verze není potřeba kreditní karta. Na konci zkušebního období budete muset vybrat placený plán pro pokračování v používání platformy. Data ze zkušební verze budou zachována po dobu 30 dnů po vypršení zkušební verze.',
           },
           cancellation: {
             title: '4. Zrušení a refundace',
-            content: 'Můžete zrušit své předplatné kdykoliv prostřednictvím nastavení účtu nebo kontaktováním našeho týmu podpory. Po zrušení:',
+            content:
+              'Můžete zrušit své předplatné kdykoliv prostřednictvím nastavení účtu nebo kontaktováním našeho týmu podpory. Po zrušení:',
             items: [
               'Zachováte přístup do konce aktuálního fakturačního období',
               'Nebudou poskytnuty refundace za částečné měsíce služby',
               'Vaše data budou k dispozici pro export po dobu 90 dnů po zrušení',
-              'Automatické obnovení bude zakázáno'
-            ]
+              'Automatické obnovení bude zakázáno',
+            ],
           },
           sla: {
             title: '5. Dohoda o úrovni služeb',
@@ -5020,8 +5336,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
               '99,9% dostupnosti platformy',
               'Plánovaná okna údržby s 48hodinovým předchozím upozorněním',
               'Odpověď zákaznické podpory do 24 hodin pro standardní požadavky',
-              'Prioritní podpora pro předplatitele Skupiny autosalonů'
-            ]
+              'Prioritní podpora pro předplatitele Skupiny autosalonů',
+            ],
           },
           data: {
             title: '6. Data a bezpečnost',
@@ -5030,8 +5346,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Denní automatizované zálohy s 30denním uchováním',
               'Šifrování a bezpečnostní protokoly na úrovni bank',
               'Soulad s GDPR a CCPA pro ochranu dat',
-              'Možnosti exportu dat ve standardních formátech'
-            ]
+              'Možnosti exportu dat ve standardních formátech',
+            ],
           },
           support: {
             title: '7. Podpora a školení',
@@ -5040,22 +5356,25 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Komplexní asistenci při nasazení a nastavení',
               'Online školicí materiály a dokumentaci',
               'E-mailovou a chatovou podporu během pracovní doby',
-              'Pravidelné aktualizace platformy a vydání nových funkcí'
-            ]
+              'Pravidelné aktualizace platformy a vydání nových funkcí',
+            ],
           },
           modifications: {
             title: '8. Úpravy služby',
-            content: 'Můžeme upravit nebo aktualizovat platformu The DAS Board za účelem zlepšení funkčnosti, bezpečnosti nebo compliance. Poskytneme přiměřené upozornění na významné změny, které mohou ovlivnit vaše používání.'
-          }
-        }
+            content:
+              'Můžeme upravit nebo aktualizovat platformu The DAS Board za účelem zlepšení funkčnosti, bezpečnosti nebo compliance. Poskytneme přiměřené upozornění na významné změny, které mohou ovlivnit vaše používání.',
+          },
+        },
       },
       pricingPage: {
         title: 'Vyberte Svou',
         titleHighlight: 'Řešení',
-        subtitle: 'Vyberte možnost, která nejlépe popisuje vaše potřeby. Přizpůsobíme vaši zkušenost odpovídajícím způsobem.',
+        subtitle:
+          'Vyberte možnost, která nejlépe popisuje vaše potřeby. Přizpůsobíme vaši zkušenost odpovídajícím způsobem.',
         singleFinance: {
           title: 'Individuální Finanční Manažer',
-          description: 'Perfektní pro individuální finanční manažery, kteří chtějí sledovat svůj osobní výkon a obchody.',
+          description:
+            'Perfektní pro individuální finanční manažery, kteří chtějí sledovat svůj osobní výkon a obchody.',
           originalPrice: '$29.99/měsíc',
           price: '$20/měsíc omezený čas',
           features: [
@@ -5063,14 +5382,15 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'PVR a analýzy zisku z produktů',
             'Kalkulačka plateb',
             'Výkonnostní metriky',
-            'Může být daňově odečitatelné'
+            'Může být daňově odečitatelné',
           ],
           buttonText: 'Začněte Nyní!',
-          setupTime: 'Vyzkoušejte bez rizika na celý kalendářní měsíc'
+          setupTime: 'Vyzkoušejte bez rizika na celý kalendářní měsíc',
         },
         dealership: {
           title: 'Dealerství / Skupina Dealerství',
-          description: 'Kompletní řízení dealerství s dashboardy specifickými pro role, správou týmu a podporou více lokalit.',
+          description:
+            'Kompletní řízení dealerství s dashboardy specifickými pro role, správou týmu a podporou více lokalit.',
           price: '$250/měsíc základ',
           priceSubtext: 'za prodejnu + doplňky',
           popular: 'Nejpopulárnější',
@@ -5079,35 +5399,37 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'Týmové dashboardy pro všechny role',
             'Analýzy více lokalit',
             'Flexibilní administrativní struktury',
-            'Dostupné objemové slevy'
+            'Dostupné objemové slevy',
           ],
           buttonText: 'Zobrazit Dynamické Ceny Balíčků',
-          setupTime: 'Začněte ještě dnes'
+          setupTime: 'Začněte ještě dnes',
         },
         benefits: {
           title: 'Transformujte Své Dealerství Dnes',
           performance: {
             title: 'Zvyšte Výkon',
-            description: 'Poznatky v reálném čase pomáhají týmům překročit cíle a maximalizovat ziskovost'
+            description:
+              'Poznatky v reálném čase pomáhají týmům překročit cíle a maximalizovat ziskovost',
           },
           operations: {
             title: 'Zefektivněte Operace',
-            description: 'Centralizované řízení snižuje administrativní čas a zlepšuje efektivitu'
+            description: 'Centralizované řízení snižuje administrativní čas a zlepšuje efektivitu',
           },
           security: {
             title: 'Bezpečné a Spolehlivé',
-            description: 'Podniková bezpečnost s 99,9% zárukou dostupnosti'
-          }
+            description: 'Podniková bezpečnost s 99,9% zárukou dostupnosti',
+          },
         },
         helpText: {
           title: 'Nejste si jisti, kterou možnost zvolit?',
-          description: 'Začněte s možností individuálního finančního manažera a vyzkoušejte naši platformu, poté snadno přejděte na funkce dealerství, až budete připraveni rozšířit svůj tým.'
+          description:
+            'Začněte s možností individuálního finančního manažera a vyzkoušejte naši platformu, poté snadno přejděte na funkce dealerství, až budete připraveni rozšířit svůj tým.',
         },
         footer: {
           copyright: '© 2025 The DAS Board. Všechna práva vyhrazena.',
           support: 'Otázky? Kontaktujte nás na',
-          email: 'support@thedasboard.com'
-        }
+          email: 'support@thedasboard.com',
+        },
       },
     },
   } as Translations,
@@ -5144,32 +5466,34 @@ export const translations: Record<Language, Translations | Partial<Translations>
           name: 'Manager Finanziario Singolo',
           price: '$20/mese tempo limitato',
           originalPrice: '$29.99/mese',
-          description: 'Perfetto per manager finanziari individuali che vogliono tracciare le loro prestazioni personali',
+          description:
+            'Perfetto per manager finanziari individuali che vogliono tracciare le loro prestazioni personali',
           features: [
             'Tracciamento affari personali',
             'Analisi PVR e profitti prodotti',
             'Calcolatore pagamenti',
             'Metriche delle prestazioni',
-            'Può essere deducibile dalle tasse'
+            'Può essere deducibile dalle tasse',
           ],
           buttonText: 'Inizia Ora!',
-          setupTime: 'Prova senza rischi per un mese di calendario completo'
+          setupTime: 'Prova senza rischi per un mese di calendario completo',
         },
         dealership: {
           name: 'Concessionaria / Gruppo Concessionari',
           price: '$250/mo base',
-          description: 'Gestione completa della concessionaria con dashboard specifici per ruolo e gestione del team',
+          description:
+            'Gestione completa della concessionaria con dashboard specifici per ruolo e gestione del team',
           popular: 'Più Popolare',
           features: [
             'Tutte le funzionalità del manager singolo',
             'Dashboard di team per tutti i ruoli',
             'Analisi multi-sede',
-            'Strutture amministrative flessibili'
+            'Strutture amministrative flessibili',
           ],
           buttonText: 'Configura Il Tuo Pacchetto',
-          setupTime: 'Inizia oggi stesso'
+          setupTime: 'Inizia oggi stesso',
         },
-        priceSubtext: 'per concessionaria + componenti aggiuntivi'
+        priceSubtext: 'per concessionaria + componenti aggiuntivi',
       },
       cta: {
         title: 'Pronto per iniziare?',
@@ -5377,26 +5701,30 @@ export const translations: Record<Language, Translations | Partial<Translations>
       terms: {
         title: 'Termini di servizio',
         lastUpdated: 'Ultimo aggiornamento: 6/28/2025',
-        intro: 'Benvenuti in The DAS Board. Questi Termini di Servizio ("Termini") disciplinano il vostro accesso e utilizzo della nostra piattaforma software di gestione concessionarie. Accedendo o utilizzando i nostri servizi, accettate di essere vincolati da questi Termini.',
+        intro:
+          'Benvenuti in The DAS Board. Questi Termini di Servizio ("Termini") disciplinano il vostro accesso e utilizzo della nostra piattaforma software di gestione concessionarie. Accedendo o utilizzando i nostri servizi, accettate di essere vincolati da questi Termini.',
         sections: {
           acceptance: {
             title: '1. Accettazione dei Termini',
-            content: 'Creando un account, accedendo o utilizzando The DAS Board, riconoscete di aver letto, compreso e accettato di essere vincolati da questi Termini e dalla nostra Informativa sulla Privacy. Se non accettate questi Termini, non potete utilizzare i nostri servizi. Dovete avere almeno 18 anni e avere l\'autorità di stipulare questi Termini per conto della vostra organizzazione.'
+            content:
+              "Creando un account, accedendo o utilizzando The DAS Board, riconoscete di aver letto, compreso e accettato di essere vincolati da questi Termini e dalla nostra Informativa sulla Privacy. Se non accettate questi Termini, non potete utilizzare i nostri servizi. Dovete avere almeno 18 anni e avere l'autorità di stipulare questi Termini per conto della vostra organizzazione.",
           },
           service: {
             title: '2. Descrizione del Servizio',
-            content: 'The DAS Board è una piattaforma software di gestione concessionarie basata su cloud che fornisce strumenti per la gestione dell\'inventario, il tracciamento delle vendite, la gestione delle relazioni con i clienti, i report finanziari e i servizi correlati dell\'industria automobilistica. Ci riserviamo il diritto di modificare, sospendere o interrompere qualsiasi aspetto del nostro servizio con ragionevole preavviso.'
+            content:
+              "The DAS Board è una piattaforma software di gestione concessionarie basata su cloud che fornisce strumenti per la gestione dell'inventario, il tracciamento delle vendite, la gestione delle relazioni con i clienti, i report finanziari e i servizi correlati dell'industria automobilistica. Ci riserviamo il diritto di modificare, sospendere o interrompere qualsiasi aspetto del nostro servizio con ragionevole preavviso.",
           },
           account: {
             title: '3. Registrazione Account e Sicurezza',
-            content: 'Per utilizzare i nostri servizi, dovete creare un account con informazioni accurate e complete. Siete responsabili di:',
+            content:
+              'Per utilizzare i nostri servizi, dovete creare un account con informazioni accurate e complete. Siete responsabili di:',
             items: [
               'Mantenere la riservatezza delle credenziali del vostro account',
               'Tutte le attività che si verificano sotto il vostro account',
               'Notificarci immediatamente di qualsiasi uso non autorizzato',
               'Assicurarvi che le informazioni del vostro account rimangano aggiornate e accurate',
-              'Rispettare i nostri requisiti di sicurezza e le migliori pratiche'
-            ]
+              'Rispettare i nostri requisiti di sicurezza e le migliori pratiche',
+            ],
           },
           subscription: {
             title: '4. Termini di Abbonamento e Pagamento',
@@ -5406,46 +5734,51 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Rinnovo automatico a meno che non sia cancellato prima della data di rinnovo',
               'Modifiche delle tariffe con 30 giorni di preavviso',
               'Nessun rimborso per periodi di abbonamento parziali',
-              'Sospensione del servizio per mancato pagamento dopo ragionevole preavviso'
-            ]
+              'Sospensione del servizio per mancato pagamento dopo ragionevole preavviso',
+            ],
           },
           usage: {
             title: '5. Politica di Uso Accettabile',
-            content: 'Accettate di utilizzare The DAS Board solo per scopi legali e in conformità con questi Termini. Non potete:',
+            content:
+              'Accettate di utilizzare The DAS Board solo per scopi legali e in conformità con questi Termini. Non potete:',
             items: [
               'Violare leggi applicabili, regolamenti o diritti di terzi',
               'Caricare contenuti dannosi, offensivi o inappropriati',
               'Tentare di ottenere accesso non autorizzato ai nostri sistemi o agli account di altri utenti',
               'Utilizzare il servizio per inviare spam, malware o altri contenuti malevoli',
               'Fare reverse engineering, decompilare o tentare di estrarre codice sorgente',
-              'Interferire o interrompere l\'integrità o le prestazioni dei nostri servizi',
-              'Utilizzare la piattaforma per attività fraudolente o illegali'
-            ]
+              "Interferire o interrompere l'integrità o le prestazioni dei nostri servizi",
+              'Utilizzare la piattaforma per attività fraudolente o illegali',
+            ],
           },
           intellectual: {
             title: '6. Diritti di Proprietà Intellettuale',
-            content: 'The DAS Board e tutte le tecnologie, contenuti e materiali correlati sono di proprietà nostra o dei nostri licenzianti. Questo include:',
+            content:
+              'The DAS Board e tutte le tecnologie, contenuti e materiali correlati sono di proprietà nostra o dei nostri licenzianti. Questo include:',
             items: [
               'Software, algoritmi e interfacce utente',
               'Marchi, loghi e materiali di branding',
               'Documentazione, tutorial e materiali di supporto',
-              'Analisi, report e approfondimenti su dati aggregati'
+              'Analisi, report e approfondimenti su dati aggregati',
             ],
-            footer: 'Mantenete la proprietà dei vostri dati ma ci concedete una licenza per utilizzarli per fornire i nostri servizi. Potremmo utilizzare dati anonimizzati e aggregati per ricerca industriale e miglioramento della piattaforma.'
+            footer:
+              'Mantenete la proprietà dei vostri dati ma ci concedete una licenza per utilizzarli per fornire i nostri servizi. Potremmo utilizzare dati anonimizzati e aggregati per ricerca industriale e miglioramento della piattaforma.',
           },
           privacy: {
             title: '7. Protezione dei Dati e Privacy',
-            content: 'Siete responsabili di assicurarvi che tutti i dati personali che elaborate attraverso la nostra piattaforma siano conformi alle leggi sulla privacy applicabili. Elaboreremo i dati in conformità con la nostra Informativa sulla Privacy e i regolamenti applicabili sulla protezione dei dati, inclusi GDPR e CCPA dove applicabile.'
+            content:
+              'Siete responsabili di assicurarvi che tutti i dati personali che elaborate attraverso la nostra piattaforma siano conformi alle leggi sulla privacy applicabili. Elaboreremo i dati in conformità con la nostra Informativa sulla Privacy e i regolamenti applicabili sulla protezione dei dati, inclusi GDPR e CCPA dove applicabile.',
           },
           availability: {
             title: '8. Disponibilità del Servizio e Supporto',
-            content: 'Sebbene ci sforziamo per un\'alta disponibilità, non garantiamo un servizio ininterrotto. Forniamo:',
+            content:
+              "Sebbene ci sforziamo per un'alta disponibilità, non garantiamo un servizio ininterrotto. Forniamo:",
             items: [
               '99,9% di SLA uptime per abbonamenti a pagamento',
               'Finestre di manutenzione regolari con preavviso',
               'Supporto tecnico basato sul vostro livello di abbonamento',
-              'Monitoraggio della sicurezza e risposta agli incidenti'
-            ]
+              'Monitoraggio della sicurezza e risposta agli incidenti',
+            ],
           },
           termination: {
             title: '9. Risoluzione',
@@ -5454,65 +5787,73 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Potete cancellare il vostro abbonamento in qualsiasi momento attraverso le impostazioni del vostro account',
               'Possiamo risolvere per violazione di questi Termini con ragionevole preavviso',
               'Possiamo sospendere il servizio immediatamente per violazioni gravi o minacce alla sicurezza',
-              'Alla risoluzione, perderete l\'accesso alla piattaforma e ai vostri dati',
-              'Forniremo un\'opportunità ragionevole per esportare i vostri dati prima della cancellazione'
-            ]
+              "Alla risoluzione, perderete l'accesso alla piattaforma e ai vostri dati",
+              "Forniremo un'opportunità ragionevole per esportare i vostri dati prima della cancellazione",
+            ],
           },
           disclaimers: {
             title: '10. Esclusioni di Responsabilità e Limitazioni di Responsabilità',
-            content: 'THE DAS BOARD È FORNITO "COSÌ COM\'È" SENZA GARANZIE DI ALCUN TIPO. NELLA MASSIMA MISURA CONSENTITA DALLA LEGGE:',
+            content:
+              'THE DAS BOARD È FORNITO "COSÌ COM\'È" SENZA GARANZIE DI ALCUN TIPO. NELLA MASSIMA MISURA CONSENTITA DALLA LEGGE:',
             items: [
               'Escludiamo tutte le garanzie, espresse o implicite, incluse commerciabilità e idoneità per uno scopo particolare',
               'Non siamo responsabili per danni indiretti, incidentali, speciali o consequenziali',
               'La nostra responsabilità totale non supererà le tariffe da voi pagate nei 12 mesi precedenti il reclamo',
-              'Riconoscete che il software può contenere bug e accettate di segnalarli prontamente'
-            ]
+              'Riconoscete che il software può contenere bug e accettate di segnalarli prontamente',
+            ],
           },
           indemnification: {
             title: '11. Indennizzo',
-            content: 'Accettate di indennizzarci e tenerci indenni da qualsiasi reclamo, perdita o danno derivante dal vostro uso dei nostri servizi, violazione di questi Termini o violazione di diritti di terzi.'
+            content:
+              'Accettate di indennizzarci e tenerci indenni da qualsiasi reclamo, perdita o danno derivante dal vostro uso dei nostri servizi, violazione di questi Termini o violazione di diritti di terzi.',
           },
           governing: {
             title: '12. Legge Applicabile e Risoluzione delle Controversie',
-            content: 'Questi Termini sono disciplinati dalle leggi di [Giurisdizione] senza riguardo ai principi di conflitto di leggi. Qualsiasi controversia sarà risolta tramite arbitrato vincolante, eccetto per i reclami di rimedio ingiuntivo che possono essere portati nei tribunali appropriati.'
+            content:
+              'Questi Termini sono disciplinati dalle leggi di [Giurisdizione] senza riguardo ai principi di conflitto di leggi. Qualsiasi controversia sarà risolta tramite arbitrato vincolante, eccetto per i reclami di rimedio ingiuntivo che possono essere portati nei tribunali appropriati.',
           },
           changes: {
             title: '13. Modifiche ai Termini',
-            content: 'Potremmo modificare questi Termini di tanto in tanto. Forniremo avviso di modifiche materiali almeno 30 giorni in anticipo. L\'uso continuato dei nostri servizi dopo l\'entrata in vigore delle modifiche costituisce accettazione dei Termini rivisti.'
+            content:
+              "Potremmo modificare questi Termini di tanto in tanto. Forniremo avviso di modifiche materiali almeno 30 giorni in anticipo. L'uso continuato dei nostri servizi dopo l'entrata in vigore delle modifiche costituisce accettazione dei Termini rivisti.",
           },
           entire: {
             title: '14. Accordo Completo',
-            content: 'Questi Termini, insieme alla nostra Informativa sulla Privacy e a qualsiasi accordo aggiuntivo, costituiscono l\'accordo completo tra voi e The DAS Board riguardo al vostro uso dei nostri servizi.'
+            content:
+              "Questi Termini, insieme alla nostra Informativa sulla Privacy e a qualsiasi accordo aggiuntivo, costituiscono l'accordo completo tra voi e The DAS Board riguardo al vostro uso dei nostri servizi.",
           },
           contact: {
             title: '15. Informazioni di Contatto',
             content: 'Se avete domande su questi Termini, contattateci:',
             email: 'legal@thedasboard.com',
             address: '[Indirizzo Aziendale]',
-            phone: '[Numero di Telefono Supporto]'
-          }
-        }
+            phone: '[Numero di Telefono Supporto]',
+          },
+        },
       },
       privacy: {
         title: 'Politica sulla privacy',
         lastUpdated: 'Ultimo aggiornamento: 28/6/2025',
-        intro: 'Questa Politica sulla privacy descrive come The DAS Board ("noi", "nostro" o "nostra") raccoglie, utilizza e protegge le vostre informazioni personali quando utilizzate la nostra piattaforma software di gestione concessionarie. Ci impegniamo a proteggere la vostra privacy e a gestire i vostri dati in modo responsabile.',
+        intro:
+          'Questa Politica sulla privacy descrive come The DAS Board ("noi", "nostro" o "nostra") raccoglie, utilizza e protegge le vostre informazioni personali quando utilizzate la nostra piattaforma software di gestione concessionarie. Ci impegniamo a proteggere la vostra privacy e a gestire i vostri dati in modo responsabile.',
         sections: {
           collection: {
             title: '1. Informazioni che raccogliamo',
-            content: 'Quando utilizzate The DAS Board, raccogliamo diversi tipi di informazioni per fornire e migliorare i nostri servizi:',
+            content:
+              'Quando utilizzate The DAS Board, raccogliamo diversi tipi di informazioni per fornire e migliorare i nostri servizi:',
             items: [
-              '<strong>Informazioni dell\'account:</strong> Nome, indirizzo email, numero di telefono, nome dell\'azienda, posizione lavorativa e informazioni di fatturazione',
+              "<strong>Informazioni dell'account:</strong> Nome, indirizzo email, numero di telefono, nome dell'azienda, posizione lavorativa e informazioni di fatturazione",
               '<strong>Dati della concessionaria:</strong> Inventario veicoli, registri di vendita, informazioni clienti e transazioni finanziarie',
               '<strong>Dati di utilizzo:</strong> Funzioni accessibili, tempo trascorso sulla piattaforma, interazioni utente e metriche di prestazione',
               '<strong>Dati tecnici:</strong> Indirizzo IP, tipo di browser, informazioni dispositivo, sistema operativo e log di accesso',
               '<strong>Dati di comunicazione:</strong> Richieste di supporto, feedback e corrispondenza con il nostro team',
-              '<strong>Dati di localizzazione:</strong> Indirizzi della concessionaria e, con consenso, posizione del dispositivo per funzioni mobile'
-            ]
+              '<strong>Dati di localizzazione:</strong> Indirizzi della concessionaria e, con consenso, posizione del dispositivo per funzioni mobile',
+            ],
           },
           usage: {
             title: '2. Come utilizziamo le vostre informazioni',
-            content: 'Utilizziamo le informazioni raccolte per scopi commerciali legittimi, inclusi:',
+            content:
+              'Utilizziamo le informazioni raccolte per scopi commerciali legittimi, inclusi:',
             items: [
               'Fornire, mantenere e migliorare la piattaforma e le funzioni di The DAS Board',
               'Elaborare abbonamenti, pagamenti e gestire il vostro account',
@@ -5521,41 +5862,44 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Inviare aggiornamenti del servizio, avvisi di sicurezza e messaggi amministrativi',
               'Rilevare, prevenire e affrontare problemi tecnici e minacce alla sicurezza',
               'Rispettare obblighi legali e normative del settore',
-              'Migliorare l\'esperienza utente attraverso sviluppo prodotto e ricerca'
-            ]
+              "Migliorare l'esperienza utente attraverso sviluppo prodotto e ricerca",
+            ],
           },
           sharing: {
             title: '3. Condivisione delle vostre informazioni',
-            content: 'Non vendiamo, affittiamo o scambiamo le vostre informazioni personali. Possiamo condividere le vostre informazioni solo nelle seguenti circostanze:',
+            content:
+              'Non vendiamo, affittiamo o scambiamo le vostre informazioni personali. Possiamo condividere le vostre informazioni solo nelle seguenti circostanze:',
             items: [
               '<strong>Fornitori di servizi:</strong> Fornitori terzi che ci aiutano a gestire la nostra piattaforma (hosting, analisi, elaborazione pagamenti)',
-              '<strong>Partner commerciali:</strong> Integrazioni autorizzate e partner dell\'industria automobilistica con il vostro consenso esplicito',
+              "<strong>Partner commerciali:</strong> Integrazioni autorizzate e partner dell'industria automobilistica con il vostro consenso esplicito",
               '<strong>Requisiti legali:</strong> Quando richiesto da legge, regolamento o procedimento legale valido',
               '<strong>Trasferimenti commerciali:</strong> In connessione con fusioni, acquisizioni o vendite di asset (con preavviso)',
-              '<strong>Sicurezza e protezione:</strong> Per proteggere i diritti, la proprietà o la sicurezza dei nostri utenti o del pubblico'
-            ]
+              '<strong>Sicurezza e protezione:</strong> Per proteggere i diritti, la proprietà o la sicurezza dei nostri utenti o del pubblico',
+            ],
           },
           retention: {
             title: '4. Conservazione dei dati',
-            content: 'Conserviamo le vostre informazioni personali per il tempo necessario a fornire i nostri servizi e rispettare gli obblighi legali. Specificamente:',
+            content:
+              'Conserviamo le vostre informazioni personali per il tempo necessario a fornire i nostri servizi e rispettare gli obblighi legali. Specificamente:',
             items: [
-              'I dati dell\'account sono conservati mentre il vostro abbonamento è attivo e per 3 anni dopo la cessazione',
+              "I dati dell'account sono conservati mentre il vostro abbonamento è attivo e per 3 anni dopo la cessazione",
               'I registri delle transazioni sono conservati per 7 anni per rispettare le normative finanziarie',
               'I log di utilizzo sono conservati per 2 anni per analisi di sicurezza e prestazioni',
-              'I registri di comunicazione sono conservati per 5 anni per scopi di servizio clienti'
-            ]
+              'I registri di comunicazione sono conservati per 5 anni per scopi di servizio clienti',
+            ],
           },
           rights: {
             title: '5. I vostri diritti e scelte',
-            content: 'A seconda della vostra posizione, potreste avere i seguenti diritti riguardo alle vostre informazioni personali:',
+            content:
+              'A seconda della vostra posizione, potreste avere i seguenti diritti riguardo alle vostre informazioni personali:',
             items: [
               '<strong>Accesso:</strong> Richiedere una copia delle vostre informazioni personali che deteniamo',
               '<strong>Correzione:</strong> Aggiornare o correggere informazioni personali inesatte',
               '<strong>Cancellazione:</strong> Richiedere la cancellazione delle vostre informazioni personali (soggetto a obblighi legali)',
               '<strong>Portabilità:</strong> Ricevere i vostri dati in un formato leggibile da macchina',
               '<strong>Limitazione:</strong> Limitare come elaboriamo le vostre informazioni personali',
-              '<strong>Opposizione:</strong> Opporsi all\'elaborazione basata su interessi legittimi'
-            ]
+              "<strong>Opposizione:</strong> Opporsi all'elaborazione basata su interessi legittimi",
+            ],
           },
           cookies: {
             title: '6. Cookie e tecnologie di tracciamento',
@@ -5564,75 +5908,87 @@ export const translations: Record<Language, Translations | Partial<Translations>
               '<strong>Cookie essenziali:</strong> Richiesti per funzionalità e sicurezza della piattaforma',
               '<strong>Cookie analitici:</strong> Ci aiutano a capire come utilizzate la nostra piattaforma',
               '<strong>Cookie di preferenza:</strong> Ricordano le vostre impostazioni e personalizzazioni',
-              '<strong>Cookie di marketing:</strong> Utilizzati per comunicazioni mirate (con il vostro consenso)'
+              '<strong>Cookie di marketing:</strong> Utilizzati per comunicazioni mirate (con il vostro consenso)',
             ],
-            footer: 'Potete controllare le preferenze dei cookie attraverso le impostazioni del browser o il nostro strumento di gestione cookie.'
+            footer:
+              'Potete controllare le preferenze dei cookie attraverso le impostazioni del browser o il nostro strumento di gestione cookie.',
           },
           security: {
             title: '7. Misure di sicurezza',
-            content: 'Implementiamo misure di sicurezza standard del settore per proteggere le vostre informazioni, inclusi:',
+            content:
+              'Implementiamo misure di sicurezza standard del settore per proteggere le vostre informazioni, inclusi:',
             items: [
               'Crittografia dei dati in transito e a riposo utilizzando standard AES-256',
               'Audit di sicurezza regolari e test di penetrazione',
               'Autenticazione multi-fattore e controlli di accesso',
               'Conformità SOC 2 Type II e valutazioni di sicurezza regolari',
-              'Formazione dei dipendenti sulla protezione dei dati e best practice di sicurezza'
-            ]
+              'Formazione dei dipendenti sulla protezione dei dati e best practice di sicurezza',
+            ],
           },
           international: {
             title: '8. Trasferimenti internazionali di dati',
-            content: 'Le vostre informazioni possono essere trasferite ed elaborate in paesi diversi dal vostro. Garantiamo che siano implementate salvaguardie appropriate, incluse Clausole Contrattuali Standard e decisioni di adeguatezza, per proteggere i vostri dati durante i trasferimenti internazionali.'
+            content:
+              'Le vostre informazioni possono essere trasferite ed elaborate in paesi diversi dal vostro. Garantiamo che siano implementate salvaguardie appropriate, incluse Clausole Contrattuali Standard e decisioni di adeguatezza, per proteggere i vostri dati durante i trasferimenti internazionali.',
           },
           children: {
             title: '9. Privacy dei minori',
-            content: 'The DAS Board non è destinato all\'uso da parte di individui sotto i 18 anni. Non raccogliamo consapevolmente informazioni personali da bambini sotto i 18 anni. Se veniamo a conoscenza di tale raccolta, cancelleremo le informazioni prontamente.'
+            content:
+              "The DAS Board non è destinato all'uso da parte di individui sotto i 18 anni. Non raccogliamo consapevolmente informazioni personali da bambini sotto i 18 anni. Se veniamo a conoscenza di tale raccolta, cancelleremo le informazioni prontamente.",
           },
           changes: {
             title: '10. Modifiche a questa Politica sulla privacy',
-            content: 'Possiamo aggiornare questa Politica sulla privacy periodicamente per riflettere cambiamenti nelle nostre pratiche o requisiti legali. Vi notificheremo dei cambiamenti significativi via email o notifica sulla piattaforma almeno 30 giorni prima che abbiano effetto.'
+            content:
+              'Possiamo aggiornare questa Politica sulla privacy periodicamente per riflettere cambiamenti nelle nostre pratiche o requisiti legali. Vi notificheremo dei cambiamenti significativi via email o notifica sulla piattaforma almeno 30 giorni prima che abbiano effetto.',
           },
           contact: {
             title: '11. Contattateci',
-            content: 'Se avete domande su questa Politica sulla privacy o desiderate esercitare i vostri diritti, contattateci:',
+            content:
+              'Se avete domande su questa Politica sulla privacy o desiderate esercitare i vostri diritti, contattateci:',
             email: 'privacy@thedasboard.com',
             address: '[Company Address]',
-            phone: '[Support Phone Number]'
-          }
-        }
+            phone: '[Support Phone Number]',
+          },
+        },
       },
       subscription: {
         title: 'Accordo di abbonamento',
         lastUpdated: 'Ultimo aggiornamento: 6/28/2025',
-        intro: 'Questo Accordo di abbonamento regola la tua iscrizione e l\'uso della piattaforma di gestione delle concessionarie The DAS Board.',
+        intro:
+          "Questo Accordo di abbonamento regola la tua iscrizione e l'uso della piattaforma di gestione delle concessionarie The DAS Board.",
         sections: {
           plans: {
             title: '1. Piani di abbonamento',
-            content: 'The DAS Board offre livelli di abbonamento progettati per diverse esigenze delle concessionarie:',
+            content:
+              'The DAS Board offre livelli di abbonamento progettati per diverse esigenze delle concessionarie:',
             items: [
               '<strong>Prova gratuita di 60 giorni:</strong> Accesso completo alla piattaforma senza carta di credito richiesta',
               '<strong>Manager finanziario:</strong> Accesso utente individuale con strumenti finanziari principali',
               '<strong>Concessionaria:</strong> Accesso multi-utente con gestione completa di inventario e vendite',
-              '<strong>Gruppo concessionari:</strong> Accesso a livello aziendale su più località'
+              '<strong>Gruppo concessionari:</strong> Accesso a livello aziendale su più località',
             ],
-            footer: 'Gli abbonamenti vengono fatturati mensilmente in anticipo. Puoi aggiornare o declassare il tuo abbonamento in qualsiasi momento, con modifiche che hanno effetto nel prossimo ciclo di fatturazione.'
+            footer:
+              'Gli abbonamenti vengono fatturati mensilmente in anticipo. Puoi aggiornare o declassare il tuo abbonamento in qualsiasi momento, con modifiche che hanno effetto nel prossimo ciclo di fatturazione.',
           },
           payment: {
             title: '2. Termini di pagamento',
-            content: 'Il pagamento è dovuto all\'inizio dell\'abbonamento e lo stesso giorno di ogni mese successivo. Accettiamo le principali carte di credito e trasferimenti ACH per account aziendali. Se il pagamento fallisce, potremmo sospendere il tuo accesso a The DAS Board dopo ragionevole preavviso.'
+            content:
+              "Il pagamento è dovuto all'inizio dell'abbonamento e lo stesso giorno di ogni mese successivo. Accettiamo le principali carte di credito e trasferimenti ACH per account aziendali. Se il pagamento fallisce, potremmo sospendere il tuo accesso a The DAS Board dopo ragionevole preavviso.",
           },
           trial: {
             title: '3. Periodo di prova',
-            content: 'La prova di 60 giorni fornisce accesso completo alla piattaforma The DAS Board. Non è richiesta carta di credito per iniziare la prova. Alla fine del periodo di prova, dovrai selezionare un piano a pagamento per continuare a utilizzare la piattaforma. I dati della prova saranno conservati per 30 giorni dopo la scadenza della prova.'
+            content:
+              'La prova di 60 giorni fornisce accesso completo alla piattaforma The DAS Board. Non è richiesta carta di credito per iniziare la prova. Alla fine del periodo di prova, dovrai selezionare un piano a pagamento per continuare a utilizzare la piattaforma. I dati della prova saranno conservati per 30 giorni dopo la scadenza della prova.',
           },
           cancellation: {
             title: '4. Cancellazione e rimborsi',
-            content: 'Puoi cancellare il tuo abbonamento in qualsiasi momento tramite le impostazioni del tuo account o contattando il nostro team di supporto. Alla cancellazione:',
+            content:
+              'Puoi cancellare il tuo abbonamento in qualsiasi momento tramite le impostazioni del tuo account o contattando il nostro team di supporto. Alla cancellazione:',
             items: [
-              'Manterrai l\'accesso fino alla fine del tuo periodo di fatturazione corrente',
+              "Manterrai l'accesso fino alla fine del tuo periodo di fatturazione corrente",
               'Non vengono forniti rimborsi per mesi parziali di servizio',
-              'I tuoi dati saranno disponibili per l\'esportazione per 90 giorni dopo la cancellazione',
-              'Il rinnovo automatico sarà disabilitato'
-            ]
+              "I tuoi dati saranno disponibili per l'esportazione per 90 giorni dopo la cancellazione",
+              'Il rinnovo automatico sarà disabilitato',
+            ],
           },
           sla: {
             title: '5. Accordo sul livello di servizio',
@@ -5641,8 +5997,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
               '99,9% di disponibilità uptime della piattaforma',
               'Finestre di manutenzione programmate con preavviso di 48 ore',
               'Risposta del supporto clienti entro 24 ore per richieste standard',
-              'Supporto prioritario per abbonati Gruppo concessionari'
-            ]
+              'Supporto prioritario per abbonati Gruppo concessionari',
+            ],
           },
           data: {
             title: '6. Dati e sicurezza',
@@ -5651,8 +6007,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Backup automatizzati giornalieri con conservazione di 30 giorni',
               'Protocolli di crittografia e sicurezza a livello bancario',
               'Conformità GDPR e CCPA per la protezione dei dati',
-              'Capacità di esportazione dati in formati standard'
-            ]
+              'Capacità di esportazione dati in formati standard',
+            ],
           },
           support: {
             title: '7. Supporto e formazione',
@@ -5660,23 +6016,26 @@ export const translations: Record<Language, Translations | Partial<Translations>
             items: [
               'Assistenza completa per onboarding e configurazione',
               'Risorse di formazione online e documentazione',
-              'Supporto email e chat durante l\'orario lavorativo',
-              'Aggiornamenti regolari della piattaforma e rilasci di nuove funzionalità'
-            ]
+              "Supporto email e chat durante l'orario lavorativo",
+              'Aggiornamenti regolari della piattaforma e rilasci di nuove funzionalità',
+            ],
           },
           modifications: {
             title: '8. Modifiche al servizio',
-            content: 'Potremmo modificare o aggiornare la piattaforma The DAS Board per migliorare funzionalità, sicurezza o conformità. Forniremo ragionevole preavviso di cambiamenti significativi che potrebbero influenzare il tuo utilizzo.'
-          }
-        }
+            content:
+              'Potremmo modificare o aggiornare la piattaforma The DAS Board per migliorare funzionalità, sicurezza o conformità. Forniremo ragionevole preavviso di cambiamenti significativi che potrebbero influenzare il tuo utilizzo.',
+          },
+        },
       },
       pricingPage: {
         title: 'Seleziona la Tua',
         titleHighlight: 'Soluzione',
-        subtitle: 'Seleziona l\'opzione che descrive meglio le tue esigenze. Personalizzeremo la tua esperienza di conseguenza.',
+        subtitle:
+          "Seleziona l'opzione che descrive meglio le tue esigenze. Personalizzeremo la tua esperienza di conseguenza.",
         singleFinance: {
           title: 'Manager Finanziario Singolo',
-          description: 'Perfetto per manager finanziari individuali che vogliono tracciare le loro prestazioni personali e affari.',
+          description:
+            'Perfetto per manager finanziari individuali che vogliono tracciare le loro prestazioni personali e affari.',
           originalPrice: '$29.99/mese',
           price: '$20/mese tempo limitato',
           features: [
@@ -5684,14 +6043,15 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'Analisi PVR e profitti prodotti',
             'Calcolatore pagamenti',
             'Metriche delle prestazioni',
-            'Può essere deducibile dalle tasse'
+            'Può essere deducibile dalle tasse',
           ],
           buttonText: 'Inizia Ora!',
-          setupTime: 'Prova senza rischi per un mese di calendario completo'
+          setupTime: 'Prova senza rischi per un mese di calendario completo',
         },
         dealership: {
           title: 'Concessionaria / Gruppo Concessionari',
-          description: 'Gestione completa della concessionaria con dashboard specifici per ruolo, gestione del team e supporto multi-sede.',
+          description:
+            'Gestione completa della concessionaria con dashboard specifici per ruolo, gestione del team e supporto multi-sede.',
           price: '$250/mese base',
           priceSubtext: 'per concessionaria + componenti aggiuntivi',
           popular: 'Più Popolare',
@@ -5700,35 +6060,38 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'Dashboard di team per tutti i ruoli',
             'Analisi multi-sede',
             'Strutture amministrative flessibili',
-            'Sconti volume disponibili'
+            'Sconti volume disponibili',
           ],
           buttonText: 'Visualizza Prezzi Pacchetto Dinamico',
-          setupTime: 'Inizia oggi stesso'
+          setupTime: 'Inizia oggi stesso',
         },
         benefits: {
           title: 'Trasforma la Tua Concessionaria Oggi',
           performance: {
             title: 'Aumenta le Prestazioni',
-            description: 'Gli insights in tempo reale aiutano i team a superare gli obiettivi e massimizzare la redditività'
+            description:
+              'Gli insights in tempo reale aiutano i team a superare gli obiettivi e massimizzare la redditività',
           },
           operations: {
             title: 'Semplifica le Operazioni',
-            description: 'La gestione centralizzata riduce i tempi amministrativi e migliora l\'efficienza'
+            description:
+              "La gestione centralizzata riduce i tempi amministrativi e migliora l'efficienza",
           },
           security: {
             title: 'Sicuro e Affidabile',
-            description: 'Sicurezza di livello aziendale con garanzia di uptime del 99,9%'
-          }
+            description: 'Sicurezza di livello aziendale con garanzia di uptime del 99,9%',
+          },
         },
         helpText: {
           title: 'Non sei sicuro di quale opzione scegliere?',
-          description: 'Inizia con l\'opzione manager finanziario singolo per provare la nostra piattaforma, poi passa facilmente alle funzionalità della concessionaria quando sei pronto ad espandere il tuo team.'
+          description:
+            "Inizia con l'opzione manager finanziario singolo per provare la nostra piattaforma, poi passa facilmente alle funzionalità della concessionaria quando sei pronto ad espandere il tuo team.",
         },
         footer: {
           copyright: '© 2025 The DAS Board. Tutti i diritti riservati.',
           support: 'Domande? Contattaci a',
-          email: 'support@thedasboard.com'
-        }
+          email: 'support@thedasboard.com',
+        },
       },
     },
     dashboard: {
@@ -5756,8 +6119,10 @@ export const translations: Record<Language, Translations | Partial<Translations>
           showingDeals: 'Mostrando {count} di {total} affari',
           totalGross: 'Totale Lordo:',
           backEndTotal: 'Totale Back-end:',
-          confirmDelete: 'Sei sicuro di voler eliminare questo affare? Questa azione è irreversibile.',
-          finalConfirmDelete: 'Questa è la tua conferma finale. L\'affare sarà eliminato permanentemente. Continuare?',
+          confirmDelete:
+            'Sei sicuro di voler eliminare questo affare? Questa azione è irreversibile.',
+          finalConfirmDelete:
+            "Questa è la tua conferma finale. L'affare sarà eliminato permanentemente. Continuare?",
           editButton: 'Modifica',
           note: 'Questi sono i tuoi affari elaborati. Puoi modificarli, eliminarli o cambiare il loro stato.',
           statusOptions: {
@@ -5824,7 +6189,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
           saveDeal: 'Salva Affare',
           cancel: 'Annulla',
           success: 'Affare salvato con successo!',
-          error: 'Errore nel salvare l\'affare. Riprova.',
+          error: "Errore nel salvare l'affare. Riprova.",
           backEndGross: 'Profitto Back-end lordo calcolato dai singoli profitti dei prodotti',
           totalGross: 'Profitto totale lordo (Front-end + Back-end)',
           salesperson: 'Venditore',
@@ -5900,32 +6265,34 @@ export const translations: Record<Language, Translations | Partial<Translations>
           name: 'Indywidualny Menedżer Finansowy',
           price: '$20/miesiąc ograniczony czas',
           originalPrice: '$29.99/miesiąc',
-          description: 'Idealny dla indywidualnych menedżerów finansowych, którzy chcą śledzić swoje osobiste wyniki',
+          description:
+            'Idealny dla indywidualnych menedżerów finansowych, którzy chcą śledzić swoje osobiste wyniki',
           features: [
             'Śledzenie osobistych transakcji',
             'Analiza PVR i zysków z produktów',
             'Kalkulator płatności',
             'Metryki wydajności',
-            'Może być odliczane od podatku'
+            'Może być odliczane od podatku',
           ],
           buttonText: 'Zacznij Teraz!',
-          setupTime: 'Wypróbuj bez ryzyka przez cały miesiąc kalendarzowy'
+          setupTime: 'Wypróbuj bez ryzyka przez cały miesiąc kalendarzowy',
         },
         dealership: {
           name: 'Salon / Grupa Salonów',
           price: '$250/mo base',
-          description: 'Kompletne zarządzanie salonem z dashboardami specyficznymi dla ról i zarządzaniem zespołem',
+          description:
+            'Kompletne zarządzanie salonem z dashboardami specyficznymi dla ról i zarządzaniem zespołem',
           popular: 'Najpopularniejsze',
           features: [
             'Wszystkie funkcje indywidualnego menedżera',
             'Dashboardy zespołowe dla wszystkich ról',
             'Analiza wielu lokalizacji',
-            'Elastyczne struktury administracyjne'
+            'Elastyczne struktury administracyjne',
           ],
           buttonText: 'Skonfiguruj Swój Pakiet',
-          setupTime: 'Zacznij już dziś'
+          setupTime: 'Zacznij już dziś',
         },
-        priceSubtext: 'za salon + dodatki'
+        priceSubtext: 'za salon + dodatki',
       },
       cta: {
         title: 'Gotowy na rozpoczęcie?',
@@ -6131,41 +6498,47 @@ export const translations: Record<Language, Translations | Partial<Translations>
       terms: {
         title: 'Warunki świadczenia usług',
         lastUpdated: 'Ostatnia aktualizacja: 6/28/2025',
-        intro: 'Witamy w The DAS Board. Niniejsze Warunki Świadczenia Usług ("Warunki") regulują Państwa dostęp do naszej platformy oprogramowania do zarządzania salonami samochodowymi i korzystanie z niej. Uzyskując dostęp lub korzystając z naszych usług, wyrażają Państwo zgodę na związanie tymi Warunkami.',
+        intro:
+          'Witamy w The DAS Board. Niniejsze Warunki Świadczenia Usług ("Warunki") regulują Państwa dostęp do naszej platformy oprogramowania do zarządzania salonami samochodowymi i korzystanie z niej. Uzyskując dostęp lub korzystając z naszych usług, wyrażają Państwo zgodę na związanie tymi Warunkami.',
         sections: {
           acceptance: {
             title: '1. Akceptacja Warunków',
-            content: 'Tworząc konto, uzyskując dostęp lub korzystając z The DAS Board, potwierdzają Państwo, że przeczytali, zrozumieli i zgodzili się być związani niniejszymi Warunkami oraz naszą Polityką Prywatności. Jeśli nie akceptują Państwo tych Warunków, nie mogą Państwo korzystać z naszych usług. Muszą Państwo mieć co najmniej 18 lat i posiadać uprawnienia do zawierania tych Warunków w imieniu swojej organizacji.'
+            content:
+              'Tworząc konto, uzyskując dostęp lub korzystając z The DAS Board, potwierdzają Państwo, że przeczytali, zrozumieli i zgodzili się być związani niniejszymi Warunkami oraz naszą Polityką Prywatności. Jeśli nie akceptują Państwo tych Warunków, nie mogą Państwo korzystać z naszych usług. Muszą Państwo mieć co najmniej 18 lat i posiadać uprawnienia do zawierania tych Warunków w imieniu swojej organizacji.',
           },
           service: {
             title: '2. Opis Usługi',
-            content: 'The DAS Board to oparta na chmurze platforma oprogramowania do zarządzania salonami samochodowymi, która zapewnia narzędzia do zarządzania zapasami, śledzenia sprzedaży, zarządzania relacjami z klientami, raportowania finansowego i powiązanych usług w branży motoryzacyjnej. Zastrzegamy sobie prawo do modyfikacji, zawieszenia lub zaprzestania dowolnego aspektu naszej usługi z rozsądnym wyprzedzeniem.'
+            content:
+              'The DAS Board to oparta na chmurze platforma oprogramowania do zarządzania salonami samochodowymi, która zapewnia narzędzia do zarządzania zapasami, śledzenia sprzedaży, zarządzania relacjami z klientami, raportowania finansowego i powiązanych usług w branży motoryzacyjnej. Zastrzegamy sobie prawo do modyfikacji, zawieszenia lub zaprzestania dowolnego aspektu naszej usługi z rozsądnym wyprzedzeniem.',
           },
           account: {
             title: '3. Rejestracja Konta i Bezpieczeństwo',
-            content: 'Aby korzystać z naszych usług, muszą Państwo utworzyć konto z dokładnymi i kompletnymi informacjami. Są Państwo odpowiedzialni za:',
+            content:
+              'Aby korzystać z naszych usług, muszą Państwo utworzyć konto z dokładnymi i kompletnymi informacjami. Są Państwo odpowiedzialni za:',
             items: [
               'Zachowanie poufności danych logowania do swojego konta',
               'Wszystkie działania, które mają miejsce na Państwa koncie',
               'Natychmiastowe powiadomienie nas o jakimkolwiek nieautoryzowanym użyciu',
               'Zapewnienie, że informacje o Państwa koncie pozostają aktualne i dokładne',
-              'Przestrzeganie naszych wymagań bezpieczeństwa i najlepszych praktyk'
-            ]
+              'Przestrzeganie naszych wymagań bezpieczeństwa i najlepszych praktyk',
+            ],
           },
           subscription: {
             title: '4. Warunki Subskrypcji i Płatności',
-            content: 'The DAS Board działa w modelu subskrypcyjnym. Subskrybując, zgadzają się Państwo na:',
+            content:
+              'The DAS Board działa w modelu subskrypcyjnym. Subskrybując, zgadzają się Państwo na:',
             items: [
               'Opłacenie wszystkich opłat związanych z Państwa planem subskrypcji',
               'Automatyczne odnowienie, chyba że zostanie anulowane przed datą odnowienia',
               'Zmiany opłat z 30-dniowym wyprzedzeniem',
               'Brak zwrotów za częściowe okresy subskrypcji',
-              'Zawieszenie usługi za nieopłacenie po rozsądnym powiadomieniu'
-            ]
+              'Zawieszenie usługi za nieopłacenie po rozsądnym powiadomieniu',
+            ],
           },
           usage: {
             title: '5. Polityka Dopuszczalnego Użycia',
-            content: 'Zgadzają się Państwo korzystać z The DAS Board wyłącznie w celach zgodnych z prawem i zgodnie z niniejszymi Warunkami. Nie mogą Państwo:',
+            content:
+              'Zgadzają się Państwo korzystać z The DAS Board wyłącznie w celach zgodnych z prawem i zgodnie z niniejszymi Warunkami. Nie mogą Państwo:',
             items: [
               'Naruszać obowiązujących przepisów prawa, regulacji lub praw osób trzecich',
               'Przesyłać szkodliwych, obraźliwych lub nieodpowiednich treści',
@@ -6173,33 +6546,37 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Używać usługi do wysyłania spamu, złośliwego oprogramowania lub innych szkodliwych treści',
               'Przeprowadzać inżynierii wstecznej, dekompilować lub próbować wyodrębnić kod źródłowy',
               'Zakłócać lub przerywać integralność lub wydajność naszych usług',
-              'Używać platformy do oszukańczych lub nielegalnych działań'
-            ]
+              'Używać platformy do oszukańczych lub nielegalnych działań',
+            ],
           },
           intellectual: {
             title: '6. Prawa Własności Intelektualnej',
-            content: 'The DAS Board oraz wszystkie powiązane technologie, treści i materiały są własnością naszą lub naszych licencjodawców. Obejmuje to:',
+            content:
+              'The DAS Board oraz wszystkie powiązane technologie, treści i materiały są własnością naszą lub naszych licencjodawców. Obejmuje to:',
             items: [
               'Oprogramowanie, algorytmy i interfejsy użytkownika',
               'Znaki towarowe, logo i materiały brandingowe',
               'Dokumentację, samouczki i materiały wsparcia',
-              'Analizy, raporty i zagregowane wglądy w dane'
+              'Analizy, raporty i zagregowane wglądy w dane',
             ],
-            footer: 'Zachowują Państwo własność swoich danych, ale udzielają nam licencji na ich wykorzystanie w celu świadczenia naszych usług. Możemy wykorzystywać zanonimizowane, zagregowane dane do badań branżowych i ulepszania platformy.'
+            footer:
+              'Zachowują Państwo własność swoich danych, ale udzielają nam licencji na ich wykorzystanie w celu świadczenia naszych usług. Możemy wykorzystywać zanonimizowane, zagregowane dane do badań branżowych i ulepszania platformy.',
           },
           privacy: {
             title: '7. Ochrona Danych i Prywatność',
-            content: 'Są Państwo odpowiedzialni za zapewnienie, że wszelkie dane osobowe przetwarzane przez Państwa za pośrednictwem naszej platformy są zgodne z obowiązującymi przepisami o ochronie prywatności. Będziemy przetwarzać dane zgodnie z naszą Polityką Prywatności i obowiązującymi przepisami o ochronie danych, w tym RODO i CCPA, gdzie ma to zastosowanie.'
+            content:
+              'Są Państwo odpowiedzialni za zapewnienie, że wszelkie dane osobowe przetwarzane przez Państwa za pośrednictwem naszej platformy są zgodne z obowiązującymi przepisami o ochronie prywatności. Będziemy przetwarzać dane zgodnie z naszą Polityką Prywatności i obowiązującymi przepisami o ochronie danych, w tym RODO i CCPA, gdzie ma to zastosowanie.',
           },
           availability: {
             title: '8. Dostępność Usługi i Wsparcie',
-            content: 'Chociaż dążymy do wysokiej dostępności, nie gwarantujemy nieprzerwanej usługi. Zapewniamy:',
+            content:
+              'Chociaż dążymy do wysokiej dostępności, nie gwarantujemy nieprzerwanej usługi. Zapewniamy:',
             items: [
               '99,9% SLA czasu pracy dla płatnych subskrypcji',
               'Regularne okna konserwacyjne z wyprzedzeniem',
               'Wsparcie techniczne oparte na Państwa poziomie subskrypcji',
-              'Monitorowanie bezpieczeństwa i reagowanie na incydenty'
-            ]
+              'Monitorowanie bezpieczeństwa i reagowanie na incydenty',
+            ],
           },
           termination: {
             title: '9. Rozwiązanie',
@@ -6209,60 +6586,67 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Możemy rozwiązać za naruszenie tych Warunków z rozsądnym wyprzedzeniem',
               'Możemy natychmiast zawiesić usługę w przypadku poważnych naruszeń lub zagrożeń bezpieczeństwa',
               'Po rozwiązaniu stracą Państwo dostęp do platformy i swoich danych',
-              'Zapewnimy rozsądną możliwość eksportu Państwa danych przed usunięciem'
-            ]
+              'Zapewnimy rozsądną możliwość eksportu Państwa danych przed usunięciem',
+            ],
           },
           disclaimers: {
             title: '10. Wyłączenia Odpowiedzialności i Ograniczenia Odpowiedzialności',
-            content: 'THE DAS BOARD JEST DOSTARCZANE "TAK JAK JEST" BEZ GWARANCJI JAKIEGOKOLWIEK RODZAJU. W MAKSYMALNYM ZAKRESIE DOZWOLONYM PRZEZ PRAWO:',
+            content:
+              'THE DAS BOARD JEST DOSTARCZANE "TAK JAK JEST" BEZ GWARANCJI JAKIEGOKOLWIEK RODZAJU. W MAKSYMALNYM ZAKRESIE DOZWOLONYM PRZEZ PRAWO:',
             items: [
               'Wyłączamy wszystkie gwarancje, wyraźne lub dorozumiane, w tym przydatność handlową i przydatność do określonego celu',
               'Nie ponosimy odpowiedzialności za szkody pośrednie, przypadkowe, specjalne lub następcze',
               'Nasza całkowita odpowiedzialność nie przekroczy opłat przez Państwa zapłaconych w ciągu 12 miesięcy poprzedzających roszczenie',
-              'Uznają Państwo, że oprogramowanie może zawierać błędy i zgadzają się na ich szybkie zgłaszanie'
-            ]
+              'Uznają Państwo, że oprogramowanie może zawierać błędy i zgadzają się na ich szybkie zgłaszanie',
+            ],
           },
           indemnification: {
             title: '11. Odszkodowanie',
-            content: 'Zgadzają się Państwo na odszkodowanie i zwolnienie nas z odpowiedzialności za wszelkie roszczenia, straty lub szkody wynikające z Państwa korzystania z naszych usług, naruszenia tych Warunków lub naruszenia praw osób trzecich.'
+            content:
+              'Zgadzają się Państwo na odszkodowanie i zwolnienie nas z odpowiedzialności za wszelkie roszczenia, straty lub szkody wynikające z Państwa korzystania z naszych usług, naruszenia tych Warunków lub naruszenia praw osób trzecich.',
           },
           governing: {
             title: '12. Prawo Właściwe i Rozstrzyganie Sporów',
-            content: 'Niniejsze Warunki podlegają prawu [Jurysdykcja] bez względu na zasady kolizji praw. Wszelkie spory będą rozstrzygane poprzez wiążący arbitraż, z wyjątkiem roszczeń o zabezpieczenie, które mogą być wnoszone do odpowiednich sądów.'
+            content:
+              'Niniejsze Warunki podlegają prawu [Jurysdykcja] bez względu na zasady kolizji praw. Wszelkie spory będą rozstrzygane poprzez wiążący arbitraż, z wyjątkiem roszczeń o zabezpieczenie, które mogą być wnoszone do odpowiednich sądów.',
           },
           changes: {
             title: '13. Zmiany Warunków',
-            content: 'Możemy od czasu do czasu modyfikować te Warunki. Zapewnimy powiadomienie o istotnych zmianach co najmniej 30 dni z wyprzedzeniem. Kontynuowanie korzystania z naszych usług po wejściu zmian w życie stanowi akceptację zmienionych Warunków.'
+            content:
+              'Możemy od czasu do czasu modyfikować te Warunki. Zapewnimy powiadomienie o istotnych zmianach co najmniej 30 dni z wyprzedzeniem. Kontynuowanie korzystania z naszych usług po wejściu zmian w życie stanowi akceptację zmienionych Warunków.',
           },
           entire: {
             title: '14. Całość Umowy',
-            content: 'Niniejsze Warunki wraz z naszą Polityką Prywatności i wszelkimi dodatkowymi umowami stanowią całość umowy między Państwem a The DAS Board w odniesieniu do korzystania z naszych usług.'
+            content:
+              'Niniejsze Warunki wraz z naszą Polityką Prywatności i wszelkimi dodatkowymi umowami stanowią całość umowy między Państwem a The DAS Board w odniesieniu do korzystania z naszych usług.',
           },
           contact: {
             title: '15. Informacje Kontaktowe',
             content: 'Jeśli mają Państwo pytania dotyczące tych Warunków, prosimy o kontakt:',
             email: 'legal@thedasboard.com',
             address: '[Adres Firmy]',
-            phone: '[Numer Telefonu Wsparcia]'
-          }
-        }
+            phone: '[Numer Telefonu Wsparcia]',
+          },
+        },
       },
       privacy: {
         title: 'Polityka prywatności',
         lastUpdated: 'Ostatnia aktualizacja: 28.6.2025',
-        intro: 'Ta Polityka prywatności opisuje, jak The DAS Board („my", „nasz" lub „nasze") zbiera, używa i chroni Państwa dane osobowe podczas korzystania z naszej platformy oprogramowania do zarządzania salonami samochodowymi. Zobowiązujemy się chronić Państwa prywatność i odpowiedzialnie zarządzać Państwa danymi.',
+        intro:
+          'Ta Polityka prywatności opisuje, jak The DAS Board („my", „nasz" lub „nasze") zbiera, używa i chroni Państwa dane osobowe podczas korzystania z naszej platformy oprogramowania do zarządzania salonami samochodowymi. Zobowiązujemy się chronić Państwa prywatność i odpowiedzialnie zarządzać Państwa danymi.',
         sections: {
           collection: {
             title: '1. Informacje, które zbieramy',
-            content: 'Podczas korzystania z The DAS Board zbieramy kilka rodzajów informacji w celu świadczenia i poprawy naszych usług:',
+            content:
+              'Podczas korzystania z The DAS Board zbieramy kilka rodzajów informacji w celu świadczenia i poprawy naszych usług:',
             items: [
               '<strong>Informacje o koncie:</strong> Imię i nazwisko, adres e-mail, numer telefonu, nazwa firmy, stanowisko i informacje rozliczeniowe',
               '<strong>Dane salonu:</strong> Inwentarz pojazdów, zapisy sprzedaży, informacje o klientach i transakcje finansowe',
               '<strong>Dane o użytkowaniu:</strong> Używane funkcje, czas spędzony na platformie, interakcje użytkownika i metryki wydajności',
               '<strong>Dane techniczne:</strong> Adres IP, typ przeglądarki, informacje o urządzeniu, system operacyjny i dzienniki dostępu',
               '<strong>Dane komunikacyjne:</strong> Prośby o wsparcie, opinie i korespondencja z naszym zespołem',
-              '<strong>Dane lokalizacyjne:</strong> Adresy salonu i, za zgodą, lokalizacja urządzenia dla funkcji mobilnych'
-            ]
+              '<strong>Dane lokalizacyjne:</strong> Adresy salonu i, za zgodą, lokalizacja urządzenia dla funkcji mobilnych',
+            ],
           },
           usage: {
             title: '2. Jak używamy Państwa informacji',
@@ -6275,118 +6659,134 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Wysyłanie aktualizacji usług, alertów bezpieczeństwa i wiadomości administracyjnych',
               'Wykrywanie, zapobieganie i rozwiązywanie problemów technicznych oraz zagrożeń bezpieczeństwa',
               'Przestrzeganie zobowiązań prawnych i przepisów branżowych',
-              'Poprawianie doświadczenia użytkownika poprzez rozwój produktu i badania'
-            ]
+              'Poprawianie doświadczenia użytkownika poprzez rozwój produktu i badania',
+            ],
           },
           sharing: {
             title: '3. Udostępnianie Państwa informacji',
-            content: 'Nie sprzedajemy, nie wypożyczamy ani nie wymieniamy Państwa danych osobowych. Możemy udostępniać Państwa informacje tylko w następujących okolicznościach:',
+            content:
+              'Nie sprzedajemy, nie wypożyczamy ani nie wymieniamy Państwa danych osobowych. Możemy udostępniać Państwa informacje tylko w następujących okolicznościach:',
             items: [
               '<strong>Dostawcy usług:</strong> Dostawcy zewnętrzni, którzy pomagają nam obsługiwać naszą platformę (hosting, analityka, przetwarzanie płatności)',
               '<strong>Partnerzy biznesowi:</strong> Autoryzowane integracje i partnerzy z branży motoryzacyjnej za Państwa wyraźną zgodą',
               '<strong>Wymogi prawne:</strong> Gdy wymaga tego prawo, rozporządzenie lub ważny proces prawny',
               '<strong>Transfery biznesowe:</strong> W związku z fuzjami, przejęciami lub sprzedażą aktywów (z powiadomieniem)',
-              '<strong>Bezpieczeństwo i ochrona:</strong> W celu ochrony praw, własności lub bezpieczeństwa naszych użytkowników lub społeczeństwa'
-            ]
+              '<strong>Bezpieczeństwo i ochrona:</strong> W celu ochrony praw, własności lub bezpieczeństwa naszych użytkowników lub społeczeństwa',
+            ],
           },
           retention: {
             title: '4. Przechowywanie danych',
-            content: 'Przechowujemy Państwa dane osobowe tak długo, jak jest to konieczne do świadczenia naszych usług i przestrzegania zobowiązań prawnych. Konkretnie:',
+            content:
+              'Przechowujemy Państwa dane osobowe tak długo, jak jest to konieczne do świadczenia naszych usług i przestrzegania zobowiązań prawnych. Konkretnie:',
             items: [
               'Dane konta są przechowywane podczas aktywnej subskrypcji i przez 3 lata po rozwiązaniu',
               'Zapisy transakcji są przechowywane przez 7 lat w celu przestrzegania przepisów finansowych',
               'Dzienniki użytkowania są przechowywane przez 2 lata do analizy bezpieczeństwa i wydajności',
-              'Zapisy komunikacji są przechowywane przez 5 lat do celów obsługi klienta'
-            ]
+              'Zapisy komunikacji są przechowywane przez 5 lat do celów obsługi klienta',
+            ],
           },
           rights: {
             title: '5. Państwa prawa i wybory',
-            content: 'W zależności od Państwa lokalizacji, mogą Państwo mieć następujące prawa dotyczące Państwa danych osobowych:',
+            content:
+              'W zależności od Państwa lokalizacji, mogą Państwo mieć następujące prawa dotyczące Państwa danych osobowych:',
             items: [
               '<strong>Dostęp:</strong> Żądanie kopii Państwa danych osobowych, które posiadamy',
               '<strong>Sprostowanie:</strong> Aktualizacja lub korekta niedokładnych danych osobowych',
               '<strong>Usunięcie:</strong> Żądanie usunięcia Państwa danych osobowych (z zastrzeżeniem zobowiązań prawnych)',
               '<strong>Przenośność:</strong> Otrzymanie Państwa danych w formacie nadającym się do odczytu maszynowego',
               '<strong>Ograniczenie:</strong> Ograniczenie sposobu przetwarzania Państwa danych osobowych',
-              '<strong>Sprzeciw:</strong> Sprzeciw wobec przetwarzania opartego na uzasadnionych interesach'
-            ]
+              '<strong>Sprzeciw:</strong> Sprzeciw wobec przetwarzania opartego na uzasadnionych interesach',
+            ],
           },
           cookies: {
             title: '6. Pliki cookie i technologie śledzenia',
-            content: 'Używamy plików cookie i podobnych technologii w celu poprawy Państwa doświadczenia:',
+            content:
+              'Używamy plików cookie i podobnych technologii w celu poprawy Państwa doświadczenia:',
             items: [
               '<strong>Niezbędne pliki cookie:</strong> Wymagane do funkcjonalności i bezpieczeństwa platformy',
               '<strong>Analityczne pliki cookie:</strong> Pomagają nam zrozumieć, jak korzystają Państwo z naszej platformy',
               '<strong>Preferencyjne pliki cookie:</strong> Zapamiętują Państwa ustawienia i personalizacje',
-              '<strong>Marketingowe pliki cookie:</strong> Używane do celowej komunikacji (za Państwa zgodą)'
+              '<strong>Marketingowe pliki cookie:</strong> Używane do celowej komunikacji (za Państwa zgodą)',
             ],
-            footer: 'Mogą Państwo kontrolować preferencje plików cookie poprzez ustawienia przeglądarki lub nasze narzędzie zarządzania plikami cookie.'
+            footer:
+              'Mogą Państwo kontrolować preferencje plików cookie poprzez ustawienia przeglądarki lub nasze narzędzie zarządzania plikami cookie.',
           },
           security: {
             title: '7. Środki bezpieczeństwa',
-            content: 'Implementujemy standardowe w branży środki bezpieczeństwa w celu ochrony Państwa informacji, w tym:',
+            content:
+              'Implementujemy standardowe w branży środki bezpieczeństwa w celu ochrony Państwa informacji, w tym:',
             items: [
               'Szyfrowanie danych w transakcji i w spoczynku przy użyciu standardów AES-256',
               'Regularne audyty bezpieczeństwa i testy penetracyjne',
               'Uwierzytelnianie wieloskładnikowe i kontrole dostępu',
               'Zgodność SOC 2 Type II i regularne oceny bezpieczeństwa',
-              'Szkolenie pracowników w zakresie ochrony danych i najlepszych praktyk bezpieczeństwa'
-            ]
+              'Szkolenie pracowników w zakresie ochrony danych i najlepszych praktyk bezpieczeństwa',
+            ],
           },
           international: {
             title: '8. Międzynarodowe transfery danych',
-            content: 'Państwa informacje mogą być przekazywane i przetwarzane w krajach innych niż Państwa własny. Zapewniamy, że odpowiednie zabezpieczenia są wdrożone, w tym Standardowe Klauzule Umowne i decyzje o adekwatności, w celu ochrony Państwa danych podczas międzynarodowych transferów.'
+            content:
+              'Państwa informacje mogą być przekazywane i przetwarzane w krajach innych niż Państwa własny. Zapewniamy, że odpowiednie zabezpieczenia są wdrożone, w tym Standardowe Klauzule Umowne i decyzje o adekwatności, w celu ochrony Państwa danych podczas międzynarodowych transferów.',
           },
           children: {
             title: '9. Prywatność dzieci',
-            content: 'The DAS Board nie jest przeznaczony do użytku przez osoby poniżej 18 roku życia. Nie zbieramy świadomie danych osobowych od dzieci poniżej 18 roku życia. Jeśli dowiemy się o takim zbieraniu, usuniemy informacje niezwłocznie.'
+            content:
+              'The DAS Board nie jest przeznaczony do użytku przez osoby poniżej 18 roku życia. Nie zbieramy świadomie danych osobowych od dzieci poniżej 18 roku życia. Jeśli dowiemy się o takim zbieraniu, usuniemy informacje niezwłocznie.',
           },
           changes: {
             title: '10. Zmiany w tej Polityce prywatności',
-            content: 'Możemy okresowo aktualizować tę Politykę prywatności, aby odzwierciedlić zmiany w naszych praktykach lub wymogach prawnych. Powiadomimy Państwa o znaczących zmianach poprzez e-mail lub powiadomienie na platformie co najmniej 30 dni przed ich wejściem w życie.'
+            content:
+              'Możemy okresowo aktualizować tę Politykę prywatności, aby odzwierciedlić zmiany w naszych praktykach lub wymogach prawnych. Powiadomimy Państwa o znaczących zmianach poprzez e-mail lub powiadomienie na platformie co najmniej 30 dni przed ich wejściem w życie.',
           },
           contact: {
             title: '11. Skontaktuj się z nami',
-            content: 'Jeśli mają Państwo pytania dotyczące tej Polityki prywatności lub chcą skorzystać ze swoich praw, prosimy o kontakt:',
+            content:
+              'Jeśli mają Państwo pytania dotyczące tej Polityki prywatności lub chcą skorzystać ze swoich praw, prosimy o kontakt:',
             email: 'privacy@thedasboard.com',
             address: '[Company Address]',
-            phone: '[Support Phone Number]'
-          }
-        }
+            phone: '[Support Phone Number]',
+          },
+        },
       },
       subscription: {
         title: 'Umowa subskrypcji',
         lastUpdated: 'Ostatnia aktualizacja: 6/28/2025',
-        intro: 'Ta Umowa subskrypcji reguluje Twoją subskrypcję i korzystanie z platformy zarządzania dealerami The DAS Board.',
+        intro:
+          'Ta Umowa subskrypcji reguluje Twoją subskrypcję i korzystanie z platformy zarządzania dealerami The DAS Board.',
         sections: {
           plans: {
             title: '1. Plany subskrypcji',
-            content: 'The DAS Board oferuje poziomy subskrypcji zaprojektowane dla różnych potrzeb dealerów:',
+            content:
+              'The DAS Board oferuje poziomy subskrypcji zaprojektowane dla różnych potrzeb dealerów:',
             items: [
               '<strong>60-dniowa bezpłatna wersja próbna:</strong> Pełny dostęp do platformy bez wymaganej karty kredytowej',
               '<strong>Menedżer finansowy:</strong> Indywidualny dostęp użytkownika z podstawowymi narzędziami finansowymi',
               '<strong>Dealer:</strong> Dostęp dla wielu użytkowników z pełnym zarządzaniem inwentarzem i sprzedażą',
-              '<strong>Grupa dealerów:</strong> Dostęp na poziomie przedsiębiorstwa w wielu lokalizacjach'
+              '<strong>Grupa dealerów:</strong> Dostęp na poziomie przedsiębiorstwa w wielu lokalizacjach',
             ],
-            footer: 'Subskrypcje są rozliczane miesięcznie z góry. Możesz w każdej chwili zaktualizować lub obniżyć swoją subskrypcję, zmiany wchodzą w życie w następnym cyklu rozliczeniowym.'
+            footer:
+              'Subskrypcje są rozliczane miesięcznie z góry. Możesz w każdej chwili zaktualizować lub obniżyć swoją subskrypcję, zmiany wchodzą w życie w następnym cyklu rozliczeniowym.',
           },
           payment: {
             title: '2. Warunki płatności',
-            content: 'Płatność jest należna po rozpoczęciu subskrypcji i tego samego dnia każdego kolejnego miesiąca. Akceptujemy główne karty kredytowe i przelewy ACH dla kont firmowych. Jeśli płatność się nie powiedzie, możemy zawiesić Twój dostęp do The DAS Board po uzasadnionym powiadomieniu.'
+            content:
+              'Płatność jest należna po rozpoczęciu subskrypcji i tego samego dnia każdego kolejnego miesiąca. Akceptujemy główne karty kredytowe i przelewy ACH dla kont firmowych. Jeśli płatność się nie powiedzie, możemy zawiesić Twój dostęp do The DAS Board po uzasadnionym powiadomieniu.',
           },
           trial: {
             title: '3. Okres próbny',
-            content: '60-dniowa wersja próbna zapewnia pełny dostęp do platformy The DAS Board. Do rozpoczęcia wersji próbnej nie jest wymagana karta kredytowa. Na koniec okresu próbnego musisz wybrać płatny plan, aby kontynuować korzystanie z platformy. Dane z wersji próbnej będą zachowane przez 30 dni po wygaśnięciu wersji próbnej.'
+            content:
+              '60-dniowa wersja próbna zapewnia pełny dostęp do platformy The DAS Board. Do rozpoczęcia wersji próbnej nie jest wymagana karta kredytowa. Na koniec okresu próbnego musisz wybrać płatny plan, aby kontynuować korzystanie z platformy. Dane z wersji próbnej będą zachowane przez 30 dni po wygaśnięciu wersji próbnej.',
           },
           cancellation: {
             title: '4. Anulowanie i zwroty',
-            content: 'Możesz anulować swoją subskrypcję w dowolnym momencie za pośrednictwem ustawień konta lub kontaktując się z naszym zespołem wsparcia. Po anulowaniu:',
+            content:
+              'Możesz anulować swoją subskrypcję w dowolnym momencie za pośrednictwem ustawień konta lub kontaktując się z naszym zespołem wsparcia. Po anulowaniu:',
             items: [
               'Zachowasz dostęp do końca bieżącego okresu rozliczeniowego',
               'Nie są udzielane zwroty za częściowe miesiące usługi',
               'Twoje dane będą dostępne do eksportu przez 90 dni po anulowaniu',
-              'Automatyczne odnawianie zostanie wyłączone'
-            ]
+              'Automatyczne odnawianie zostanie wyłączone',
+            ],
           },
           sla: {
             title: '5. Umowa poziomu usług',
@@ -6395,8 +6795,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
               '99,9% dostępności platformy',
               'Zaplanowane okna konserwacji z 48-godzinnym wyprzedzeniem',
               'Odpowiedź wsparcia klienta w ciągu 24 godzin dla standardowych zapytań',
-              'Wsparcie priorytetowe dla subskrybentów Grupy dealerów'
-            ]
+              'Wsparcie priorytetowe dla subskrybentów Grupy dealerów',
+            ],
           },
           data: {
             title: '6. Dane i bezpieczeństwo',
@@ -6405,8 +6805,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Codzienne automatyczne kopie zapasowe z 30-dniowym przechowywaniem',
               'Szyfrowanie i protokoły bezpieczeństwa na poziomie bankowym',
               'Zgodność z GDPR i CCPA w zakresie ochrony danych',
-              'Możliwości eksportu danych w standardowych formatach'
-            ]
+              'Możliwości eksportu danych w standardowych formatach',
+            ],
           },
           support: {
             title: '7. Wsparcie i szkolenia',
@@ -6415,22 +6815,25 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Kompleksową pomoc w wdrożeniu i konfiguracji',
               'Zasoby szkoleniowe online i dokumentację',
               'Wsparcie e-mail i chat w godzinach pracy',
-              'Regularne aktualizacje platformy i wydania nowych funkcji'
-            ]
+              'Regularne aktualizacje platformy i wydania nowych funkcji',
+            ],
           },
           modifications: {
             title: '8. Modyfikacje usługi',
-            content: 'Możemy modyfikować lub aktualizować platformę The DAS Board w celu poprawy funkcjonalności, bezpieczeństwa lub zgodności. Zapewnimy uzasadnione powiadomienie o istotnych zmianach, które mogą wpłynąć na Twoje użytkowanie.'
-          }
-        }
+            content:
+              'Możemy modyfikować lub aktualizować platformę The DAS Board w celu poprawy funkcjonalności, bezpieczeństwa lub zgodności. Zapewnimy uzasadnione powiadomienie o istotnych zmianach, które mogą wpłynąć na Twoje użytkowanie.',
+          },
+        },
       },
       pricingPage: {
         title: 'Wybierz Swoje',
         titleHighlight: 'Rozwiązanie',
-        subtitle: 'Wybierz opcję, która najlepiej opisuje Twoje potrzeby. Dostosujemy Twoje doświadczenie odpowiednio.',
+        subtitle:
+          'Wybierz opcję, która najlepiej opisuje Twoje potrzeby. Dostosujemy Twoje doświadczenie odpowiednio.',
         singleFinance: {
           title: 'Indywidualny Menedżer Finansowy',
-          description: 'Idealny dla indywidualnych menedżerów finansowych, którzy chcą śledzić swoje osobiste wyniki i transakcje.',
+          description:
+            'Idealny dla indywidualnych menedżerów finansowych, którzy chcą śledzić swoje osobiste wyniki i transakcje.',
           originalPrice: '$29.99/miesiąc',
           price: '$20/miesiąc ograniczony czas',
           features: [
@@ -6438,14 +6841,15 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'Analiza PVR i zysków z produktów',
             'Kalkulator płatności',
             'Metryki wydajności',
-            'Może być odliczane od podatku'
+            'Może być odliczane od podatku',
           ],
           buttonText: 'Zacznij Teraz!',
-          setupTime: 'Wypróbuj bez ryzyka przez cały miesiąc kalendarzowy'
+          setupTime: 'Wypróbuj bez ryzyka przez cały miesiąc kalendarzowy',
         },
         dealership: {
           title: 'Salon / Grupa Salonów',
-          description: 'Kompletne zarządzanie salonem z dashboardami specyficznymi dla ról, zarządzaniem zespołem i wsparciem wielolokalizacyjnym.',
+          description:
+            'Kompletne zarządzanie salonem z dashboardami specyficznymi dla ról, zarządzaniem zespołem i wsparciem wielolokalizacyjnym.',
           price: '$250/miesiąc podstawa',
           priceSubtext: 'za salon + dodatki',
           popular: 'Najpopularniejsze',
@@ -6454,35 +6858,39 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'Dashboardy zespołowe dla wszystkich ról',
             'Analiza wielu lokalizacji',
             'Elastyczne struktury administracyjne',
-            'Dostępne rabaty hurtowe'
+            'Dostępne rabaty hurtowe',
           ],
           buttonText: 'Zobacz Dynamiczne Ceny Pakietów',
-          setupTime: 'Zacznij już dziś'
+          setupTime: 'Zacznij już dziś',
         },
         benefits: {
           title: 'Przekształć Swój Salon Już Dziś',
           performance: {
             title: 'Zwiększ Wydajność',
-            description: 'Wgląd w czasie rzeczywistym pomaga zespołom przekraczać cele i maksymalizować rentowność'
+            description:
+              'Wgląd w czasie rzeczywistym pomaga zespołom przekraczać cele i maksymalizować rentowność',
           },
           operations: {
             title: 'Uspraw Operacje',
-            description: 'Scentralizowane zarządzanie redukuje czas administracyjny i poprawia efektywność'
+            description:
+              'Scentralizowane zarządzanie redukuje czas administracyjny i poprawia efektywność',
           },
           security: {
             title: 'Bezpieczne i Niezawodne',
-            description: 'Bezpieczeństwo na poziomie przedsiębiorstwa z gwarancją 99,9% dostępności'
-          }
+            description:
+              'Bezpieczeństwo na poziomie przedsiębiorstwa z gwarancją 99,9% dostępności',
+          },
         },
         helpText: {
           title: 'Nie jesteś pewien, którą opcję wybrać?',
-          description: 'Zacznij od opcji indywidualnego menedżera finansowego, aby wypróbować naszą platformę, a następnie łatwo przejdź na funkcje salonu, gdy będziesz gotowy rozszerzyć swój zespół.'
+          description:
+            'Zacznij od opcji indywidualnego menedżera finansowego, aby wypróbować naszą platformę, a następnie łatwo przejdź na funkcje salonu, gdy będziesz gotowy rozszerzyć swój zespół.',
         },
         footer: {
           copyright: '© 2025 The DAS Board. Wszystkie prawa zastrzeżone.',
           support: 'Pytania? Skontaktuj się z nami pod adresem',
-          email: 'support@thedasboard.com'
-        }
+          email: 'support@thedasboard.com',
+        },
       },
     },
     dashboard: {
@@ -6511,7 +6919,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
           totalGross: 'Całkowity Brutto:',
           backEndTotal: 'Całkowity Back-end:',
           confirmDelete: 'Czy na pewno chcesz usunąć tę ofertę? Ta akcja jest nieodwracalna.',
-          finalConfirmDelete: 'To jest ostateczne potwierdzenie. Oferta zostanie trwale usunięta. Kontynuować?',
+          finalConfirmDelete:
+            'To jest ostateczne potwierdzenie. Oferta zostanie trwale usunięta. Kontynuować?',
           editButton: 'Edytuj',
           note: 'To są Twoje przetworzone oferty. Możesz je edytować, usuwać lub zmieniać ich status.',
           statusOptions: {
@@ -6656,32 +7065,34 @@ export const translations: Record<Language, Translations | Partial<Translations>
           name: 'Gerente Financeiro Individual',
           price: '$20/mês tempo limitado',
           originalPrice: '$29.99/mês',
-          description: 'Perfeito para gerentes financeiros individuais que querem acompanhar seu desempenho pessoal',
+          description:
+            'Perfeito para gerentes financeiros individuais que querem acompanhar seu desempenho pessoal',
           features: [
             'Rastreamento de negócios pessoais',
             'Análises de PVR e lucros de produtos',
             'Calculadora de pagamentos',
             'Métricas de desempenho',
-            'Pode ser dedutível de impostos'
+            'Pode ser dedutível de impostos',
           ],
           buttonText: 'Comece Agora!',
-          setupTime: 'Experimente sem risco por um mês civil completo'
+          setupTime: 'Experimente sem risco por um mês civil completo',
         },
         dealership: {
           name: 'Concessionária / Grupo de Concessionárias',
           price: '$250/mo base',
-          description: 'Gestão completa da concessionária com dashboards específicos para funções e gerenciamento de equipe',
+          description:
+            'Gestão completa da concessionária com dashboards específicos para funções e gerenciamento de equipe',
           popular: 'Mais Popular',
           features: [
             'Todas as funcionalidades do gerente individual',
             'Dashboards de equipe para todas as funções',
             'Análises multi-localização',
-            'Estruturas administrativas flexíveis'
+            'Estruturas administrativas flexíveis',
           ],
           buttonText: 'Configure Seu Pacote',
-          setupTime: 'Comece hoje mesmo'
+          setupTime: 'Comece hoje mesmo',
         },
-        priceSubtext: 'por concessionária + complementos'
+        priceSubtext: 'por concessionária + complementos',
       },
       cta: {
         title: 'Pronto para transformar as operações da sua concessionária?',
@@ -6890,26 +7301,30 @@ export const translations: Record<Language, Translations | Partial<Translations>
       terms: {
         title: 'Termos de Serviço',
         lastUpdated: 'Última atualização: 6/28/2025',
-        intro: 'Bem-vindos ao The DAS Board. Estes Termos de Serviço ("Termos") regem o seu acesso e uso da nossa plataforma de software de gestão de concessionárias. Ao acessar ou utilizar os nossos serviços, concordam em estar vinculados a estes Termos.',
+        intro:
+          'Bem-vindos ao The DAS Board. Estes Termos de Serviço ("Termos") regem o seu acesso e uso da nossa plataforma de software de gestão de concessionárias. Ao acessar ou utilizar os nossos serviços, concordam em estar vinculados a estes Termos.',
         sections: {
           acceptance: {
             title: '1. Aceitação dos Termos',
-            content: 'Ao criar uma conta, acessar ou utilizar o The DAS Board, reconhecem que leram, compreenderam e concordaram em estar vinculados a estes Termos e à nossa Política de Privacidade. Se não concordarem com estes Termos, não podem utilizar os nossos serviços. Devem ter pelo menos 18 anos e ter autoridade para celebrar estes Termos em nome da sua organização.'
+            content:
+              'Ao criar uma conta, acessar ou utilizar o The DAS Board, reconhecem que leram, compreenderam e concordaram em estar vinculados a estes Termos e à nossa Política de Privacidade. Se não concordarem com estes Termos, não podem utilizar os nossos serviços. Devem ter pelo menos 18 anos e ter autoridade para celebrar estes Termos em nome da sua organização.',
           },
           service: {
             title: '2. Descrição do Serviço',
-            content: 'O The DAS Board é uma plataforma de software de gestão de concessionárias baseada na nuvem que fornece ferramentas para gestão de inventário, acompanhamento de vendas, gestão de relacionamento com clientes, relatórios financeiros e serviços relacionados da indústria automobilística. Reservamo-nos o direito de modificar, suspender ou descontinuar qualquer aspecto do nosso serviço com aviso razoável.'
+            content:
+              'O The DAS Board é uma plataforma de software de gestão de concessionárias baseada na nuvem que fornece ferramentas para gestão de inventário, acompanhamento de vendas, gestão de relacionamento com clientes, relatórios financeiros e serviços relacionados da indústria automobilística. Reservamo-nos o direito de modificar, suspender ou descontinuar qualquer aspecto do nosso serviço com aviso razoável.',
           },
           account: {
             title: '3. Registro de Conta e Segurança',
-            content: 'Para utilizar os nossos serviços, devem criar uma conta com informações precisas e completas. São responsáveis por:',
+            content:
+              'Para utilizar os nossos serviços, devem criar uma conta com informações precisas e completas. São responsáveis por:',
             items: [
               'Manter a confidencialidade das credenciais da sua conta',
               'Todas as atividades que ocorrem sob a sua conta',
               'Notificar-nos imediatamente de qualquer uso não autorizado',
               'Garantir que as informações da sua conta permaneçam atuais e precisas',
-              'Cumprir os nossos requisitos de segurança e melhores práticas'
-            ]
+              'Cumprir os nossos requisitos de segurança e melhores práticas',
+            ],
           },
           subscription: {
             title: '4. Termos de Subscrição e Pagamento',
@@ -6919,12 +7334,13 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Renovação automática a menos que seja cancelada antes da data de renovação',
               'Alterações de taxas com aviso prévio de 30 dias',
               'Sem reembolsos por períodos de subscrição parciais',
-              'Suspensão do serviço por não pagamento após aviso razoável'
-            ]
+              'Suspensão do serviço por não pagamento após aviso razoável',
+            ],
           },
           usage: {
             title: '5. Política de Uso Aceitável',
-            content: 'Concordam em utilizar o The DAS Board apenas para fins legais e de acordo com estes Termos. Não podem:',
+            content:
+              'Concordam em utilizar o The DAS Board apenas para fins legais e de acordo com estes Termos. Não podem:',
             items: [
               'Violar leis aplicáveis, regulamentos ou direitos de terceiros',
               'Carregar conteúdo prejudicial, ofensivo ou inadequado',
@@ -6932,33 +7348,37 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Usar o serviço para enviar spam, malware ou outro conteúdo malicioso',
               'Fazer engenharia reversa, descompilar ou tentar extrair código fonte',
               'Interferir ou interromper a integridade ou desempenho dos nossos serviços',
-              'Usar a plataforma para atividades fraudulentas ou ilegais'
-            ]
+              'Usar a plataforma para atividades fraudulentas ou ilegais',
+            ],
           },
           intellectual: {
             title: '6. Direitos de Propriedade Intelectual',
-            content: 'O The DAS Board e todas as tecnologias, conteúdos e materiais relacionados são propriedade nossa ou dos nossos licenciadores. Isto inclui:',
+            content:
+              'O The DAS Board e todas as tecnologias, conteúdos e materiais relacionados são propriedade nossa ou dos nossos licenciadores. Isto inclui:',
             items: [
               'Software, algoritmos e interfaces de utilizador',
               'Marcas comerciais, logótipos e materiais de marca',
               'Documentação, tutoriais e materiais de suporte',
-              'Análises, relatórios e insights de dados agregados'
+              'Análises, relatórios e insights de dados agregados',
             ],
-            footer: 'Mantêm a propriedade dos seus dados, mas concedem-nos uma licença para os utilizar para fornecer os nossos serviços. Podemos usar dados anonimizados e agregados para pesquisa da indústria e melhoria da plataforma.'
+            footer:
+              'Mantêm a propriedade dos seus dados, mas concedem-nos uma licença para os utilizar para fornecer os nossos serviços. Podemos usar dados anonimizados e agregados para pesquisa da indústria e melhoria da plataforma.',
           },
           privacy: {
             title: '7. Proteção de Dados e Privacidade',
-            content: 'São responsáveis por garantir que quaisquer dados pessoais que processem através da nossa plataforma cumpram as leis de privacidade aplicáveis. Processaremos dados de acordo com a nossa Política de Privacidade e regulamentos de proteção de dados aplicáveis, incluindo RGPD e CCPA onde aplicável.'
+            content:
+              'São responsáveis por garantir que quaisquer dados pessoais que processem através da nossa plataforma cumpram as leis de privacidade aplicáveis. Processaremos dados de acordo com a nossa Política de Privacidade e regulamentos de proteção de dados aplicáveis, incluindo RGPD e CCPA onde aplicável.',
           },
           availability: {
             title: '8. Disponibilidade do Serviço e Suporte',
-            content: 'Embora nos esforcemos por alta disponibilidade, não garantimos serviço ininterrupto. Fornecemos:',
+            content:
+              'Embora nos esforcemos por alta disponibilidade, não garantimos serviço ininterrupto. Fornecemos:',
             items: [
               '99,9% SLA de tempo de atividade para subscrições pagas',
               'Janelas de manutenção regulares com aviso prévio',
               'Suporte técnico baseado no seu nível de subscrição',
-              'Monitorização de segurança e resposta a incidentes'
-            ]
+              'Monitorização de segurança e resposta a incidentes',
+            ],
           },
           termination: {
             title: '9. Rescisão',
@@ -6968,64 +7388,72 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Podemos rescindir por violação destes Termos com aviso razoável',
               'Podemos suspender o serviço imediatamente por violações graves ou ameaças de segurança',
               'Após a rescisão, perderão o acesso à plataforma e aos seus dados',
-              'Forneceremos uma oportunidade razoável para exportar os seus dados antes da eliminação'
-            ]
+              'Forneceremos uma oportunidade razoável para exportar os seus dados antes da eliminação',
+            ],
           },
           disclaimers: {
             title: '10. Isenções de Responsabilidade e Limitações de Responsabilidade',
-            content: 'O THE DAS BOARD É FORNECIDO "COMO ESTÁ" SEM GARANTIAS DE QUALQUER TIPO. NA MÁXIMA EXTENSÃO PERMITIDA POR LEI:',
+            content:
+              'O THE DAS BOARD É FORNECIDO "COMO ESTÁ" SEM GARANTIAS DE QUALQUER TIPO. NA MÁXIMA EXTENSÃO PERMITIDA POR LEI:',
             items: [
               'Isentamos todas as garantias, expressas ou implícitas, incluindo comercialização e adequação para um propósito particular',
               'Não somos responsáveis por danos indiretos, incidentais, especiais ou consequenciais',
               'A nossa responsabilidade total não excederá as taxas pagas por vocês nos 12 meses anteriores à reclamação',
-              'Reconhecem que o software pode conter bugs e concordam em reportá-los prontamente'
-            ]
+              'Reconhecem que o software pode conter bugs e concordam em reportá-los prontamente',
+            ],
           },
           indemnification: {
             title: '11. Indemnização',
-            content: 'Concordam em indemnizar-nos e isentar-nos de responsabilidade por quaisquer reclamações, perdas ou danos decorrentes do vosso uso dos nossos serviços, violação destes Termos ou violação de direitos de terceiros.'
+            content:
+              'Concordam em indemnizar-nos e isentar-nos de responsabilidade por quaisquer reclamações, perdas ou danos decorrentes do vosso uso dos nossos serviços, violação destes Termos ou violação de direitos de terceiros.',
           },
           governing: {
             title: '12. Lei Aplicável e Resolução de Disputas',
-            content: 'Estes Termos são regidos pelas leis de [Jurisdição] sem consideração aos princípios de conflito de leis. Quaisquer disputas serão resolvidas através de arbitragem vinculativa, exceto para reclamações de medidas cautelares que podem ser apresentadas em tribunais apropriados.'
+            content:
+              'Estes Termos são regidos pelas leis de [Jurisdição] sem consideração aos princípios de conflito de leis. Quaisquer disputas serão resolvidas através de arbitragem vinculativa, exceto para reclamações de medidas cautelares que podem ser apresentadas em tribunais apropriados.',
           },
           changes: {
             title: '13. Alterações aos Termos',
-            content: 'Podemos modificar estes Termos de tempos em tempos. Forneceremos aviso de alterações materiais pelo menos 30 dias de antecedência. O uso continuado dos nossos serviços após as alterações entrarem em vigor constitui aceitação dos Termos revistos.'
+            content:
+              'Podemos modificar estes Termos de tempos em tempos. Forneceremos aviso de alterações materiais pelo menos 30 dias de antecedência. O uso continuado dos nossos serviços após as alterações entrarem em vigor constitui aceitação dos Termos revistos.',
           },
           entire: {
             title: '14. Acordo Completo',
-            content: 'Estes Termos, juntamente com a nossa Política de Privacidade e quaisquer acordos adicionais, constituem o acordo completo entre vocês e o The DAS Board relativamente ao vosso uso dos nossos serviços.'
+            content:
+              'Estes Termos, juntamente com a nossa Política de Privacidade e quaisquer acordos adicionais, constituem o acordo completo entre vocês e o The DAS Board relativamente ao vosso uso dos nossos serviços.',
           },
           contact: {
             title: '15. Informações de Contato',
             content: 'Se tiverem questões sobre estes Termos, contactem-nos:',
             email: 'legal@thedasboard.com',
             address: '[Endereço da Empresa]',
-            phone: '[Número de Telefone de Suporte]'
-          }
-        }
+            phone: '[Número de Telefone de Suporte]',
+          },
+        },
       },
       privacy: {
         title: 'Política de Privacidade',
         lastUpdated: 'Última Atualização: 28/6/2025',
-        intro: 'Esta Política de Privacidade descreve como o The DAS Board ("nós", "nosso" ou "nossa") coleta, usa e protege suas informações pessoais quando você utiliza nossa plataforma de software de gestão de concessionárias. Estamos comprometidos em proteger sua privacidade e tratar seus dados de forma responsável.',
+        intro:
+          'Esta Política de Privacidade descreve como o The DAS Board ("nós", "nosso" ou "nossa") coleta, usa e protege suas informações pessoais quando você utiliza nossa plataforma de software de gestão de concessionárias. Estamos comprometidos em proteger sua privacidade e tratar seus dados de forma responsável.',
         sections: {
           collection: {
             title: '1. Informações que Coletamos',
-            content: 'Quando você usa o The DAS Board, coletamos vários tipos de informações para fornecer e melhorar nossos serviços:',
+            content:
+              'Quando você usa o The DAS Board, coletamos vários tipos de informações para fornecer e melhorar nossos serviços:',
             items: [
               '<strong>Informações da Conta:</strong> Nome, endereço de e-mail, número de telefone, nome da empresa, cargo e informações de faturamento',
               '<strong>Dados da Concessionária:</strong> Inventário de veículos, registros de vendas, informações de clientes e transações financeiras',
               '<strong>Dados de Uso:</strong> Recursos acessados, tempo gasto na plataforma, interações do usuário e métricas de desempenho',
               '<strong>Dados Técnicos:</strong> Endereço IP, tipo de navegador, informações do dispositivo, sistema operacional e logs de acesso',
               '<strong>Dados de Comunicação:</strong> Solicitações de suporte, feedback e correspondência com nossa equipe',
-              '<strong>Dados de Localização:</strong> Endereços da concessionária e, com consentimento, localização do dispositivo para recursos móveis'
-            ]
+              '<strong>Dados de Localização:</strong> Endereços da concessionária e, com consentimento, localização do dispositivo para recursos móveis',
+            ],
           },
           usage: {
             title: '2. Como Usamos Suas Informações',
-            content: 'Usamos as informações coletadas para propósitos comerciais legítimos, incluindo:',
+            content:
+              'Usamos as informações coletadas para propósitos comerciais legítimos, incluindo:',
             items: [
               'Fornecer, manter e melhorar a plataforma e recursos do The DAS Board',
               'Processar assinaturas, pagamentos e gerenciar sua conta',
@@ -7034,41 +7462,44 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Enviar atualizações de serviço, alertas de segurança e mensagens administrativas',
               'Detectar, prevenir e resolver problemas técnicos e ameaças de segurança',
               'Cumprir obrigações legais e regulamentações da indústria',
-              'Melhorar a experiência do usuário através do desenvolvimento de produtos e pesquisa'
-            ]
+              'Melhorar a experiência do usuário através do desenvolvimento de produtos e pesquisa',
+            ],
           },
           sharing: {
             title: '3. Compartilhamento de Suas Informações',
-            content: 'Não vendemos, alugamos ou negociamos suas informações pessoais. Podemos compartilhar suas informações apenas nas seguintes circunstâncias:',
+            content:
+              'Não vendemos, alugamos ou negociamos suas informações pessoais. Podemos compartilhar suas informações apenas nas seguintes circunstâncias:',
             items: [
               '<strong>Prestadores de Serviços:</strong> Fornecedores terceirizados que nos ajudam a operar nossa plataforma (hospedagem, análises, processamento de pagamentos)',
               '<strong>Parceiros Comerciais:</strong> Integrações autorizadas e parceiros da indústria automotiva com seu consentimento explícito',
               '<strong>Requisitos Legais:</strong> Quando exigido por lei, regulamento ou processo legal válido',
               '<strong>Transferências Comerciais:</strong> Em conexão com fusões, aquisições ou vendas de ativos (com notificação prévia)',
-              '<strong>Segurança e Proteção:</strong> Para proteger os direitos, propriedade ou segurança de nossos usuários ou do público'
-            ]
+              '<strong>Segurança e Proteção:</strong> Para proteger os direitos, propriedade ou segurança de nossos usuários ou do público',
+            ],
           },
           retention: {
             title: '4. Retenção de Dados',
-            content: 'Retemos suas informações pessoais pelo tempo necessário para fornecer nossos serviços e cumprir obrigações legais. Especificamente:',
+            content:
+              'Retemos suas informações pessoais pelo tempo necessário para fornecer nossos serviços e cumprir obrigações legais. Especificamente:',
             items: [
               'Dados da conta são retidos enquanto sua assinatura estiver ativa e por 3 anos após o cancelamento',
               'Registros de transações são mantidos por 7 anos para cumprir regulamentações financeiras',
               'Logs de uso são retidos por 2 anos para análise de segurança e desempenho',
-              'Registros de comunicação são mantidos por 5 anos para fins de atendimento ao cliente'
-            ]
+              'Registros de comunicação são mantidos por 5 anos para fins de atendimento ao cliente',
+            ],
           },
           rights: {
             title: '5. Seus Direitos e Escolhas',
-            content: 'Dependendo da sua localização, você pode ter os seguintes direitos em relação às suas informações pessoais:',
+            content:
+              'Dependendo da sua localização, você pode ter os seguintes direitos em relação às suas informações pessoais:',
             items: [
               '<strong>Acesso:</strong> Solicitar uma cópia de suas informações pessoais que mantemos',
               '<strong>Correção:</strong> Atualizar ou corrigir informações pessoais imprecisas',
               '<strong>Exclusão:</strong> Solicitar a exclusão de suas informações pessoais (sujeito a obrigações legais)',
               '<strong>Portabilidade:</strong> Receber seus dados em formato legível por máquina',
               '<strong>Restrição:</strong> Limitar como processamos suas informações pessoais',
-              '<strong>Objeção:</strong> Objetar ao processamento baseado em interesses legítimos'
-            ]
+              '<strong>Objeção:</strong> Objetar ao processamento baseado em interesses legítimos',
+            ],
           },
           cookies: {
             title: '6. Cookies e Tecnologias de Rastreamento',
@@ -7077,75 +7508,87 @@ export const translations: Record<Language, Translations | Partial<Translations>
               '<strong>Cookies Essenciais:</strong> Necessários para funcionalidade e segurança da plataforma',
               '<strong>Cookies Analíticos:</strong> Nos ajudam a entender como você usa nossa plataforma',
               '<strong>Cookies de Preferência:</strong> Lembram suas configurações e personalizações',
-              '<strong>Cookies de Marketing:</strong> Usados para comunicações direcionadas (com seu consentimento)'
+              '<strong>Cookies de Marketing:</strong> Usados para comunicações direcionadas (com seu consentimento)',
             ],
-            footer: 'Você pode controlar as preferências de cookies através das configurações do seu navegador ou nossa ferramenta de gerenciamento de cookies.'
+            footer:
+              'Você pode controlar as preferências de cookies através das configurações do seu navegador ou nossa ferramenta de gerenciamento de cookies.',
           },
           security: {
             title: '7. Medidas de Segurança',
-            content: 'Implementamos medidas de segurança padrão da indústria para proteger suas informações, incluindo:',
+            content:
+              'Implementamos medidas de segurança padrão da indústria para proteger suas informações, incluindo:',
             items: [
               'Criptografia de dados em trânsito e em repouso usando padrões AES-256',
               'Auditorias de segurança regulares e testes de penetração',
               'Autenticação multifator e controles de acesso',
               'Conformidade SOC 2 Type II e avaliações de segurança regulares',
-              'Treinamento de funcionários sobre proteção de dados e melhores práticas de segurança'
-            ]
+              'Treinamento de funcionários sobre proteção de dados e melhores práticas de segurança',
+            ],
           },
           international: {
             title: '8. Transferências Internacionais de Dados',
-            content: 'Suas informações podem ser transferidas e processadas em países diferentes do seu. Garantimos que salvaguardas apropriadas estejam implementadas, incluindo Cláusulas Contratuais Padrão e decisões de adequação, para proteger seus dados durante transferências internacionais.'
+            content:
+              'Suas informações podem ser transferidas e processadas em países diferentes do seu. Garantimos que salvaguardas apropriadas estejam implementadas, incluindo Cláusulas Contratuais Padrão e decisões de adequação, para proteger seus dados durante transferências internacionais.',
           },
           children: {
             title: '9. Privacidade de Crianças',
-            content: 'O The DAS Board não se destina ao uso por indivíduos menores de 18 anos. Não coletamos conscientemente informações pessoais de crianças menores de 18 anos. Se tomarmos conhecimento de tal coleta, excluiremos as informações prontamente.'
+            content:
+              'O The DAS Board não se destina ao uso por indivíduos menores de 18 anos. Não coletamos conscientemente informações pessoais de crianças menores de 18 anos. Se tomarmos conhecimento de tal coleta, excluiremos as informações prontamente.',
           },
           changes: {
             title: '10. Alterações nesta Política de Privacidade',
-            content: 'Podemos atualizar esta Política de Privacidade periodicamente para refletir mudanças em nossas práticas ou requisitos legais. Notificaremos você sobre mudanças significativas por e-mail ou notificação na plataforma pelo menos 30 dias antes de entrarem em vigor.'
+            content:
+              'Podemos atualizar esta Política de Privacidade periodicamente para refletir mudanças em nossas práticas ou requisitos legais. Notificaremos você sobre mudanças significativas por e-mail ou notificação na plataforma pelo menos 30 dias antes de entrarem em vigor.',
           },
           contact: {
             title: '11. Entre em Contato',
-            content: 'Se você tiver dúvidas sobre esta Política de Privacidade ou desejar exercer seus direitos, entre em contato conosco:',
+            content:
+              'Se você tiver dúvidas sobre esta Política de Privacidade ou desejar exercer seus direitos, entre em contato conosco:',
             email: 'privacy@thedasboard.com',
             address: '[Company Address]',
-            phone: '[Support Phone Number]'
-          }
-        }
+            phone: '[Support Phone Number]',
+          },
+        },
       },
       subscription: {
         title: 'Acordo de Assinatura',
         lastUpdated: 'Última atualização: 6/28/2025',
-        intro: 'Este Acordo de Assinatura rege sua assinatura e uso da plataforma de gestão de concessionárias The DAS Board.',
+        intro:
+          'Este Acordo de Assinatura rege sua assinatura e uso da plataforma de gestão de concessionárias The DAS Board.',
         sections: {
           plans: {
             title: '1. Planos de assinatura',
-            content: 'O The DAS Board oferece níveis de assinatura projetados para diferentes necessidades de concessionárias:',
+            content:
+              'O The DAS Board oferece níveis de assinatura projetados para diferentes necessidades de concessionárias:',
             items: [
               '<strong>Teste gratuito de 60 dias:</strong> Acesso completo à plataforma sem cartão de crédito necessário',
               '<strong>Gerente financeiro:</strong> Acesso individual de usuário com ferramentas financeiras principais',
               '<strong>Concessionária:</strong> Acesso multiusuário com gestão completa de inventário e vendas',
-              '<strong>Grupo de concessionárias:</strong> Acesso de nível empresarial em múltiplas localizações'
+              '<strong>Grupo de concessionárias:</strong> Acesso de nível empresarial em múltiplas localizações',
             ],
-            footer: 'As assinaturas são cobradas mensalmente com antecedência. Você pode atualizar ou rebaixar sua assinatura a qualquer momento, com alterações tendo efeito no próximo ciclo de cobrança.'
+            footer:
+              'As assinaturas são cobradas mensalmente com antecedência. Você pode atualizar ou rebaixar sua assinatura a qualquer momento, com alterações tendo efeito no próximo ciclo de cobrança.',
           },
           payment: {
             title: '2. Termos de pagamento',
-            content: 'O pagamento é devido no início da assinatura e no mesmo dia a cada mês seguinte. Aceitamos os principais cartões de crédito e transferências ACH para contas empresariais. Se o pagamento falhar, podemos suspender seu acesso ao The DAS Board após aviso razoável.'
+            content:
+              'O pagamento é devido no início da assinatura e no mesmo dia a cada mês seguinte. Aceitamos os principais cartões de crédito e transferências ACH para contas empresariais. Se o pagamento falhar, podemos suspender seu acesso ao The DAS Board após aviso razoável.',
           },
           trial: {
             title: '3. Período de teste',
-            content: 'O teste de 60 dias fornece acesso completo à plataforma The DAS Board. Nenhum cartão de crédito é necessário para iniciar seu teste. No final do período de teste, você precisará selecionar um plano pago para continuar usando a plataforma. Os dados do teste serão preservados por 30 dias após a expiração do teste.'
+            content:
+              'O teste de 60 dias fornece acesso completo à plataforma The DAS Board. Nenhum cartão de crédito é necessário para iniciar seu teste. No final do período de teste, você precisará selecionar um plano pago para continuar usando a plataforma. Os dados do teste serão preservados por 30 dias após a expiração do teste.',
           },
           cancellation: {
             title: '4. Cancelamento e reembolsos',
-            content: 'Você pode cancelar sua assinatura a qualquer momento através das configurações da sua conta ou entrando em contato com nossa equipe de suporte. Após o cancelamento:',
+            content:
+              'Você pode cancelar sua assinatura a qualquer momento através das configurações da sua conta ou entrando em contato com nossa equipe de suporte. Após o cancelamento:',
             items: [
               'Você manterá acesso até o final do seu período de cobrança atual',
               'Nenhum reembolso é fornecido para meses parciais de serviço',
               'Seus dados estarão disponíveis para exportação por 90 dias após o cancelamento',
-              'A renovação automática será desabilitada'
-            ]
+              'A renovação automática será desabilitada',
+            ],
           },
           sla: {
             title: '5. Acordo de nível de serviço',
@@ -7154,8 +7597,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
               '99,9% de disponibilidade da plataforma',
               'Janelas de manutenção programadas com aviso de 48 horas',
               'Resposta do suporte ao cliente dentro de 24 horas para solicitações padrão',
-              'Suporte prioritário para assinantes do Grupo de concessionárias'
-            ]
+              'Suporte prioritário para assinantes do Grupo de concessionárias',
+            ],
           },
           data: {
             title: '6. Dados e segurança',
@@ -7164,8 +7607,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Backups automatizados diários com retenção de 30 dias',
               'Protocolos de criptografia e segurança de nível bancário',
               'Conformidade com GDPR e CCPA para proteção de dados',
-              'Capacidades de exportação de dados em formatos padrão'
-            ]
+              'Capacidades de exportação de dados em formatos padrão',
+            ],
           },
           support: {
             title: '7. Suporte e treinamento',
@@ -7174,22 +7617,25 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Assistência abrangente de integração e configuração',
               'Recursos de treinamento online e documentação',
               'Suporte por email e chat durante horário comercial',
-              'Atualizações regulares da plataforma e lançamentos de novos recursos'
-            ]
+              'Atualizações regulares da plataforma e lançamentos de novos recursos',
+            ],
           },
           modifications: {
             title: '8. Modificações do serviço',
-            content: 'Podemos modificar ou atualizar a plataforma The DAS Board para melhorar funcionalidade, segurança ou conformidade. Forneceremos aviso razoável de mudanças significativas que possam afetar seu uso.'
-          }
-        }
+            content:
+              'Podemos modificar ou atualizar a plataforma The DAS Board para melhorar funcionalidade, segurança ou conformidade. Forneceremos aviso razoável de mudanças significativas que possam afetar seu uso.',
+          },
+        },
       },
       pricingPage: {
         title: 'Selecione Sua',
         titleHighlight: 'Solução',
-        subtitle: 'Selecione a opção que melhor descreve suas necessidades. Personalizaremos sua experiência de acordo.',
+        subtitle:
+          'Selecione a opção que melhor descreve suas necessidades. Personalizaremos sua experiência de acordo.',
         singleFinance: {
           title: 'Gerente Financeiro Individual',
-          description: 'Perfeito para gerentes financeiros individuais que querem acompanhar seu desempenho pessoal e negócios.',
+          description:
+            'Perfeito para gerentes financeiros individuais que querem acompanhar seu desempenho pessoal e negócios.',
           originalPrice: '$29.99/mês',
           price: '$20/mês tempo limitado',
           features: [
@@ -7197,14 +7643,15 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'Análises de PVR e lucros de produtos',
             'Calculadora de pagamentos',
             'Métricas de desempenho',
-            'Pode ser dedutível de impostos'
+            'Pode ser dedutível de impostos',
           ],
           buttonText: 'Comece Agora!',
-          setupTime: 'Experimente sem risco por um mês civil completo'
+          setupTime: 'Experimente sem risco por um mês civil completo',
         },
         dealership: {
           title: 'Concessionária / Grupo de Concessionárias',
-          description: 'Gestão completa da concessionária com dashboards específicos para funções, gerenciamento de equipe e suporte multi-localização.',
+          description:
+            'Gestão completa da concessionária com dashboards específicos para funções, gerenciamento de equipe e suporte multi-localização.',
           price: '$250/mês base',
           priceSubtext: 'por concessionária + complementos',
           popular: 'Mais Popular',
@@ -7213,35 +7660,39 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'Dashboards de equipe para todas as funções',
             'Análises multi-localização',
             'Estruturas administrativas flexíveis',
-            'Descontos por volume disponíveis'
+            'Descontos por volume disponíveis',
           ],
           buttonText: 'Ver Preços de Pacote Dinâmico',
-          setupTime: 'Comece hoje mesmo'
+          setupTime: 'Comece hoje mesmo',
         },
         benefits: {
           title: 'Transforme Sua Concessionária Hoje',
           performance: {
             title: 'Aumente o Desempenho',
-            description: 'Insights em tempo real ajudam as equipes a superar metas e maximizar a rentabilidade'
+            description:
+              'Insights em tempo real ajudam as equipes a superar metas e maximizar a rentabilidade',
           },
           operations: {
             title: 'Otimize as Operações',
-            description: 'Gerenciamento centralizado reduz tempo administrativo e melhora a eficiência'
+            description:
+              'Gerenciamento centralizado reduz tempo administrativo e melhora a eficiência',
           },
           security: {
             title: 'Seguro e Confiável',
-            description: 'Segurança de nível empresarial com garantia de 99,9% de tempo de atividade'
-          }
+            description:
+              'Segurança de nível empresarial com garantia de 99,9% de tempo de atividade',
+          },
         },
         helpText: {
           title: 'Não tem certeza de qual opção escolher?',
-          description: 'Comece com a opção de gerente financeiro individual para experimentar nossa plataforma, depois atualize facilmente para recursos de concessionária quando estiver pronto para expandir sua equipe.'
+          description:
+            'Comece com a opção de gerente financeiro individual para experimentar nossa plataforma, depois atualize facilmente para recursos de concessionária quando estiver pronto para expandir sua equipe.',
         },
         footer: {
           copyright: '© 2025 The DAS Board. Todos os direitos reservados.',
           support: 'Dúvidas? Entre em contato conosco em',
-          email: 'support@thedasboard.com'
-        }
+          email: 'support@thedasboard.com',
+        },
       },
     },
     dashboard: {
@@ -7269,8 +7720,10 @@ export const translations: Record<Language, Translations | Partial<Translations>
           showingDeals: 'Mostrando {count} de {total} negócios',
           totalGross: 'Total Bruto:',
           backEndTotal: 'Total Back-end:',
-          confirmDelete: 'Tem certeza de que deseja excluir este negócio? Esta ação é irreversível.',
-          finalConfirmDelete: 'Esta é sua confirmação final. O negócio será excluído permanentemente. Continuar?',
+          confirmDelete:
+            'Tem certeza de que deseja excluir este negócio? Esta ação é irreversível.',
+          finalConfirmDelete:
+            'Esta é sua confirmação final. O negócio será excluído permanentemente. Continuar?',
           editButton: 'Editar',
           note: 'Estes são seus negócios processados. Você pode editá-los, excluí-los ou alterar seu status.',
           statusOptions: {
@@ -7415,32 +7868,34 @@ export const translations: Record<Language, Translations | Partial<Translations>
           name: 'Μεμονωμένος Χρηματοοικονομικός Διευθυντής',
           price: '$20/μήνα περιορισμένος χρόνος',
           originalPrice: '$29.99/μήνα',
-          description: 'Ιδανικό για μεμονωμένους χρηματοοικονομικούς διευθυντές που θέλουν να παρακολουθούν την προσωπική τους απόδοση',
+          description:
+            'Ιδανικό για μεμονωμένους χρηματοοικονομικούς διευθυντές που θέλουν να παρακολουθούν την προσωπική τους απόδοση',
           features: [
             'Παρακολούθηση προσωπικών συναλλαγών',
             'Αναλύσεις PVR και κερδών προϊόντων',
             'Υπολογιστής πληρωμών',
             'Μετρήσεις απόδοσης',
-            'Μπορεί να είναι εκπεστέα από φόρους'
+            'Μπορεί να είναι εκπεστέα από φόρους',
           ],
           buttonText: 'Ξεκινήστε Τώρα!',
-          setupTime: 'Δοκιμάστε χωρίς κίνδυνο για έναν πλήρη ημερολογιακό μήνα'
+          setupTime: 'Δοκιμάστε χωρίς κίνδυνο για έναν πλήρη ημερολογιακό μήνα',
         },
         dealership: {
           name: 'Αντιπροσωπεία / Ομάδα Αντιπροσωπειών',
           price: '$250/mo base',
-          description: 'Πλήρης διαχείριση αντιπροσωπείας με dashboards ειδικά για ρόλους και διαχείριση ομάδας',
+          description:
+            'Πλήρης διαχείριση αντιπροσωπείας με dashboards ειδικά για ρόλους και διαχείριση ομάδας',
           popular: 'Πιο Δημοφιλές',
           features: [
             'Όλες οι λειτουργίες του μεμονωμένου διευθυντή',
             'Dashboards ομάδας για όλους τους ρόλους',
             'Αναλύσεις πολλαπλών τοποθεσιών',
-            'Ευέλικτες διοικητικές δομές'
+            'Ευέλικτες διοικητικές δομές',
           ],
           buttonText: 'Διαμορφώστε το Πακέτο Σας',
-          setupTime: 'Ξεκινήστε σήμερα'
+          setupTime: 'Ξεκινήστε σήμερα',
         },
-        priceSubtext: 'ανά αντιπροσωπεία + πρόσθετα'
+        priceSubtext: 'ανά αντιπροσωπεία + πρόσθετα',
       },
       cta: {
         title: 'Έτοιμοι να μεταμορφώσετε τις λειτουργίες της αντιπροσωπείας σας;',
@@ -7649,26 +8104,30 @@ export const translations: Record<Language, Translations | Partial<Translations>
       terms: {
         title: 'Όροι Χρήσης',
         lastUpdated: 'Τελευταία ενημέρωση: 6/28/2025',
-        intro: 'Καλώς ήρθατε στο The DAS Board. Αυτοί οι Όροι Χρήσης ("Όροι") διέπουν την πρόσβασή σας και τη χρήση της πλατφόρμας λογισμικού διαχείρισης αντιπροσωπειών μας. Με την πρόσβαση ή τη χρήση των υπηρεσιών μας, συμφωνείτε να δεσμεύεστε από αυτούς τους Όρους.',
+        intro:
+          'Καλώς ήρθατε στο The DAS Board. Αυτοί οι Όροι Χρήσης ("Όροι") διέπουν την πρόσβασή σας και τη χρήση της πλατφόρμας λογισμικού διαχείρισης αντιπροσωπειών μας. Με την πρόσβαση ή τη χρήση των υπηρεσιών μας, συμφωνείτε να δεσμεύεστε από αυτούς τους Όρους.',
         sections: {
           acceptance: {
             title: '1. Αποδοχή των Όρων',
-            content: 'Δημιουργώντας έναν λογαριασμό, αποκτώντας πρόσβαση ή χρησιμοποιώντας το The DAS Board, αναγνωρίζετε ότι έχετε διαβάσει, κατανοήσει και συμφωνείτε να δεσμεύεστε από αυτούς τους Όρους και την Πολιτική Απορρήτου μας. Εάν δεν συμφωνείτε με αυτούς τους Όρους, δεν μπορείτε να χρησιμοποιήσετε τις υπηρεσίες μας. Πρέπει να είστε τουλάχιστον 18 ετών και να έχετε την εξουσία να συνάψετε αυτούς τους Όρους εκ μέρους του οργανισμού σας.'
+            content:
+              'Δημιουργώντας έναν λογαριασμό, αποκτώντας πρόσβαση ή χρησιμοποιώντας το The DAS Board, αναγνωρίζετε ότι έχετε διαβάσει, κατανοήσει και συμφωνείτε να δεσμεύεστε από αυτούς τους Όρους και την Πολιτική Απορρήτου μας. Εάν δεν συμφωνείτε με αυτούς τους Όρους, δεν μπορείτε να χρησιμοποιήσετε τις υπηρεσίες μας. Πρέπει να είστε τουλάχιστον 18 ετών και να έχετε την εξουσία να συνάψετε αυτούς τους Όρους εκ μέρους του οργανισμού σας.',
           },
           service: {
             title: '2. Περιγραφή Υπηρεσίας',
-            content: 'Το The DAS Board είναι μια πλατφόρμα λογισμικού διαχείρισης αντιπροσωπειών βασισμένη στο cloud που παρέχει εργαλεία για διαχείριση αποθέματος, παρακολούθηση πωλήσεων, διαχείριση σχέσεων πελατών, οικονομική αναφορά και σχετικές υπηρεσίες της αυτοκινητοβιομηχανίας. Διατηρούμε το δικαίωμα να τροποποιήσουμε, να αναστείλουμε ή να διακόψουμε οποιαδήποτε πτυχή της υπηρεσίας μας με εύλογη ειδοποίηση.'
+            content:
+              'Το The DAS Board είναι μια πλατφόρμα λογισμικού διαχείρισης αντιπροσωπειών βασισμένη στο cloud που παρέχει εργαλεία για διαχείριση αποθέματος, παρακολούθηση πωλήσεων, διαχείριση σχέσεων πελατών, οικονομική αναφορά και σχετικές υπηρεσίες της αυτοκινητοβιομηχανίας. Διατηρούμε το δικαίωμα να τροποποιήσουμε, να αναστείλουμε ή να διακόψουμε οποιαδήποτε πτυχή της υπηρεσίας μας με εύλογη ειδοποίηση.',
           },
           account: {
             title: '3. Εγγραφή Λογαριασμού και Ασφάλεια',
-            content: 'Για να χρησιμοποιήσετε τις υπηρεσίες μας, πρέπει να δημιουργήσετε έναν λογαριασμό με ακριβείς και πλήρεις πληροφορίες. Είστε υπεύθυνοι για:',
+            content:
+              'Για να χρησιμοποιήσετε τις υπηρεσίες μας, πρέπει να δημιουργήσετε έναν λογαριασμό με ακριβείς και πλήρεις πληροφορίες. Είστε υπεύθυνοι για:',
             items: [
               'Τη διατήρηση της εμπιστευτικότητας των διαπιστευτηρίων του λογαριασμού σας',
               'Όλες τις δραστηριότητες που πραγματοποιούνται στον λογαριασμό σας',
               'Την άμεση ειδοποίησή μας για οποιαδήποτε μη εξουσιοδοτημένη χρήση',
               'Να διασφαλίζετε ότι οι πληροφορίες του λογαριασμού σας παραμένουν ενημερωμένες και ακριβείς',
-              'Τη συμμόρφωση με τις απαιτήσεις ασφαλείας μας και τις βέλτιστες πρακτικές'
-            ]
+              'Τη συμμόρφωση με τις απαιτήσεις ασφαλείας μας και τις βέλτιστες πρακτικές',
+            ],
           },
           subscription: {
             title: '4. Όροι Συνδρομής και Πληρωμής',
@@ -7678,12 +8137,13 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Αυτόματη ανανέωση εκτός εάν ακυρωθεί πριν την ημερομηνία ανανέωσης',
               'Αλλαγές τελών με προειδοποίηση 30 ημερών',
               'Καμία επιστροφή χρημάτων για μερικές περιόδους συνδρομής',
-              'Αναστολή υπηρεσίας για μη πληρωμή μετά από εύλογη ειδοποίηση'
-            ]
+              'Αναστολή υπηρεσίας για μη πληρωμή μετά από εύλογη ειδοποίηση',
+            ],
           },
           usage: {
             title: '5. Πολιτική Αποδεκτής Χρήσης',
-            content: 'Συμφωνείτε να χρησιμοποιήσετε το The DAS Board μόνο για νόμιμους σκοπούς και σύμφωνα με αυτούς τους Όρους. Δεν μπορείτε να:',
+            content:
+              'Συμφωνείτε να χρησιμοποιήσετε το The DAS Board μόνο για νόμιμους σκοπούς και σύμφωνα με αυτούς τους Όρους. Δεν μπορείτε να:',
             items: [
               'Παραβιάζετε ισχύοντες νόμους, κανονισμούς ή δικαιώματα τρίτων',
               'Ανεβάζετε βλαβερό, προσβλητικό ή ακατάλληλο περιεχόμενο',
@@ -7691,33 +8151,37 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Χρησιμοποιείτε την υπηρεσία για αποστολή spam, κακόβουλου λογισμικού ή άλλου κακόβουλου περιεχομένου',
               'Πραγματοποιείτε reverse engineering, αποσυμπίληση ή επιχειρείτε να εξάγετε πηγαίο κώδικα',
               'Παρεμβαίνετε ή διακόπτετε την ακεραιότητα ή την απόδοση των υπηρεσιών μας',
-              'Χρησιμοποιείτε την πλατφόρμα για δόλιες ή παράνομες δραστηριότητες'
-            ]
+              'Χρησιμοποιείτε την πλατφόρμα για δόλιες ή παράνομες δραστηριότητες',
+            ],
           },
           intellectual: {
             title: '6. Δικαιώματα Πνευματικής Ιδιοκτησίας',
-            content: 'Το The DAS Board και όλες οι σχετικές τεχνολογίες, περιεχόμενο και υλικά είναι ιδιοκτησία μας ή των αδειοδοτών μας. Αυτό περιλαμβάνει:',
+            content:
+              'Το The DAS Board και όλες οι σχετικές τεχνολογίες, περιεχόμενο και υλικά είναι ιδιοκτησία μας ή των αδειοδοτών μας. Αυτό περιλαμβάνει:',
             items: [
               'Λογισμικό, αλγορίθμους και διεπαφές χρήστη',
               'Εμπορικά σήματα, λογότυπα και υλικά επωνυμίας',
               'Τεκμηρίωση, οδηγούς και υλικά υποστήριξης',
-              'Αναλύσεις, αναφορές και συγκεντρωτικές πληροφορίες δεδομένων'
+              'Αναλύσεις, αναφορές και συγκεντρωτικές πληροφορίες δεδομένων',
             ],
-            footer: 'Διατηρείτε την κυριότητα των δεδομένων σας αλλά μας παρέχετε άδεια χρήσης τους για την παροχή των υπηρεσιών μας. Μπορούμε να χρησιμοποιήσουμε ανωνυμοποιημένα, συγκεντρωτικά δεδομένα για βιομηχανική έρευνα και βελτίωση της πλατφόρμας.'
+            footer:
+              'Διατηρείτε την κυριότητα των δεδομένων σας αλλά μας παρέχετε άδεια χρήσης τους για την παροχή των υπηρεσιών μας. Μπορούμε να χρησιμοποιήσουμε ανωνυμοποιημένα, συγκεντρωτικά δεδομένα για βιομηχανική έρευνα και βελτίωση της πλατφόρμας.',
           },
           privacy: {
             title: '7. Προστασία Δεδομένων και Απόρρητο',
-            content: 'Είστε υπεύθυνοι για να διασφαλίσετε ότι οποιαδήποτε προσωπικά δεδομένα επεξεργάζεστε μέσω της πλατφόρμας μας συμμορφώνονται με τους ισχύοντες νόμους απορρήτου. Θα επεξεργαστούμε δεδομένα σύμφωνα με την Πολιτική Απορρήτου μας και τους ισχύοντες κανονισμούς προστασίας δεδομένων, συμπεριλαμβανομένου του GDPR και CCPA όπου εφαρμόζεται.'
+            content:
+              'Είστε υπεύθυνοι για να διασφαλίσετε ότι οποιαδήποτε προσωπικά δεδομένα επεξεργάζεστε μέσω της πλατφόρμας μας συμμορφώνονται με τους ισχύοντες νόμους απορρήτου. Θα επεξεργαστούμε δεδομένα σύμφωνα με την Πολιτική Απορρήτου μας και τους ισχύοντες κανονισμούς προστασίας δεδομένων, συμπεριλαμβανομένου του GDPR και CCPA όπου εφαρμόζεται.',
           },
           availability: {
             title: '8. Διαθεσιμότητα Υπηρεσίας και Υποστήριξη',
-            content: 'Ενώ προσπαθούμε για υψηλή διαθεσιμότητα, δεν εγγυόμαστε αδιάκοπη υπηρεσία. Παρέχουμε:',
+            content:
+              'Ενώ προσπαθούμε για υψηλή διαθεσιμότητα, δεν εγγυόμαστε αδιάκοπη υπηρεσία. Παρέχουμε:',
             items: [
               '99,9% SLA χρόνου λειτουργίας για πληρωμένες συνδρομές',
               'Τακτικά παράθυρα συντήρησης με προειδοποίηση',
               'Τεχνική υποστήριξη βασισμένη στο επίπεδο συνδρομής σας',
-              'Παρακολούθηση ασφαλείας και απόκριση σε περιστατικά'
-            ]
+              'Παρακολούθηση ασφαλείας και απόκριση σε περιστατικά',
+            ],
           },
           termination: {
             title: '9. Καταγγελία',
@@ -7727,64 +8191,73 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Μπορούμε να καταγγείλουμε για παραβίαση αυτών των Όρων με εύλογη ειδοποίηση',
               'Μπορούμε να αναστείλουμε την υπηρεσία άμεσα για σοβαρές παραβιάσεις ή απειλές ασφαλείας',
               'Με την καταγγελία, θα χάσετε πρόσβαση στην πλατφόρμα και τα δεδομένα σας',
-              'Θα παρέχουμε εύλογη ευκαιρία για εξαγωγή των δεδομένων σας πριν τη διαγραφή'
-            ]
+              'Θα παρέχουμε εύλογη ευκαιρία για εξαγωγή των δεδομένων σας πριν τη διαγραφή',
+            ],
           },
           disclaimers: {
             title: '10. Αποποιήσεις Ευθύνης και Περιορισμοί Ευθύνης',
-            content: 'ΤΟ THE DAS BOARD ΠΑΡΕΧΕΤΑΙ "ΩΣ ΕΧΕΙ" ΧΩΡΙΣ ΕΓΓΥΗΣΕΙΣ ΟΠΟΙΟΥΔΗΠΟΤΕ ΕΙΔΟΥΣ. ΣΤΟ ΜΕΓΙΣΤΟ ΒΑΘΜΟ ΠΟΥ ΕΠΙΤΡΕΠΕΤΑΙ ΑΠΟ ΤΟ ΝΟΜΟ:',
+            content:
+              'ΤΟ THE DAS BOARD ΠΑΡΕΧΕΤΑΙ "ΩΣ ΕΧΕΙ" ΧΩΡΙΣ ΕΓΓΥΗΣΕΙΣ ΟΠΟΙΟΥΔΗΠΟΤΕ ΕΙΔΟΥΣ. ΣΤΟ ΜΕΓΙΣΤΟ ΒΑΘΜΟ ΠΟΥ ΕΠΙΤΡΕΠΕΤΑΙ ΑΠΟ ΤΟ ΝΟΜΟ:',
             items: [
               'Αποποιούμαστε όλες τις εγγυήσεις, ρητές ή συνεπαγόμενες, συμπεριλαμβανομένης της εμπορευσιμότητας και καταλληλότητας για συγκεκριμένο σκοπό',
               'Δεν ευθυνόμαστε για έμμεσες, τυχαίες, ειδικές ή συνεπαγόμενες ζημίες',
               'Η συνολική ευθύνη μας δεν θα υπερβαίνει τα τέλη που πληρώσατε τους 12 μήνες πριν την αξίωση',
-              'Αναγνωρίζετε ότι το λογισμικό μπορεί να περιέχει σφάλματα και συμφωνείτε να τα αναφέρετε άμεσα'
-            ]
+              'Αναγνωρίζετε ότι το λογισμικό μπορεί να περιέχει σφάλματα και συμφωνείτε να τα αναφέρετε άμεσα',
+            ],
           },
           indemnification: {
             title: '11. Αποζημίωση',
-            content: 'Συμφωνείτε να μας αποζημιώσετε και να μας απαλλάξετε από οποιεσδήποτε αξιώσεις, απώλειες ή ζημίες που προκύπτουν από τη χρήση των υπηρεσιών μας, παραβίαση αυτών των Όρων ή παραβίαση δικαιωμάτων τρίτων.'
+            content:
+              'Συμφωνείτε να μας αποζημιώσετε και να μας απαλλάξετε από οποιεσδήποτε αξιώσεις, απώλειες ή ζημίες που προκύπτουν από τη χρήση των υπηρεσιών μας, παραβίαση αυτών των Όρων ή παραβίαση δικαιωμάτων τρίτων.',
           },
           governing: {
             title: '12. Εφαρμοστέο Δίκαιο και Επίλυση Διαφορών',
-            content: 'Αυτοί οι Όροι διέπονται από τους νόμους της [Δικαιοδοσίας] χωρίς να λαμβάνονται υπόψη οι αρχές σύγκρουσης νόμων. Οποιεσδήποτε διαφορές θα επιλυθούν μέσω δεσμευτικής διαιτησίας, εκτός από αξιώσεις ασφαλιστικών μέτρων που μπορούν να προσφύγουν στα κατάλληλα δικαστήρια.'
+            content:
+              'Αυτοί οι Όροι διέπονται από τους νόμους της [Δικαιοδοσίας] χωρίς να λαμβάνονται υπόψη οι αρχές σύγκρουσης νόμων. Οποιεσδήποτε διαφορές θα επιλυθούν μέσω δεσμευτικής διαιτησίας, εκτός από αξιώσεις ασφαλιστικών μέτρων που μπορούν να προσφύγουν στα κατάλληλα δικαστήρια.',
           },
           changes: {
             title: '13. Αλλαγές στους Όρους',
-            content: 'Μπορούμε να τροποποιήσουμε αυτούς τους Όρους κατά καιρούς. Θα παρέχουμε ειδοποίηση για ουσιώδεις αλλαγές τουλάχιστον 30 ημέρες εκ των προτέρων. Η συνεχιζόμενη χρήση των υπηρεσιών μας μετά την έναρξη ισχύος των αλλαγών συνιστά αποδοχή των αναθεωρημένων Όρων.'
+            content:
+              'Μπορούμε να τροποποιήσουμε αυτούς τους Όρους κατά καιρούς. Θα παρέχουμε ειδοποίηση για ουσιώδεις αλλαγές τουλάχιστον 30 ημέρες εκ των προτέρων. Η συνεχιζόμενη χρήση των υπηρεσιών μας μετά την έναρξη ισχύος των αλλαγών συνιστά αποδοχή των αναθεωρημένων Όρων.',
           },
           entire: {
             title: '14. Πλήρης Συμφωνία',
-            content: 'Αυτοί οι Όροι, μαζί με την Πολιτική Απορρήτου μας και οποιεσδήποτε πρόσθετες συμφωνίες, αποτελούν την πλήρη συμφωνία μεταξύ σας και του The DAS Board σχετικά με τη χρήση των υπηρεσιών μας.'
+            content:
+              'Αυτοί οι Όροι, μαζί με την Πολιτική Απορρήτου μας και οποιεσδήποτε πρόσθετες συμφωνίες, αποτελούν την πλήρη συμφωνία μεταξύ σας και του The DAS Board σχετικά με τη χρήση των υπηρεσιών μας.',
           },
           contact: {
             title: '15. Στοιχεία Επικοινωνίας',
-            content: 'Εάν έχετε ερωτήσεις σχετικά με αυτούς τους Όρους, παρακαλώ επικοινωνήστε μαζί μας:',
+            content:
+              'Εάν έχετε ερωτήσεις σχετικά με αυτούς τους Όρους, παρακαλώ επικοινωνήστε μαζί μας:',
             email: 'legal@thedasboard.com',
             address: '[Διεύθυνση Εταιρείας]',
-            phone: '[Αριθμός Τηλεφώνου Υποστήριξης]'
-          }
-        }
+            phone: '[Αριθμός Τηλεφώνου Υποστήριξης]',
+          },
+        },
       },
       privacy: {
         title: 'Πολιτική Απορρήτου',
         lastUpdated: 'Τελευταία Ενημέρωση: 28/6/2025',
-        intro: 'Αυτή η Πολιτική Απορρήτου περιγράφει πώς το The DAS Board ("εμείς", "μας" ή "μας") συλλέγει, χρησιμοποιεί και προστατεύει τις προσωπικές σας πληροφορίες όταν χρησιμοποιείτε την πλατφόρμα λογισμικού διαχείρισης αντιπροσωπειών μας. Δεσμευόμαστε να προστατεύουμε το απόρρητό σας και να χειριζόμαστε τα δεδομένα σας με υπευθυνότητα.',
+        intro:
+          'Αυτή η Πολιτική Απορρήτου περιγράφει πώς το The DAS Board ("εμείς", "μας" ή "μας") συλλέγει, χρησιμοποιεί και προστατεύει τις προσωπικές σας πληροφορίες όταν χρησιμοποιείτε την πλατφόρμα λογισμικού διαχείρισης αντιπροσωπειών μας. Δεσμευόμαστε να προστατεύουμε το απόρρητό σας και να χειριζόμαστε τα δεδομένα σας με υπευθυνότητα.',
         sections: {
           collection: {
             title: '1. Πληροφορίες που Συλλέγουμε',
-            content: 'Όταν χρησιμοποιείτε το The DAS Board, συλλέγουμε διάφορους τύπους πληροφοριών για να παρέχουμε και να βελτιώνουμε τις υπηρεσίες μας:',
+            content:
+              'Όταν χρησιμοποιείτε το The DAS Board, συλλέγουμε διάφορους τύπους πληροφοριών για να παρέχουμε και να βελτιώνουμε τις υπηρεσίες μας:',
             items: [
               '<strong>Στοιχεία Λογαριασμού:</strong> Όνομα, διεύθυνση email, αριθμός τηλεφώνου, όνομα εταιρείας, θέση εργασίας και στοιχεία χρέωσης',
               '<strong>Δεδομένα Αντιπροσωπείας:</strong> Απόθεμα οχημάτων, αρχεία πωλήσεων, πληροφορίες πελατών και χρηματοοικονομικές συναλλαγές',
               '<strong>Δεδομένα Χρήσης:</strong> Χαρακτηριστικά που προσπελάστηκαν, χρόνος που περάστηκε στην πλατφόρμα, αλληλεπιδράσεις χρήστη και μετρήσεις απόδοσης',
               '<strong>Τεχνικά Δεδομένα:</strong> Διεύθυνση IP, τύπος φυλλομετρητή, πληροφορίες συσκευής, λειτουργικό σύστημα και αρχεία πρόσβασης',
               '<strong>Δεδομένα Επικοινωνίας:</strong> Αιτήματα υποστήριξης, σχόλια και αλληλογραφία με την ομάδα μας',
-              '<strong>Δεδομένα Τοποθεσίας:</strong> Διευθύνσεις αντιπροσωπείας και, με συναίνεση, τοποθεσία συσκευής για λειτουργίες κινητού'
-            ]
+              '<strong>Δεδομένα Τοποθεσίας:</strong> Διευθύνσεις αντιπροσωπείας και, με συναίνεση, τοποθεσία συσκευής για λειτουργίες κινητού',
+            ],
           },
           usage: {
             title: '2. Πώς Χρησιμοποιούμε τις Πληροφορίες σας',
-            content: 'Χρησιμοποιούμε τις συλλεχθείσες πληροφορίες για νόμιμους επιχειρηματικούς σκοπούς, συμπεριλαμβανομένων:',
+            content:
+              'Χρησιμοποιούμε τις συλλεχθείσες πληροφορίες για νόμιμους επιχειρηματικούς σκοπούς, συμπεριλαμβανομένων:',
             items: [
               'Παροχή, συντήρηση και βελτίωση της πλατφόρμας και χαρακτηριστικών του The DAS Board',
               'Επεξεργασία συνδρομών, πληρωμών και διαχείριση του λογαριασμού σας',
@@ -7793,118 +8266,134 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Αποστολή ενημερώσεων υπηρεσίας, ειδοποιήσεων ασφαλείας και διοικητικών μηνυμάτων',
               'Εντοπισμός, πρόληψη και αντιμετώπιση τεχνικών προβλημάτων και απειλών ασφαλείας',
               'Συμμόρφωση με νομικές υποχρεώσεις και κανονισμούς του κλάδου',
-              'Βελτίωση της εμπειρίας χρήστη μέσω ανάπτυξης προϊόντος και έρευνας'
-            ]
+              'Βελτίωση της εμπειρίας χρήστη μέσω ανάπτυξης προϊόντος και έρευνας',
+            ],
           },
           sharing: {
             title: '3. Κοινή Χρήση των Πληροφοριών σας',
-            content: 'Δεν πουλάμε, ενοικιάζουμε ή ανταλλάσσουμε τις προσωπικές σας πληροφορίες. Μπορούμε να μοιραστούμε τις πληροφορίες σας μόνο στις ακόλουθες περιστάσεις:',
+            content:
+              'Δεν πουλάμε, ενοικιάζουμε ή ανταλλάσσουμε τις προσωπικές σας πληροφορίες. Μπορούμε να μοιραστούμε τις πληροφορίες σας μόνο στις ακόλουθες περιστάσεις:',
             items: [
               '<strong>Παροχείς Υπηρεσιών:</strong> Τρίτοι πωλητές που μας βοηθούν να λειτουργούμε την πλατφόρμα μας (φιλοξενία, αναλυτικά, επεξεργασία πληρωμών)',
               '<strong>Επιχειρηματικοί Εταίροι:</strong> Εξουσιοδοτημένες ενοποιήσεις και εταίροι της αυτοκινητοβιομηχανίας με τη ρητή συναίνεσή σας',
               '<strong>Νομικές Απαιτήσεις:</strong> Όταν απαιτείται από νόμο, κανονισμό ή έγκυρη νομική διαδικασία',
               '<strong>Επιχειρηματικές Μεταφορές:</strong> Σε σχέση με συγχωνεύσεις, εξαγορές ή πωλήσεις περιουσιακών στοιχείων (με ειδοποίηση)',
-              '<strong>Ασφάλεια και Προστασία:</strong> Για την προστασία των δικαιωμάτων, περιουσίας ή ασφάλειας των χρηστών μας ή του κοινού'
-            ]
+              '<strong>Ασφάλεια και Προστασία:</strong> Για την προστασία των δικαιωμάτων, περιουσίας ή ασφάλειας των χρηστών μας ή του κοινού',
+            ],
           },
           retention: {
             title: '4. Διατήρηση Δεδομένων',
-            content: 'Διατηρούμε τις προσωπικές σας πληροφορίες για όσο χρόνο είναι απαραίτητο για την παροχή των υπηρεσιών μας και την συμμόρφωση με νομικές υποχρεώσεις. Συγκεκριμένα:',
+            content:
+              'Διατηρούμε τις προσωπικές σας πληροφορίες για όσο χρόνο είναι απαραίτητο για την παροχή των υπηρεσιών μας και την συμμόρφωση με νομικές υποχρεώσεις. Συγκεκριμένα:',
             items: [
               'Τα δεδομένα λογαριασμού διατηρούνται ενώ η συνδρομή σας είναι ενεργή και για 3 χρόνια μετά τη λήξη',
               'Τα αρχεία συναλλαγών διατηρούνται για 7 χρόνια για συμμόρφωση με χρηματοοικονομικούς κανονισμούς',
               'Τα αρχεία χρήσης διατηρούνται για 2 χρόνια για ανάλυση ασφαλείας και απόδοσης',
-              'Τα αρχεία επικοινωνίας διατηρούνται για 5 χρόνια για σκοπούς εξυπηρέτησης πελατών'
-            ]
+              'Τα αρχεία επικοινωνίας διατηρούνται για 5 χρόνια για σκοπούς εξυπηρέτησης πελατών',
+            ],
           },
           rights: {
             title: '5. Τα Δικαιώματα και Επιλογές σας',
-            content: 'Ανάλογα με την τοποθεσία σας, μπορεί να έχετε τα ακόλουθα δικαιώματα σχετικά με τις προσωπικές σας πληροφορίες:',
+            content:
+              'Ανάλογα με την τοποθεσία σας, μπορεί να έχετε τα ακόλουθα δικαιώματα σχετικά με τις προσωπικές σας πληροφορίες:',
             items: [
               '<strong>Πρόσβαση:</strong> Αίτημα αντιγράφου των προσωπικών σας πληροφοριών που κατέχουμε',
               '<strong>Διόρθωση:</strong> Ενημέρωση ή διόρθωση ανακριβών προσωπικών πληροφοριών',
               '<strong>Διαγραφή:</strong> Αίτημα διαγραφής των προσωπικών σας πληροφοριών (υπόκειται σε νομικές υποχρεώσεις)',
               '<strong>Φορητότητα:</strong> Λήψη των δεδομένων σας σε μορφή αναγνώσιμη από μηχανή',
               '<strong>Περιορισμός:</strong> Περιορισμός του τρόπου επεξεργασίας των προσωπικών σας πληροφοριών',
-              '<strong>Αντίρρηση:</strong> Αντίρρηση στην επεξεργασία βάσει νόμιμων συμφερόντων'
-            ]
+              '<strong>Αντίρρηση:</strong> Αντίρρηση στην επεξεργασία βάσει νόμιμων συμφερόντων',
+            ],
           },
           cookies: {
             title: '6. Cookies και Τεχνολογίες Παρακολούθησης',
-            content: 'Χρησιμοποιούμε cookies και παρόμοιες τεχνολογίες για να βελτιώσουμε την εμπειρία σας:',
+            content:
+              'Χρησιμοποιούμε cookies και παρόμοιες τεχνολογίες για να βελτιώσουμε την εμπειρία σας:',
             items: [
               '<strong>Βασικά Cookies:</strong> Απαιτούνται για τη λειτουργικότητα και ασφάλεια της πλατφόρμας',
               '<strong>Αναλυτικά Cookies:</strong> Μας βοηθούν να κατανοήσουμε πώς χρησιμοποιείτε την πλατφόρμα μας',
               '<strong>Cookies Προτιμήσεων:</strong> Θυμούνται τις ρυθμίσεις και προσαρμογές σας',
-              '<strong>Cookies Μάρκετινγκ:</strong> Χρησιμοποιούνται για στοχευμένες επικοινωνίες (με τη συναίνεσή σας)'
+              '<strong>Cookies Μάρκετινγκ:</strong> Χρησιμοποιούνται για στοχευμένες επικοινωνίες (με τη συναίνεσή σας)',
             ],
-            footer: 'Μπορείτε να ελέγξετε τις προτιμήσεις cookies μέσω των ρυθμίσεων του φυλλομετρητή σας ή του εργαλείου διαχείρισης cookies μας.'
+            footer:
+              'Μπορείτε να ελέγξετε τις προτιμήσεις cookies μέσω των ρυθμίσεων του φυλλομετρητή σας ή του εργαλείου διαχείρισης cookies μας.',
           },
           security: {
             title: '7. Μέτρα Ασφαλείας',
-            content: 'Εφαρμόζουμε βιομηχανικά πρότυπα μέτρα ασφαλείας για την προστασία των πληροφοριών σας, συμπεριλαμβανομένων:',
+            content:
+              'Εφαρμόζουμε βιομηχανικά πρότυπα μέτρα ασφαλείας για την προστασία των πληροφοριών σας, συμπεριλαμβανομένων:',
             items: [
               'Κρυπτογράφηση δεδομένων σε μετάδοση και σε ηρεμία χρησιμοποιώντας πρότυπα AES-256',
               'Τακτικοί έλεγχοι ασφαλείας και δοκιμές διείσδυσης',
               'Πολυπαραγοντική ταυτοποίηση και έλεγχοι πρόσβασης',
               'Συμμόρφωση SOC 2 Type II και τακτικές αξιολογήσεις ασφαλείας',
-              'Εκπαίδευση υπαλλήλων σχετικά με την προστασία δεδομένων και τις καλύτερες πρακτικές ασφαλείας'
-            ]
+              'Εκπαίδευση υπαλλήλων σχετικά με την προστασία δεδομένων και τις καλύτερες πρακτικές ασφαλείας',
+            ],
           },
           international: {
             title: '8. Διεθνείς Μεταφορές Δεδομένων',
-            content: 'Οι πληροφορίες σας μπορεί να μεταφερθούν και να επεξεργαστούν σε χώρες άλλες από τη δική σας. Διασφαλίζουμε ότι κατάλληλες διασφαλίσεις είναι σε ισχύ, συμπεριλαμβανομένων Τυποποιημένων Συμβατικών Ρητρών και αποφάσεων επάρκειας, για την προστασία των δεδομένων σας κατά τις διεθνείς μεταφορές.'
+            content:
+              'Οι πληροφορίες σας μπορεί να μεταφερθούν και να επεξεργαστούν σε χώρες άλλες από τη δική σας. Διασφαλίζουμε ότι κατάλληλες διασφαλίσεις είναι σε ισχύ, συμπεριλαμβανομένων Τυποποιημένων Συμβατικών Ρητρών και αποφάσεων επάρκειας, για την προστασία των δεδομένων σας κατά τις διεθνείς μεταφορές.',
           },
           children: {
             title: '9. Απόρρητο Παιδιών',
-            content: 'Το The DAS Board δεν προορίζεται για χρήση από άτομα κάτω των 18 ετών. Δεν συλλέγουμε εν γνώσει μας προσωπικές πληροφορίες από παιδιά κάτω των 18 ετών. Εάν λάβουμε γνώση τέτοιας συλλογής, θα διαγράψουμε τις πληροφορίες άμεσα.'
+            content:
+              'Το The DAS Board δεν προορίζεται για χρήση από άτομα κάτω των 18 ετών. Δεν συλλέγουμε εν γνώσει μας προσωπικές πληροφορίες από παιδιά κάτω των 18 ετών. Εάν λάβουμε γνώση τέτοιας συλλογής, θα διαγράψουμε τις πληροφορίες άμεσα.',
           },
           changes: {
             title: '10. Αλλαγές σε αυτή την Πολιτική Απορρήτου',
-            content: 'Μπορούμε να ενημερώνουμε αυτή την Πολιτική Απορρήτου περιοδικά για να αντικατοπτρίζουμε αλλαγές στις πρακτικές μας ή νομικές απαιτήσεις. Θα σας ειδοποιήσουμε για σημαντικές αλλαγές μέσω email ή ειδοποίησης πλατφόρμας τουλάχιστον 30 ημέρες πριν τεθούν σε ισχύ.'
+            content:
+              'Μπορούμε να ενημερώνουμε αυτή την Πολιτική Απορρήτου περιοδικά για να αντικατοπτρίζουμε αλλαγές στις πρακτικές μας ή νομικές απαιτήσεις. Θα σας ειδοποιήσουμε για σημαντικές αλλαγές μέσω email ή ειδοποίησης πλατφόρμας τουλάχιστον 30 ημέρες πριν τεθούν σε ισχύ.',
           },
           contact: {
             title: '11. Επικοινωνήστε μαζί μας',
-            content: 'Εάν έχετε ερωτήσεις σχετικά με αυτή την Πολιτική Απορρήτου ή θέλετε να ασκήσετε τα δικαιώματά σας, παρακαλούμε επικοινωνήστε μαζί μας:',
+            content:
+              'Εάν έχετε ερωτήσεις σχετικά με αυτή την Πολιτική Απορρήτου ή θέλετε να ασκήσετε τα δικαιώματά σας, παρακαλούμε επικοινωνήστε μαζί μας:',
             email: 'privacy@thedasboard.com',
             address: '[Company Address]',
-            phone: '[Support Phone Number]'
-          }
-        }
+            phone: '[Support Phone Number]',
+          },
+        },
       },
       subscription: {
         title: 'Συμφωνία Συνδρομής',
         lastUpdated: 'Τελευταία ενημέρωση: 6/28/2025',
-        intro: 'Αυτή η Συμφωνία Συνδρομής διέπει τη συνδρομή σας και τη χρήση της πλατφόρμας διαχείρισης αντιπροσωπειών The DAS Board.',
+        intro:
+          'Αυτή η Συμφωνία Συνδρομής διέπει τη συνδρομή σας και τη χρήση της πλατφόρμας διαχείρισης αντιπροσωπειών The DAS Board.',
         sections: {
           plans: {
             title: '1. Πλάνα συνδρομής',
-            content: 'Το The DAS Board προσφέρει επίπεδα συνδρομής σχεδιασμένα για διαφορετικές ανάγκες αντιπροσωπειών:',
+            content:
+              'Το The DAS Board προσφέρει επίπεδα συνδρομής σχεδιασμένα για διαφορετικές ανάγκες αντιπροσωπειών:',
             items: [
               '<strong>60ήμερη δωρεάν δοκιμή:</strong> Πλήρης πρόσβαση στην πλατφόρμα χωρίς απαιτούμενη πιστωτική κάρτα',
               '<strong>Διαχειριστής χρηματοδότησης:</strong> Ατομική πρόσβαση χρήστη με βασικά χρηματοοικονομικά εργαλεία',
               '<strong>Αντιπροσωπεία:</strong> Πρόσβαση πολλών χρηστών με πλήρη διαχείριση αποθέματος και πωλήσεων',
-              '<strong>Ομάδα αντιπροσωπειών:</strong> Πρόσβαση επιχειρηματικού επιπέδου σε πολλές τοποθεσίες'
+              '<strong>Ομάδα αντιπροσωπειών:</strong> Πρόσβαση επιχειρηματικού επιπέδου σε πολλές τοποθεσίες',
             ],
-            footer: 'Οι συνδρομές χρεώνονται μηνιαίως εκ των προτέρων. Μπορείτε να αναβαθμίσετε ή να υποβαθμίσετε τη συνδρομή σας οποιαδήποτε στιγμή, με τις αλλαγές να ισχύουν στον επόμενο κύκλο χρέωσης.'
+            footer:
+              'Οι συνδρομές χρεώνονται μηνιαίως εκ των προτέρων. Μπορείτε να αναβαθμίσετε ή να υποβαθμίσετε τη συνδρομή σας οποιαδήποτε στιγμή, με τις αλλαγές να ισχύουν στον επόμενο κύκλο χρέωσης.',
           },
           payment: {
             title: '2. Όροι πληρωμής',
-            content: 'Η πληρωμή οφείλεται κατά την έναρξη της συνδρομής και την ίδια ημέρα κάθε επόμενο μήνα. Δεχόμαστε τις κύριες πιστωτικές κάρτες και μεταφορές ACH για εταιρικούς λογαριασμούς. Εάν η πληρωμή αποτύχει, μπορούμε να αναστείλουμε την πρόσβασή σας στο The DAS Board μετά από εύλογη ειδοποίηση.'
+            content:
+              'Η πληρωμή οφείλεται κατά την έναρξη της συνδρομής και την ίδια ημέρα κάθε επόμενο μήνα. Δεχόμαστε τις κύριες πιστωτικές κάρτες και μεταφορές ACH για εταιρικούς λογαριασμούς. Εάν η πληρωμή αποτύχει, μπορούμε να αναστείλουμε την πρόσβασή σας στο The DAS Board μετά από εύλογη ειδοποίηση.',
           },
           trial: {
             title: '3. Περίοδος δοκιμής',
-            content: 'Η 60ήμερη δοκιμή παρέχει πλήρη πρόσβαση στην πλατφόρμα The DAS Board. Δεν απαιτείται πιστωτική κάρτα για να ξεκινήσετε τη δοκιμή σας. Στο τέλος της περιόδου δοκιμής, θα χρειαστεί να επιλέξετε ένα επί πληρωμή πλάνο για να συνεχίσετε να χρησιμοποιείτε την πλατφόρμα. Τα δεδομένα δοκιμής θα διατηρηθούν για 30 ημέρες μετά τη λήξη της δοκιμής.'
+            content:
+              'Η 60ήμερη δοκιμή παρέχει πλήρη πρόσβαση στην πλατφόρμα The DAS Board. Δεν απαιτείται πιστωτική κάρτα για να ξεκινήσετε τη δοκιμή σας. Στο τέλος της περιόδου δοκιμής, θα χρειαστεί να επιλέξετε ένα επί πληρωμή πλάνο για να συνεχίσετε να χρησιμοποιείτε την πλατφόρμα. Τα δεδομένα δοκιμής θα διατηρηθούν για 30 ημέρες μετά τη λήξη της δοκιμής.',
           },
           cancellation: {
             title: '4. Ακύρωση και επιστροφές χρημάτων',
-            content: 'Μπορείτε να ακυρώσετε τη συνδρομή σας οποιαδήποτε στιγμή μέσω των ρυθμίσεων του λογαριασμού σας ή επικοινωνώντας με την ομάδα υποστήριξής μας. Κατά την ακύρωση:',
+            content:
+              'Μπορείτε να ακυρώσετε τη συνδρομή σας οποιαδήποτε στιγμή μέσω των ρυθμίσεων του λογαριασμού σας ή επικοινωνώντας με την ομάδα υποστήριξής μας. Κατά την ακύρωση:',
             items: [
               'Θα διατηρήσετε πρόσβαση μέχρι το τέλος της τρέχουσας περιόδου χρέωσής σας',
               'Δεν παρέχονται επιστροφές χρημάτων για μερικούς μήνες υπηρεσίας',
               'Τα δεδομένα σας θα είναι διαθέσιμα για εξαγωγή για 90 ημέρες μετά την ακύρωση',
-              'Η αυτόματη ανανέωση θα απενεργοποιηθεί'
-            ]
+              'Η αυτόματη ανανέωση θα απενεργοποιηθεί',
+            ],
           },
           sla: {
             title: '5. Συμφωνία επιπέδου υπηρεσίας',
@@ -7913,8 +8402,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
               '99,9% διαθεσιμότητα λειτουργίας πλατφόρμας',
               'Προγραμματισμένα παράθυρα συντήρησης με προειδοποίηση 48 ωρών',
               'Απάντηση υποστήριξης πελατών εντός 24 ωρών για τυπικά αιτήματα',
-              'Προτεραιότητα υποστήριξης για συνδρομητές Ομάδας αντιπροσωπειών'
-            ]
+              'Προτεραιότητα υποστήριξης για συνδρομητές Ομάδας αντιπροσωπειών',
+            ],
           },
           data: {
             title: '6. Δεδομένα και ασφάλεια',
@@ -7923,8 +8412,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Καθημερινά αυτοματοποιημένα αντίγραφα ασφαλείας με διατήρηση 30 ημερών',
               'Πρωτόκολλα κρυπτογράφησης και ασφάλειας τραπεζικού επιπέδου',
               'Συμμόρφωση GDPR και CCPA για προστασία δεδομένων',
-              'Δυνατότητες εξαγωγής δεδομένων σε τυπικές μορφές'
-            ]
+              'Δυνατότητες εξαγωγής δεδομένων σε τυπικές μορφές',
+            ],
           },
           support: {
             title: '7. Υποστήριξη και εκπαίδευση',
@@ -7933,22 +8422,25 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Ολοκληρωμένη βοήθεια ενσωμάτωσης και εγκατάστασης',
               'Διαδικτυακούς πόρους εκπαίδευσης και τεκμηρίωση',
               'Υποστήριξη email και chat κατά τις εργάσιμες ώρες',
-              'Τακτικές ενημερώσεις πλατφόρμας και κυκλοφορίες νέων χαρακτηριστικών'
-            ]
+              'Τακτικές ενημερώσεις πλατφόρμας και κυκλοφορίες νέων χαρακτηριστικών',
+            ],
           },
           modifications: {
             title: '8. Τροποποιήσεις υπηρεσίας',
-            content: 'Μπορούμε να τροποποιήσουμε ή να ενημερώσουμε την πλατφόρμα The DAS Board για να βελτιώσουμε τη λειτουργικότητα, την ασφάλεια ή τη συμμόρφωση. Θα παρέχουμε εύλογη ειδοποίηση σημαντικών αλλαγών που μπορεί να επηρεάσουν τη χρήση σας.'
-          }
-        }
+            content:
+              'Μπορούμε να τροποποιήσουμε ή να ενημερώσουμε την πλατφόρμα The DAS Board για να βελτιώσουμε τη λειτουργικότητα, την ασφάλεια ή τη συμμόρφωση. Θα παρέχουμε εύλογη ειδοποίηση σημαντικών αλλαγών που μπορεί να επηρεάσουν τη χρήση σας.',
+          },
+        },
       },
       pricingPage: {
         title: 'Επιλέξτε την',
         titleHighlight: 'Λύση σας',
-        subtitle: 'Επιλέξτε την επιλογή που περιγράφει καλύτερα τις ανάγκες σας. Θα προσαρμόσουμε την εμπειρία σας αναλόγως.',
+        subtitle:
+          'Επιλέξτε την επιλογή που περιγράφει καλύτερα τις ανάγκες σας. Θα προσαρμόσουμε την εμπειρία σας αναλόγως.',
         singleFinance: {
           title: 'Μεμονωμένος Χρηματοοικονομικός Διευθυντής',
-          description: 'Ιδανικό για μεμονωμένους χρηματοοικονομικούς διευθυντές που θέλουν να παρακολουθούν την προσωπική τους απόδοση και τις συναλλαγές.',
+          description:
+            'Ιδανικό για μεμονωμένους χρηματοοικονομικούς διευθυντές που θέλουν να παρακολουθούν την προσωπική τους απόδοση και τις συναλλαγές.',
           originalPrice: '$29.99/μήνα',
           price: '$20/μήνα περιορισμένος χρόνος',
           features: [
@@ -7956,14 +8448,15 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'Αναλύσεις PVR και κερδών προϊόντων',
             'Υπολογιστής πληρωμών',
             'Μετρήσεις απόδοσης',
-            'Μπορεί να είναι εκπεστέα από φόρους'
+            'Μπορεί να είναι εκπεστέα από φόρους',
           ],
           buttonText: 'Ξεκινήστε Τώρα!',
-          setupTime: 'Δοκιμάστε χωρίς κίνδυνο για έναν πλήρη ημερολογιακό μήνα'
+          setupTime: 'Δοκιμάστε χωρίς κίνδυνο για έναν πλήρη ημερολογιακό μήνα',
         },
         dealership: {
           title: 'Αντιπροσωπεία / Ομάδα Αντιπροσωπειών',
-          description: 'Πλήρης διαχείριση αντιπροσωπείας με dashboards ειδικά για ρόλους, διαχείριση ομάδας και υποστήριξη πολλαπλών τοποθεσιών.',
+          description:
+            'Πλήρης διαχείριση αντιπροσωπείας με dashboards ειδικά για ρόλους, διαχείριση ομάδας και υποστήριξη πολλαπλών τοποθεσιών.',
           price: '$250/μήνα βάση',
           priceSubtext: 'ανά αντιπροσωπεία + πρόσθετα',
           popular: 'Πιο Δημοφιλές',
@@ -7972,35 +8465,38 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'Dashboards ομάδας για όλους τους ρόλους',
             'Αναλύσεις πολλαπλών τοποθεσιών',
             'Ευέλικτες διοικητικές δομές',
-            'Διαθέσιμες εκπτώσεις όγκου'
+            'Διαθέσιμες εκπτώσεις όγκου',
           ],
           buttonText: 'Δείτε Δυναμικές Τιμές Πακέτων',
-          setupTime: 'Ξεκινήστε σήμερα'
+          setupTime: 'Ξεκινήστε σήμερα',
         },
         benefits: {
           title: 'Μεταμορφώστε την Αντιπροσωπεία σας Σήμερα',
           performance: {
             title: 'Αυξήστε την Απόδοση',
-            description: 'Οι πληροφορίες πραγματικού χρόνου βοηθούν τις ομάδες να ξεπεράσουν τους στόχους και να μεγιστοποιήσουν την κερδοφορία'
+            description:
+              'Οι πληροφορίες πραγματικού χρόνου βοηθούν τις ομάδες να ξεπεράσουν τους στόχους και να μεγιστοποιήσουν την κερδοφορία',
           },
           operations: {
             title: 'Βελτιστοποιήστε τις Λειτουργίες',
-            description: 'Η κεντρική διαχείριση μειώνει τον διοικητικό χρόνο και βελτιώνει την αποτελεσματικότητα'
+            description:
+              'Η κεντρική διαχείριση μειώνει τον διοικητικό χρόνο και βελτιώνει την αποτελεσματικότητα',
           },
           security: {
             title: 'Ασφαλές και Αξιόπιστο',
-            description: 'Ασφάλεια επιχειρηματικού επιπέδου με εγγύηση διαθεσιμότητας 99,9%'
-          }
+            description: 'Ασφάλεια επιχειρηματικού επιπέδου με εγγύηση διαθεσιμότητας 99,9%',
+          },
         },
         helpText: {
           title: 'Δεν είστε σίγουροι ποια επιλογή να διαλέξετε;',
-          description: 'Ξεκινήστε με την επιλογή μεμονωμένου χρηματοοικονομικού διευθυντή για να δοκιμάσετε την πλατφόρμα μας, στη συνέχεια αναβαθμιστείτε εύκολα σε χαρακτηριστικά αντιπροσωπείας όταν είστε έτοιμοι να επεκτείνετε την ομάδα σας.'
+          description:
+            'Ξεκινήστε με την επιλογή μεμονωμένου χρηματοοικονομικού διευθυντή για να δοκιμάσετε την πλατφόρμα μας, στη συνέχεια αναβαθμιστείτε εύκολα σε χαρακτηριστικά αντιπροσωπείας όταν είστε έτοιμοι να επεκτείνετε την ομάδα σας.',
         },
         footer: {
           copyright: '© 2025 The DAS Board. Όλα τα δικαιώματα διατηρούνται.',
           support: 'Ερωτήσεις; Επικοινωνήστε μαζί μας στο',
-          email: 'support@thedasboard.com'
-        }
+          email: 'support@thedasboard.com',
+        },
       },
     },
     dashboard: {
@@ -8028,8 +8524,10 @@ export const translations: Record<Language, Translations | Partial<Translations>
           showingDeals: 'Εμφάνιση {count} από {total} συμφωνίες',
           totalGross: 'Συνολικό Μικτό:',
           backEndTotal: 'Συνολικό Back-end:',
-          confirmDelete: 'Είστε σίγουροι ότι θέλετε να διαγράψετε αυτή τη συμφωνία; Αυτή η ενέργεια είναι μη αναστρέψιμη.',
-          finalConfirmDelete: 'Αυτή είναι η τελική επιβεβαίωσή σας. Η συμφωνία θα διαγραφεί οριστικά. Συνέχεια;',
+          confirmDelete:
+            'Είστε σίγουροι ότι θέλετε να διαγράψετε αυτή τη συμφωνία; Αυτή η ενέργεια είναι μη αναστρέψιμη.',
+          finalConfirmDelete:
+            'Αυτή είναι η τελική επιβεβαίωσή σας. Η συμφωνία θα διαγραφεί οριστικά. Συνέχεια;',
           editButton: 'Επεξεργασία',
           note: 'Αυτές είναι οι επεξεργασμένες συμφωνίες σας. Μπορείτε να τις επεξεργαστείτε, να τις διαγράψετε ή να αλλάξετε την κατάστασή τους.',
           statusOptions: {
@@ -8173,32 +8671,34 @@ export const translations: Record<Language, Translations | Partial<Translations>
           name: 'Individuele Finance Manager',
           price: '$20/maand beperkte tijd',
           originalPrice: '$29.99/maand',
-          description: 'Perfect voor individuele finance managers die hun persoonlijke prestaties willen volgen',
+          description:
+            'Perfect voor individuele finance managers die hun persoonlijke prestaties willen volgen',
           features: [
             'Persoonlijke deal tracking',
             'PVR & product winst analytics',
             'Betaal calculator',
             'Prestatie metrieken',
-            'Mogelijk fiscaal aftrekbaar'
+            'Mogelijk fiscaal aftrekbaar',
           ],
           buttonText: 'Begin Nu!',
-          setupTime: 'Probeer risicovrij voor een volledige kalendermaand'
+          setupTime: 'Probeer risicovrij voor een volledige kalendermaand',
         },
         dealership: {
           name: 'Dealership / Dealer Group',
           price: '$250/maand basis',
-          description: 'Complete dealership management met rol-specifieke dashboards en team management',
+          description:
+            'Complete dealership management met rol-specifieke dashboards en team management',
           popular: 'Meest Populair',
           features: [
             'Alle individuele manager functies',
             'Team dashboards voor alle rollen',
             'Multi-locatie analytics',
-            'Flexibele admin structuren'
+            'Flexibele admin structuren',
           ],
           buttonText: 'Configureer Uw Pakket',
-          setupTime: 'Begin vandaag nog'
+          setupTime: 'Begin vandaag nog',
         },
-        priceSubtext: 'per dealership + add-ons'
+        priceSubtext: 'per dealership + add-ons',
       },
       cta: {
         title: 'Klaar om uw dealership operaties te transformeren?',
@@ -8270,8 +8770,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'Personal deal tracking',
             'PVR tracking & product analytics',
             'Pay calculator met live verdiensten',
-            'Prestatie metrieken & rapporten'
-          ]
+            'Prestatie metrieken & rapporten',
+          ],
         },
         dealership: {
           name: 'Enkel Dealership',
@@ -8282,8 +8782,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'Alles van Finance Manager plus',
             'Sales team dashboards',
             'Manager oversight tools',
-            'Inventory & lead management'
-          ]
+            'Inventory & lead management',
+          ],
         },
         group: {
           name: 'Dealer Groups',
@@ -8306,17 +8806,20 @@ export const translations: Record<Language, Translations | Partial<Translations>
         copy: 'Kopiëren',
         claimOffer: 'Claim Aanbieding',
         useLater: 'Later Gebruiken',
-        validityNotice: '* Geldig voor nieuwe dealership abonnementen alleen. Verloopt over 30 dagen.',
+        validityNotice:
+          '* Geldig voor nieuwe dealership abonnementen alleen. Verloopt over 30 dagen.',
         emailRequired: 'E-mailadres is vereist',
         validEmailRequired: 'Voer een geldig e-mailadres in',
       },
       pricingPage: {
         title: 'Selecteer Uw',
         titleHighlight: 'Oplossing',
-        subtitle: 'Selecteer de optie die uw behoeften het beste beschrijft. Wij passen uw ervaring dienovereenkomstig aan.',
+        subtitle:
+          'Selecteer de optie die uw behoeften het beste beschrijft. Wij passen uw ervaring dienovereenkomstig aan.',
         singleFinance: {
           title: 'Individuele Finance Manager',
-          description: 'Perfect voor individuele finance managers die hun persoonlijke prestaties en deals willen volgen.',
+          description:
+            'Perfect voor individuele finance managers die hun persoonlijke prestaties en deals willen volgen.',
           originalPrice: '$29.99/maand',
           price: '$20/maand beperkte tijd',
           features: [
@@ -8324,14 +8827,15 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'PVR & product winst analytics',
             'Betaal calculator',
             'Prestatie metrieken',
-            'Mogelijk fiscaal aftrekbaar'
+            'Mogelijk fiscaal aftrekbaar',
           ],
           buttonText: 'Begin Nu!',
-          setupTime: 'Probeer risicovrij voor een volledige kalendermaand'
+          setupTime: 'Probeer risicovrij voor een volledige kalendermaand',
         },
         dealership: {
           title: 'Dealership / Dealer Group',
-          description: 'Complete dealership management met rol-specifieke dashboards, team management en multi-locatie ondersteuning.',
+          description:
+            'Complete dealership management met rol-specifieke dashboards, team management en multi-locatie ondersteuning.',
           price: '$250/maand basis',
           priceSubtext: 'per dealership + add-ons',
           popular: 'Meest Populair',
@@ -8340,35 +8844,38 @@ export const translations: Record<Language, Translations | Partial<Translations>
             'Team dashboards voor alle rollen',
             'Multi-locatie analytics',
             'Flexibele admin structuren',
-            'Volume kortingen beschikbaar'
+            'Volume kortingen beschikbaar',
           ],
           buttonText: 'Bekijk Dynamische Pakket Prijzen',
-          setupTime: 'Begin vandaag nog'
+          setupTime: 'Begin vandaag nog',
         },
         benefits: {
           title: 'Transformeer Uw Dealership Vandaag',
           performance: {
             title: 'Verhoog Prestaties',
-            description: 'Real-time inzichten helpen teams doelen te overtreffen en winstgevendheid te maximaliseren'
+            description:
+              'Real-time inzichten helpen teams doelen te overtreffen en winstgevendheid te maximaliseren',
           },
           operations: {
             title: 'Stroomlijn Operaties',
-            description: 'Gecentraliseerd management reduceert administratieve tijd en verbetert efficiëntie'
+            description:
+              'Gecentraliseerd management reduceert administratieve tijd en verbetert efficiëntie',
           },
           security: {
             title: 'Veilig & Betrouwbaar',
-            description: 'Enterprise-grade beveiliging met 99,9% uptime garantie'
-          }
+            description: 'Enterprise-grade beveiliging met 99,9% uptime garantie',
+          },
         },
         helpText: {
           title: 'Niet zeker welke optie te kiezen?',
-          description: 'Begin met de individuele finance manager optie om ons platform te proberen, upgrade dan eenvoudig naar dealership functies wanneer u klaar bent om uw team uit te breiden.'
+          description:
+            'Begin met de individuele finance manager optie om ons platform te proberen, upgrade dan eenvoudig naar dealership functies wanneer u klaar bent om uw team uit te breiden.',
         },
         footer: {
           copyright: '© 2025 Het DAS Board. Alle rechten voorbehouden.',
           support: 'Vragen? Neem contact met ons op via',
-          email: 'support@thedasboard.com'
-        }
+          email: 'support@thedasboard.com',
+        },
       },
     },
     about: {
@@ -8413,15 +8920,18 @@ export const translations: Record<Language, Translations | Partial<Translations>
         title: 'Onze Waarden',
         customerFocused: {
           title: 'Klantgericht',
-          description: 'Wij plaatsen dealership succes centraal in alles wat wij doen, bouwen functies die echte waarde leveren.',
+          description:
+            'Wij plaatsen dealership succes centraal in alles wat wij doen, bouwen functies die echte waarde leveren.',
         },
         dataDriven: {
           title: 'Data-gedreven',
-          description: 'Onze beslissingen zijn gebaseerd op concrete data en feedback van echte automotive professionals.',
+          description:
+            'Onze beslissingen zijn gebaseerd op concrete data en feedback van echte automotive professionals.',
         },
         continuousImprovement: {
           title: 'Continue Verbetering',
-          description: 'Wij evolueren voortdurend ons platform om de veranderende behoeften van de automotive industrie te ontmoeten.',
+          description:
+            'Wij evolueren voortdurend ons platform om de veranderende behoeften van de automotive industrie te ontmoeten.',
         },
       },
       contact: {
@@ -8468,35 +8978,40 @@ export const translations: Record<Language, Translations | Partial<Translations>
       terms: {
         title: 'Servicevoorwaarden',
         lastUpdated: 'Laatst Bijgewerkt: 28/6/2025',
-        intro: 'Deze Servicevoorwaarden ("Voorwaarden") regelen uw gebruik van Het DAS Board platform en services.',
+        intro:
+          'Deze Servicevoorwaarden ("Voorwaarden") regelen uw gebruik van Het DAS Board platform en services.',
         sections: {
           acceptance: {
             title: '1. Acceptatie van Voorwaarden',
-            content: 'Door toegang te krijgen tot of gebruik te maken van Het DAS Board, gaat u akkoord met deze Voorwaarden. Als u niet akkoord gaat met deze voorwaarden, mag u onze services niet gebruiken.'
+            content:
+              'Door toegang te krijgen tot of gebruik te maken van Het DAS Board, gaat u akkoord met deze Voorwaarden. Als u niet akkoord gaat met deze voorwaarden, mag u onze services niet gebruiken.',
           },
           description: {
             title: '2. Service Beschrijving',
-            content: 'Het DAS Board biedt dealership management software met real-time dashboards en analytics voor automotive professionals.',
+            content:
+              'Het DAS Board biedt dealership management software met real-time dashboards en analytics voor automotive professionals.',
             items: [
               '<strong>Finance Manager Tools:</strong> Deal tracking, PVR analytics, betaal calculators',
               '<strong>Sales Management:</strong> Team prestatie monitoring, lead tracking',
               '<strong>Dealership Analytics:</strong> Comprehensive rapportage en inzichten',
-              '<strong>Multi-user Ondersteuning:</strong> Rol-gebaseerde toegang en permissies'
-            ]
+              '<strong>Multi-user Ondersteuning:</strong> Rol-gebaseerde toegang en permissies',
+            ],
           },
           eligibility: {
             title: '3. Geschiktheid',
-            content: 'U moet 18 jaar of ouder zijn en gemachtigd om namens uw dealership contracten aan te gaan om deze service te gebruiken.'
+            content:
+              'U moet 18 jaar of ouder zijn en gemachtigd om namens uw dealership contracten aan te gaan om deze service te gebruiken.',
           },
           accounts: {
             title: '4. Gebruikersaccounts',
-            content: 'U bent verantwoordelijk voor het handhaven van de vertrouwelijkheid van uw account en het beperken van toegang tot uw computer. U gaat akkoord om verantwoordelijkheid te accepteren voor alle activiteiten die plaatsvinden onder uw account.',
+            content:
+              'U bent verantwoordelijk voor het handhaven van de vertrouwelijkheid van uw account en het beperken van toegang tot uw computer. U gaat akkoord om verantwoordelijkheid te accepteren voor alle activiteiten die plaatsvinden onder uw account.',
             items: [
               'Verstrek accurate en volledige registratie informatie',
               'Houd uw wachtwoord veilig en deel het niet',
               'Informeer ons onmiddellijk over ongeautoriseerd gebruik',
-              'U bent verantwoordelijk voor alle activiteiten onder uw account'
-            ]
+              'U bent verantwoordelijk voor alle activiteiten onder uw account',
+            ],
           },
           conduct: {
             title: '5. Gebruikersgedrag',
@@ -8506,108 +9021,123 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Inbreuk op intellectueel eigendom rechten',
               'Verzending van spam, malware of schadelijke code',
               'Poging tot ongeautoriseerde toegang tot onze systemen',
-              'Verstoring van service voor andere gebruikers'
-            ]
+              'Verstoring van service voor andere gebruikers',
+            ],
           },
           data: {
             title: '6. Data en Privacy',
-            content: 'Uw privacy is belangrijk voor ons. Onze praktijken zijn beschreven in ons Privacybeleid.',
+            content:
+              'Uw privacy is belangrijk voor ons. Onze praktijken zijn beschreven in ons Privacybeleid.',
             items: [
               'U behoudt eigendom van uw dealership data',
               'Wij gebruiken uw data alleen zoals beschreven in ons Privacybeleid',
               'Wij implementeren industriestandaard beveiligingsmaatregelen',
-              'U kunt uw data te allen tijde exporteren'
-            ]
+              'U kunt uw data te allen tijde exporteren',
+            ],
           },
           payment: {
             title: '7. Betaling en Facturering',
-            content: 'Betaalde abonnementen worden maandelijks vooraf gefactureerd. Alle prijzen zijn in USD tenzij anders vermeld.',
+            content:
+              'Betaalde abonnementen worden maandelijks vooraf gefactureerd. Alle prijzen zijn in USD tenzij anders vermeld.',
             items: [
               'Betalingen zijn verschuldigd bij het begin van elke factureringsperiode',
               'Prijzen kunnen veranderen met 30 dagen voorafgaande kennisgeving',
               'Restituties worden behandeld per geval',
-              'Niet-betaling kan resulteren in service opschorting'
-            ]
+              'Niet-betaling kan resulteren in service opschorting',
+            ],
           },
           termination: {
             title: '8. Beëindiging',
-            content: 'Beide partijen kunnen deze overeenkomst beëindigen. Bij beëindiging wordt uw toegang tot de service gestopt en kunnen we uw data verwijderen na een redelijke kennisgevingsperiode.'
+            content:
+              'Beide partijen kunnen deze overeenkomst beëindigen. Bij beëindiging wordt uw toegang tot de service gestopt en kunnen we uw data verwijderen na een redelijke kennisgevingsperiode.',
           },
           disclaimers: {
             title: '9. Disclaimers',
-            content: 'Het DAS Board wordt geleverd "zoals het is" zonder garanties van welke aard dan ook. Wij wijzen alle garanties af, uitdrukkelijk of impliciet.'
+            content:
+              'Het DAS Board wordt geleverd "zoals het is" zonder garanties van welke aard dan ook. Wij wijzen alle garanties af, uitdrukkelijk of impliciet.',
           },
           limitation: {
             title: '10. Beperking van Aansprakelijkheid',
-            content: 'Onze aansprakelijkheid is beperkt tot het maximum toegestaan door de wet. Wij zijn niet aansprakelijk voor indirecte, incidentele of gevolgschade.'
+            content:
+              'Onze aansprakelijkheid is beperkt tot het maximum toegestaan door de wet. Wij zijn niet aansprakelijk voor indirecte, incidentele of gevolgschade.',
           },
           governing: {
             title: '11. Toepasselijk Recht',
-            content: 'Deze voorwaarden worden beheerst door de wetten van [Jurisdictie]. Geschillen worden opgelost door bindende arbitrage.'
+            content:
+              'Deze voorwaarden worden beheerst door de wetten van [Jurisdictie]. Geschillen worden opgelost door bindende arbitrage.',
           },
           changes: {
             title: '12. Wijzigingen in Voorwaarden',
-            content: 'Wij kunnen deze voorwaarden te allen tijde wijzigen. Wij zullen gebruikers op de hoogte stellen van materiële wijzigingen via e-mail of service kennisgevingen.'
+            content:
+              'Wij kunnen deze voorwaarden te allen tijde wijzigen. Wij zullen gebruikers op de hoogte stellen van materiële wijzigingen via e-mail of service kennisgevingen.',
           },
           contact: {
             title: '13. Contact Informatie',
-            content: 'Voor vragen over deze Voorwaarden, neem contact met ons op via support@thedasboard.com.'
+            content:
+              'Voor vragen over deze Voorwaarden, neem contact met ons op via support@thedasboard.com.',
           },
           severability: {
             title: '14. Deelbaarheid',
-            content: 'Als een deel van deze voorwaarden ongeldig wordt verklaard, blijven de resterende bepalingen volledig van kracht.'
+            content:
+              'Als een deel van deze voorwaarden ongeldig wordt verklaard, blijven de resterende bepalingen volledig van kracht.',
           },
           entire: {
             title: '15. Volledige Overeenkomst',
-            content: 'Deze Voorwaarden vormen de volledige overeenkomst tussen u en Het DAS Board betreffende het gebruik van onze service.'
-          }
-        }
+            content:
+              'Deze Voorwaarden vormen de volledige overeenkomst tussen u en Het DAS Board betreffende het gebruik van onze service.',
+          },
+        },
       },
       privacy: {
         title: 'Privacybeleid',
         lastUpdated: 'Laatst Bijgewerkt: 28/6/2025',
-        intro: 'Dit Privacybeleid beschrijft hoe Het DAS Board uw persoonlijke informatie verzamelt, gebruikt en beschermt.',
+        intro:
+          'Dit Privacybeleid beschrijft hoe Het DAS Board uw persoonlijke informatie verzamelt, gebruikt en beschermt.',
         sections: {
           collection: {
             title: '1. Informatie Verzameling',
-            content: 'Wij verzamelen informatie die u ons verstrekt en informatie die automatisch wordt verzameld wanneer u onze service gebruikt.',
+            content:
+              'Wij verzamelen informatie die u ons verstrekt en informatie die automatisch wordt verzameld wanneer u onze service gebruikt.',
             items: [
               '<strong>Account Informatie:</strong> Naam, e-mailadres, telefoon, bedrijfsinformatie',
               '<strong>Dealership Data:</strong> Verkoop records, klant data, inventaris informatie',
               '<strong>Gebruik Data:</strong> Hoe u onze service gebruikt, functies die u opent',
-              '<strong>Technische Data:</strong> IP-adres, browser type, apparaat informatie'
-            ]
+              '<strong>Technische Data:</strong> IP-adres, browser type, apparaat informatie',
+            ],
           },
           usage: {
             title: '2. Hoe Wij Informatie Gebruiken',
-            content: 'Wij gebruiken uw informatie om onze service te leveren, te verbeteren en te ondersteunen.',
+            content:
+              'Wij gebruiken uw informatie om onze service te leveren, te verbeteren en te ondersteunen.',
             items: [
               'Service functionaliteit en ondersteuning leveren',
               'Uw account en veiligheid beheren',
               'Communiceren over service updates en ondersteuning',
               'Onze service analyseren en verbeteren',
-              'Voldoen aan wettelijke verplichtingen'
-            ]
+              'Voldoen aan wettelijke verplichtingen',
+            ],
           },
           sharing: {
             title: '3. Informatie Delen',
-            content: 'Wij verkopen uw persoonlijke informatie niet. Wij kunnen informatie delen in beperkte omstandigheden:',
+            content:
+              'Wij verkopen uw persoonlijke informatie niet. Wij kunnen informatie delen in beperkte omstandigheden:',
             items: [
               '<strong>Service Providers:</strong> Vertrouwde partners die ons helpen bij service levering',
               '<strong>Wettelijke Verplichtingen:</strong> Wanneer vereist door wet of rechtelijke procedures',
               '<strong>Bedrijfsoverdrachten:</strong> In geval van fusie, acquisitie of asset verkoop',
-              '<strong>Toestemming:</strong> Wanneer u uitdrukkelijke toestemming geeft'
-            ]
+              '<strong>Toestemming:</strong> Wanneer u uitdrukkelijke toestemming geeft',
+            ],
           },
           retention: {
             title: '4. Data Bewaring',
-            content: 'Wij bewaren uw informatie zolang uw account actief is of zoals nodig om u service te verlenen.',
+            content:
+              'Wij bewaren uw informatie zolang uw account actief is of zoals nodig om u service te verlenen.',
             items: [
               'Account data wordt bewaard totdat u uw account sluit',
               'Dealership data wordt bewaard volgens uw abonnement',
               'Sommige informatie kan langer worden bewaard voor wettelijke doeleinden',
-              'U kunt data verwijdering aanvragen, onderhevig aan wettelijke beperkingen'
-            ]
+              'U kunt data verwijdering aanvragen, onderhevig aan wettelijke beperkingen',
+            ],
           },
           rights: {
             title: '5. Uw Rechten en Keuzes',
@@ -8616,84 +9146,97 @@ export const translations: Record<Language, Translations | Partial<Translations>
               '<strong>Toegang:</strong> Vraag een kopie van uw persoonlijke informatie aan',
               '<strong>Correctie:</strong> Verzoek om correctie van onnauwkeurige informatie',
               '<strong>Verwijdering:</strong> Verzoek om verwijdering van uw persoonlijke informatie',
-              '<strong>Portabiliteit:</strong> Ontvang uw data in een overdraagbare vorm'
-            ]
+              '<strong>Portabiliteit:</strong> Ontvang uw data in een overdraagbare vorm',
+            ],
           },
           cookies: {
             title: '6. Cookies en Tracking',
-            content: 'Wij gebruiken cookies en vergelijkbare technologieën om uw ervaring te verbeteren.',
+            content:
+              'Wij gebruiken cookies en vergelijkbare technologieën om uw ervaring te verbeteren.',
             items: [
               '<strong>Essentiële Cookies:</strong> Vereist voor basis service functionaliteit',
               '<strong>Prestatie Cookies:</strong> Helpen ons te begrijpen hoe u onze service gebruikt',
               '<strong>Functionele Cookies:</strong> Onthouden uw voorkeuren en instellingen',
-              '<strong>Third-party Cookies:</strong> Van onze analytics en service providers'
+              '<strong>Third-party Cookies:</strong> Van onze analytics en service providers',
             ],
-            footer: 'U kunt cookies beheren via uw browser instellingen, maar dit kan service functionaliteit beïnvloeden.'
+            footer:
+              'U kunt cookies beheren via uw browser instellingen, maar dit kan service functionaliteit beïnvloeden.',
           },
           security: {
             title: '7. Beveiliging',
-            content: 'Wij implementeren passende technische en organisatorische maatregelen om uw informatie te beschermen.',
+            content:
+              'Wij implementeren passende technische en organisatorische maatregelen om uw informatie te beschermen.',
             items: [
               'Encryptie van data in transit en at rest',
               'Regelmatige beveiligingsbeoordelingen en updates',
               'Toegangscontroles en employee training',
-              'Incident response procedures'
-            ]
+              'Incident response procedures',
+            ],
           },
           international: {
             title: '8. Internationale Overdrachten',
-            content: 'Uw informatie kan worden overgedragen naar en verwerkt in landen buiten uw woonplaats. Wij zorgen ervoor dat passende waarborgen worden getroffen voor dergelijke overdrachten.'
+            content:
+              'Uw informatie kan worden overgedragen naar en verwerkt in landen buiten uw woonplaats. Wij zorgen ervoor dat passende waarborgen worden getroffen voor dergelijke overdrachten.',
           },
           children: {
             title: '9. Kinderen Privacy',
-            content: 'Onze service is niet bedoeld voor kinderen onder de 16 jaar. Wij verzamelen niet bewust persoonlijke informatie van kinderen onder de 16.'
+            content:
+              'Onze service is niet bedoeld voor kinderen onder de 16 jaar. Wij verzamelen niet bewust persoonlijke informatie van kinderen onder de 16.',
           },
           changes: {
             title: '10. Wijzigingen in dit Beleid',
-            content: 'Wij kunnen dit Privacybeleid bijwerken. Wij zullen u op de hoogte stellen van materiële wijzigingen via e-mail of service kennisgeving.'
+            content:
+              'Wij kunnen dit Privacybeleid bijwerken. Wij zullen u op de hoogte stellen van materiële wijzigingen via e-mail of service kennisgeving.',
           },
           contact: {
             title: '11. Contact Ons',
-            content: 'Voor vragen over dit Privacybeleid of onze privacy praktijken, neem contact met ons op:',
+            content:
+              'Voor vragen over dit Privacybeleid of onze privacy praktijken, neem contact met ons op:',
             email: 'privacy@thedasboard.com',
             address: '123 Privacy Street, Data City, DC 12345',
-            phone: '(555) 123-4567'
-          }
-        }
+            phone: '(555) 123-4567',
+          },
+        },
       },
       subscription: {
         title: 'Abonnement Overeenkomst',
         lastUpdated: 'Laatst Bijgewerkt: 28/6/2025',
-        intro: 'Deze Abonnement Overeenkomst regelt uw abonnement op en gebruik van Het DAS Board dealership management platform.',
+        intro:
+          'Deze Abonnement Overeenkomst regelt uw abonnement op en gebruik van Het DAS Board dealership management platform.',
         sections: {
           plans: {
             title: '1. Abonnement Plannen',
-            content: 'Het DAS Board biedt abonnement tiers ontworpen voor verschillende dealership behoeften:',
+            content:
+              'Het DAS Board biedt abonnement tiers ontworpen voor verschillende dealership behoeften:',
             items: [
               '<strong>60-Dag Gratis Proefperiode:</strong> Volledige toegang tot platform zonder creditcard vereist',
               '<strong>Finance Manager:</strong> Enkelvoudige gebruiker toegang met kern financiële tools',
               '<strong>Dealership:</strong> Multi-user toegang met volledige inventory en sales management',
-              '<strong>Dealer Group:</strong> Enterprise-level toegang over meerdere locaties'
+              '<strong>Dealer Group:</strong> Enterprise-level toegang over meerdere locaties',
             ],
-            footer: 'Abonnementen worden maandelijks vooraf gefactureerd. U kunt uw abonnement op elk moment upgraden of downgraden, met wijzigingen die ingaan bij de volgende factureringsperiode.'
+            footer:
+              'Abonnementen worden maandelijks vooraf gefactureerd. U kunt uw abonnement op elk moment upgraden of downgraden, met wijzigingen die ingaan bij de volgende factureringsperiode.',
           },
           payment: {
             title: '2. Betalingsvoorwaarden',
-            content: 'Alle abonnement tarieven zijn in USD en exclusief toepasselijke belastingen. Betalingen zijn verschuldigd bij het begin van elke factureringsperiode. Niet-betaling kan resulteren in service opschorting.'
+            content:
+              'Alle abonnement tarieven zijn in USD en exclusief toepasselijke belastingen. Betalingen zijn verschuldigd bij het begin van elke factureringsperiode. Niet-betaling kan resulteren in service opschorting.',
           },
           trial: {
             title: '3. Proefperiode',
-            content: 'Nieuwe gebruikers ontvangen een 60-dagen gratis proefperiode. Geen creditcard vereist voor proefperiode activatie. Proefperiode limieten gelden per dealership entiteit.'
+            content:
+              'Nieuwe gebruikers ontvangen een 60-dagen gratis proefperiode. Geen creditcard vereist voor proefperiode activatie. Proefperiode limieten gelden per dealership entiteit.',
           },
           cancellation: {
             title: '4. Annulering en Restitutie',
-            content: 'U kunt uw abonnement op elk moment annuleren met onmiddellijke ingang. Restituties worden per geval behandeld:',
+            content:
+              'U kunt uw abonnement op elk moment annuleren met onmiddellijke ingang. Restituties worden per geval behandeld:',
             items: [
               'Geen restituties voor gedeeltelijk gebruikte maanden',
               'Annulering stopt toekomstige facturering maar beëindigt geen huidige service periode',
               'Data export beschikbaar voor 30 dagen na annulering',
-              'Enterprise klanten kunnen aangepaste annuleringsvoorwaarden hebben'
-            ]
+              'Enterprise klanten kunnen aangepaste annuleringsvoorwaarden hebben',
+            ],
           },
           sla: {
             title: '5. Service Level Overeenkomst',
@@ -8702,8 +9245,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Maandelijkse uptime doelstelling van 99.9%',
               'Geplande onderhoudsmeldingen met 24 uur voorafgaande kennisgeving',
               'Service credits voor significante outages',
-              '24/7 monitoring en incident response'
-            ]
+              '24/7 monitoring en incident response',
+            ],
           },
           data: {
             title: '6. Data en Beveiliging',
@@ -8712,8 +9255,8 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Dagelijkse geautomatiseerde backups met 30-dagen retentie',
               'Bank-grade encryptie en beveiligingsprotocollen',
               'GDPR en CCPA compliance voor data bescherming',
-              'Data export mogelijkheden in standaard formaten'
-            ]
+              'Data export mogelijkheden in standaard formaten',
+            ],
           },
           support: {
             title: '7. Ondersteuning en Training',
@@ -8722,14 +9265,15 @@ export const translations: Record<Language, Translations | Partial<Translations>
               'Volledige onboarding en setup ondersteuning',
               'Online training resources en documentatie',
               'E-mail en chat ondersteuning tijdens kantooruren',
-              'Regelmatige platform updates en nieuwe feature releases'
-            ]
+              'Regelmatige platform updates en nieuwe feature releases',
+            ],
           },
           modifications: {
             title: '8. Service Wijzigingen',
-            content: 'Wij kunnen Het DAS Board platform wijzigen of updaten om functionaliteit, beveiliging of compliance te verbeteren. Wij zullen redelijke voorafgaande kennisgeving geven van significante wijzigingen die uw gebruik kunnen beïnvloeden.'
-          }
-        }
+            content:
+              'Wij kunnen Het DAS Board platform wijzigen of updaten om functionaliteit, beveiliging of compliance te verbeteren. Wij zullen redelijke voorafgaande kennisgeving geven van significante wijzigingen die uw gebruik kunnen beïnvloeden.',
+          },
+        },
       },
     },
     dashboard: {
@@ -8858,7 +9402,6 @@ export const getTranslation = (language: Language, key: string): string | string
     }
     return current;
   };
-
 
   // Try to get translation in requested language
   let result = getNestedValue(translations[language], keys);

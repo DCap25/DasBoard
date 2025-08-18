@@ -1,41 +1,50 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logoutDirectAuth } from '../lib/directAuth';
-import { supabase } from '../lib/supabaseClient';
+import { getSecureSupabaseClient } from '../lib/supabaseClient';
 
 export default function LogoutPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Clear all authentication data
-    logoutDirectAuth();
+    const performLogout = async () => {
+      // Clear all authentication data
+      logoutDirectAuth();
 
-    // Clear only authentication-related localStorage keys (preserve user data like deals)
-    const authKeys = [
-      'supabase.auth.token',
-      'supabase.auth.expires_at',
-      'supabase.auth.expires_in',
-      'directauth_user',
-      'direct_auth_user',
-      'force_redirect_after_login',
-      'force_redirect_timestamp',
-      'logout_in_progress',
-    ];
+      // Clear only authentication-related localStorage keys (preserve user data like deals)
+      const authKeys = [
+        'supabase.auth.token',
+        'supabase.auth.expires_at',
+        'supabase.auth.expires_in',
+        'directauth_user',
+        'direct_auth_user',
+        'force_redirect_after_login',
+        'force_redirect_timestamp',
+        'logout_in_progress',
+      ];
 
-    authKeys.forEach(key => localStorage.removeItem(key));
+      authKeys.forEach(key => localStorage.removeItem(key));
 
-    // Also remove any sb-*-auth-token keys created by Supabase
-    Object.keys(localStorage)
-      .filter(k => k.startsWith('sb-') && k.endsWith('-auth-token'))
-      .forEach(k => localStorage.removeItem(k));
+      // Also remove any sb-*-auth-token keys created by Supabase
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('sb-') && k.endsWith('-auth-token'))
+        .forEach(k => localStorage.removeItem(k));
 
-    // Explicitly call Supabase signOut to revoke refresh token
-    supabase.auth.signOut().catch(() => {});
+      // Explicitly call Supabase signOut to revoke refresh token
+      try {
+        const supabase = await getSecureSupabaseClient();
+        await supabase.auth.signOut();
+      } catch (error) {
+        console.error('[LogoutPage] Error during signOut:', error);
+      }
 
-    // Small delay then redirect to home
-    setTimeout(() => {
-      navigate('/', { replace: true });
-    }, 1000);
+      // Small delay then redirect to home
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 1000);
+    };
+
+    performLogout();
   }, [navigate]);
 
   return (

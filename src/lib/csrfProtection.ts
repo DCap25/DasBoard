@@ -32,7 +32,7 @@ class CSRFProtection {
     if (stored) {
       try {
         const tokenData: CSRFTokenData = JSON.parse(stored);
-        
+
         // Check if token is still valid
         if (now < tokenData.expiresAt) {
           return tokenData.token;
@@ -47,7 +47,7 @@ class CSRFProtection {
     const tokenData: CSRFTokenData = {
       token,
       timestamp: now,
-      expiresAt: now + this.TOKEN_LIFETIME_MS
+      expiresAt: now + this.TOKEN_LIFETIME_MS,
     };
 
     sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(tokenData));
@@ -133,7 +133,7 @@ class CSRFProtection {
 
     const now = new Date();
     const fiveMinutesFromNow = new Date(now.getTime() + 5 * 60 * 1000);
-    
+
     return expiration <= fiveMinutesFromNow;
   }
 
@@ -161,16 +161,14 @@ class CSRFProtection {
   static addToHeaders(headers: Record<string, string> = {}): Record<string, string> {
     return {
       ...headers,
-      'X-CSRF-Token': this.getToken()
+      'X-CSRF-Token': this.getToken(),
     };
   }
 
   /**
    * Validate CSRF token from request data
    */
-  static validateFromRequest(
-    data: { csrf_token?: string } | FormData | Headers
-  ): boolean {
+  static validateFromRequest(data: { csrf_token?: string } | FormData | Headers): boolean {
     let token: string | null = null;
 
     if (data instanceof FormData) {

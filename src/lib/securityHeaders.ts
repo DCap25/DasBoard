@@ -23,7 +23,7 @@ class SecurityHeadersManager {
     "connect-src 'self' https://iugjtokydvbcvmrpeziv.supabase.co wss://iugjtokydvbcvmrpeziv.supabase.co https://api.stripe.com",
     "frame-src 'self' https://js.stripe.com",
     "object-src 'none'",
-    "base-uri 'self'"
+    "base-uri 'self'",
   ].join('; ');
 
   /**
@@ -37,7 +37,8 @@ class SecurityHeadersManager {
       'X-XSS-Protection': '1; mode=block',
       'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
-      'Permissions-Policy': 'geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()'
+      'Permissions-Policy':
+        'geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()',
     };
   }
 
@@ -51,7 +52,7 @@ class SecurityHeadersManager {
       'X-Frame-Options': 'DENY',
       'X-XSS-Protection': '1; mode=block',
       'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
-      'Referrer-Policy': 'no-referrer'
+      'Referrer-Policy': 'no-referrer',
     };
   }
 
@@ -68,10 +69,7 @@ class SecurityHeadersManager {
    * Create CSP with nonce for inline scripts
    */
   static createCSPWithNonce(nonce: string): string {
-    return this.DEFAULT_CSP.replace(
-      "'unsafe-inline'",
-      `'nonce-${nonce}'`
-    );
+    return this.DEFAULT_CSP.replace("'unsafe-inline'", `'nonce-${nonce}'`);
   }
 
   /**
@@ -79,13 +77,7 @@ class SecurityHeadersManager {
    */
   static validateCSP(csp: string): boolean {
     // Basic validation - check for dangerous directives
-    const dangerous = [
-      "'unsafe-eval'",
-      "data:",
-      "*",
-      "javascript:",
-      "unsafe-inline"
-    ];
+    const dangerous = ["'unsafe-eval'", 'data:', '*', 'javascript:', 'unsafe-inline'];
 
     // Allow unsafe-inline and unsafe-eval for development
     if (process.env.NODE_ENV === 'development') {
@@ -107,13 +99,13 @@ class SecurityHeadersManager {
    */
   static addToFetchOptions(options: RequestInit = {}): RequestInit {
     const headers = this.getApiHeaders();
-    
+
     return {
       ...options,
       headers: {
         ...headers,
-        ...options.headers
-      }
+        ...options.headers,
+      },
     };
   }
 
@@ -128,13 +120,13 @@ class SecurityHeadersManager {
    * Log security violations (for CSP reporting)
    */
   static setupCSPReporting(): void {
-    document.addEventListener('securitypolicyviolation', (event) => {
+    document.addEventListener('securitypolicyviolation', event => {
       console.error('[CSP Violation]', {
         blockedURI: event.blockedURI,
         directive: event.violatedDirective,
         originalPolicy: event.originalPolicy,
         referrer: event.referrer,
-        statusCode: event.statusCode
+        statusCode: event.statusCode,
       });
 
       // In production, you might want to send this to a logging service
@@ -143,14 +135,14 @@ class SecurityHeadersManager {
         fetch('/api/csp-violation', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             blockedURI: event.blockedURI,
             directive: event.violatedDirective,
             originalPolicy: event.originalPolicy,
-            timestamp: new Date().toISOString()
-          })
+            timestamp: new Date().toISOString(),
+          }),
         }).catch(console.error);
       }
     });

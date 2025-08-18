@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Cookie, Shield, Info, Settings, Globe, AlertCircle } from 'lucide-react';
+import { Cookie, Shield, Settings, Globe } from 'lucide-react';
 
 interface CookiePreferences {
   essential: boolean;
@@ -10,7 +10,6 @@ interface CookiePreferences {
 
 export default function CookieConsent() {
   const [showBanner, setShowBanner] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [preferences, setPreferences] = useState<CookiePreferences>({
     essential: true, // Always true, cannot be disabled
@@ -26,13 +25,13 @@ export default function CookieConsent() {
     // Check if user has already made a choice
     const cookieConsent = localStorage.getItem('cookie-consent');
     const consentDate = localStorage.getItem('cookie-consent-date');
-    
+
     // GDPR requires re-consent after 12 months
     if (cookieConsent && consentDate) {
       const consentTimestamp = new Date(consentDate).getTime();
       const now = new Date().getTime();
       const twelveMonths = 365 * 24 * 60 * 60 * 1000;
-      
+
       if (now - consentTimestamp > twelveMonths) {
         // Consent expired, show banner again
         localStorage.removeItem('cookie-consent');
@@ -53,7 +52,7 @@ export default function CookieConsent() {
     // In production, use a service like ipapi.co or MaxMind
     // For now, we'll check timezone as a rough indicator
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    
+
     if (timezone.includes('Europe')) {
       setUserRegion('EU');
     } else if (timezone.includes('Los_Angeles') || timezone.includes('America')) {
@@ -90,12 +89,14 @@ export default function CookieConsent() {
     localStorage.setItem('cookie-consent', type);
     localStorage.setItem('cookie-consent-date', new Date().toISOString());
     localStorage.setItem('cookie-preferences', JSON.stringify(prefs));
-    
+
     // Fire a custom event for other parts of the app to listen to
-    window.dispatchEvent(new CustomEvent('cookieConsentUpdated', { 
-      detail: { consent: type, preferences: prefs } 
-    }));
-    
+    window.dispatchEvent(
+      new CustomEvent('cookieConsentUpdated', {
+        detail: { consent: type, preferences: prefs },
+      })
+    );
+
     setShowBanner(false);
     setShowSettings(false);
   };
@@ -167,8 +168,10 @@ export default function CookieConsent() {
               /* Settings View */
               <>
                 <div className="mb-6">
-                  <h4 className="text-lg font-semibold text-gray-900 mb-4">Manage Cookie Preferences</h4>
-                  
+                  <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                    Manage Cookie Preferences
+                  </h4>
+
                   <div className="space-y-4">
                     {/* Essential Cookies */}
                     <div className="border rounded-lg p-4">
@@ -179,8 +182,9 @@ export default function CookieConsent() {
                             Strictly Necessary Cookies
                           </h5>
                           <p className="text-sm text-gray-600 mt-1">
-                            These cookies are essential for the website to function properly. They enable core 
-                            functionality such as security, authentication, and session management.
+                            These cookies are essential for the website to function properly. They
+                            enable core functionality such as security, authentication, and session
+                            management.
                           </p>
                         </div>
                         <div className="ml-4">
@@ -203,15 +207,17 @@ export default function CookieConsent() {
                             Functional Cookies
                           </h5>
                           <p className="text-sm text-gray-600 mt-1">
-                            These cookies enable personalized features and functionality, remembering your 
-                            preferences and settings for a better user experience.
+                            These cookies enable personalized features and functionality,
+                            remembering your preferences and settings for a better user experience.
                           </p>
                         </div>
                         <div className="ml-4">
                           <input
                             type="checkbox"
                             checked={preferences.functional}
-                            onChange={(e) => setPreferences({...preferences, functional: e.target.checked})}
+                            onChange={e =>
+                              setPreferences({ ...preferences, functional: e.target.checked })
+                            }
                             className="h-5 w-5 text-blue-600 rounded cursor-pointer"
                           />
                         </div>
@@ -227,7 +233,7 @@ export default function CookieConsent() {
                             Analytics Cookies
                           </h5>
                           <p className="text-sm text-gray-600 mt-1">
-                            These cookies help us understand how visitors interact with our website, 
+                            These cookies help us understand how visitors interact with our website,
                             allowing us to improve our services and user experience.
                           </p>
                         </div>
@@ -235,7 +241,9 @@ export default function CookieConsent() {
                           <input
                             type="checkbox"
                             checked={preferences.analytics}
-                            onChange={(e) => setPreferences({...preferences, analytics: e.target.checked})}
+                            onChange={e =>
+                              setPreferences({ ...preferences, analytics: e.target.checked })
+                            }
                             className="h-5 w-5 text-blue-600 rounded cursor-pointer"
                           />
                         </div>
@@ -251,15 +259,17 @@ export default function CookieConsent() {
                             Marketing Cookies
                           </h5>
                           <p className="text-sm text-gray-600 mt-1">
-                            These cookies may be set by our advertising partners to build a profile of your 
-                            interests and show relevant ads on other sites.
+                            These cookies may be set by our advertising partners to build a profile
+                            of your interests and show relevant ads on other sites.
                           </p>
                         </div>
                         <div className="ml-4">
                           <input
                             type="checkbox"
                             checked={preferences.marketing}
-                            onChange={(e) => setPreferences({...preferences, marketing: e.target.checked})}
+                            onChange={e =>
+                              setPreferences({ ...preferences, marketing: e.target.checked })
+                            }
                             className="h-5 w-5 text-blue-600 rounded cursor-pointer"
                           />
                         </div>
@@ -285,7 +295,6 @@ export default function CookieConsent() {
                 </div>
               </>
             )}
-
           </div>
         </div>
       </div>

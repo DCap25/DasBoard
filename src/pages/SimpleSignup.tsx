@@ -1,14 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  User,
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  ArrowRight,
-  Check
-} from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, ArrowRight, Check } from 'lucide-react';
 import { useTranslation } from '../contexts/TranslationContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import LanguageSelector from '../components/auth/LanguageSelector';
@@ -31,9 +23,9 @@ export default function SimpleSignup() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({ 
-      ...prev, 
-      [name]: type === 'checkbox' ? checked : value 
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
     }));
     // Clear error when user starts typing
     if (errors[name]) {
@@ -70,7 +62,7 @@ export default function SimpleSignup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -84,7 +76,7 @@ export default function SimpleSignup() {
       // Try to create signup request directly, handle duplicate email error if it occurs
       console.log('[SimpleSignup] Creating signup request...');
       let signupRequestData;
-      
+
       const { data: newSignupData, error: signupRequestError } = await supabase
         .from('signup_requests')
         .insert({
@@ -107,19 +99,22 @@ export default function SimpleSignup() {
 
       if (signupRequestError) {
         // If it's a duplicate email error, fetch the existing record instead
-        if (signupRequestError.code === '23505' || signupRequestError.message?.includes('duplicate')) {
+        if (
+          signupRequestError.code === '23505' ||
+          signupRequestError.message?.includes('duplicate')
+        ) {
           console.log('[SimpleSignup] Email already exists, fetching existing signup request...');
           const { data: existingData, error: fetchError } = await supabase
             .from('signup_requests')
             .select('*')
             .eq('email', formData.email)
             .single();
-          
+
           if (fetchError) {
             console.error('[SimpleSignup] Failed to fetch existing signup:', fetchError);
             throw new Error('Failed to process signup request');
           }
-          
+
           signupRequestData = existingData;
           console.log('[SimpleSignup] Using existing signup request:', signupRequestData);
         } else {
@@ -128,7 +123,7 @@ export default function SimpleSignup() {
             message: signupRequestError.message,
             details: signupRequestError.details,
             hint: signupRequestError.hint,
-            code: signupRequestError.code
+            code: signupRequestError.code,
           });
           throw new Error(`Failed to process signup request: ${signupRequestError.message}`);
         }
@@ -148,8 +143,8 @@ export default function SimpleSignup() {
             full_name: formData.fullName,
             role: 'single_finance_manager',
             preferred_language: language,
-          }
-        }
+          },
+        },
       });
 
       if (authError) {
@@ -158,7 +153,7 @@ export default function SimpleSignup() {
           message: authError.message,
           status: authError.status,
         });
-        
+
         // Handle specific error cases
         if (authError.message?.includes('User already registered')) {
           // Try to sign them in instead
@@ -167,25 +162,29 @@ export default function SimpleSignup() {
             email: formData.email,
             password: formData.password,
           });
-          
+
           if (signInError) {
-            throw new Error('An account with this email already exists but the password is incorrect. Please try signing in with the correct password.');
+            throw new Error(
+              'An account with this email already exists but the password is incorrect. Please try signing in with the correct password.'
+            );
           }
-          
+
           console.log('[SimpleSignup] Successfully signed in existing user');
-          
+
           // Update the existing user's metadata to ensure they have the Single Finance Manager role
           const { error: updateError } = await supabase.auth.updateUser({
             data: {
               full_name: formData.fullName,
               role: 'single_finance_manager',
-            }
+            },
           });
-          
+
           if (updateError) {
             console.warn('[SimpleSignup] Failed to update user metadata:', updateError);
           } else {
-            console.log('[SimpleSignup] Updated existing user metadata with Single Finance Manager role');
+            console.log(
+              '[SimpleSignup] Updated existing user metadata with Single Finance Manager role'
+            );
           }
         } else {
           throw new Error(authError.message || 'Failed to create account');
@@ -197,9 +196,12 @@ export default function SimpleSignup() {
       // Skip profile creation due to RLS policy recursion issue
       // The auth user metadata already contains the necessary information
       if (authData.user) {
-        console.log('[SimpleSignup] Auth user created successfully with metadata:', authData.user.user_metadata);
+        console.log(
+          '[SimpleSignup] Auth user created successfully with metadata:',
+          authData.user.user_metadata
+        );
         console.log('[SimpleSignup] Skipping profiles table due to RLS policy issue');
-        
+
         // Note: User information is stored in auth.users.user_metadata and signup_requests table
         // The AuthContext will handle user role and data retrieval
       }
@@ -209,21 +211,20 @@ export default function SimpleSignup() {
       localStorage.setItem('singleFinanceEmail', formData.email);
       localStorage.setItem('singleFinanceName', formData.fullName);
       localStorage.setItem('app-language', language); // Persist language choice
-      
+
       // Navigate to welcome page
       navigate('/welcome/single-finance', {
         state: {
           fullName: formData.fullName,
           email: formData.email,
           accountType: 'single-finance',
-          justSignedUp: true
-        }
+          justSignedUp: true,
+        },
       });
-
     } catch (error: any) {
       console.error('[SimpleSignup] Signup failed:', error);
       setErrors({
-        general: error.message || 'Signup failed. Please try again.'
+        general: error.message || 'Signup failed. Please try again.',
       });
     } finally {
       setIsLoading(false);
@@ -237,7 +238,7 @@ export default function SimpleSignup() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <button 
+              <button
                 onClick={() => navigate('/')}
                 className="text-2xl font-bold text-white hover:text-blue-400 transition-colors"
               >
@@ -290,15 +291,13 @@ export default function SimpleSignup() {
           <div className="absolute top-4 right-4">
             <LanguageSelector variant="compact" />
           </div>
-          
+
           <div className="text-center mb-7">
             <div className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
               <User className="w-7 h-7 text-white" />
             </div>
             <h2 className="text-2xl font-bold text-white mb-2">{t('signup.simple.subtitle')}</h2>
-            <p className="text-gray-400">
-              {t('signup.simple.description')}
-            </p>
+            <p className="text-gray-400">{t('signup.simple.description')}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -319,9 +318,7 @@ export default function SimpleSignup() {
                   placeholder="John Doe"
                 />
               </div>
-              {errors.fullName && (
-                <p className="text-red-400 text-sm mt-1">{errors.fullName}</p>
-              )}
+              {errors.fullName && <p className="text-red-400 text-sm mt-1">{errors.fullName}</p>}
             </div>
 
             <div>
@@ -341,12 +338,9 @@ export default function SimpleSignup() {
                   placeholder="john@example.com"
                 />
               </div>
-              {errors.email && (
-                <p className="text-red-400 text-sm mt-1">{errors.email}</p>
-              )}
+              {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
               <p className="text-gray-400 text-xs mt-1">{t('signup.form.emailNote')}</p>
             </div>
-
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -372,9 +366,7 @@ export default function SimpleSignup() {
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              {errors.password && (
-                <p className="text-red-400 text-sm mt-1">{errors.password}</p>
-              )}
+              {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
             </div>
 
             <div>
@@ -398,7 +390,11 @@ export default function SimpleSignup() {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
                 >
-                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
                 </button>
               </div>
               {errors.confirmPassword && (

@@ -122,15 +122,18 @@ const DealsByLenderComponent: React.FC<{ deals: Deal[] }> = ({ deals }) => {
   const [showAll, setShowAll] = useState(false);
 
   // Process deals to count by lender
-  const lenderCounts = deals.reduce((acc, deal) => {
-    const lenderName = deal.lender || 'Unknown';
-    
-    if (!acc[lenderName]) {
-      acc[lenderName] = 0;
-    }
-    acc[lenderName]++;
-    return acc;
-  }, {} as Record<string, number>);
+  const lenderCounts = deals.reduce(
+    (acc, deal) => {
+      const lenderName = deal.lender || 'Unknown';
+
+      if (!acc[lenderName]) {
+        acc[lenderName] = 0;
+      }
+      acc[lenderName]++;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   // Sort lenders by deal count
   const sortedLenders = Object.entries(lenderCounts)
@@ -750,7 +753,10 @@ const FinanceDirectorDashboard = () => {
                         <h4 className="font-semibold text-sm">{manager.name}</h4>
                         <div className="flex items-center space-x-1">
                           {getVSCIcon(manager.vsc_penetration)}
-                          <Badge variant={manager.status === 'active' ? 'default' : 'secondary'} className="text-xs">
+                          <Badge
+                            variant={manager.status === 'active' ? 'default' : 'secondary'}
+                            className="text-xs"
+                          >
                             {manager.status}
                           </Badge>
                         </div>
@@ -762,7 +768,9 @@ const FinanceDirectorDashboard = () => {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Revenue:</span>
-                          <span className="font-medium">${(manager.mtd_revenue / 1000).toFixed(1)}K</span>
+                          <span className="font-medium">
+                            ${(manager.mtd_revenue / 1000).toFixed(1)}K
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">PPD:</span>
@@ -778,7 +786,9 @@ const FinanceDirectorDashboard = () => {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Rating:</span>
-                          <span className="text-xs">{getPerformanceBadge(manager.performance_rating)}</span>
+                          <span className="text-xs">
+                            {getPerformanceBadge(manager.performance_rating)}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -795,9 +805,9 @@ const FinanceDirectorDashboard = () => {
                 <FileText className="mr-2 h-5 w-5 text-blue-500" />
                 Department Deals Log
               </CardTitle>
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 className="h-8 text-xs px-2"
                 onClick={() => setSelectedTab('deals')}
               >
@@ -856,53 +866,66 @@ const FinanceDirectorDashboard = () => {
                             index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
                           } hover:bg-gray-100 transition-colors`}
                         >
-                          <td className="py-2 pl-3 text-center text-gray-600">
-                            {index + 1}
+                          <td className="py-2 pl-3 text-center text-gray-600">{index + 1}</td>
+                          <td className="py-2 pl-4 pr-2 text-left font-medium">{deal.id}</td>
+                          <td className="py-2 px-2 text-left">
+                            S{Math.floor(Math.random() * 9000) + 1000}
                           </td>
-                          <td className="py-2 pl-4 pr-2 text-left font-medium">
-                            {deal.id}
-                          </td>
-                          <td className="py-2 px-2 text-left">S{Math.floor(Math.random() * 9000) + 1000}</td>
                           <td className="py-2 px-2 text-left">{deal.customer_name}</td>
                           <td className="py-2 px-2 text-center text-xs">
-                            {new Date(deal.date).toLocaleDateString('en-US', { 
-                              month: '2-digit', 
-                              day: '2-digit', 
-                              year: '2-digit' 
+                            {new Date(deal.date).toLocaleDateString('en-US', {
+                              month: '2-digit',
+                              day: '2-digit',
+                              year: '2-digit',
                             })}
                           </td>
                           <td className="py-2 px-2 text-center">
-                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                              deal.deal_type === 'new' 
-                                ? 'bg-blue-100 text-blue-700' 
+                            <span
+                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                deal.deal_type === 'new'
+                                  ? 'bg-blue-100 text-blue-700'
+                                  : deal.deal_type === 'used'
+                                    ? 'bg-purple-100 text-purple-700'
+                                    : 'bg-green-100 text-green-700'
+                              }`}
+                            >
+                              {deal.deal_type === 'new'
+                                ? 'N'
                                 : deal.deal_type === 'used'
-                                ? 'bg-purple-100 text-purple-700'
-                                : 'bg-green-100 text-green-700'
-                            }`}>
-                              {deal.deal_type === 'new' ? 'N' : deal.deal_type === 'used' ? 'U' : 'C'}
+                                  ? 'U'
+                                  : 'C'}
                             </span>
                           </td>
                           <td className="py-2 px-2 text-center text-xs">
-                            {deal.finance_manager.split(' ').map(n => n[0]).join('')}
+                            {deal.finance_manager
+                              .split(' ')
+                              .map(n => n[0])
+                              .join('')}
                           </td>
                           <td className="py-2 px-2 text-right font-medium text-green-600">
                             ${deal.fi_gross.toLocaleString()}
                           </td>
-                          <td className="py-2 px-2 text-center">
-                            {deal.products.length}
-                          </td>
+                          <td className="py-2 px-2 text-center">{deal.products.length}</td>
                           <td className="py-2 px-2 text-center text-xs">
-                            {deal.lender.length > 15 ? deal.lender.substring(0, 15) + '...' : deal.lender}
+                            {deal.lender.length > 15
+                              ? deal.lender.substring(0, 15) + '...'
+                              : deal.lender}
                           </td>
                           <td className="py-2 px-2 text-center">
-                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                              deal.status === 'completed' 
-                                ? 'bg-green-100 text-green-700' 
+                            <span
+                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                deal.status === 'completed'
+                                  ? 'bg-green-100 text-green-700'
+                                  : deal.status === 'pending'
+                                    ? 'bg-yellow-100 text-yellow-700'
+                                    : 'bg-red-100 text-red-700'
+                              }`}
+                            >
+                              {deal.status === 'completed'
+                                ? 'Funded'
                                 : deal.status === 'pending'
-                                ? 'bg-yellow-100 text-yellow-700'
-                                : 'bg-red-100 text-red-700'
-                            }`}>
-                              {deal.status === 'completed' ? 'Funded' : deal.status === 'pending' ? 'Pending' : 'Cancelled'}
+                                  ? 'Pending'
+                                  : 'Cancelled'}
                             </span>
                           </td>
                           <td className="py-2 px-2 text-center">

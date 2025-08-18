@@ -558,10 +558,10 @@ const AVPDashboard = () => {
                                 index === 0
                                   ? 'bg-yellow-100 text-yellow-600'
                                   : index === 1
-                                  ? 'bg-gray-100 text-gray-600'
-                                  : index === 2
-                                  ? 'bg-amber-100 text-amber-600'
-                                  : 'bg-white border-r border-gray-200 text-blue-500'
+                                    ? 'bg-gray-100 text-gray-600'
+                                    : index === 2
+                                      ? 'bg-amber-100 text-amber-600'
+                                      : 'bg-white border-r border-gray-200 text-blue-500'
                               }`}
                             >
                               <span className="text-xs font-bold">{index + 1}</span>
@@ -598,8 +598,8 @@ const AVPDashboard = () => {
                   {districtMetrics.goal_achievement >= 90
                     ? 'Exceeding expectations'
                     : districtMetrics.goal_achievement >= 70
-                    ? 'On track'
-                    : 'Needs attention'}
+                      ? 'On track'
+                      : 'Needs attention'}
                 </p>
                 <div className="mt-4">
                   <h4 className="font-semibold mb-2">Top Performing Store</h4>
@@ -657,42 +657,44 @@ const AVPDashboard = () => {
 
                     {/* Sample data rows */}
                     <div>
-                    {[
-                      {
-                        name: 'John Smith',
-                        totalDeals: 45,
-                        newDeals: 28,
-                        usedDeals: 17,
-                        gross: 84500,
-                        avgFront: 1250,
-                        avgBack: 950,
-                      },
-                      {
-                        name: 'Jessica Lee',
-                        totalDeals: 41,
-                        newDeals: 25,
-                        usedDeals: 16,
-                        gross: 78900,
-                        avgFront: 1180,
-                        avgBack: 920,
-                      },
-                    ].map((manager, index) => (
-                      <div
-                        key={index}
-                        className={`flex items-center py-2 px-1 ${
-                          index !== 1 ? 'border-b' : ''
-                        } border-gray-100 text-sm hover:bg-gray-50`}
-                      >
-                        <div className="flex-1 flex justify-center">{index + 1}</div>
-                        <div className="flex-[3] font-medium px-2">{manager.name}</div>
-                        <div className="flex-[2] text-center">{manager.totalDeals}</div>
-                        <div className="flex-1 text-center">{manager.newDeals}</div>
-                        <div className="flex-1 text-center">{manager.usedDeals}</div>
-                        <div className="flex-[2] text-center">${manager.avgFront}</div>
-                        <div className="flex-[2] text-center">${manager.avgBack}</div>
-                        <div className="flex-[2] text-center">${manager.gross.toLocaleString()}</div>
-                      </div>
-                    ))}
+                      {[
+                        {
+                          name: 'John Smith',
+                          totalDeals: 45,
+                          newDeals: 28,
+                          usedDeals: 17,
+                          gross: 84500,
+                          avgFront: 1250,
+                          avgBack: 950,
+                        },
+                        {
+                          name: 'Jessica Lee',
+                          totalDeals: 41,
+                          newDeals: 25,
+                          usedDeals: 16,
+                          gross: 78900,
+                          avgFront: 1180,
+                          avgBack: 920,
+                        },
+                      ].map((manager, index) => (
+                        <div
+                          key={index}
+                          className={`flex items-center py-2 px-1 ${
+                            index !== 1 ? 'border-b' : ''
+                          } border-gray-100 text-sm hover:bg-gray-50`}
+                        >
+                          <div className="flex-1 flex justify-center">{index + 1}</div>
+                          <div className="flex-[3] font-medium px-2">{manager.name}</div>
+                          <div className="flex-[2] text-center">{manager.totalDeals}</div>
+                          <div className="flex-1 text-center">{manager.newDeals}</div>
+                          <div className="flex-1 text-center">{manager.usedDeals}</div>
+                          <div className="flex-[2] text-center">${manager.avgFront}</div>
+                          <div className="flex-[2] text-center">${manager.avgBack}</div>
+                          <div className="flex-[2] text-center">
+                            ${manager.gross.toLocaleString()}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>

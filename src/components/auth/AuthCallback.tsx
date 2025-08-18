@@ -15,7 +15,7 @@ export default function AuthCallback() {
     const handleAuthCallback = async () => {
       try {
         console.log('[AuthCallback] Processing auth callback');
-        
+
         // Get the hash parameters from URL
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         const accessToken = hashParams.get('access_token');
@@ -30,7 +30,7 @@ export default function AuthCallback() {
           console.error('[AuthCallback] Error in callback:', error, errorDescription);
           setStatus('error');
           setMessage(`Authentication failed: ${errorDescription || error}`);
-          
+
           // Redirect to auth page with error message after 3 seconds
           setTimeout(() => {
             navigate('/auth?error=' + encodeURIComponent(errorDescription || error));
@@ -40,15 +40,18 @@ export default function AuthCallback() {
 
         if (type === 'signup' || type === 'email_change' || type === 'invite') {
           console.log('[AuthCallback] Processing email verification');
-          
+
           // Let Supabase handle the session automatically
-          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-          
+          const {
+            data: { session },
+            error: sessionError,
+          } = await supabase.auth.getSession();
+
           if (sessionError) {
             console.error('[AuthCallback] Session error:', sessionError);
             setStatus('error');
             setMessage('Failed to verify email. Please try again.');
-            
+
             setTimeout(() => {
               navigate('/auth?error=' + encodeURIComponent('Email verification failed'));
             }, 3000);
@@ -59,7 +62,7 @@ export default function AuthCallback() {
             console.log('[AuthCallback] Email verified successfully:', session.user.email);
             setStatus('success');
             setMessage('Email verified successfully! Redirecting to dashboard...');
-            
+
             // Wait a moment then redirect to dashboard
             setTimeout(() => {
               navigate('/dashboard');
@@ -68,16 +71,19 @@ export default function AuthCallback() {
             console.log('[AuthCallback] No session found, redirecting to login');
             setStatus('success');
             setMessage('Email verified! Please sign in to continue.');
-            
+
             setTimeout(() => {
-              navigate('/auth?message=' + encodeURIComponent('Email verified successfully. Please sign in.'));
+              navigate(
+                '/auth?message=' +
+                  encodeURIComponent('Email verified successfully. Please sign in.')
+              );
             }, 2000);
           }
         } else if (type === 'recovery') {
           console.log('[AuthCallback] Processing password recovery');
           setStatus('success');
           setMessage('Password recovery verified! Redirecting...');
-          
+
           setTimeout(() => {
             navigate('/auth/reset-password');
           }, 2000);
@@ -85,17 +91,16 @@ export default function AuthCallback() {
           console.log('[AuthCallback] Unknown callback type, redirecting to auth');
           setStatus('success');
           setMessage('Verification complete! Redirecting...');
-          
+
           setTimeout(() => {
             navigate('/auth');
           }, 2000);
         }
-
       } catch (error) {
         console.error('[AuthCallback] Unexpected error:', error);
         setStatus('error');
         setMessage('An unexpected error occurred during verification.');
-        
+
         setTimeout(() => {
           navigate('/auth?error=' + encodeURIComponent('Verification failed'));
         }, 3000);
@@ -115,7 +120,7 @@ export default function AuthCallback() {
             <p className="text-gray-600">{message}</p>
           </>
         )}
-        
+
         {status === 'success' && (
           <>
             <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-4" />
@@ -123,7 +128,7 @@ export default function AuthCallback() {
             <p className="text-gray-600">{message}</p>
           </>
         )}
-        
+
         {status === 'error' && (
           <>
             <XCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />

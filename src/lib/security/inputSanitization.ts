@@ -1,9 +1,9 @@
 /**
  * Input Sanitization and XSS Prevention Utilities
- * 
+ *
  * This module provides comprehensive input sanitization functions to prevent
  * XSS attacks, HTML injection, and other security vulnerabilities.
- * 
+ *
  * Security Features:
  * - HTML entity encoding
  * - Script tag removal
@@ -22,7 +22,7 @@ const HTML_ENTITIES: Record<string, string> = {
   "'": '&#x27;',
   '/': '&#x2F;',
   '`': '&#x60;',
-  '=': '&#x3D;'
+  '=': '&#x3D;',
 };
 
 /**
@@ -34,8 +34,8 @@ export function escapeHtml(input: string): string {
   if (typeof input !== 'string') {
     return String(input);
   }
-  
-  return input.replace(/[&<>"'`=/]/g, (match) => HTML_ENTITIES[match] || match);
+
+  return input.replace(/[&<>"'`=/]/g, match => HTML_ENTITIES[match] || match);
 }
 
 /**
@@ -50,28 +50,45 @@ export function sanitizeHtml(input: string): string {
 
   // Remove script tags and their content
   let sanitized = input.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-  
+
   // Remove dangerous event handlers
   sanitized = sanitized.replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi, '');
   sanitized = sanitized.replace(/\s*on\w+\s*=\s*[^>\s]+/gi, '');
-  
+
   // Remove javascript: URLs
   sanitized = sanitized.replace(/javascript\s*:/gi, '');
-  
+
   // Remove data: URLs (except safe image formats)
-  sanitized = sanitized.replace(/data:(?!image\/(png|jpeg|jpg|gif|svg\+xml))[^;,]+[;,]/gi, 'data:text/plain,');
-  
+  sanitized = sanitized.replace(
+    /data:(?!image\/(png|jpeg|jpg|gif|svg\+xml))[^;,]+[;,]/gi,
+    'data:text/plain,'
+  );
+
   // Remove dangerous tags
   const dangerousTags = [
-    'script', 'object', 'embed', 'link', 'style', 'iframe', 'frame', 'frameset',
-    'applet', 'meta', 'base', 'form', 'input', 'button', 'textarea', 'select'
+    'script',
+    'object',
+    'embed',
+    'link',
+    'style',
+    'iframe',
+    'frame',
+    'frameset',
+    'applet',
+    'meta',
+    'base',
+    'form',
+    'input',
+    'button',
+    'textarea',
+    'select',
   ];
-  
+
   dangerousTags.forEach(tag => {
     const regex = new RegExp(`<\\/?${tag}\\b[^>]*>`, 'gi');
     sanitized = sanitized.replace(regex, '');
   });
-  
+
   return sanitized;
 }
 
@@ -98,7 +115,7 @@ export function sanitizeUserInput(
     allowHtml = false,
     maxLength = 10000,
     trimWhitespace = true,
-    normalizeSpaces = true
+    normalizeSpaces = true,
   } = options;
 
   let sanitized = input;
@@ -140,10 +157,10 @@ export function sanitizeEmail(email: string): string | null {
 
   // Basic sanitization
   const sanitized = email.trim().toLowerCase();
-  
+
   // Basic email regex (more permissive than RFC compliant for UX)
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  
+
   if (!emailRegex.test(sanitized)) {
     return null;
   }
@@ -167,10 +184,10 @@ export function sanitizeUrl(url: string): string | null {
   }
 
   const sanitized = url.trim();
-  
+
   // Allow only safe protocols
   const safeProtocols = ['http:', 'https:', 'mailto:', 'tel:'];
-  
+
   try {
     const urlObj = new URL(sanitized);
     if (!safeProtocols.includes(urlObj.protocol)) {
@@ -215,20 +232,20 @@ export function isSafeString(value: unknown, maxLength: number = 1000): value is
   if (!isNonEmptyString(value)) {
     return false;
   }
-  
+
   if (value.length > maxLength) {
     return false;
   }
-  
+
   // Check for suspicious patterns
   const suspiciousPatterns = [
     /<script/i,
     /javascript:/i,
     /vbscript:/i,
     /data:(?!image)/i,
-    /on\w+\s*=/i
+    /on\w+\s*=/i,
   ];
-  
+
   return !suspiciousPatterns.some(pattern => pattern.test(value));
 }
 
@@ -303,7 +320,7 @@ export function validateFormData<T extends Record<string, unknown>>(
               allowHtml: fieldRules.allowHtml || false,
               maxLength: fieldRules.maxLength || 1000,
               trimWhitespace: true,
-              normalizeSpaces: true
+              normalizeSpaces: true,
             });
             (sanitizedData as any)[field] = sanitized;
           }
@@ -346,7 +363,7 @@ export function sanitizeComponentProps<T extends Record<string, unknown>>(props:
       (sanitized as any)[key] = sanitizeUserInput(value, {
         allowHtml: false,
         maxLength: 5000,
-        trimWhitespace: true
+        trimWhitespace: true,
       });
     }
   }
@@ -360,7 +377,7 @@ export const SECURITY_LIMITS = {
   MAX_EMAIL_LENGTH: 254,
   MAX_URL_LENGTH: 2048,
   MAX_NAME_LENGTH: 100,
-  MAX_DESCRIPTION_LENGTH: 2000
+  MAX_DESCRIPTION_LENGTH: 2000,
 } as const;
 
 // Export common validation patterns
@@ -369,5 +386,5 @@ export const VALIDATION_PATTERNS = {
   PHONE: /^\+?[\d\s\-\(\)]{10,15}$/,
   ZIP_CODE: /^[\d\-\s]{5,10}$/,
   ALPHANUMERIC: /^[a-zA-Z0-9\s]+$/,
-  NO_SPECIAL_CHARS: /^[a-zA-Z0-9\s\-_]+$/
+  NO_SPECIAL_CHARS: /^[a-zA-Z0-9\s\-_]+$/,
 } as const;

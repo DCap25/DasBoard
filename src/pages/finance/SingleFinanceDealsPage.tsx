@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../contexts/TranslationContext';
 import { SingleFinanceStorage } from '../../lib/singleFinanceStorage';
 import { getConsistentUserId, debugUserId } from '../../utils/userIdHelper';
-import { supabase } from '../../lib/supabaseClient';
+import { getSecureSupabaseClient } from '../../lib/supabaseClient';
 import {
   Search,
   Filter,
@@ -69,13 +69,18 @@ const SingleFinanceDealsPage: React.FC = () => {
     let cancelled = false;
     const tryFetch = async () => {
       if (localUserId || user?.id) return;
-      const { data } = await supabase.auth.getSession();
-      const uid = data?.session?.user?.id || null;
-      if (!cancelled && uid) {
-        console.log('[SingleFinanceDealsPage] Got user ID from session:', uid);
-        setLocalUserId(uid);
-        // Also store it for future use
-        localStorage.setItem('singleFinanceUserId', uid);
+      try {
+        const supabase = await getSecureSupabaseClient();
+        const { data } = await supabase.auth.getSession();
+        const uid = data?.session?.user?.id || null;
+        if (!cancelled && uid) {
+          console.log('[SingleFinanceDealsPage] Got user ID from session:', uid);
+          setLocalUserId(uid);
+          // Also store it for future use
+          localStorage.setItem('singleFinanceUserId', uid);
+        }
+      } catch (error) {
+        console.error('[SingleFinanceDealsPage] Error getting session:', error);
       }
     };
     tryFetch();
@@ -431,7 +436,9 @@ const SingleFinanceDealsPage: React.FC = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-50 border-b text-xs">
-                  <th className="py-3 px-4 text-center font-medium">{t('dashboard.deals.tableHeaders.number')}</th>
+                  <th className="py-3 px-4 text-center font-medium">
+                    {t('dashboard.deals.tableHeaders.number')}
+                  </th>
                   <th className="py-3 px-4 text-left font-medium">
                     <button className="flex items-center" onClick={() => toggleSort('customer')}>
                       {t('dashboard.deals.tableHeaders.lastName')}
@@ -448,7 +455,9 @@ const SingleFinanceDealsPage: React.FC = () => {
                       )}
                     </button>
                   </th>
-                  <th className="py-3 px-4 text-left font-medium">{t('dashboard.deals.tableHeaders.stockNumber')}</th>
+                  <th className="py-3 px-4 text-left font-medium">
+                    {t('dashboard.deals.tableHeaders.stockNumber')}
+                  </th>
                   <th className="py-3 px-4 text-center font-medium">
                     <button className="flex items-center" onClick={() => toggleSort('saleDate')}>
                       {t('dashboard.deals.tableHeaders.date')}
@@ -457,19 +466,45 @@ const SingleFinanceDealsPage: React.FC = () => {
                       )}
                     </button>
                   </th>
-                  <th className="py-3 px-4 text-left font-medium">{t('dashboard.deals.tableHeaders.vin')}</th>
-                  <th className="py-3 px-4 text-center font-medium">{t('dashboard.deals.tableHeaders.vehicleType')}</th>
-                  <th className="py-3 px-4 text-left font-medium">{t('dashboard.deals.tableHeaders.lender')}</th>
-                  <th className="py-3 px-4 text-right font-medium">{t('dashboard.deals.tableHeaders.frontEnd')}</th>
-                  <th className="py-3 px-4 text-right font-medium">{t('dashboard.deals.tableHeaders.vsc')}</th>
-                  <th className="py-3 px-4 text-right font-medium">{t('dashboard.deals.tableHeaders.ppm')}</th>
-                  <th className="py-3 px-4 text-right font-medium">{t('dashboard.deals.tableHeaders.gap')}</th>
-                  <th className="py-3 px-4 text-right font-medium">{t('dashboard.deals.tableHeaders.tireWheel')}</th>
-                  <th className="py-3 px-4 text-right font-medium">{t('dashboard.deals.tableHeaders.appearance')}</th>
-                  <th className="py-3 px-4 text-right font-medium">{t('dashboard.deals.tableHeaders.theft')}</th>
-                  <th className="py-3 px-4 text-right font-medium">{t('dashboard.deals.tableHeaders.bundled')}</th>
-                  <th className="py-3 px-4 text-center font-medium">{t('dashboard.deals.tableHeaders.ppd')}</th>
-                  <th className="py-3 px-4 text-right font-medium">{t('dashboard.deals.tableHeaders.pvr')}</th>
+                  <th className="py-3 px-4 text-left font-medium">
+                    {t('dashboard.deals.tableHeaders.vin')}
+                  </th>
+                  <th className="py-3 px-4 text-center font-medium">
+                    {t('dashboard.deals.tableHeaders.vehicleType')}
+                  </th>
+                  <th className="py-3 px-4 text-left font-medium">
+                    {t('dashboard.deals.tableHeaders.lender')}
+                  </th>
+                  <th className="py-3 px-4 text-right font-medium">
+                    {t('dashboard.deals.tableHeaders.frontEnd')}
+                  </th>
+                  <th className="py-3 px-4 text-right font-medium">
+                    {t('dashboard.deals.tableHeaders.vsc')}
+                  </th>
+                  <th className="py-3 px-4 text-right font-medium">
+                    {t('dashboard.deals.tableHeaders.ppm')}
+                  </th>
+                  <th className="py-3 px-4 text-right font-medium">
+                    {t('dashboard.deals.tableHeaders.gap')}
+                  </th>
+                  <th className="py-3 px-4 text-right font-medium">
+                    {t('dashboard.deals.tableHeaders.tireWheel')}
+                  </th>
+                  <th className="py-3 px-4 text-right font-medium">
+                    {t('dashboard.deals.tableHeaders.appearance')}
+                  </th>
+                  <th className="py-3 px-4 text-right font-medium">
+                    {t('dashboard.deals.tableHeaders.theft')}
+                  </th>
+                  <th className="py-3 px-4 text-right font-medium">
+                    {t('dashboard.deals.tableHeaders.bundled')}
+                  </th>
+                  <th className="py-3 px-4 text-center font-medium">
+                    {t('dashboard.deals.tableHeaders.ppd')}
+                  </th>
+                  <th className="py-3 px-4 text-right font-medium">
+                    {t('dashboard.deals.tableHeaders.pvr')}
+                  </th>
                   <th className="py-3 px-4 text-right font-medium">
                     <button
                       className="flex items-center ml-auto"
@@ -481,8 +516,12 @@ const SingleFinanceDealsPage: React.FC = () => {
                       )}
                     </button>
                   </th>
-                  <th className="py-3 px-4 text-center font-medium">{t('dashboard.deals.tableHeaders.status')}</th>
-                  <th className="py-3 px-4 text-center font-medium bg-blue-600 text-white">{t('dashboard.deals.tableHeaders.edit')}</th>
+                  <th className="py-3 px-4 text-center font-medium">
+                    {t('dashboard.deals.tableHeaders.status')}
+                  </th>
+                  <th className="py-3 px-4 text-center font-medium bg-blue-600 text-white">
+                    {t('dashboard.deals.tableHeaders.edit')}
+                  </th>
                   <th className="py-3 px-4 text-center font-medium bg-red-600 text-white">
                     {t('dashboard.deals.tableHeaders.delete')}
                   </th>
@@ -616,11 +655,19 @@ const SingleFinanceDealsPage: React.FC = () => {
                                       : 'bg-gray-100 text-gray-800'
                             }`}
                           >
-                            <option value="Pending">{t('dashboard.deals.statusOptions.pending')}</option>
-                            <option value="Funded">{t('dashboard.deals.statusOptions.funded')}</option>
+                            <option value="Pending">
+                              {t('dashboard.deals.statusOptions.pending')}
+                            </option>
+                            <option value="Funded">
+                              {t('dashboard.deals.statusOptions.funded')}
+                            </option>
                             <option value="Held">{t('dashboard.deals.statusOptions.held')}</option>
-                            <option value="Unwound">{t('dashboard.deals.statusOptions.unwound')}</option>
-                            <option value="Dead Deal">{t('dashboard.deals.statusOptions.deadDeal')}</option>
+                            <option value="Unwound">
+                              {t('dashboard.deals.statusOptions.unwound')}
+                            </option>
+                            <option value="Dead Deal">
+                              {t('dashboard.deals.statusOptions.deadDeal')}
+                            </option>
                           </select>
                         </td>
                         <td className="py-3 px-4 text-center">
@@ -651,7 +698,9 @@ const SingleFinanceDealsPage: React.FC = () => {
       {filteredDeals.length > 0 && (
         <div className="flex justify-between items-center text-sm text-gray-600">
           <div>
-            {t('dashboard.deals.showingDeals').replace('{count}', filteredDeals.length.toString()).replace('{total}', deals.length.toString())}
+            {t('dashboard.deals.showingDeals')
+              .replace('{count}', filteredDeals.length.toString())
+              .replace('{total}', deals.length.toString())}
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">

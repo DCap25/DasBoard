@@ -20,21 +20,24 @@ interface LanguageSelectorProps {
   className?: string;
 }
 
-export default function LanguageSelector({ variant = 'nav', className = '' }: LanguageSelectorProps) {
+export default function LanguageSelector({
+  variant = 'nav',
+  className = '',
+}: LanguageSelectorProps) {
   const { language, setLanguage, t } = useTranslation();
 
   if (variant === 'compact') {
     const currentLanguage = languages.find(lang => lang.code === language) || languages[0];
-    
+
     return (
       <div className={`relative ${className}`}>
         <select
           value={language}
-          onChange={(e) => setLanguage(e.target.value as Language)}
+          onChange={e => setLanguage(e.target.value as Language)}
           className="appearance-none bg-transparent border-none text-gray-500 text-xs cursor-pointer hover:text-gray-400 focus:outline-none focus:text-gray-300 pr-3"
           title="Select Language"
         >
-          {languages.map((lang) => (
+          {languages.map(lang => (
             <option key={lang.code} value={lang.code} className="bg-gray-800 text-white text-sm">
               {lang.flag} {lang.name}
             </option>
@@ -56,10 +59,10 @@ export default function LanguageSelector({ variant = 'nav', className = '' }: La
         </label>
         <select
           value={language}
-          onChange={(e) => setLanguage(e.target.value as Language)}
+          onChange={e => setLanguage(e.target.value as Language)}
           className="w-full px-3 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         >
-          {languages.map((lang) => (
+          {languages.map(lang => (
             <option key={lang.code} value={lang.code} className="bg-gray-700 text-white">
               {lang.flag} {lang.name}
             </option>

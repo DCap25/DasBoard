@@ -33,6 +33,7 @@ import {
   reportError,
   createSpecializedErrorBoundary,
 } from './lib/errorHandling';
+import AuthErrorBoundary, { type AuthErrorInfo } from './components/AuthErrorBoundary';
 
 // Create safe query client with enhanced error handling
 const safeQueryClient = createSafeQueryClient();
@@ -939,12 +940,38 @@ function App() {
       <TranslationProvider>
         <QueryClientProvider client={safeQueryClient}>
           <ToastContextProvider>
-            <SectionErrorBoundary
-              identifier="AuthProvider"
-              {...createSpecializedErrorBoundary('auth')}
+            <AuthErrorBoundary
+              enableAutoRecovery={true}
+              maxRetries={3}
+              onError={(authError: AuthErrorInfo) => {
+                console.error('[App] Auth error caught by boundary:', authError);
+                
+                // Log development warnings
+                if (import.meta.env.DEV) {
+                  console.warn(`🔐 [AUTH BOUNDARY] ${authError.type}: ${authError.message}`);
+                  if (authError.sessionInfo) {
+                    console.warn('Session Info:', authError.sessionInfo);
+                  }
+                }
+                
+                // Report to error tracking service
+                reportError({
+                  message: `Auth Error: ${authError.type}`,
+                  stack: authError.originalError.stack,
+                  name: authError.originalError.name,
+                } as any, {
+                  authErrorType: authError.type,
+                  recoverable: authError.recoverable,
+                  sessionInfo: authError.sessionInfo,
+                });
+              }}
             >
-              <AuthProvider>
-                <DealershipProvider>
+              <SectionErrorBoundary
+                identifier="AuthProvider"
+                {...createSpecializedErrorBoundary('auth')}
+              >
+                <AuthProvider>
+                  <DealershipProvider>
                   <SectionErrorBoundary
                     identifier="Router"
                     {...createSpecializedErrorBoundary('navigation')}
@@ -1267,9 +1294,10 @@ function App() {
                       </DirectAuthProvider>
                     </Router>
                   </SectionErrorBoundary>
-                </DealershipProvider>
-              </AuthProvider>
-            </SectionErrorBoundary>
+                  </DealershipProvider>
+                </AuthProvider>
+              </SectionErrorBoundary>
+            </AuthErrorBoundary>
             {APP_ENV !== 'production' && (
               <ComponentErrorBoundary identifier="ReactQueryDevtools">
                 <ReactQueryDevtools />

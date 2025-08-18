@@ -13,14 +13,11 @@ interface RateLimitResponse {
 
 class ServerRateLimiter {
   private static readonly EDGE_FUNCTION_URL = '/functions/v1/rate-limiter';
-  
+
   /**
    * Check rate limit with server
    */
-  static async checkRateLimit(
-    action: string,
-    identifier: string
-  ): Promise<RateLimitResponse> {
+  static async checkRateLimit(action: string, identifier: string): Promise<RateLimitResponse> {
     try {
       const { data, error } = await supabase.functions.invoke('rate-limiter', {
         body: {
@@ -74,9 +71,9 @@ class ServerRateLimiter {
     if (userId) return userId;
 
     // Use a combination of IP (if available) and session ID
-    const sessionId = sessionStorage.getItem('client_id') || 
-      'anon_' + Math.random().toString(36).substr(2, 9);
-    
+    const sessionId =
+      sessionStorage.getItem('client_id') || 'anon_' + Math.random().toString(36).substr(2, 9);
+
     if (!sessionStorage.getItem('client_id')) {
       sessionStorage.setItem('client_id', sessionId);
     }

@@ -25,7 +25,7 @@ describe('LogNewDeal Component', () => {
   beforeEach(() => {
     // Reset all mocks before each test
     vi.clearAllMocks();
-    
+
     // Mock the auth context with a logged-in F&I manager
     (useAuth as jest.Mock).mockReturnValue({
       user: { id: 'test-user-id', name: 'Test User' },
@@ -79,7 +79,9 @@ describe('LogNewDeal Component', () => {
     expect(await screen.findByText(/stock number is required/i)).toBeInTheDocument();
     expect(await screen.findByText(/last 8 of vin must be 8 characters/i)).toBeInTheDocument();
     expect(await screen.findByText(/customer last name is required/i)).toBeInTheDocument();
-    expect(await screen.findByText(/front end gross must be a positive number/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/front end gross must be a positive number/i)
+    ).toBeInTheDocument();
   });
 
   it('submits the form successfully', async () => {
@@ -138,4 +140,4 @@ describe('LogNewDeal Component', () => {
     // Check if error message is displayed
     expect(await screen.findByText(/failed to create deal/i)).toBeInTheDocument();
   });
-}); 
+});

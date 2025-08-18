@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../contexts/TranslationContext';
 import { getConsistentUserId, getUserIdSync, debugUserId } from '../../utils/userIdHelper';
-import { supabase, quickHasSupabaseSessionToken } from '../../lib/supabaseClient';
+import { getSecureSupabaseClient, quickHasSupabaseSessionToken } from '../../lib/supabaseClient';
 import { Card } from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
@@ -131,9 +131,14 @@ export default function LogSingleFinanceDeal() {
     const tryFetch = async () => {
       if (localUserId || user?.id) return;
       if (!quickHasSupabaseSessionToken()) return;
-      const { data } = await supabase.auth.getSession();
-      const uid = data?.session?.user?.id || null;
-      if (!cancelled && uid) setLocalUserId(uid);
+      try {
+        const supabase = await getSecureSupabaseClient();
+        const { data } = await supabase.auth.getSession();
+        const uid = data?.session?.user?.id || null;
+        if (!cancelled && uid) setLocalUserId(uid);
+      } catch (error) {
+        console.error('[LogSingleFinanceDeal] Error getting session:', error);
+      }
     };
     tryFetch();
     const t = setTimeout(tryFetch, 800);
@@ -193,8 +198,9 @@ export default function LogSingleFinanceDeal() {
       const reserve = parseFloat(formData.reserveFlat) || 0;
 
       // Back End Gross = All product profits + Reserve/Flat
-      const backEndGross = vsc + gap + ppm + tireWheel + appearance + theft + bundled + other + reserve;
-      
+      const backEndGross =
+        vsc + gap + ppm + tireWheel + appearance + theft + bundled + other + reserve;
+
       // Total Gross = Front End Gross + Back End Gross
       const frontEnd = parseFloat(formData.frontEndGross) || 0;
       const totalGross = frontEnd + backEndGross;
@@ -222,10 +228,10 @@ export default function LogSingleFinanceDeal() {
 
   useEffect(() => {
     console.log('[LogSingleFinanceDeal] Component mounted');
-    
+
     // Load team members from localStorage
     loadTeamMembers();
-    
+
     // Check if we're in edit mode
     if (dealId) {
       setIsEditMode(true);
@@ -279,12 +285,12 @@ export default function LogSingleFinanceDeal() {
     console.log('[LogSingleFinanceDeal] loadTeamMembers called, resolved userId:', userId);
     console.log('[LogSingleFinanceDeal] user context:', user);
     console.log('[LogSingleFinanceDeal] localUserId:', localUserId);
-    
+
     if (!userId) {
       console.log('[LogSingleFinanceDeal] No user ID resolved, skipping load');
       return;
     }
-    
+
     try {
       console.log('[LogSingleFinanceDeal] Loading team members for userId:', userId);
       const savedTeamMembers = SingleFinanceStorage.getTeamMembers(userId);
@@ -299,7 +305,7 @@ export default function LogSingleFinanceDeal() {
   const saveTeamMembers = (members: TeamMember[]) => {
     const userId = getUserId();
     if (!userId) return;
-    
+
     try {
       SingleFinanceStorage.setTeamMembers(userId, members);
       setTeamMembers(members);
@@ -308,7 +314,7 @@ export default function LogSingleFinanceDeal() {
       toast({
         title: 'Error',
         description: 'Failed to save team members',
-        variant: 'destructive'
+        variant: 'destructive',
       });
     }
   };
@@ -319,32 +325,33 @@ export default function LogSingleFinanceDeal() {
       toast({
         title: 'Validation Error',
         description: 'First name and last name are required',
-        variant: 'destructive'
+        variant: 'destructive',
       });
       return;
     }
 
-    const initials = `${newSalesperson.firstName.charAt(0)}${newSalesperson.lastName.charAt(0)}`.toUpperCase();
-    
+    const initials =
+      `${newSalesperson.firstName.charAt(0)}${newSalesperson.lastName.charAt(0)}`.toUpperCase();
+
     const member: TeamMember = {
       id: `member_${Date.now()}`,
       firstName: newSalesperson.firstName,
       lastName: newSalesperson.lastName,
       initials,
       role: 'salesperson',
-      active: true
+      active: true,
     };
 
     const updatedMembers = [...teamMembers, member];
     saveTeamMembers(updatedMembers);
-    
+
     // Reset form and close modal
     setNewSalesperson({ firstName: '', lastName: '' });
     setShowAddSalesperson(false);
 
     toast({
       title: 'Success',
-      description: `${member.firstName} ${member.lastName} added to team`
+      description: `${member.firstName} ${member.lastName} added to team`,
     });
   };
 
@@ -354,7 +361,7 @@ export default function LogSingleFinanceDeal() {
     if (confirm(`Are you sure you want to remove ${member?.firstName} ${member?.lastName}?`)) {
       const updatedMembers = teamMembers.filter(m => m.id !== memberId);
       saveTeamMembers(updatedMembers);
-      
+
       // Clear selection if the removed member was selected
       if (formData.salespersonId === memberId) {
         setFormData(prev => ({ ...prev, salespersonId: '' }));
@@ -362,10 +369,10 @@ export default function LogSingleFinanceDeal() {
       if (formData.secondSalespersonId === memberId) {
         setFormData(prev => ({ ...prev, secondSalespersonId: '' }));
       }
-      
+
       toast({
         title: 'Success',
-        description: 'Team member removed'
+        description: 'Team member removed',
       });
     }
   };
@@ -374,16 +381,16 @@ export default function LogSingleFinanceDeal() {
   const loadDealForEdit = (dealIdToEdit: string) => {
     const userId = getUserId();
     if (!userId) return;
-    
+
     try {
       const existingDeals = SingleFinanceStorage.getDeals(userId);
-      
+
       const dealToEdit = existingDeals.find((deal: any) => deal.id === dealIdToEdit);
-      
+
       if (dealToEdit) {
         console.log('[LogSingleFinanceDeal] Loading deal for edit:', dealToEdit);
         setOriginalDeal(dealToEdit);
-        
+
         // Map the deal data back to form data
         setFormData({
           dealNumber: dealToEdit.dealNumber || '',
@@ -394,7 +401,8 @@ export default function LogSingleFinanceDeal() {
           customerName: dealToEdit.customer || dealToEdit.lastName || '',
           dealType: dealToEdit.dealType || 'Finance',
           status: dealToEdit.status || 'Pending',
-          saleDate: dealToEdit.dealDate || dealToEdit.saleDate || new Date().toISOString().split('T')[0],
+          saleDate:
+            dealToEdit.dealDate || dealToEdit.saleDate || new Date().toISOString().split('T')[0],
           frontEndGross: dealToEdit.frontEndGross?.toString() || '',
           salespersonId: dealToEdit.salesperson_id?.toString() || '',
           isSplitDeal: dealToEdit.is_split_deal || false,
@@ -415,14 +423,14 @@ export default function LogSingleFinanceDeal() {
           otherProfit: dealToEdit.otherProfit?.toString() || '',
           backEndGross: dealToEdit.backEndGross?.toString() || '',
           totalGross: dealToEdit.totalGross?.toString() || '',
-          notes: dealToEdit.notes || ''
+          notes: dealToEdit.notes || '',
         });
       } else {
         console.error('[LogSingleFinanceDeal] Deal not found for editing:', dealIdToEdit);
         toast({
           title: 'Error',
           description: 'Deal not found for editing',
-          variant: 'destructive'
+          variant: 'destructive',
         });
         navigate('/dashboard/single-finance');
       }
@@ -431,23 +439,30 @@ export default function LogSingleFinanceDeal() {
       toast({
         title: 'Error',
         description: 'Failed to load deal for editing',
-        variant: 'destructive'
+        variant: 'destructive',
       });
       navigate('/dashboard/single-finance');
     }
   };
 
   // Handle key press to prevent accidental form submission on Enter
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      console.log('[LogSingleFinanceDeal] Enter key pressed in input field - prevented form submission');
+      console.log(
+        '[LogSingleFinanceDeal] Enter key pressed in input field - prevented form submission'
+      );
       // Move focus to next field or keep focus on current field
       const form = e.currentTarget.form;
       if (form) {
         const elements = Array.from(form.elements) as HTMLElement[];
         const currentIndex = elements.indexOf(e.currentTarget as HTMLElement);
-        const nextElement = elements[currentIndex + 1] as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+        const nextElement = elements[currentIndex + 1] as
+          | HTMLInputElement
+          | HTMLTextAreaElement
+          | HTMLSelectElement;
         if (nextElement && nextElement.focus) {
           nextElement.focus();
         }
@@ -510,10 +525,14 @@ export default function LogSingleFinanceDeal() {
     setIsSubmitting(true);
 
     try {
-      console.log(`[LogSingleFinanceDeal] ${isEditMode ? 'Updating' : 'Submitting'} deal for Single Finance Dashboard`);
+      console.log(
+        `[LogSingleFinanceDeal] ${isEditMode ? 'Updating' : 'Submitting'} deal for Single Finance Dashboard`
+      );
 
       // Use existing ID for edit mode, or generate new ID for create mode
-      const dealIdToUse = isEditMode ? dealId : (formData.dealNumber || `SF${Math.floor(1000 + Math.random() * 9000)}`);
+      const dealIdToUse = isEditMode
+        ? dealId
+        : formData.dealNumber || `SF${Math.floor(1000 + Math.random() * 9000)}`;
 
       // Get salesperson information from team members
       const salesperson = teamMembers.find(s => s.id === formData.salespersonId);
@@ -620,37 +639,42 @@ export default function LogSingleFinanceDeal() {
       if (!userId) {
         throw new Error('User ID is required');
       }
-      
+
       try {
         const existingDeals = SingleFinanceStorage.getDeals(userId);
-        
+
         let updatedDeals;
         if (isEditMode) {
           // Update existing deal
-          updatedDeals = existingDeals.map((deal: any) => 
+          updatedDeals = existingDeals.map((deal: any) =>
             deal.id === dealIdToUse ? dealData : deal
           );
-          console.log('[LogSingleFinanceDeal] Deal updated in singleFinanceDeals storage:', dealData);
+          console.log(
+            '[LogSingleFinanceDeal] Deal updated in singleFinanceDeals storage:',
+            dealData
+          );
         } else {
           // Add new deal
           updatedDeals = [dealData, ...existingDeals];
           console.log('[LogSingleFinanceDeal] Deal saved to singleFinanceDeals storage:', dealData);
         }
-        
+
         SingleFinanceStorage.setDeals(userId, updatedDeals);
-        
+
         // Dispatch custom event to notify dashboard of data change
-        window.dispatchEvent(new CustomEvent('singleFinanceDealsUpdated', { 
-          detail: { deals: updatedDeals, updatedDeal: dealData } 
-        }));
+        window.dispatchEvent(
+          new CustomEvent('singleFinanceDealsUpdated', {
+            detail: { deals: updatedDeals, updatedDeal: dealData },
+          })
+        );
       } catch (error) {
         console.error('Error saving to localStorage:', error);
       }
 
       toast({
         title: 'Success',
-        description: isEditMode 
-          ? 'Deal updated successfully!' 
+        description: isEditMode
+          ? 'Deal updated successfully!'
           : 'Deal logged successfully to Single Finance Dashboard!',
       });
 
@@ -684,10 +708,8 @@ export default function LogSingleFinanceDeal() {
 
       <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-blue-800 text-sm">
-          <strong>{t('dashboard.dealLog.note')}:</strong> {isEditMode 
-            ? t('dashboard.dealLog.editingNote')
-            : t('dashboard.dealLog.dashboardNote')
-          }
+          <strong>{t('dashboard.dealLog.note')}:</strong>{' '}
+          {isEditMode ? t('dashboard.dealLog.editingNote') : t('dashboard.dealLog.dashboardNote')}
         </p>
       </div>
 
@@ -835,14 +857,16 @@ export default function LogSingleFinanceDeal() {
                       id="isSplitDeal"
                       checked={formData.isSplitDeal}
                       onCheckedChange={checked =>
-                        setFormData(prev => ({ 
-                          ...prev, 
+                        setFormData(prev => ({
+                          ...prev,
                           isSplitDeal: checked as boolean,
-                          secondSalespersonId: checked ? prev.secondSalespersonId : ''
+                          secondSalespersonId: checked ? prev.secondSalespersonId : '',
                         }))
                       }
                     />
-                    <Label htmlFor="isSplitDeal" className="text-xs">{t('dashboard.dealLog.splitDeal')}</Label>
+                    <Label htmlFor="isSplitDeal" className="text-xs">
+                      {t('dashboard.dealLog.splitDeal')}
+                    </Label>
                   </div>
                 </div>
                 {formData.isSplitDeal ? (
@@ -855,11 +879,13 @@ export default function LogSingleFinanceDeal() {
                       className="w-full p-2 border-2 border-gray-400 rounded-md text-sm"
                     >
                       <option value="">{t('dashboard.dealLog.selectSalesperson')}</option>
-                      {teamMembers.filter(member => member.role === 'salesperson' && member.active).map(person => (
-                        <option key={person.id} value={person.id}>
-                          {person.firstName} {person.lastName}
-                        </option>
-                      ))}
+                      {teamMembers
+                        .filter(member => member.role === 'salesperson' && member.active)
+                        .map(person => (
+                          <option key={person.id} value={person.id}>
+                            {person.firstName} {person.lastName}
+                          </option>
+                        ))}
                     </select>
                     <select
                       id="secondSalespersonId"
@@ -869,15 +895,18 @@ export default function LogSingleFinanceDeal() {
                       className="w-full p-2 border-2 border-gray-400 rounded-md text-sm"
                     >
                       <option value="">{t('dashboard.dealLog.selectSecondSalesperson')}</option>
-                      {teamMembers.filter(member => 
-                        member.role === 'salesperson' && 
-                        member.active && 
-                        member.id !== formData.salespersonId
-                      ).map(person => (
-                        <option key={person.id} value={person.id}>
-                          {person.firstName} {person.lastName}
-                        </option>
-                      ))}
+                      {teamMembers
+                        .filter(
+                          member =>
+                            member.role === 'salesperson' &&
+                            member.active &&
+                            member.id !== formData.salespersonId
+                        )
+                        .map(person => (
+                          <option key={person.id} value={person.id}>
+                            {person.firstName} {person.lastName}
+                          </option>
+                        ))}
                     </select>
                   </div>
                 ) : (
@@ -889,11 +918,13 @@ export default function LogSingleFinanceDeal() {
                     className="w-full p-2 border-2 border-gray-400 rounded-md"
                   >
                     <option value="">{t('dashboard.dealLog.selectSalesperson')}</option>
-                    {teamMembers.filter(member => member.role === 'salesperson' && member.active).map(person => (
-                      <option key={person.id} value={person.id}>
-                        {person.firstName} {person.lastName}
-                      </option>
-                    ))}
+                    {teamMembers
+                      .filter(member => member.role === 'salesperson' && member.active)
+                      .map(person => (
+                        <option key={person.id} value={person.id}>
+                          {person.firstName} {person.lastName}
+                        </option>
+                      ))}
                   </select>
                 )}
               </div>
@@ -908,11 +939,13 @@ export default function LogSingleFinanceDeal() {
                   className="w-full p-2 border-2 border-gray-400 rounded-md"
                 >
                   <option value="">{t('dashboard.dealLog.selectManager')}</option>
-                  {teamMembers.filter(member => member.role === 'sales_manager' && member.active).map(manager => (
-                    <option key={manager.id} value={manager.id}>
-                      {manager.firstName} {manager.lastName}
-                    </option>
-                  ))}
+                  {teamMembers
+                    .filter(member => member.role === 'sales_manager' && member.active)
+                    .map(manager => (
+                      <option key={manager.id} value={manager.id}>
+                        {manager.firstName} {manager.lastName}
+                      </option>
+                    ))}
                 </select>
               </div>
 
@@ -1025,7 +1058,9 @@ export default function LogSingleFinanceDeal() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="tireWheelProfit">{t('dashboard.dealLog.products.tireWheelProfit')}</Label>
+                    <Label htmlFor="tireWheelProfit">
+                      {t('dashboard.dealLog.products.tireWheelProfit')}
+                    </Label>
                     <Input
                       id="tireWheelProfit"
                       name="tireWheelProfit"
@@ -1042,7 +1077,9 @@ export default function LogSingleFinanceDeal() {
 
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <Label htmlFor="appearanceProfit">{t('dashboard.dealLog.products.appearanceProfit')}</Label>
+                    <Label htmlFor="appearanceProfit">
+                      {t('dashboard.dealLog.products.appearanceProfit')}
+                    </Label>
                     <Input
                       id="appearanceProfit"
                       name="appearanceProfit"
@@ -1056,7 +1093,9 @@ export default function LogSingleFinanceDeal() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="theftProfit">{t('dashboard.dealLog.products.theftProfit')}</Label>
+                    <Label htmlFor="theftProfit">
+                      {t('dashboard.dealLog.products.theftProfit')}
+                    </Label>
                     <Input
                       id="theftProfit"
                       name="theftProfit"
@@ -1073,7 +1112,9 @@ export default function LogSingleFinanceDeal() {
 
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <Label htmlFor="bundledProfit">{t('dashboard.dealLog.products.bundledProfit')}</Label>
+                    <Label htmlFor="bundledProfit">
+                      {t('dashboard.dealLog.products.bundledProfit')}
+                    </Label>
                     <Input
                       id="bundledProfit"
                       name="bundledProfit"
@@ -1087,7 +1128,9 @@ export default function LogSingleFinanceDeal() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="otherProfit">{t('dashboard.dealLog.products.otherProfit')}</Label>
+                    <Label htmlFor="otherProfit">
+                      {t('dashboard.dealLog.products.otherProfit')}
+                    </Label>
                     <Input
                       id="otherProfit"
                       name="otherProfit"
@@ -1116,7 +1159,9 @@ export default function LogSingleFinanceDeal() {
               <div className="space-y-2">
                 {/* Front End Gross */}
                 <div className="p-2 bg-gray-50 rounded">
-                  <Label htmlFor="frontEndGross" className="text-xs font-medium">{t('dashboard.dealLog.frontEndGross')}</Label>
+                  <Label htmlFor="frontEndGross" className="text-xs font-medium">
+                    {t('dashboard.dealLog.frontEndGross')}
+                  </Label>
                   <Input
                     id="frontEndGross"
                     name="frontEndGross"
@@ -1132,7 +1177,9 @@ export default function LogSingleFinanceDeal() {
 
                 {/* Reserve/Flat */}
                 <div className="p-2 bg-gray-50 rounded">
-                  <Label htmlFor="reserveFlat" className="text-xs font-medium">{t('dashboard.dealLog.reserveFlat')}</Label>
+                  <Label htmlFor="reserveFlat" className="text-xs font-medium">
+                    {t('dashboard.dealLog.reserveFlat')}
+                  </Label>
                   <Input
                     id="reserveFlat"
                     name="reserveFlat"
@@ -1148,7 +1195,12 @@ export default function LogSingleFinanceDeal() {
 
                 {/* Back End Gross - Calculated */}
                 <div className="p-2 bg-green-50 rounded border border-green-200">
-                  <Label className="text-xs font-medium text-green-900">{t('dashboard.dealLog.backEndGross')} <span className="text-[10px] font-normal">({t('dashboard.dealLog.autoCalculated')})</span></Label>
+                  <Label className="text-xs font-medium text-green-900">
+                    {t('dashboard.dealLog.backEndGross')}{' '}
+                    <span className="text-[10px] font-normal">
+                      ({t('dashboard.dealLog.autoCalculated')})
+                    </span>
+                  </Label>
                   <div className="mt-1 text-xs font-semibold text-green-900">
                     ${formData.backEndGross || '0.00'}
                   </div>
@@ -1157,8 +1209,12 @@ export default function LogSingleFinanceDeal() {
                 {/* Total Gross - Calculated */}
                 <div className="p-2 bg-blue-50 rounded border border-blue-200">
                   <div className="flex items-center gap-2">
-                    <Label className="text-xs font-medium text-black">{t('dashboard.dealLog.totalGross')}</Label>
-                    <span className="text-[10px] text-black">({t('dashboard.dealLog.autoCalculated')})</span>
+                    <Label className="text-xs font-medium text-black">
+                      {t('dashboard.dealLog.totalGross')}
+                    </Label>
+                    <span className="text-[10px] text-black">
+                      ({t('dashboard.dealLog.autoCalculated')})
+                    </span>
                   </div>
                   <div className="mt-1 text-lg font-bold text-blue-900">
                     ${formData.totalGross || '0.00'}
@@ -1169,25 +1225,30 @@ export default function LogSingleFinanceDeal() {
           </Card>
         </div>
 
-
-
         {/* Submit Button */}
         <div className="flex justify-between items-center">
           <p className="text-sm text-gray-600 ml-10">{t('dashboard.dealLog.allFieldsRequired')}</p>
           <div className="flex space-x-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate('/dashboard/single-finance')}
-          >
-            {t('dashboard.dealLog.cancel')}
-          </Button>
-          <Button type="submit" disabled={isSubmitting} className="px-8 bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-400">
-            {isSubmitting 
-              ? (isEditMode ? t('dashboard.dealLog.updatingDeal') : t('dashboard.dealLog.savingDeal')) 
-              : (isEditMode ? t('dashboard.dealLog.updateDeal') : t('dashboard.dealLog.saveDeal'))
-            }
-          </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate('/dashboard/single-finance')}
+            >
+              {t('dashboard.dealLog.cancel')}
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-8 bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-400"
+            >
+              {isSubmitting
+                ? isEditMode
+                  ? t('dashboard.dealLog.updatingDeal')
+                  : t('dashboard.dealLog.savingDeal')
+                : isEditMode
+                  ? t('dashboard.dealLog.updateDeal')
+                  : t('dashboard.dealLog.saveDeal')}
+            </Button>
           </div>
         </div>
       </form>
@@ -1196,14 +1257,18 @@ export default function LogSingleFinanceDeal() {
       {showAddSalesperson && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4">{t('dashboard.dealLog.addNewSalesperson')}</h3>
+            <h3 className="text-lg font-semibold mb-4">
+              {t('dashboard.dealLog.addNewSalesperson')}
+            </h3>
             <div className="space-y-4">
               <div>
                 <Label htmlFor="newFirstName">{t('dashboard.dealLog.firstName')}</Label>
                 <Input
                   id="newFirstName"
                   value={newSalesperson.firstName}
-                  onChange={(e) => setNewSalesperson(prev => ({ ...prev, firstName: e.target.value }))}
+                  onChange={e =>
+                    setNewSalesperson(prev => ({ ...prev, firstName: e.target.value }))
+                  }
                   placeholder={t('dashboard.dealLog.firstName')}
                 />
               </div>
@@ -1212,7 +1277,7 @@ export default function LogSingleFinanceDeal() {
                 <Input
                   id="newLastName"
                   value={newSalesperson.lastName}
-                  onChange={(e) => setNewSalesperson(prev => ({ ...prev, lastName: e.target.value }))}
+                  onChange={e => setNewSalesperson(prev => ({ ...prev, lastName: e.target.value }))}
                   placeholder={t('dashboard.dealLog.lastName')}
                 />
               </div>

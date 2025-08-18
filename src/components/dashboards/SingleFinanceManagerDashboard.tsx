@@ -31,7 +31,7 @@ import { SingleFinanceHomePage } from '../../pages/finance/SingleFinanceHomePage
 import SingleFinanceDealsPage from '../../pages/finance/SingleFinanceDealsPage';
 import SingleFinanceSettings from '../../pages/finance/SingleFinanceSettings';
 import { getFinanceManagerDeals } from '../../lib/apiService';
-import { supabase } from '../../lib/supabaseClient';
+import { getSecureSupabaseClient } from '../../lib/supabaseClient';
 import { quickHasSupabaseSessionToken } from '../../lib/supabaseClient';
 
 // Interface for a deal
@@ -60,7 +60,7 @@ const SingleFinanceManagerDashboard = () => {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Debug user object
   useEffect(() => {
     console.log('[SingleFinanceManagerDashboard] User object:', user);
@@ -77,9 +77,14 @@ const SingleFinanceManagerDashboard = () => {
     const tryFetch = async () => {
       if (localUserId || user?.id) return;
       if (!quickHasSupabaseSessionToken()) return;
-      const { data } = await supabase.auth.getSession();
-      const uid = data?.session?.user?.id || null;
-      if (!cancelled && uid) setLocalUserId(uid);
+      try {
+        const supabase = await getSecureSupabaseClient();
+        const { data } = await supabase.auth.getSession();
+        const uid = data?.session?.user?.id || null;
+        if (!cancelled && uid) setLocalUserId(uid);
+      } catch (error) {
+        console.error('[SingleFinanceManagerDashboard] Error getting session:', error);
+      }
     };
     tryFetch();
     const t = setTimeout(tryFetch, 800);
@@ -174,6 +179,12 @@ const SingleFinanceManagerDashboard = () => {
 
   // Load deals from the schema if it exists
   useEffect(() => {
+    // Skip expensive operations if user is not authenticated
+    if (!user && !localUserId) {
+      console.log('[SingleFinanceManagerDashboard] Skipping data loading - user not authenticated');
+      return;
+    }
+    
     if (schemaName) {
       fetchDealsFromSchema();
     } else {
@@ -181,10 +192,15 @@ const SingleFinanceManagerDashboard = () => {
       console.log('[SingleFinanceManagerDashboard] No schema available, loading from localStorage');
       loadDealsFromLocalStorage();
     }
-  }, [schemaName, timePeriod, loadDealsFromLocalStorage]);
+  }, [schemaName, timePeriod, loadDealsFromLocalStorage, user, localUserId]);
 
   // Listen for deals updates from the deal log page
   useEffect(() => {
+    // Skip event listeners if user is not authenticated
+    if (!user && !localUserId) {
+      return;
+    }
+    
     const handleDealsUpdated = (event: CustomEvent) => {
       console.log('[SingleFinanceManagerDashboard] Received deals update event', event.detail);
       // Reload deals when they are updated from another page
@@ -196,7 +212,7 @@ const SingleFinanceManagerDashboard = () => {
     return () => {
       window.removeEventListener('singleFinanceDealsUpdated', handleDealsUpdated as EventListener);
     };
-  }, [loadDealsFromLocalStorage]);
+  }, [loadDealsFromLocalStorage, user, localUserId]);
 
   // Function to fetch deals from the schema
   const fetchDealsFromSchema = async () => {
@@ -276,8 +292,8 @@ const SingleFinanceManagerDashboard = () => {
           products: Array.isArray(schemaDeal.products)
             ? schemaDeal.products
             : typeof schemaDeal.products === 'string'
-            ? JSON.parse(schemaDeal.products)
-            : [],
+              ? JSON.parse(schemaDeal.products)
+              : [],
           profit: schemaDeal.profit,
           created_at: schemaDeal.created_at,
         }));
@@ -398,15 +414,11 @@ const SingleFinanceManagerDashboard = () => {
     if (!shouldDelete) return;
 
     // Enhanced warning popup with better messaging
-    const confirmed = confirm(
-      t('dashboard.singleFinance.confirmations.deleteWarning')
-    );
+    const confirmed = confirm(t('dashboard.singleFinance.confirmations.deleteWarning'));
 
     if (confirmed) {
       // Second confirmation for extra safety
-      const finalConfirm = confirm(
-        t('dashboard.singleFinance.confirmations.finalConfirmation')
-      );
+      const finalConfirm = confirm(t('dashboard.singleFinance.confirmations.finalConfirmation'));
 
       if (finalConfirm) {
         try {
@@ -457,7 +469,8 @@ const SingleFinanceManagerDashboard = () => {
         <div>
           <h1 className="text-2xl font-bold">{t('dashboard.singleFinance.title')}</h1>
           <p className="text-gray-600 text-sm mb-2">
-            Finance Manager: {user?.email || user?.user_metadata?.email || 'Dan Caplan (dan.caplan@sportdurst.com)'}
+            Finance Manager:{' '}
+            {user?.email || user?.user_metadata?.email || 'Dan Caplan (dan.caplan@sportdurst.com)'}
           </p>
           <div className="flex items-center gap-3">
             <h2 className="text-lg font-medium text-gray-700">{getPeriodLabel(timePeriod)}</h2>
@@ -468,7 +481,9 @@ const SingleFinanceManagerDashboard = () => {
             >
               <option value="this-month">{t('dashboard.singleFinance.periods.thisMonth')}</option>
               <option value="last-month">{t('dashboard.singleFinance.periods.lastMonth')}</option>
-              <option value="last-quarter">{t('dashboard.singleFinance.periods.lastQuarter')}</option>
+              <option value="last-quarter">
+                {t('dashboard.singleFinance.periods.lastQuarter')}
+              </option>
               <option value="ytd">{t('dashboard.singleFinance.periods.ytd')}</option>
               <option value="last-year">{t('dashboard.singleFinance.periods.lastYear')}</option>
             </select>
@@ -523,7 +538,9 @@ const SingleFinanceManagerDashboard = () => {
               <RefreshCw className="h-4 w-4" />
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <Link to="/dashboard/single-finance/deals">{t('dashboard.singleFinance.deals.viewAll')}</Link>
+              <Link to="/dashboard/single-finance/deals">
+                {t('dashboard.singleFinance.deals.viewAll')}
+              </Link>
             </Button>
           </div>
         </CardHeader>
@@ -618,8 +635,8 @@ const SingleFinanceManagerDashboard = () => {
                       (deal.vehicle.toLowerCase().includes('new')
                         ? 'N'
                         : deal.vehicle.toLowerCase().includes('cpo')
-                        ? 'C'
-                        : 'U');
+                          ? 'C'
+                          : 'U');
 
                     console.log(`[Dashboard] Processing deal ${deal.id}:`, {
                       dealData: dealData,
@@ -675,20 +692,20 @@ const SingleFinanceManagerDashboard = () => {
                       deal.status === 'Complete' || deal.status === 'Funded'
                         ? 'Funded'
                         : deal.status === 'Held'
-                        ? 'Held'
-                        : deal.status === 'Canceled' || deal.status === 'Unwound'
-                        ? 'Unwound'
-                        : deal.status || 'Pending';
+                          ? 'Held'
+                          : deal.status === 'Canceled' || deal.status === 'Unwound'
+                            ? 'Unwound'
+                            : deal.status || 'Pending';
 
                     // Status badge colors
                     const statusColor =
                       status === 'Funded'
                         ? 'bg-green-100 text-green-800 border-green-200'
                         : status === 'Held'
-                        ? 'bg-red-100 text-red-800 border-red-200'
-                        : status === 'Unwound'
-                        ? 'bg-red-100 text-red-800 border-red-200'
-                        : 'bg-amber-100 text-amber-800 border-amber-200';
+                          ? 'bg-red-100 text-red-800 border-red-200'
+                          : status === 'Unwound'
+                            ? 'bg-red-100 text-red-800 border-red-200'
+                            : 'bg-amber-100 text-amber-800 border-amber-200';
 
                     return (
                       <tr
@@ -696,9 +713,13 @@ const SingleFinanceManagerDashboard = () => {
                         className="border-b"
                         style={{
                           backgroundColor:
-                            status === 'Funded' ? '#dcfce7' : 
-                            status === 'Held' ? '#fecaca' : 
-                            index % 2 === 1 ? '#f9fafb' : 'white',
+                            status === 'Funded'
+                              ? '#dcfce7'
+                              : status === 'Held'
+                                ? '#fecaca'
+                                : index % 2 === 1
+                                  ? '#f9fafb'
+                                  : 'white',
                         }}
                       >
                         <td className="py-2 pl-1 pr-2 text-center font-medium">
@@ -721,8 +742,8 @@ const SingleFinanceManagerDashboard = () => {
                               vehicleType === 'N'
                                 ? 'bg-green-100 text-green-800'
                                 : vehicleType === 'C'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-amber-100 text-amber-800'
+                                  ? 'bg-blue-100 text-blue-800'
+                                  : 'bg-amber-100 text-amber-800'
                             }`}
                           >
                             {vehicleType}
@@ -765,10 +786,18 @@ const SingleFinanceManagerDashboard = () => {
                             onClick={e => e.stopPropagation()}
                             className={`text-xs px-2 py-1 rounded border-0 focus:ring-1 focus:ring-blue-500 ${statusColor}`}
                           >
-                            <option value="Pending">{t('dashboard.singleFinance.deals.statusOptions.pending')}</option>
-                            <option value="Funded">{t('dashboard.singleFinance.deals.statusOptions.funded')}</option>
-                            <option value="Held">{t('dashboard.singleFinance.deals.statusOptions.held')}</option>
-                            <option value="Unwound">{t('dashboard.singleFinance.deals.statusOptions.unwound')}</option>
+                            <option value="Pending">
+                              {t('dashboard.singleFinance.deals.statusOptions.pending')}
+                            </option>
+                            <option value="Funded">
+                              {t('dashboard.singleFinance.deals.statusOptions.funded')}
+                            </option>
+                            <option value="Held">
+                              {t('dashboard.singleFinance.deals.statusOptions.held')}
+                            </option>
+                            <option value="Unwound">
+                              {t('dashboard.singleFinance.deals.statusOptions.unwound')}
+                            </option>
                           </select>
                         </td>
                         <td className="py-2 px-2 text-center">

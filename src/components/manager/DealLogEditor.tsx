@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useState } from 'react';
+// import { useAuth } from '../../contexts/AuthContext'; // Not currently using auth data
 import { supabase } from '../../lib/supabaseClient';
 import { useToast } from '../../hooks/use-toast';
 import { useSupabaseQuery } from '../../hooks/use-supabase-query';
@@ -40,7 +40,6 @@ import {
   DialogTrigger,
 } from '../../components/ui/dialog';
 import { Label } from '../../components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Loader2, Edit, Save, AlertTriangle, Search, RefreshCw } from 'lucide-react';
 
 // Define interfaces for our data types
@@ -67,7 +66,7 @@ interface EditableDeal {
 }
 
 export function DealLogEditor() {
-  const { user } = useAuth();
+  // const { } = useAuth(); // Not currently using auth data
   const { toast } = useToast();
 
   // State for selected deal and filter
@@ -75,7 +74,7 @@ export function DealLogEditor() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const [dateRange, setDateRange] = useState({
+  const [dateRange] = useState({
     start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0], // First day of current month
     end: new Date().toISOString().split('T')[0], // Today
   });
@@ -200,9 +199,9 @@ export function DealLogEditor() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <Card>
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-3 px-3 sm:px-6">
           <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
             <div>
               <CardTitle>Deal Management</CardTitle>
@@ -240,7 +239,7 @@ export function DealLogEditor() {
           </div>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="px-3 sm:px-6">
           {isLoading ? (
             <div className="h-[400px] w-full flex items-center justify-center">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -258,36 +257,52 @@ export function DealLogEditor() {
               <p>No deals found matching your criteria.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
+            <div className="overflow-x-auto -mx-3 sm:mx-0">
+              <Table className="min-w-[640px]">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Vehicle</TableHead>
-                    <TableHead>Salesperson</TableHead>
-                    <TableHead className="text-right">Front End</TableHead>
-                    <TableHead className="text-right">Back End</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="w-[80px]">Action</TableHead>
+                    <TableHead className="text-xs sm:text-sm">Date</TableHead>
+                    <TableHead className="text-xs sm:text-sm">Customer</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden sm:table-cell">
+                      Vehicle
+                    </TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">
+                      Salesperson
+                    </TableHead>
+                    <TableHead className="text-xs sm:text-sm text-right">Front End</TableHead>
+                    <TableHead className="text-xs sm:text-sm text-right hidden sm:table-cell">
+                      Back End
+                    </TableHead>
+                    <TableHead className="text-xs sm:text-sm">Status</TableHead>
+                    <TableHead className="text-xs sm:text-sm w-[60px] sm:w-[80px]">
+                      Action
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {deals.map(deal => (
                     <TableRow key={deal.id}>
-                      <TableCell>{formatDate(deal.sale_date)}</TableCell>
-                      <TableCell className="font-medium">{deal.customer_name}</TableCell>
-                      <TableCell>{deal.vehicle}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-xs sm:text-sm">
+                        {formatDate(deal.sale_date)}
+                      </TableCell>
+                      <TableCell className="font-medium text-xs sm:text-sm">
+                        {deal.customer_name}
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm hidden sm:table-cell">
+                        {deal.vehicle}
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm hidden md:table-cell">
                         {deal.salesperson?.first_name} {deal.salesperson?.last_name}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right text-xs sm:text-sm">
                         {formatCurrency(deal.front_end_gross)}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right text-xs sm:text-sm hidden sm:table-cell">
                         {formatCurrency(deal.back_end_gross)}
                       </TableCell>
-                      <TableCell>{getStatusBadge(deal.status)}</TableCell>
+                      <TableCell className="text-xs sm:text-sm">
+                        {getStatusBadge(deal.status)}
+                      </TableCell>
                       <TableCell>
                         <Dialog
                           open={isEditing && selectedDeal?.id === deal.id}
@@ -299,6 +314,7 @@ export function DealLogEditor() {
                             <Button
                               variant="ghost"
                               size="icon"
+                              className="h-8 w-8 sm:h-10 sm:w-10"
                               onClick={() => {
                                 setSelectedDeal({
                                   id: deal.id,

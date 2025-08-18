@@ -6,7 +6,10 @@ type PayCalculatorProps = {
   fundedEarnings: number;
 };
 
-export const PayCalculator: React.FC<PayCalculatorProps> = ({ pendingEarnings, fundedEarnings }) => (
+export const PayCalculator: React.FC<PayCalculatorProps> = ({
+  pendingEarnings,
+  fundedEarnings,
+}) => (
   <Card>
     <CardHeader>
       <CardTitle>Pay Calculator</CardTitle>
@@ -26,8 +29,9 @@ export const PayCalculator: React.FC<PayCalculatorProps> = ({ pendingEarnings, f
         </div>
       </div>
       <div className="text-xs text-muted-foreground mt-2">
-        Disclaimer: This calculator is for informational purposes only. Actual pay may differ based on final accounting and management review.
+        Disclaimer: This calculator is for informational purposes only. Actual pay may differ based
+        on final accounting and management review.
       </div>
     </CardContent>
   </Card>
-); 
+);

@@ -187,7 +187,7 @@ export const DealLog: React.FC = () => {
 
   return (
     <Card className="w-full">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
+      <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-2 px-4 sm:px-6 gap-3">
         <div>
           <CardTitle className="text-2xl text-gray-800">Deal Log</CardTitle>
           <CardDescription>View and manage your recent deals</CardDescription>
@@ -197,7 +197,7 @@ export const DealLog: React.FC = () => {
           size="sm"
           onClick={refreshDeals}
           disabled={loading}
-          className="ml-auto"
+          className="w-full sm:w-auto"
         >
           {loading ? (
             <RefreshCw className="h-4 w-4 animate-spin" />
@@ -207,7 +207,7 @@ export const DealLog: React.FC = () => {
           <span className="ml-2">Refresh</span>
         </Button>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-0 sm:px-6">
         {deals.length === 0 && !loading ? (
           <div className="flex flex-col items-center justify-center py-8 text-center text-gray-500">
             <Info className="h-12 w-12 mb-4 text-gray-400" />
@@ -218,63 +218,140 @@ export const DealLog: React.FC = () => {
             </p>
           </div>
         ) : (
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-gray-100">
-                  <TableHead className="font-semibold">Date</TableHead>
-                  <TableHead className="font-semibold">Customer</TableHead>
-                  <TableHead className="font-semibold">Vehicle</TableHead>
-                  <TableHead className="font-semibold">Deal Amount</TableHead>
-                  <TableHead className="font-semibold">VSC Sold</TableHead>
-                  <TableHead className="font-semibold">Product Profit</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="h-24 text-center">
-                      <RefreshCw className="h-5 w-5 animate-spin mx-auto" />
-                      <span className="text-sm text-gray-500 mt-2">Loading deals...</span>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  deals.map(deal => (
-                    <TableRow key={deal.id}>
-                      <TableCell>
-                        {deal.deal_details?.deal?.saleDate
-                          ? formatDate(deal.deal_details.deal.saleDate)
-                          : formatDate(deal.created_at)}
-                      </TableCell>
-                      <TableCell>
+          <>
+            {/* Mobile card view */}
+            <div className="block sm:hidden px-4">
+              {deals.map(deal => (
+                <div key={deal.id} className="border rounded-lg p-4 mb-3 bg-card">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <p className="font-semibold text-sm">
                         {deal.deal_details?.customer
                           ? `${deal.deal_details.customer.firstName} ${deal.deal_details.customer.lastName}`
                           : 'N/A'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {deal.deal_details?.deal?.saleDate
+                          ? formatDate(deal.deal_details.deal.saleDate)
+                          : formatDate(deal.created_at)}
+                      </p>
+                    </div>
+                    {deal.vsc_sold ? (
+                      <Badge className="bg-green-100 text-green-800 hover:bg-green-200 text-xs">
+                        VSC
+                      </Badge>
+                    ) : null}
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">
+                      {deal.deal_details?.vehicle
+                        ? `${deal.deal_details.vehicle.year} ${deal.deal_details.vehicle.make} ${deal.deal_details.vehicle.model}`
+                        : 'Vehicle N/A'}
+                    </p>
+                    <div className="flex justify-between items-center pt-2 border-t">
+                      <span className="text-sm font-medium">
+                        Deal: {formatCurrency(deal.deal_amount)}
+                      </span>
+                      <span className="text-sm text-green-600">
+                        Profit: {formatCurrency(deal.product_profit)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop table view */}
+            <div className="hidden sm:block rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-100">
+                    <TableHead className="font-semibold">Date</TableHead>
+                    <TableHead className="font-semibold">Customer</TableHead>
+                    <TableHead className="font-semibold hidden md:table-cell">
+                      Vehicle
+                    </TableHead>{' '}
+                    {/* Hide on tablets */}
+                    <TableHead className="font-semibold text-right">Deal Amount</TableHead>
+                    <TableHead className="font-semibold hidden lg:table-cell">
+                      VSC Sold
+                    </TableHead>{' '}
+                    {/* Hide on smaller screens */}
+                    <TableHead className="font-semibold text-right">Product Profit</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="h-24 text-center">
+                        <RefreshCw className="h-5 w-5 animate-spin mx-auto" />
+                        <span className="text-sm text-gray-500 mt-2">Loading deals...</span>
                       </TableCell>
-                      <TableCell>
-                        {deal.deal_details?.vehicle
-                          ? `${deal.deal_details.vehicle.year} ${deal.deal_details.vehicle.make} ${deal.deal_details.vehicle.model}`
-                          : 'N/A'}
-                      </TableCell>
-                      <TableCell>{formatCurrency(deal.deal_amount)}</TableCell>
-                      <TableCell>
-                        {deal.vsc_sold ? (
-                          <Badge className="bg-green-100 text-green-800 hover:bg-green-200">
-                            Yes
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline" className="text-gray-500">
-                            No
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell>{formatCurrency(deal.product_profit)}</TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                  ) : (
+                    deals.map(deal => (
+                      <TableRow key={deal.id}>
+                        <TableCell className="whitespace-nowrap">
+                          {deal.deal_details?.deal?.saleDate
+                            ? formatDate(deal.deal_details.deal.saleDate)
+                            : formatDate(deal.created_at)}
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">
+                              {deal.deal_details?.customer
+                                ? `${deal.deal_details.customer.firstName} ${deal.deal_details.customer.lastName}`
+                                : 'N/A'}
+                            </p>
+                            {/* Show vehicle on mobile/tablet as subtitle */}
+                            <p className="text-xs text-muted-foreground md:hidden">
+                              {deal.deal_details?.vehicle
+                                ? `${deal.deal_details.vehicle.year} ${deal.deal_details.vehicle.make} ${deal.deal_details.vehicle.model}`
+                                : 'Vehicle N/A'}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          {' '}
+                          {/* Hide on tablets and below */}
+                          {deal.deal_details?.vehicle
+                            ? `${deal.deal_details.vehicle.year} ${deal.deal_details.vehicle.make} ${deal.deal_details.vehicle.model}`
+                            : 'N/A'}
+                        </TableCell>
+                        <TableCell className="text-right font-medium">
+                          {formatCurrency(deal.deal_amount)}
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell">
+                          {' '}
+                          {/* Hide on smaller screens */}
+                          {deal.vsc_sold ? (
+                            <Badge className="bg-green-100 text-green-800 hover:bg-green-200">
+                              Yes
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-gray-500">
+                              No
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div>
+                            <p className="font-medium text-green-600">
+                              {formatCurrency(deal.product_profit)}
+                            </p>
+                            {/* Show VSC status inline on smaller screens */}
+                            {deal.vsc_sold && (
+                              <span className="text-xs text-green-600 lg:hidden">+VSC</span>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </>
         )}
       </CardContent>
     </Card>

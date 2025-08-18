@@ -63,7 +63,7 @@ const AdminDashboard: React.FC = () => {
     try {
       const { error } = await supabase.from('profiles').insert([newUser]);
       if (error) throw error;
-      
+
       toast.success('User added successfully');
       setNewUser({
         first_name: '',
@@ -92,7 +92,7 @@ const AdminDashboard: React.FC = () => {
         .eq('role_id', newPayPlan.role_id);
 
       if (error) throw error;
-      
+
       toast.success('Pay plan updated successfully');
       setNewPayPlan({
         role_id: '',
@@ -115,7 +115,7 @@ const AdminDashboard: React.FC = () => {
         email: user?.email || '',
         password,
       });
-      
+
       if (error) throw error;
       setIsPasswordValid(true);
       toast.success('Password verified');
@@ -132,7 +132,7 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
-      
+
       <div className="flex space-x-4 mb-8">
         <button
           className={`px-4 py-2 rounded ${
@@ -161,7 +161,7 @@ const AdminDashboard: React.FC = () => {
                 type="text"
                 placeholder="First Name"
                 value={newUser.first_name}
-                onChange={(e) => setNewUser({ ...newUser, first_name: e.target.value })}
+                onChange={e => setNewUser({ ...newUser, first_name: e.target.value })}
                 className="border p-2 rounded"
                 required
               />
@@ -169,7 +169,7 @@ const AdminDashboard: React.FC = () => {
                 type="text"
                 placeholder="Last Name"
                 value={newUser.last_name}
-                onChange={(e) => setNewUser({ ...newUser, last_name: e.target.value })}
+                onChange={e => setNewUser({ ...newUser, last_name: e.target.value })}
                 className="border p-2 rounded"
                 required
               />
@@ -177,18 +177,18 @@ const AdminDashboard: React.FC = () => {
                 type="email"
                 placeholder="Email"
                 value={newUser.email}
-                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                onChange={e => setNewUser({ ...newUser, email: e.target.value })}
                 className="border p-2 rounded"
                 required
               />
               <select
                 value={newUser.role_id}
-                onChange={(e) => setNewUser({ ...newUser, role_id: e.target.value })}
+                onChange={e => setNewUser({ ...newUser, role_id: e.target.value })}
                 className="border p-2 rounded"
                 required
               >
                 <option value="">Select Role</option>
-                {payPlans.map((plan) => (
+                {payPlans.map(plan => (
                   <option key={plan.role_id} value={plan.role_id}>
                     {plan.role_id}
                   </option>
@@ -209,13 +209,28 @@ const AdminDashboard: React.FC = () => {
               <table className="min-w-full bg-white">
                 <thead>
                   <tr>
-                    <th className="bg-gray-700 text-white" className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white">Name</th>
-                    <th className="bg-gray-700 text-white" className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white">Email</th>
-                    <th className="bg-gray-700 text-white" className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white">Role</th>
+                    <th
+                      className="bg-gray-700 text-white"
+                      className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white"
+                    >
+                      Name
+                    </th>
+                    <th
+                      className="bg-gray-700 text-white"
+                      className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white"
+                    >
+                      Email
+                    </th>
+                    <th
+                      className="bg-gray-700 text-white"
+                      className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white"
+                    >
+                      Role
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((user) => (
+                  {users.map(user => (
                     <tr key={user.id}>
                       <td className="px-6 py-4 border-b border-gray-200">
                         {user.first_name} {user.last_name}
@@ -238,21 +253,52 @@ const AdminDashboard: React.FC = () => {
                 <table className="min-w-full bg-white">
                   <thead>
                     <tr>
-                      <th className="bg-gray-700 text-white" className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white">Role</th>
-                      <th className="bg-gray-700 text-white" className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white">Base Salary</th>
-                      <th className="bg-gray-700 text-white" className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white">Commission Rate</th>
-                      <th className="bg-gray-700 text-white" className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white">Bonus %</th>
-                      <th className="bg-gray-700 text-white" className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white">Profit Sharing</th>
+                      <th
+                        className="bg-gray-700 text-white"
+                        className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white"
+                      >
+                        Role
+                      </th>
+                      <th
+                        className="bg-gray-700 text-white"
+                        className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white"
+                      >
+                        Base Salary
+                      </th>
+                      <th
+                        className="bg-gray-700 text-white"
+                        className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white"
+                      >
+                        Commission Rate
+                      </th>
+                      <th
+                        className="bg-gray-700 text-white"
+                        className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white"
+                      >
+                        Bonus %
+                      </th>
+                      <th
+                        className="bg-gray-700 text-white"
+                        className="px-6 py-3 border-b-2 border-gray-200 text-left bg-gray-700 text-white"
+                      >
+                        Profit Sharing
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {payPlans.map((plan) => (
+                    {payPlans.map(plan => (
                       <tr key={plan.role_id}>
                         <td className="px-6 py-4 border-b border-gray-200">{plan.role_id}</td>
                         <td className="px-6 py-4 border-b border-gray-200">${plan.base_salary}</td>
-                        <td className="px-6 py-4 border-b border-gray-200">{plan.commission_rate}%</td>
-                        <td className="px-6 py-4 border-b border-gray-200">{plan.bonus_percentage}%</td>
-                        <td className="px-6 py-4 border-b border-gray-200">{plan.profit_sharing}%</td>
+                        <td className="px-6 py-4 border-b border-gray-200">
+                          {plan.commission_rate}%
+                        </td>
+                        <td className="px-6 py-4 border-b border-gray-200">
+                          {plan.bonus_percentage}%
+                        </td>
+                        <td className="px-6 py-4 border-b border-gray-200">
+                          {plan.profit_sharing}%
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -274,7 +320,7 @@ const AdminDashboard: React.FC = () => {
                     type="password"
                     placeholder="Enter your password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={e => setPassword(e.target.value)}
                     className="border p-2 rounded"
                   />
                   <button
@@ -290,14 +336,14 @@ const AdminDashboard: React.FC = () => {
                   <form onSubmit={handleUpdatePayPlan} className="space-y-4">
                     <select
                       value={newPayPlan.role_id}
-                      onChange={(e) => setNewPayPlan({ ...newPayPlan, role_id: e.target.value })}
+                      onChange={e => setNewPayPlan({ ...newPayPlan, role_id: e.target.value })}
                       className="border p-2 rounded w-full"
                       required
                     >
                       <option value="">Select Role</option>
                       {payPlans
-                        .filter((plan) => plan.role_id !== 'Admin')
-                        .map((plan) => (
+                        .filter(plan => plan.role_id !== 'Admin')
+                        .map(plan => (
                           <option key={plan.role_id} value={plan.role_id}>
                             {plan.role_id}
                           </option>
@@ -307,7 +353,7 @@ const AdminDashboard: React.FC = () => {
                       type="number"
                       placeholder="Base Salary"
                       value={newPayPlan.base_salary}
-                      onChange={(e) =>
+                      onChange={e =>
                         setNewPayPlan({ ...newPayPlan, base_salary: parseFloat(e.target.value) })
                       }
                       className="border p-2 rounded w-full"
@@ -317,8 +363,11 @@ const AdminDashboard: React.FC = () => {
                       type="number"
                       placeholder="Commission Rate (%)"
                       value={newPayPlan.commission_rate}
-                      onChange={(e) =>
-                        setNewPayPlan({ ...newPayPlan, commission_rate: parseFloat(e.target.value) })
+                      onChange={e =>
+                        setNewPayPlan({
+                          ...newPayPlan,
+                          commission_rate: parseFloat(e.target.value),
+                        })
                       }
                       className="border p-2 rounded w-full"
                       required
@@ -327,8 +376,11 @@ const AdminDashboard: React.FC = () => {
                       type="number"
                       placeholder="Bonus Percentage (%)"
                       value={newPayPlan.bonus_percentage}
-                      onChange={(e) =>
-                        setNewPayPlan({ ...newPayPlan, bonus_percentage: parseFloat(e.target.value) })
+                      onChange={e =>
+                        setNewPayPlan({
+                          ...newPayPlan,
+                          bonus_percentage: parseFloat(e.target.value),
+                        })
                       }
                       className="border p-2 rounded w-full"
                       required
@@ -337,7 +389,7 @@ const AdminDashboard: React.FC = () => {
                       type="number"
                       placeholder="Profit Sharing (%)"
                       value={newPayPlan.profit_sharing}
-                      onChange={(e) =>
+                      onChange={e =>
                         setNewPayPlan({ ...newPayPlan, profit_sharing: parseFloat(e.target.value) })
                       }
                       className="border p-2 rounded w-full"
@@ -374,4 +426,4 @@ const AdminDashboard: React.FC = () => {
 };
 
 export { AdminDashboard };
-export default AdminDashboard; 
+export default AdminDashboard;

@@ -1,9 +1,9 @@
 /**
  * Safe Rendering Components and Utilities
- * 
+ *
  * This module provides React components and utilities for safely rendering
  * user-generated content while preventing XSS attacks and other security issues.
- * 
+ *
  * Security Features:
  * - Safe HTML rendering with content sanitization
  * - Type-safe prop validation
@@ -13,13 +13,13 @@
  */
 
 import React, { ReactNode, HTMLAttributes, AnchorHTMLAttributes, ImgHTMLAttributes } from 'react';
-import { 
-  sanitizeHtml, 
-  escapeHtml, 
-  sanitizeUrl, 
-  sanitizeUserInput, 
-  isNonEmptyString, 
-  isSafeString 
+import {
+  sanitizeHtml,
+  escapeHtml,
+  sanitizeUrl,
+  sanitizeUserInput,
+  isNonEmptyString,
+  isSafeString,
 } from './inputSanitization';
 
 /**
@@ -38,13 +38,13 @@ interface SafeTextProps {
  * Safely renders text content with automatic sanitization
  * Prevents XSS attacks by escaping HTML entities or sanitizing allowed HTML
  */
-export function SafeText({ 
-  children, 
-  allowHtml = false, 
-  maxLength = 1000, 
-  className, 
+export function SafeText({
+  children,
+  allowHtml = false,
+  maxLength = 1000,
+  className,
   as: Component = 'span',
-  fallback = null 
+  fallback = null,
 }: SafeTextProps) {
   // Type guard to ensure we have a string
   if (!isNonEmptyString(children)) {
@@ -61,16 +61,13 @@ export function SafeText({
     allowHtml,
     maxLength,
     trimWhitespace: true,
-    normalizeSpaces: true
+    normalizeSpaces: true,
   });
 
   if (allowHtml && sanitizedContent) {
     // Use sanitized HTML with dangerouslySetInnerHTML as last resort
     return (
-      <Component 
-        className={className}
-        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-      />
+      <Component className={className} dangerouslySetInnerHTML={{ __html: sanitizedContent }} />
     );
   }
 
@@ -93,16 +90,16 @@ interface SafeLinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'h
  * Safely renders links with URL validation and security attributes
  * Prevents XSS attacks through malicious URLs
  */
-export function SafeLink({ 
-  href, 
-  children, 
-  external = false, 
+export function SafeLink({
+  href,
+  children,
+  external = false,
   allowedDomains = [],
   fallback = null,
-  ...props 
+  ...props
 }: SafeLinkProps) {
   const sanitizedUrl = sanitizeUrl(href);
-  
+
   if (!sanitizedUrl) {
     console.warn('[SafeLink] Invalid or unsafe URL detected:', href);
     return <>{fallback || children}</>;
@@ -112,10 +109,10 @@ export function SafeLink({
   if (external && allowedDomains.length > 0) {
     try {
       const url = new URL(sanitizedUrl);
-      const isAllowed = allowedDomains.some(domain => 
-        url.hostname === domain || url.hostname.endsWith(`.${domain}`)
+      const isAllowed = allowedDomains.some(
+        domain => url.hostname === domain || url.hostname.endsWith(`.${domain}`)
       );
-      
+
       if (!isAllowed) {
         console.warn('[SafeLink] Domain not in allowlist:', url.hostname);
         return <>{fallback || children}</>;
@@ -156,19 +153,19 @@ interface SafeImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src'
  * Safely renders images with URL validation and security attributes
  * Prevents XSS attacks through malicious image URLs
  */
-export function SafeImage({ 
-  src, 
-  alt, 
+export function SafeImage({
+  src,
+  alt,
   allowedDomains = [],
   fallback = null,
   maxWidth,
   maxHeight,
   style,
-  ...props 
+  ...props
 }: SafeImageProps) {
   const sanitizedSrc = sanitizeUrl(src);
   const sanitizedAlt = sanitizeUserInput(alt, { allowHtml: false, maxLength: 200 });
-  
+
   if (!sanitizedSrc) {
     console.warn('[SafeImage] Invalid or unsafe image URL detected:', src);
     return <>{fallback}</>;
@@ -178,10 +175,10 @@ export function SafeImage({
   if (allowedDomains.length > 0) {
     try {
       const url = new URL(sanitizedSrc);
-      const isAllowed = allowedDomains.some(domain => 
-        url.hostname === domain || url.hostname.endsWith(`.${domain}`)
+      const isAllowed = allowedDomains.some(
+        domain => url.hostname === domain || url.hostname.endsWith(`.${domain}`)
       );
-      
+
       if (!isAllowed) {
         console.warn('[SafeImage] Image domain not in allowlist:', url.hostname);
         return <>{fallback}</>;
@@ -203,7 +200,7 @@ export function SafeImage({
   };
 
   return (
-    <img 
+    <img
       {...props}
       src={sanitizedSrc}
       alt={sanitizedAlt}
@@ -231,13 +228,13 @@ interface SafeHtmlProps {
  * Safely renders HTML content with strict sanitization
  * Use only when absolutely necessary and with trusted content
  */
-export function SafeHtml({ 
-  html, 
+export function SafeHtml({
+  html,
   allowedTags = ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li'],
   allowedAttributes = ['class'],
   className,
   maxLength = 5000,
-  fallback = null 
+  fallback = null,
 }: SafeHtmlProps) {
   if (!isNonEmptyString(html)) {
     return <>{fallback}</>;
@@ -250,7 +247,7 @@ export function SafeHtml({
 
   // Sanitize HTML with allowed tags and attributes
   let sanitized = sanitizeHtml(html);
-  
+
   // Additional filtering for allowed tags
   if (allowedTags.length > 0) {
     const tagRegex = /<\/?(\w+)[^>]*>/g;
@@ -273,20 +270,15 @@ export function SafeHtml({
     });
   }
 
-  return (
-    <div 
-      className={className}
-      dangerouslySetInnerHTML={{ __html: sanitized }}
-    />
-  );
+  return <div className={className} dangerouslySetInnerHTML={{ __html: sanitized }} />;
 }
 
 /**
  * Higher-order component that adds input sanitization to form components
  */
-export function withInputSanitization<T extends { value?: string; onChange?: (value: string) => void }>(
-  Component: React.ComponentType<T>
-) {
+export function withInputSanitization<
+  T extends { value?: string; onChange?: (value: string) => void },
+>(Component: React.ComponentType<T>) {
   return function SafeInputComponent(props: T) {
     const { value, onChange, ...otherProps } = props;
 
@@ -296,26 +288,22 @@ export function withInputSanitization<T extends { value?: string; onChange?: (va
           allowHtml: false,
           maxLength: 1000,
           trimWhitespace: false, // Don't trim while typing
-          normalizeSpaces: false // Don't normalize while typing
+          normalizeSpaces: false, // Don't normalize while typing
         });
         onChange(sanitized);
       }
     };
 
-    const sanitizedValue = value ? sanitizeUserInput(value, {
-      allowHtml: false,
-      maxLength: 1000,
-      trimWhitespace: false,
-      normalizeSpaces: false
-    }) : value;
+    const sanitizedValue = value
+      ? sanitizeUserInput(value, {
+          allowHtml: false,
+          maxLength: 1000,
+          trimWhitespace: false,
+          normalizeSpaces: false,
+        })
+      : value;
 
-    return (
-      <Component 
-        {...(otherProps as T)}
-        value={sanitizedValue}
-        onChange={handleChange}
-      />
-    );
+    return <Component {...(otherProps as T)} value={sanitizedValue} onChange={handleChange} />;
   };
 }
 
@@ -329,7 +317,12 @@ interface SafeRenderProps {
   errorMessage?: string;
 }
 
-export function SafeRender({ children, validator, fallback = null, errorMessage }: SafeRenderProps) {
+export function SafeRender({
+  children,
+  validator,
+  fallback = null,
+  errorMessage,
+}: SafeRenderProps) {
   if (!validator(children)) {
     if (errorMessage) {
       console.warn('[SafeRender]', errorMessage);
@@ -351,12 +344,12 @@ interface DynamicContentProps {
   fallback?: ReactNode;
 }
 
-export function DynamicContent({ 
-  content, 
-  type, 
-  maxLength = 2000, 
-  className, 
-  fallback = null 
+export function DynamicContent({
+  content,
+  type,
+  maxLength = 2000,
+  className,
+  fallback = null,
 }: DynamicContentProps) {
   if (!isNonEmptyString(content)) {
     return <>{fallback}</>;
@@ -365,33 +358,20 @@ export function DynamicContent({
   switch (type) {
     case 'text':
       return (
-        <SafeText 
-          className={className}
-          maxLength={maxLength}
-          fallback={fallback}
-        >
+        <SafeText className={className} maxLength={maxLength} fallback={fallback}>
           {content}
         </SafeText>
       );
 
     case 'html':
       return (
-        <SafeHtml 
-          html={content}
-          className={className}
-          maxLength={maxLength}
-          fallback={fallback}
-        />
+        <SafeHtml html={content} className={className} maxLength={maxLength} fallback={fallback} />
       );
 
     case 'markdown':
       // For now, treat markdown as text (you could add a markdown parser later)
       return (
-        <SafeText 
-          className={className}
-          maxLength={maxLength}
-          fallback={fallback}
-        >
+        <SafeText className={className} maxLength={maxLength} fallback={fallback}>
           {content}
         </SafeText>
       );
@@ -460,7 +440,7 @@ export const safeRenderingUtils = {
   createSecureProps: (baseProps: Record<string, unknown>, overrides?: Record<string, unknown>) => {
     const sanitizedBase = safeRenderingUtils.sanitizeProps(baseProps);
     const sanitizedOverrides = overrides ? safeRenderingUtils.sanitizeProps(overrides) : {};
-    
+
     return {
       ...sanitizedBase,
       ...sanitizedOverrides,
@@ -470,5 +450,5 @@ export const safeRenderingUtils = {
       onError: undefined,
       onLoad: undefined,
     };
-  }
+  },
 };

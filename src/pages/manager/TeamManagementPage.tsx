@@ -364,10 +364,10 @@ const TeamManagementPage = () => {
                               member.performance === 'top'
                                 ? 'text-green-600'
                                 : member.performance === 'high'
-                                ? 'text-blue-600'
-                                : member.performance === 'medium'
-                                ? 'text-amber-600'
-                                : 'text-gray-600'
+                                  ? 'text-blue-600'
+                                  : member.performance === 'medium'
+                                    ? 'text-amber-600'
+                                    : 'text-gray-600'
                             }`}
                           >
                             {member.deals}

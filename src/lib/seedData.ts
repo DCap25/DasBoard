@@ -17,43 +17,33 @@ export async function seedDatabase() {
     console.log('Seeding database with mock data...');
 
     // Insert dealerships
-    const { error: dealershipsError } = await supabase
-      .from('dealerships')
-      .insert(mockDealerships);
-    
+    const { error: dealershipsError } = await supabase.from('dealerships').insert(mockDealerships);
+
     if (dealershipsError) throw dealershipsError;
     console.log('Dealerships seeded successfully');
 
     // Insert users (profiles)
     // Note: This assumes users are already created in auth - this just adds profile data
-    const { error: usersError } = await supabase
-      .from('profiles')
-      .insert(mockUsers);
-    
+    const { error: usersError } = await supabase.from('profiles').insert(mockUsers);
+
     if (usersError) throw usersError;
     console.log('User profiles seeded successfully');
 
     // Insert sales
-    const { error: salesError } = await supabase
-      .from('sales')
-      .insert(mockSales);
-    
+    const { error: salesError } = await supabase.from('sales').insert(mockSales);
+
     if (salesError) throw salesError;
     console.log('Sales seeded successfully');
 
     // Insert F&I details
-    const { error: fniError } = await supabase
-      .from('fni_details')
-      .insert(mockFniDetails);
-    
+    const { error: fniError } = await supabase.from('fni_details').insert(mockFniDetails);
+
     if (fniError) throw fniError;
     console.log('F&I details seeded successfully');
 
     // Insert metrics
-    const { error: metricsError } = await supabase
-      .from('metrics')
-      .insert(mockMetrics);
-    
+    const { error: metricsError } = await supabase.from('metrics').insert(mockMetrics);
+
     if (metricsError) throw metricsError;
     console.log('Metrics seeded successfully');
 
@@ -73,12 +63,12 @@ export async function createTestUsers() {
         .from('profiles')
         .select('email')
         .eq('email', user.email);
-      
+
       if (existingUsers && existingUsers.length > 0) {
         console.log(`User with email ${user.email} already exists. Skipping...`);
         continue;
       }
-      
+
       // Create user in Supabase Auth
       const { data, error } = await supabase.auth.signUp({
         email: user.email,
@@ -87,19 +77,19 @@ export async function createTestUsers() {
           data: {
             name: user.name,
             role: user.role,
-            dealership_id: user.dealership_id
-          }
-        }
+            dealership_id: user.dealership_id,
+          },
+        },
       });
-      
+
       if (error) {
         console.error(`Error creating user ${user.email}:`, error);
         continue;
       }
-      
+
       console.log(`Created user: ${user.email}`);
     }
-    
+
     console.log('Test users created successfully!');
   } catch (error) {
     console.error('Error creating test users:', error);
@@ -111,14 +101,14 @@ export async function createTestUsers() {
 export async function clearDatabase() {
   try {
     console.log('Clearing database...');
-    
+
     // Delete in proper order to respect foreign keys
     await supabase.from('fni_details').delete().neq('id', '');
     await supabase.from('metrics').delete().neq('id', '');
     await supabase.from('sales').delete().neq('id', '');
     await supabase.from('profiles').delete().neq('id', '');
     await supabase.from('dealerships').delete().neq('id', '');
-    
+
     console.log('Database cleared successfully!');
   } catch (error) {
     console.error('Error clearing database:', error);
@@ -133,7 +123,7 @@ export async function initializeDatabase() {
     const { count } = await supabase
       .from('dealerships')
       .select('*', { count: 'exact', head: true });
-    
+
     if (!count || count === 0) {
       await createTestUsers();
       await seedDatabase();
@@ -146,4 +136,4 @@ export async function initializeDatabase() {
     console.error('Error initializing database:', error);
     return false;
   }
-} 
+}

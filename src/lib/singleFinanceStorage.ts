@@ -13,14 +13,19 @@ export class SingleFinanceStorage {
     try {
       const key = this.getUserKey('singleFinanceTeamMembers', userId);
       console.log('[SingleFinanceStorage] Getting team members:', { userId, key });
-      
+
       const teamMembers = EncryptedStorage.getItem(key, []);
       console.log('[SingleFinanceStorage] Retrieved team members:', {
         key,
         count: teamMembers.length,
-        members: teamMembers.map(m => ({ id: m.id, name: `${m.firstName} ${m.lastName}`, role: m.role, active: m.active }))
+        members: teamMembers.map(m => ({
+          id: m.id,
+          name: `${m.firstName} ${m.lastName}`,
+          role: m.role,
+          active: m.active,
+        })),
       });
-      
+
       return teamMembers;
     } catch (error) {
       console.error('[SingleFinanceStorage] Error loading team members:', error);
@@ -35,20 +40,24 @@ export class SingleFinanceStorage {
         userId,
         key,
         count: teamMembers.length,
-        members: teamMembers.map(m => ({ id: m.id, name: `${m.firstName} ${m.lastName}`, role: m.role, active: m.active }))
+        members: teamMembers.map(m => ({
+          id: m.id,
+          name: `${m.firstName} ${m.lastName}`,
+          role: m.role,
+          active: m.active,
+        })),
       });
-      
+
       EncryptedStorage.setItem(key, teamMembers);
-      
+
       // Immediate verification
       const verification = EncryptedStorage.getItem(key, []);
       console.log('[SingleFinanceStorage] Save verification:', {
         key,
         savedCount: teamMembers.length,
         retrievedCount: verification.length,
-        success: teamMembers.length === verification.length
+        success: teamMembers.length === verification.length,
       });
-      
     } catch (error) {
       console.error('[SingleFinanceStorage] Error saving team members:', error);
       throw error; // Re-throw so caller can handle
@@ -123,7 +132,7 @@ export class SingleFinanceStorage {
         const now = new Date();
         const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
         const archiveKey = this.getUserKey(`singleFinanceDealsArchive_${monthKey}`, userId);
-        
+
         EncryptedStorage.setItem(archiveKey, currentDeals);
         console.log(`[SingleFinanceStorage] Archived ${currentDeals.length} deals for ${monthKey}`);
       }
@@ -182,14 +191,14 @@ export class SingleFinanceStorage {
   static getUserKeys(userId: string): string[] {
     const keys: string[] = [];
     const suffix = `_${userId}`;
-    
+
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key && key.endsWith(suffix) && key.startsWith('singleFinance')) {
         keys.push(key);
       }
     }
-    
+
     return keys;
   }
 
@@ -225,17 +234,17 @@ export class SingleFinanceStorage {
   // Debug storage state for troubleshooting
   static debugStorageState(userId: string): void {
     console.group('[SingleFinanceStorage] Storage Debug for user:', userId);
-    
+
     const key = this.getUserKey('singleFinanceTeamMembers', userId);
     console.log('Expected storage key:', key);
     console.log('User ID:', userId);
-    
+
     // Check encrypted storage
     const encryptedKey = `enc_${key}`;
     const encryptedData = localStorage.getItem(encryptedKey);
     console.log('Encrypted key exists:', !!encryptedData);
     console.log('Encrypted data length:', encryptedData?.length || 0);
-    
+
     // Check unencrypted storage
     const unencryptedData = localStorage.getItem(key);
     console.log('Unencrypted key exists:', !!unencryptedData);
@@ -247,13 +256,14 @@ export class SingleFinanceStorage {
         console.log('Unencrypted data (not JSON):', unencryptedData);
       }
     }
-    
+
     // Check all related keys
-    const allKeys = Object.keys(localStorage).filter(k => 
-      k.includes('singleFinance') || k.includes('TeamMembers') || (userId && k.includes(userId))
+    const allKeys = Object.keys(localStorage).filter(
+      k =>
+        k.includes('singleFinance') || k.includes('TeamMembers') || (userId && k.includes(userId))
     );
     console.log('All related localStorage keys:', allKeys);
-    
+
     // Try to retrieve using encrypted storage
     try {
       const retrieved = this.getTeamMembers(userId);
@@ -261,19 +271,19 @@ export class SingleFinanceStorage {
     } catch (error) {
       console.error('Error retrieving team members:', error);
     }
-    
+
     console.groupEnd();
   }
 
   // Clear old format localStorage keys that might have sample data
   static clearOldFormatData(): void {
     const oldKeys = [
-      'singleFinanceTeamMembers',  // Old format without user ID
-      'teamMembers',               // Generic team members  
-      'salespeople',               // Old salespeople data
-      'salesManagers',             // Old sales managers data
-      'sampleTeamMembers',         // Any sample data
-      'defaultTeamMembers'         // Any default data
+      'singleFinanceTeamMembers', // Old format without user ID
+      'teamMembers', // Generic team members
+      'salespeople', // Old salespeople data
+      'salesManagers', // Old sales managers data
+      'sampleTeamMembers', // Any sample data
+      'defaultTeamMembers', // Any default data
     ];
 
     let clearedCount = 0;
@@ -293,9 +303,17 @@ export class SingleFinanceStorage {
           const value = localStorage.getItem(key);
           if (value) {
             // Check if it's team member data with sample names
-            if (value.includes('John') || value.includes('Jane') || value.includes('Mike') || value.includes('Sarah')) {
+            if (
+              value.includes('John') ||
+              value.includes('Jane') ||
+              value.includes('Mike') ||
+              value.includes('Sarah')
+            ) {
               const parsed = JSON.parse(value);
-              if (Array.isArray(parsed) && parsed.some((item: any) => item.firstName && item.lastName)) {
+              if (
+                Array.isArray(parsed) &&
+                parsed.some((item: any) => item.firstName && item.lastName)
+              ) {
                 localStorage.removeItem(key);
                 clearedCount++;
                 console.log(`[Storage] Cleared sample data from key: ${key}`);

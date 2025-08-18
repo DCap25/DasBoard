@@ -1,6 +1,6 @@
 /**
  * Enhanced Error Handling Utilities for The DAS Board
- * 
+ *
  * FEATURES IMPLEMENTED:
  * - Safe API call wrappers with automatic error handling
  * - State management error boundaries and recovery
@@ -11,7 +11,12 @@
  */
 
 import { QueryClient } from '@tanstack/react-query';
-import { SecureErrorLogger, type SafeErrorInfo, type ErrorType, type ErrorSeverity } from '../components/ErrorBoundary';
+import {
+  SecureErrorLogger,
+  ErrorSeverity,
+  type SafeErrorInfo,
+  type ErrorType,
+} from '../components/ErrorBoundary';
 
 // =================== API ERROR HANDLING ===================
 
@@ -55,7 +60,7 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
   baseDelay: 1000,
   maxDelay: 10000,
   backoffFactor: 2,
-  retryableStatuses: [408, 429, 500, 502, 503, 504]
+  retryableStatuses: [408, 429, 500, 502, 503, 504],
 };
 
 /**
@@ -76,7 +81,7 @@ async function safeApiCall<T>(
     timeout = 30000,
     onError,
     onRetry,
-    identifier = 'UnknownAPI'
+    identifier = 'UnknownAPI',
   } = options;
 
   const config = { ...DEFAULT_RETRY_CONFIG, ...retryConfig };
@@ -100,24 +105,19 @@ async function safeApiCall<T>(
       return {
         data,
         success: true,
-        timestamp
+        timestamp,
       };
-
     } catch (error) {
       const apiError = createApiError(error, attempt, identifier);
       lastError = apiError;
 
       // Create safe error info for logging
-      const safeError = SecureErrorLogger.createSafeErrorInfo(
-        apiError,
-        undefined,
-        {
-          attempt,
-          maxAttempts: config.maxAttempts,
-          identifier,
-          apiFunction: apiFunction.name || 'anonymous'
-        }
-      );
+      const safeError = SecureErrorLogger.createSafeErrorInfo(apiError, undefined, {
+        attempt,
+        maxAttempts: config.maxAttempts,
+        identifier,
+        apiFunction: apiFunction.name || 'anonymous',
+      });
 
       // Log the error
       SecureErrorLogger.logError(safeError);
@@ -128,10 +128,8 @@ async function safeApiCall<T>(
       }
 
       // Check if we should retry
-      const shouldRetry = (
-        attempt < config.maxAttempts &&
-        isRetryableError(apiError, config.retryableStatuses)
-      );
+      const shouldRetry =
+        attempt < config.maxAttempts && isRetryableError(apiError, config.retryableStatuses);
 
       if (shouldRetry) {
         // Calculate delay with exponential backoff
@@ -140,7 +138,9 @@ async function safeApiCall<T>(
           config.maxDelay
         );
 
-        console.log(`API call failed, retrying in ${delay}ms (attempt ${attempt}/${config.maxAttempts})`);
+        console.log(
+          `API call failed, retrying in ${delay}ms (attempt ${attempt}/${config.maxAttempts})`
+        );
 
         // Call retry handler
         if (onRetry) {
@@ -161,7 +161,7 @@ async function safeApiCall<T>(
   return {
     error: lastError || new Error('Unknown API error'),
     success: false,
-    timestamp
+    timestamp,
   };
 }
 
@@ -184,7 +184,7 @@ function createApiError(error: any, attempt: number, identifier: string): ApiErr
     identifier,
     originalType: typeof error,
     originalName: error?.name,
-    ...apiError.details
+    ...apiError.details,
   };
 
   // Determine if error is retryable
@@ -200,9 +200,11 @@ function createApiError(error: any, attempt: number, identifier: string): ApiErr
  */
 function isRetryableError(error: ApiError, retryableStatuses: number[]): boolean {
   // Network errors are usually retryable
-  if (error.message?.toLowerCase().includes('network') ||
-      error.message?.toLowerCase().includes('timeout') ||
-      error.message?.toLowerCase().includes('connection')) {
+  if (
+    error.message?.toLowerCase().includes('network') ||
+    error.message?.toLowerCase().includes('timeout') ||
+    error.message?.toLowerCase().includes('connection')
+  ) {
     return true;
   }
 
@@ -239,7 +241,7 @@ function safeStateUpdate<T>(
       {
         operation: 'setState',
         component: componentName || 'Unknown',
-        stateType: typeof newState
+        stateType: typeof newState,
       }
     );
 
@@ -253,10 +255,7 @@ function safeStateUpdate<T>(
 /**
  * Safe effect cleanup wrapper
  */
-function safeCleanup(
-  cleanupFunction: () => void,
-  componentName?: string
-): void {
+function safeCleanup(cleanupFunction: () => void, componentName?: string): void {
   try {
     cleanupFunction();
   } catch (error) {
@@ -265,7 +264,7 @@ function safeCleanup(
       undefined,
       {
         operation: 'cleanup',
-        component: componentName || 'Unknown'
+        component: componentName || 'Unknown',
       }
     );
 
@@ -277,11 +276,7 @@ function safeCleanup(
 /**
  * Safe context value provider wrapper
  */
-function safeContextValue<T>(
-  getValue: () => T,
-  fallbackValue: T,
-  contextName?: string
-): T {
+function safeContextValue<T>(getValue: () => T, fallbackValue: T, contextName?: string): T {
   try {
     return getValue();
   } catch (error) {
@@ -290,12 +285,12 @@ function safeContextValue<T>(
       undefined,
       {
         operation: 'getContextValue',
-        context: contextName || 'Unknown'
+        context: contextName || 'Unknown',
       }
     );
 
     SecureErrorLogger.logError(safeError);
-    
+
     console.warn(`Context value retrieval failed for ${contextName}, using fallback`);
     return fallbackValue;
   }
@@ -307,7 +302,7 @@ function safeContextValue<T>(
  * Enhanced error handling for React Query
  */
 function createSafeQueryClient(): QueryClient {
-  return new QueryClient({
+  const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
         retry: (failureCount, error) => {
@@ -315,15 +310,16 @@ function createSafeQueryClient(): QueryClient {
           if ((error as any)?.status === 401 || (error as any)?.status === 403) {
             return false;
           }
-          
+
           // Retry up to 3 times for other errors
           return failureCount < 3;
         },
-        retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+        retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
         staleTime: 5 * 60 * 1000, // 5 minutes
         gcTime: 10 * 60 * 1000, // 10 minutes
         refetchOnWindowFocus: false,
         refetchOnReconnect: true,
+        networkMode: 'always',
       },
       mutations: {
         retry: (failureCount, error) => {
@@ -332,10 +328,11 @@ function createSafeQueryClient(): QueryClient {
           if (nonRetryableStatuses.includes((error as any)?.status)) {
             return false;
           }
-          
+
           return failureCount < 2;
         },
-        retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
+        retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 10000),
+        networkMode: 'always',
       },
     },
     queryCache: {
@@ -346,7 +343,7 @@ function createSafeQueryClient(): QueryClient {
           {
             operation: 'query',
             queryKey: query.queryKey,
-            queryHash: query.queryHash
+            queryHash: query.queryHash,
           }
         );
 
@@ -361,7 +358,7 @@ function createSafeQueryClient(): QueryClient {
           {
             operation: 'mutation',
             mutationKey: mutation.options.mutationKey,
-            variablesType: typeof variables
+            variablesType: typeof variables,
           }
         );
 
@@ -369,6 +366,24 @@ function createSafeQueryClient(): QueryClient {
       },
     },
   });
+
+  // Override methods that might not exist in all versions
+  const clientWithFallbacks = queryClient as any;
+  
+  if (typeof clientWithFallbacks.resumePausedMutations !== 'function') {
+    clientWithFallbacks.resumePausedMutations = () => {
+      console.warn('resumePausedMutations not available in this version of React Query');
+      return Promise.resolve();
+    };
+  }
+  
+  if (typeof clientWithFallbacks.pauseMutations !== 'function') {
+    clientWithFallbacks.pauseMutations = () => {
+      console.warn('pauseMutations not available in this version of React Query');
+    };
+  }
+
+  return queryClient;
 }
 
 // =================== FORM ERROR HANDLING ===================
@@ -398,33 +413,33 @@ async function safeFormSubmit<T>(
 
   try {
     const data = await submitFunction();
-    
+
     if (onSuccess) {
       onSuccess(data);
     }
-    
+
     return { success: true, data };
-    
   } catch (error) {
     const formErrors = extractFormErrors(error);
-    
+
     const safeError = SecureErrorLogger.createSafeErrorInfo(
       error instanceof Error ? error : new Error(String(error)),
       undefined,
       {
         operation: 'formSubmit',
         formName,
-        errorCount: formErrors.length
+        errorCount: formErrors.length,
       }
     );
 
     SecureErrorLogger.logError(safeError);
 
     // Check if these are validation errors
-    const isValidationError = formErrors.some(err => 
-      err.code?.includes('validation') || 
-      err.message.toLowerCase().includes('required') ||
-      err.message.toLowerCase().includes('invalid')
+    const isValidationError = formErrors.some(
+      err =>
+        err.code?.includes('validation') ||
+        err.message.toLowerCase().includes('required') ||
+        err.message.toLowerCase().includes('invalid')
     );
 
     if (isValidationError && onValidationError) {
@@ -448,7 +463,7 @@ function extractFormErrors(error: any): FormError[] {
     errors.push({
       field: 'general',
       message: error.message || 'Submission failed',
-      code: error.code
+      code: error.code,
     });
   }
   // Handle validation library errors (e.g., Zod)
@@ -457,7 +472,7 @@ function extractFormErrors(error: any): FormError[] {
       errors.push({
         field: issue.path?.join('.') || 'unknown',
         message: issue.message || 'Validation failed',
-        code: issue.code
+        code: issue.code,
       });
     });
   }
@@ -467,7 +482,7 @@ function extractFormErrors(error: any): FormError[] {
       errors.push({
         field: inner.path || 'unknown',
         message: inner.message || 'Validation failed',
-        code: inner.type
+        code: inner.type,
       });
     });
   }
@@ -476,7 +491,7 @@ function extractFormErrors(error: any): FormError[] {
     errors.push({
       field: 'general',
       message: error?.message || 'An unexpected error occurred',
-      code: error?.code || 'UNKNOWN'
+      code: error?.code || 'UNKNOWN',
     });
   }
 
@@ -504,7 +519,7 @@ class DebouncedErrorReporter {
   reportError(error: SafeErrorInfo): void {
     // Use error type + message as key to deduplicate similar errors
     const key = `${error.type}_${error.message.substring(0, 100)}`;
-    
+
     this.reportQueue.set(key, error);
 
     // Clear existing timeout
@@ -524,7 +539,7 @@ class DebouncedErrorReporter {
     console.log(`Reporting ${this.reportQueue.size} unique errors`);
 
     // Process each unique error
-    this.reportQueue.forEach((error) => {
+    this.reportQueue.forEach(error => {
       SecureErrorLogger.logError(error);
     });
 
@@ -538,9 +553,10 @@ class DebouncedErrorReporter {
  * Report error with debouncing to prevent spam
  */
 function reportError(error: Error | SafeErrorInfo, context?: any): void {
-  const safeError = error instanceof Error 
-    ? SecureErrorLogger.createSafeErrorInfo(error, undefined, context)
-    : error;
+  const safeError =
+    error instanceof Error
+      ? SecureErrorLogger.createSafeErrorInfo(error, undefined, context)
+      : error;
 
   DebouncedErrorReporter.getInstance().reportError(safeError);
 }
@@ -548,9 +564,7 @@ function reportError(error: Error | SafeErrorInfo, context?: any): void {
 /**
  * Create error boundary for specific use cases
  */
-function createSpecializedErrorBoundary(
-  type: 'auth' | 'api' | 'form' | 'navigation' | 'data'
-) {
+function createSpecializedErrorBoundary(type: 'auth' | 'api' | 'form' | 'navigation' | 'data') {
   const config = {
     auth: {
       identifier: 'AuthBoundary',
@@ -562,7 +576,7 @@ function createSpecializedErrorBoundary(
           localStorage.removeItem('supabase.auth.token');
           window.location.href = '/auth';
         }
-      }
+      },
     },
     api: {
       identifier: 'ApiBoundary',
@@ -574,7 +588,7 @@ function createSpecializedErrorBoundary(
           // Show network status indicator
           console.log('Network error detected, showing indicator');
         }
-      }
+      },
     },
     form: {
       identifier: 'FormBoundary',
@@ -583,7 +597,7 @@ function createSpecializedErrorBoundary(
       onError: (error: SafeErrorInfo) => {
         // Reset form state on critical errors
         console.log('Form error detected, may need to reset form');
-      }
+      },
     },
     navigation: {
       identifier: 'NavigationBoundary',
@@ -594,7 +608,7 @@ function createSpecializedErrorBoundary(
         if (error.severity === ErrorSeverity.CRITICAL) {
           window.location.href = '/';
         }
-      }
+      },
     },
     data: {
       identifier: 'DataBoundary',
@@ -604,8 +618,8 @@ function createSpecializedErrorBoundary(
       onError: (error: SafeErrorInfo) => {
         // Clear stale cache on data errors
         console.log('Data error detected, may need to clear cache');
-      }
-    }
+      },
+    },
   };
 
   return config[type];
@@ -622,12 +636,7 @@ export {
   createSafeQueryClient,
   safeFormSubmit,
   reportError,
-  createSpecializedErrorBoundary
+  createSpecializedErrorBoundary,
 };
 
-export type {
-  ApiError,
-  ApiResponse,
-  RetryConfig,
-  FormError
-};
+export type { ApiError, ApiResponse, RetryConfig, FormError };

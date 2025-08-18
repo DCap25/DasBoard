@@ -12,22 +12,34 @@ interface HotspotProps {
   popupPosition?: 'bottom' | 'right' | 'top-left';
 }
 
-const Hotspot: React.FC<HotspotProps> = ({ x, y, title, description, isActive, onClick, popupPosition = 'bottom' }) => (
+const Hotspot: React.FC<HotspotProps> = ({
+  x,
+  y,
+  title,
+  description,
+  isActive,
+  onClick,
+  popupPosition = 'bottom',
+}) => (
   <div
     className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group"
     style={{ left: `${x}%`, top: `${y}%` }}
   >
-    <div className={`w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center transition-all duration-300 bg-blue-500 hover:bg-blue-400 hover:scale-110`}>
+    <div
+      className={`w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center transition-all duration-300 bg-blue-500 hover:bg-blue-400 hover:scale-110`}
+    >
       <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
     </div>
-    
-    <div className={`absolute bg-white rounded-lg shadow-xl p-4 w-64 z-10 border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ${
-      popupPosition === 'right' 
-        ? 'left-8 top-1/2 transform -translate-y-1/2' 
-        : popupPosition === 'top-left'
-        ? 'right-8 bottom-8 transform'
-        : 'top-8 left-1/2 transform -translate-x-1/2'
-    }`}>
+
+    <div
+      className={`absolute bg-white rounded-lg shadow-xl p-4 w-64 z-10 border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ${
+        popupPosition === 'right'
+          ? 'left-8 top-1/2 transform -translate-y-1/2'
+          : popupPosition === 'top-left'
+            ? 'right-8 bottom-8 transform'
+            : 'top-8 left-1/2 transform -translate-x-1/2'
+      }`}
+    >
       <h3 className="font-semibold text-gray-900 mb-2">{title}</h3>
       <p className="text-sm text-gray-600">{description}</p>
     </div>
@@ -41,191 +53,216 @@ export default function DemoPage() {
 
   const hotspotsConfig = {
     finance: [
-    {
-      x: 26,
-      y: 59,
-      title: "Product Tracking",
-      description: "Monitor product sales performance, track warranties, GAP, and other F&I products to maximize profitability per deal.",
-      popupPosition: 'right' as const
-    },
-    {
-      x: 15,
-      y: 20,
-      title: "Performance Metrics",
-      description: "Monitor your personal performance with key metrics like PVR (Per Vehicle Retailed), products per deal, and monthly targets."
-    },
-    {
-      x: 70,
-      y: 51,
-      title: "Team Performance",
-      description: "Compare your performance with team averages and see how you rank among your colleagues."
-    },
-    {
-      x: 35,
-      y: 90,
-      title: "Recent Deals Log",
-      description: "View and manage your most recent deals with quick access to customer details and deal profitability.",
-      popupPosition: 'top-left' as const
-    },
-    {
-      x: 85,
-      y: 20,
-      title: "PVR",
-      description: "Per Vehicle Retailed - Track your average profit per vehicle and see how it compares to targets and team averages."
-    },
-    {
-      x: 60,
-      y: 20,
-      title: "Pay Calculator",
-      description: "Calculate your commission and bonuses based on deal profitability and product sales."
-    },
-    {
-      x: 40,
-      y: 33,
-      title: "Schedule",
-      description: "View your Schedule for the week and month"
-    }
+      {
+        x: 26,
+        y: 59,
+        title: 'Product Tracking',
+        description:
+          'Monitor product sales performance, track warranties, GAP, and other F&I products to maximize profitability per deal.',
+        popupPosition: 'right' as const,
+      },
+      {
+        x: 15,
+        y: 20,
+        title: 'Performance Metrics',
+        description:
+          'Monitor your personal performance with key metrics like PVR (Per Vehicle Retailed), products per deal, and monthly targets.',
+      },
+      {
+        x: 70,
+        y: 51,
+        title: 'Team Performance',
+        description:
+          'Compare your performance with team averages and see how you rank among your colleagues.',
+      },
+      {
+        x: 35,
+        y: 90,
+        title: 'Recent Deals Log',
+        description:
+          'View and manage your most recent deals with quick access to customer details and deal profitability.',
+        popupPosition: 'top-left' as const,
+      },
+      {
+        x: 85,
+        y: 20,
+        title: 'PVR',
+        description:
+          'Per Vehicle Retailed - Track your average profit per vehicle and see how it compares to targets and team averages.',
+      },
+      {
+        x: 60,
+        y: 20,
+        title: 'Pay Calculator',
+        description:
+          'Calculate your commission and bonuses based on deal profitability and product sales.',
+      },
+      {
+        x: 40,
+        y: 33,
+        title: 'Schedule',
+        description: 'View your Schedule for the week and month',
+      },
     ],
     'sales-manager': [
       {
         x: 30,
         y: 55,
-        title: "Team Schedule",
-        description: "Easily view team schedules, track attendance, and manage shift assignments for optimal coverage.",
-        popupPosition: 'right' as const
+        title: 'Team Schedule',
+        description:
+          'Easily view team schedules, track attendance, and manage shift assignments for optimal coverage.',
+        popupPosition: 'right' as const,
       },
       {
         x: 15,
         y: 25,
-        title: "Gross Profit Indicator",
-        description: "Easily track Front End and Back End Gross in Real Time."
+        title: 'Gross Profit Indicator',
+        description: 'Easily track Front End and Back End Gross in Real Time.',
       },
       {
         x: 85,
         y: 88,
-        title: "Sales Reports, Scheduler, Goals",
-        description: "Access comprehensive sales reports, manage team schedules, and set/track monthly and yearly goals for your sales team.",
-        popupPosition: 'top-left' as const
+        title: 'Sales Reports, Scheduler, Goals',
+        description:
+          'Access comprehensive sales reports, manage team schedules, and set/track monthly and yearly goals for your sales team.',
+        popupPosition: 'top-left' as const,
       },
       {
         x: 35,
         y: 90,
-        title: "The DAS Board",
-        description: "View Sales Leaderboard to stay on top of your salespeople performance and rankings.",
-        popupPosition: 'top-left' as const
+        title: 'The DAS Board',
+        description:
+          'View Sales Leaderboard to stay on top of your salespeople performance and rankings.',
+        popupPosition: 'top-left' as const,
       },
       {
         x: 90,
         y: 27,
-        title: "PVR",
-        description: "Per Vehicle Retailed - Track your average profit per vehicle and see how it compares to targets and team averages."
+        title: 'PVR',
+        description:
+          'Per Vehicle Retailed - Track your average profit per vehicle and see how it compares to targets and team averages.',
       },
       {
         x: 60,
         y: 25,
-        title: "Sales Performance",
-        description: "Quick view to stay on top of sales goals, track team progress, and monitor key performance indicators."
+        title: 'Sales Performance',
+        description:
+          'Quick view to stay on top of sales goals, track team progress, and monitor key performance indicators.',
       },
       {
         x: 40,
         y: 28,
-        title: "Units Sold",
-        description: "Track total units sold including new and used vehicles with daily, weekly, and monthly breakdowns."
-      }
+        title: 'Units Sold',
+        description:
+          'Track total units sold including new and used vehicles with daily, weekly, and monthly breakdowns.',
+      },
     ],
-    'salesperson': [
+    salesperson: [
       {
         x: 21,
         y: 63,
-        title: "The DAS Board",
-        description: "View Sales Leaderboard to stay on top of your salespeople performance and rankings.",
-        popupPosition: 'right' as const
+        title: 'The DAS Board',
+        description:
+          'View Sales Leaderboard to stay on top of your salespeople performance and rankings.',
+        popupPosition: 'right' as const,
       },
       {
         x: 12,
         y: 23,
-        title: "Unit Count",
-        description: "Track your new car and used car totals with daily, weekly, and monthly breakdowns to monitor sales volume."
+        title: 'Unit Count',
+        description:
+          'Track your new car and used car totals with daily, weekly, and monthly breakdowns to monitor sales volume.',
       },
       {
         x: 70,
         y: 56,
-        title: "Deal Log",
-        description: "Stay on top of all of your deals with detailed customer information, deal status, and transaction history."
+        title: 'Deal Log',
+        description:
+          'Stay on top of all of your deals with detailed customer information, deal status, and transaction history.',
       },
       {
         x: 50,
         y: 90,
-        title: "Goal Tracker and Pay Calculator",
-        description: "Stay on top of your goals and MTD pay estimator to track progress and maximize earnings.",
-        popupPosition: 'top-left' as const
+        title: 'Goal Tracker and Pay Calculator',
+        description:
+          'Stay on top of your goals and MTD pay estimator to track progress and maximize earnings.',
+        popupPosition: 'top-left' as const,
       },
       {
         x: 88,
         y: 23,
-        title: "Goal Quick View",
-        description: "Easily know where you are at with your goals and track progress towards monthly and yearly targets."
+        title: 'Goal Quick View',
+        description:
+          'Easily know where you are at with your goals and track progress towards monthly and yearly targets.',
       },
       {
         x: 35,
         y: 23,
-        title: "Gross Tracker",
-        description: "Stay on top of your gross with quick view front and back gross tracking to maximize every deal.",
-        popupPosition: 'right' as const
+        title: 'Gross Tracker',
+        description:
+          'Stay on top of your gross with quick view front and back gross tracking to maximize every deal.',
+        popupPosition: 'right' as const,
       },
       {
         x: 40,
         y: 40,
-        title: "Schedule",
-        description: "View your Schedule for the week and month"
-      }
+        title: 'Schedule',
+        description: 'View your Schedule for the week and month',
+      },
     ],
     'general-manager': [
       {
         x: 16,
         y: 49,
-        title: "F&I Manager Performance",
-        description: "Compare F&I Manager performance with team averages and benchmark against industry standards for maximum profitability.",
-        popupPosition: 'right' as const
+        title: 'F&I Manager Performance',
+        description:
+          'Compare F&I Manager performance with team averages and benchmark against industry standards for maximum profitability.',
+        popupPosition: 'right' as const,
       },
       {
         x: 15,
         y: 20,
-        title: "Performance Metrics",
-        description: "Monitor the dealership's performance with key metrics like PVR (Per Vehicle Retailed), products per deal, and total gross."
+        title: 'Performance Metrics',
+        description:
+          "Monitor the dealership's performance with key metrics like PVR (Per Vehicle Retailed), products per deal, and total gross.",
       },
       {
         x: 85,
         y: 48,
-        title: "Sales Manager Performance",
-        description: "View Sales Manager performance against teammates and compare individual metrics across the sales management team."
+        title: 'Sales Manager Performance',
+        description:
+          'View Sales Manager performance against teammates and compare individual metrics across the sales management team.',
       },
       {
         x: 35,
         y: 90,
-        title: "Sales DAS Board",
-        description: "View your sales person leaders and track top performers for maximum productivity while monitoring team dynamics and individual goal achievement.",
-        popupPosition: 'top-left' as const
+        title: 'Sales DAS Board',
+        description:
+          'View your sales person leaders and track top performers for maximum productivity while monitoring team dynamics and individual goal achievement.',
+        popupPosition: 'top-left' as const,
       },
       {
         x: 90,
         y: 20,
-        title: "PVR",
-        description: "Per Vehicle Retailed - Track the dealership's average profit per vehicle both front end and back end to see results fast."
+        title: 'PVR',
+        description:
+          "Per Vehicle Retailed - Track the dealership's average profit per vehicle both front end and back end to see results fast.",
       },
       {
         x: 64,
         y: 20,
-        title: "Goal Tracking",
-        description: "Quickly determine unit sales progress MTD and track performance against monthly targets."
+        title: 'Goal Tracking',
+        description:
+          'Quickly determine unit sales progress MTD and track performance against monthly targets.',
       },
       {
         x: 38,
         y: 19,
-        title: "Units Sold",
-        description: "Quickly track total units sold including new and used vehicles with MTD sales."
-      }
-    ]
+        title: 'Units Sold',
+        description:
+          'Quickly track total units sold including new and used vehicles with MTD sales.',
+      },
+    ],
   };
 
   const demos = [
@@ -233,26 +270,26 @@ export default function DemoPage() {
       id: 'salesperson',
       title: 'Sales Person Dashboard',
       description: 'Individual sales tracking and customer management',
-      image: '/images/SPDASH.JPG'
+      image: '/images/SPDASH.JPG',
     },
     {
       id: 'finance',
       title: 'Finance Manager Dashboard',
       description: 'Individual finance manager tracking performance and deals',
-      image: '/images/fi.JPG'
+      image: '/images/fi.JPG',
     },
     {
       id: 'sales-manager',
       title: 'Sales Manager Dashboard',
       description: 'Team management and sales performance overview',
-      image: '/images/SMDASH.JPG'
+      image: '/images/SMDASH.JPG',
     },
     {
       id: 'general-manager',
       title: 'General Manager Dashboard',
       description: 'Complete dealership overview and analytics',
-      image: '/images/GMDASH.JPG'
-    }
+      image: '/images/GMDASH.JPG',
+    },
   ];
 
   const currentDemoData = demos.find(demo => demo.id === currentDemo);
@@ -337,13 +374,13 @@ export default function DemoPage() {
             {/* Dashboard Image Container */}
             <div className="relative bg-white rounded-lg overflow-hidden shadow-xl">
               <div className="w-full relative" style={{ minHeight: '600px' }}>
-                <img 
-                  src={currentDemoData?.image} 
-                  alt={currentDemoData?.title} 
+                <img
+                  src={currentDemoData?.image}
+                  alt={currentDemoData?.title}
                   className="w-full h-full object-contain"
                   style={{ minHeight: '600px', maxHeight: '600px' }}
                 />
-                
+
                 {/* Interactive Hotspots */}
                 {currentHotspots.map((hotspot, index) => (
                   <Hotspot
@@ -376,7 +413,6 @@ export default function DemoPage() {
               />
             ))}
           </div>
-
         </div>
       </div>
     </div>

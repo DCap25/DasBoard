@@ -71,7 +71,7 @@ interface EditableDeal {
 const GMDashboard = () => {
   const { user, role, dealershipId } = useAuth();
   const [timePeriod, setTimePeriod] = useState<string>('this-month');
-  
+
   // State for Deals Log editing
   const [selectedDeal, setSelectedDeal] = useState<EditableDeal | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -325,8 +325,8 @@ const GMDashboard = () => {
                     data.salesPerformance >= 100
                       ? 'bg-white border-r border-blue-500'
                       : data.salesPerformance >= 80
-                      ? 'bg-blue-500'
-                      : 'bg-blue-500'
+                        ? 'bg-blue-500'
+                        : 'bg-blue-500'
                   }`}
                   style={{ width: `${Math.min(data.salesPerformance, 100)}%` }}
                 ></div>
@@ -469,10 +469,10 @@ const GMDashboard = () => {
                             index === 0
                               ? 'bg-yellow-100 text-yellow-600'
                               : index === 1
-                              ? 'bg-gray-100 text-gray-600'
-                              : index === 2
-                              ? 'bg-amber-100 text-amber-600'
-                              : 'bg-white border-r border-gray-200 text-blue-500'
+                                ? 'bg-gray-100 text-gray-600'
+                                : index === 2
+                                  ? 'bg-amber-100 text-amber-600'
+                                  : 'bg-white border-r border-gray-200 text-blue-500'
                           }`}
                         >
                           <span className="text-xs font-bold">{index + 1}</span>
@@ -497,7 +497,9 @@ const GMDashboard = () => {
         {/* Department Performance */}
         <Card className="col-span-12 md:col-span-4">
           <CardHeader className="bg-white border-b border-gray-300 py-2 rounded-t-lg">
-            <CardTitle className="text-black text-base font-medium">Department Performance - % of Monthly Goal</CardTitle>
+            <CardTitle className="text-black text-base font-medium">
+              Department Performance - % of Monthly Goal
+            </CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
             <div className="space-y-4">
@@ -580,42 +582,42 @@ const GMDashboard = () => {
 
                 {/* Sample data rows */}
                 <div>
-                {[
-                  {
-                    name: 'John Smith',
-                    totalDeals: 45,
-                    newDeals: 28,
-                    usedDeals: 17,
-                    gross: 84500,
-                    avgFront: 1250,
-                    avgBack: 950,
-                  },
-                  {
-                    name: 'Jessica Lee',
-                    totalDeals: 41,
-                    newDeals: 25,
-                    usedDeals: 16,
-                    gross: 78900,
-                    avgFront: 1180,
-                    avgBack: 920,
-                  },
-                ].map((manager, index) => (
-                  <div
-                    key={index}
-                    className={`flex items-center py-2 px-1 ${
-                      index !== 1 ? 'border-b' : ''
-                    } border-gray-100 text-sm hover:bg-gray-50`}
-                  >
-                    <div className="flex-1 flex justify-center">{index + 1}</div>
-                    <div className="flex-[3] font-medium px-2">{manager.name}</div>
-                    <div className="flex-[2] text-center">{manager.totalDeals}</div>
-                    <div className="flex-1 text-center">{manager.newDeals}</div>
-                    <div className="flex-1 text-center">{manager.usedDeals}</div>
-                    <div className="flex-[2] text-center">${manager.avgFront}</div>
-                    <div className="flex-[2] text-center">${manager.avgBack}</div>
-                    <div className="flex-[2] text-center">${manager.gross.toLocaleString()}</div>
-                  </div>
-                ))}
+                  {[
+                    {
+                      name: 'John Smith',
+                      totalDeals: 45,
+                      newDeals: 28,
+                      usedDeals: 17,
+                      gross: 84500,
+                      avgFront: 1250,
+                      avgBack: 950,
+                    },
+                    {
+                      name: 'Jessica Lee',
+                      totalDeals: 41,
+                      newDeals: 25,
+                      usedDeals: 16,
+                      gross: 78900,
+                      avgFront: 1180,
+                      avgBack: 920,
+                    },
+                  ].map((manager, index) => (
+                    <div
+                      key={index}
+                      className={`flex items-center py-2 px-1 ${
+                        index !== 1 ? 'border-b' : ''
+                      } border-gray-100 text-sm hover:bg-gray-50`}
+                    >
+                      <div className="flex-1 flex justify-center">{index + 1}</div>
+                      <div className="flex-[3] font-medium px-2">{manager.name}</div>
+                      <div className="flex-[2] text-center">{manager.totalDeals}</div>
+                      <div className="flex-1 text-center">{manager.newDeals}</div>
+                      <div className="flex-1 text-center">{manager.usedDeals}</div>
+                      <div className="flex-[2] text-center">${manager.avgFront}</div>
+                      <div className="flex-[2] text-center">${manager.avgBack}</div>
+                      <div className="flex-[2] text-center">${manager.gross.toLocaleString()}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -757,10 +759,10 @@ const GMDashboard = () => {
                             index === 0
                               ? 'bg-yellow-100 text-yellow-600'
                               : index === 1
-                              ? 'bg-gray-100 text-gray-600'
-                              : index === 2
-                              ? 'bg-amber-100 text-amber-600'
-                              : 'bg-white border-r border-gray-200 text-blue-500'
+                                ? 'bg-gray-100 text-gray-600'
+                                : index === 2
+                                  ? 'bg-amber-100 text-amber-600'
+                                  : 'bg-white border-r border-gray-200 text-blue-500'
                           }`}
                         >
                           <span className="text-xs font-bold">{index + 1}</span>
@@ -770,9 +772,7 @@ const GMDashboard = () => {
                         {person.name}
                       </div>
                       <div className="w-28 text-center">${person.pvr}</div>
-                      <div className="w-36 text-center">
-                        ${person.totalGross.toLocaleString()}
-                      </div>
+                      <div className="w-36 text-center">${person.totalGross.toLocaleString()}</div>
                       <div className="w-28 text-center">{person.avgMonth}</div>
                       <div className="w-28 text-center">{person.lastMonth}</div>
                       <div className="w-28 text-center">{person.ytd}</div>
@@ -1019,160 +1019,156 @@ const GMDashboard = () => {
                       status: 'Funded',
                       csiFollowUp: true,
                     },
-                  ].slice(0, 10).map((deal, index) => {
-                    const statusColor =
-                      deal.status === 'Funded'
-                        ? 'bg-green-100 text-green-800 border-green-200'
-                        : deal.status === 'Unwound'
-                        ? 'bg-red-100 text-red-800 border-red-200'
-                        : 'bg-amber-100 text-amber-800 border-amber-200';
+                  ]
+                    .slice(0, 10)
+                    .map((deal, index) => {
+                      const statusColor =
+                        deal.status === 'Funded'
+                          ? 'bg-green-100 text-green-800 border-green-200'
+                          : deal.status === 'Unwound'
+                            ? 'bg-red-100 text-red-800 border-red-200'
+                            : 'bg-amber-100 text-amber-800 border-amber-200';
 
-                    const reverseIndex = 10 - index;
+                      const reverseIndex = 10 - index;
 
-                    return (
-                      <tr
-                        key={deal.id}
-                        className={`border-b ${
-                          index % 2 === 1 ? 'bg-gray-50' : ''
-                        } hover:bg-blue-50`}
-                      >
-                        <td className="py-2 px-2 text-center font-medium">{reverseIndex}</td>
-                        <td className="py-2 pl-4 pr-2 text-left font-medium text-blue-600">
-                          {deal.id}
-                        </td>
-                        <td className="py-2 px-2 text-left">{deal.stockNumber}</td>
-                        <td className="py-2 px-2 text-left font-medium">
-                          {deal.customer}
-                        </td>
-                        <td className="py-2 px-2 text-center text-gray-600">
-                          {deal.date}
-                        </td>
-                        <td className="py-2 px-2 text-center">
-                          <span
-                            className={`px-1.5 py-0.5 rounded text-xs font-medium ${
-                              deal.vehicleType === 'N'
-                                ? 'bg-green-100 text-green-800'
-                                : deal.vehicleType === 'U' || deal.vehicleType === 'C'
-                                ? 'bg-amber-100 text-amber-800'
-                                : 'bg-blue-100 text-blue-800'
-                            }`}
-                          >
-                            {deal.vehicleType}
-                          </span>
-                        </td>
-                        <td className="py-2 px-2 text-center font-medium">
-                          {deal.initials}
-                        </td>
-                        <td className="py-2 px-2 text-right">
-                          ${deal.frontGross.toLocaleString()}
-                        </td>
-                        <td className="py-2 px-2 text-right">
-                          ${deal.financeGross.toLocaleString()}
-                        </td>
-                        <td className="py-2 px-2 text-right font-medium text-green-600">
-                          ${deal.totalGross.toLocaleString()}
-                        </td>
-                        <td className="py-2 px-2 text-center">
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${statusColor}`}
-                          >
-                            {deal.status}
-                          </span>
-                        </td>
-                        <td className="py-2 px-2 text-center">
-                          <input
-                            type="checkbox"
-                            checked={deal.csiFollowUp}
-                            className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                          />
-                        </td>
-                        <td className="py-2 px-2 text-center">
-                          <Dialog
-                            open={isEditing && selectedDeal?.id === deal.id}
-                            onOpenChange={open => {
-                              if (!open) setIsEditing(false);
-                            }}
-                          >
-                            <DialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7"
-                                onClick={() => {
-                                  setSelectedDeal({
-                                    id: deal.id,
-                                    frontGross: deal.frontGross,
-                                    status: deal.status,
-                                  });
-                                  setIsEditing(true);
-                                }}
-                              >
-                                <Edit className="h-3.5 w-3.5" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[425px]">
-                              <DialogHeader>
-                                <DialogTitle>Edit Deal</DialogTitle>
-                                <DialogDescription>
-                                  Update deal information for {deal.customer}
-                                </DialogDescription>
-                              </DialogHeader>
-                              <form onSubmit={handleSubmit}>
-                                <div className="grid gap-4 py-4">
-                                  <div className="grid gap-2">
-                                    <Label htmlFor="frontGross">Front End Gross ($)</Label>
-                                    <Input
-                                      id="frontGross"
-                                      type="number"
-                                      value={selectedDeal?.frontGross || 0}
-                                      onChange={handleFrontGrossChange}
-                                    />
+                      return (
+                        <tr
+                          key={deal.id}
+                          className={`border-b ${
+                            index % 2 === 1 ? 'bg-gray-50' : ''
+                          } hover:bg-blue-50`}
+                        >
+                          <td className="py-2 px-2 text-center font-medium">{reverseIndex}</td>
+                          <td className="py-2 pl-4 pr-2 text-left font-medium text-blue-600">
+                            {deal.id}
+                          </td>
+                          <td className="py-2 px-2 text-left">{deal.stockNumber}</td>
+                          <td className="py-2 px-2 text-left font-medium">{deal.customer}</td>
+                          <td className="py-2 px-2 text-center text-gray-600">{deal.date}</td>
+                          <td className="py-2 px-2 text-center">
+                            <span
+                              className={`px-1.5 py-0.5 rounded text-xs font-medium ${
+                                deal.vehicleType === 'N'
+                                  ? 'bg-green-100 text-green-800'
+                                  : deal.vehicleType === 'U' || deal.vehicleType === 'C'
+                                    ? 'bg-amber-100 text-amber-800'
+                                    : 'bg-blue-100 text-blue-800'
+                              }`}
+                            >
+                              {deal.vehicleType}
+                            </span>
+                          </td>
+                          <td className="py-2 px-2 text-center font-medium">{deal.initials}</td>
+                          <td className="py-2 px-2 text-right">
+                            ${deal.frontGross.toLocaleString()}
+                          </td>
+                          <td className="py-2 px-2 text-right">
+                            ${deal.financeGross.toLocaleString()}
+                          </td>
+                          <td className="py-2 px-2 text-right font-medium text-green-600">
+                            ${deal.totalGross.toLocaleString()}
+                          </td>
+                          <td className="py-2 px-2 text-center">
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-medium ${statusColor}`}
+                            >
+                              {deal.status}
+                            </span>
+                          </td>
+                          <td className="py-2 px-2 text-center">
+                            <input
+                              type="checkbox"
+                              checked={deal.csiFollowUp}
+                              className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                            />
+                          </td>
+                          <td className="py-2 px-2 text-center">
+                            <Dialog
+                              open={isEditing && selectedDeal?.id === deal.id}
+                              onOpenChange={open => {
+                                if (!open) setIsEditing(false);
+                              }}
+                            >
+                              <DialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7"
+                                  onClick={() => {
+                                    setSelectedDeal({
+                                      id: deal.id,
+                                      frontGross: deal.frontGross,
+                                      status: deal.status,
+                                    });
+                                    setIsEditing(true);
+                                  }}
+                                >
+                                  <Edit className="h-3.5 w-3.5" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="sm:max-w-[425px]">
+                                <DialogHeader>
+                                  <DialogTitle>Edit Deal</DialogTitle>
+                                  <DialogDescription>
+                                    Update deal information for {deal.customer}
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <form onSubmit={handleSubmit}>
+                                  <div className="grid gap-4 py-4">
+                                    <div className="grid gap-2">
+                                      <Label htmlFor="frontGross">Front End Gross ($)</Label>
+                                      <Input
+                                        id="frontGross"
+                                        type="number"
+                                        value={selectedDeal?.frontGross || 0}
+                                        onChange={handleFrontGrossChange}
+                                      />
+                                    </div>
+                                    <div className="grid gap-2">
+                                      <Label htmlFor="status">Deal Status</Label>
+                                      <Select
+                                        value={selectedDeal?.status || 'Pending'}
+                                        onValueChange={handleStatusChange}
+                                      >
+                                        <SelectTrigger id="status">
+                                          <SelectValue placeholder="Select status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="Pending">Pending</SelectItem>
+                                          <SelectItem value="Funded">Funded</SelectItem>
+                                          <SelectItem value="Unwound">Unwound</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                      {selectedDeal?.status === 'Unwound' && (
+                                        <p className="text-xs text-red-500 mt-1">
+                                          Warning: Unwinding a deal may affect salesperson
+                                          commissions.
+                                        </p>
+                                      )}
+                                    </div>
                                   </div>
-                                  <div className="grid gap-2">
-                                    <Label htmlFor="status">Deal Status</Label>
-                                    <Select
-                                      value={selectedDeal?.status || 'Pending'}
-                                      onValueChange={handleStatusChange}
-                                    >
-                                      <SelectTrigger id="status">
-                                        <SelectValue placeholder="Select status" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="Pending">Pending</SelectItem>
-                                        <SelectItem value="Funded">Funded</SelectItem>
-                                        <SelectItem value="Unwound">Unwound</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                    {selectedDeal?.status === 'Unwound' && (
-                                      <p className="text-xs text-red-500 mt-1">
-                                        Warning: Unwinding a deal may affect salesperson
-                                        commissions.
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
-                                <DialogFooter>
-                                  <Button type="submit" disabled={isSaving}>
-                                    {isSaving ? (
-                                      <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Saving
-                                      </>
-                                    ) : (
-                                      <>
-                                        <Save className="mr-2 h-4 w-4" />
-                                        Save Changes
-                                      </>
-                                    )}
-                                  </Button>
-                                </DialogFooter>
-                              </form>
-                            </DialogContent>
-                          </Dialog>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                                  <DialogFooter>
+                                    <Button type="submit" disabled={isSaving}>
+                                      {isSaving ? (
+                                        <>
+                                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                          Saving
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Save className="mr-2 h-4 w-4" />
+                                          Save Changes
+                                        </>
+                                      )}
+                                    </Button>
+                                  </DialogFooter>
+                                </form>
+                              </DialogContent>
+                            </Dialog>
+                          </td>
+                        </tr>
+                      );
+                    })}
                 </tbody>
                 <tfoot>
                   <tr className="bg-gray-100 border-t border-t-gray-200 font-medium">
@@ -1235,7 +1231,6 @@ const GMDashboard = () => {
           </div>
         </CardContent>
       </Card>
-
     </>
   );
 };

@@ -1,14 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { 
-  CheckCircle2, 
-  ArrowRight, 
-  Mail, 
-  Calendar, 
-  Users,
-  Building,
-  Lightbulb
-} from 'lucide-react';
+import { CheckCircle2, ArrowRight, Mail, Calendar, Users, Building, Lightbulb } from 'lucide-react';
 
 interface SuccessState {
   planName: string;
@@ -25,36 +17,38 @@ export default function SubscriptionSuccess() {
     {
       icon: Mail,
       title: 'Check Your Email',
-      description: 'We\'ve sent setup instructions and login credentials to your admin email addresses.',
-      status: 'completed'
+      description:
+        "We've sent setup instructions and login credentials to your admin email addresses.",
+      status: 'completed',
     },
     {
       icon: Users,
       title: 'Add Your Team',
-      description: 'Invite salespeople, finance managers, and other team members to their dashboards.',
-      status: 'pending'
+      description:
+        'Invite salespeople, finance managers, and other team members to their dashboards.',
+      status: 'pending',
     },
     {
       icon: Building,
       title: 'Configure Dealerships',
       description: 'Set up goals, schedules, and customize your dashboard preferences.',
-      status: 'pending'
+      status: 'pending',
     },
     {
       icon: Calendar,
       title: 'Start Using DAS Board',
       description: 'Begin logging deals and tracking performance across your organization.',
-      status: 'pending'
-    }
+      status: 'pending',
+    },
   ];
 
   const handleGetStarted = () => {
     // Navigate to the appropriate dashboard based on the plan
-    navigate('/auth', { 
-      state: { 
+    navigate('/auth', {
+      state: {
         message: 'Welcome to The DAS Board! Please log in with your credentials.',
-        newSubscription: true
-      } 
+        newSubscription: true,
+      },
     });
   };
 
@@ -63,7 +57,9 @@ export default function SubscriptionSuccess() {
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Invalid Access</h1>
-          <p className="text-gray-400 mb-6">This page is only accessible after completing a subscription.</p>
+          <p className="text-gray-400 mb-6">
+            This page is only accessible after completing a subscription.
+          </p>
           <button
             onClick={() => navigate('/subscriptions')}
             className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-500"
@@ -86,11 +82,11 @@ export default function SubscriptionSuccess() {
                 <CheckCircle2 className="w-8 h-8 text-white" />
               </div>
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2">
-              Welcome to The DAS Board!
-            </h1>
+            <h1 className="text-3xl font-bold text-white mb-2">Welcome to The DAS Board!</h1>
             <p className="text-xl text-gray-300">
-              Your subscription for <span className="text-blue-400 font-semibold">{state.organizationName}</span> is now active.
+              Your subscription for{' '}
+              <span className="text-blue-400 font-semibold">{state.organizationName}</span> is now
+              active.
             </p>
           </div>
         </div>
@@ -120,20 +116,20 @@ export default function SubscriptionSuccess() {
           <h2 className="text-2xl font-bold text-white mb-6">Next Steps</h2>
           <div className="space-y-4">
             {nextSteps.map((step, index) => (
-              <div 
+              <div
                 key={index}
                 className={`p-6 rounded-lg border transition-all ${
-                  step.status === 'completed' 
-                    ? 'bg-green-900/20 border-green-500/30' 
+                  step.status === 'completed'
+                    ? 'bg-green-900/20 border-green-500/30'
                     : 'bg-gray-800 border-gray-700 hover:border-gray-600'
                 }`}
               >
                 <div className="flex items-start">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 ${
-                    step.status === 'completed' 
-                      ? 'bg-green-600' 
-                      : 'bg-gray-700'
-                  }`}>
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 ${
+                      step.status === 'completed' ? 'bg-green-600' : 'bg-gray-700'
+                    }`}
+                  >
                     {step.status === 'completed' ? (
                       <CheckCircle2 className="w-5 h-5 text-white" />
                     ) : (
@@ -141,17 +137,17 @@ export default function SubscriptionSuccess() {
                     )}
                   </div>
                   <div className="flex-1">
-                    <h3 className={`text-lg font-semibold mb-2 ${
-                      step.status === 'completed' ? 'text-green-400' : 'text-white'
-                    }`}>
+                    <h3
+                      className={`text-lg font-semibold mb-2 ${
+                        step.status === 'completed' ? 'text-green-400' : 'text-white'
+                      }`}
+                    >
                       {step.title}
                     </h3>
                     <p className="text-gray-400">{step.description}</p>
                   </div>
                   {step.status === 'completed' && (
-                    <div className="text-green-400 text-sm font-medium">
-                      ✓ Completed
-                    </div>
+                    <div className="text-green-400 text-sm font-medium">✓ Completed</div>
                   )}
                 </div>
               </div>
@@ -233,7 +229,8 @@ export default function SubscriptionSuccess() {
         <div className="mt-8 text-center">
           <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
             <p className="text-gray-400 text-sm">
-              Your 14-day free trial starts now. No charges until {new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toLocaleDateString()}.
+              Your 14-day free trial starts now. No charges until{' '}
+              {new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toLocaleDateString()}.
               <br />
               You can cancel anytime before your trial ends.
             </p>

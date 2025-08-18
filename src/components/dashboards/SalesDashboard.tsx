@@ -400,11 +400,15 @@ const SalesDashboard = () => {
             <div className="mt-2 text-xs">
               <div className="flex items-center justify-between">
                 <span className="font-semibold text-gray-700">New:</span>
-                <span className="text-blue-600 font-medium">{MOCK_DEALS.filter(deal => deal.isNew).length}</span>
+                <span className="text-blue-600 font-medium">
+                  {MOCK_DEALS.filter(deal => deal.isNew).length}
+                </span>
               </div>
               <div className="flex items-center justify-between mt-1">
                 <span className="font-semibold text-gray-700">Used:</span>
-                <span className="text-green-600 font-medium">{MOCK_DEALS.filter(deal => !deal.isNew).length}</span>
+                <span className="text-green-600 font-medium">
+                  {MOCK_DEALS.filter(deal => !deal.isNew).length}
+                </span>
               </div>
             </div>
           </CardContent>
@@ -541,329 +545,329 @@ const SalesDashboard = () => {
         {/* Leader Board - The Das Board (2/5 width) */}
         <div className="md:col-span-2">
           <Card className="border hover:shadow-md transition-shadow">
-          <CardHeader className="bg-white border-b border-gray-300 py-2 px-4">
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-lg font-semibold flex items-center text-black">
-                <Trophy className="mr-2 h-5 w-5 text-yellow-500" />
-                The Das Board
-              </CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="py-1">
-            {/* Sortable Header - Performance View */}
-            <div className="flex items-center text-xs font-medium text-white border-b py-1">
-              <div className="w-8 text-center bg-blue-500 border-r border-blue-600 py-1 rounded-l-md text-xs">
-                #
+            <CardHeader className="bg-white border-b border-gray-300 py-2 px-4">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-lg font-semibold flex items-center text-black">
+                  <Trophy className="mr-2 h-5 w-5 text-yellow-500" />
+                  The Das Board
+                </CardTitle>
               </div>
-              <div className="w-24 flex-shrink-0 bg-gray-700 text-white border-r border-gray-800 py-1 px-1 text-xs">
-                Name
+            </CardHeader>
+            <CardContent className="py-1">
+              {/* Sortable Header - Performance View */}
+              <div className="flex items-center text-xs font-medium text-white border-b py-1">
+                <div className="w-8 text-center bg-blue-500 border-r border-blue-600 py-1 rounded-l-md text-xs">
+                  #
+                </div>
+                <div className="w-24 flex-shrink-0 bg-gray-700 text-white border-r border-gray-800 py-1 px-1 text-xs">
+                  Name
+                </div>
+                <div className="w-16 text-center bg-blue-500 border-r border-blue-600 py-1 text-xs">
+                  PVR
+                </div>
+                <div className="w-20 text-center bg-blue-500 border-r border-blue-600 py-1 text-xs">
+                  Gross
+                </div>
+                <div className="w-14 text-center bg-blue-500 border-r border-blue-600 py-1 text-xs">
+                  Avg
+                </div>
+                <div className="w-14 text-center bg-blue-500 border-r border-blue-600 py-1 text-xs">
+                  Last
+                </div>
+                <div className="w-16 text-center bg-blue-500 border-r border-blue-600 py-1 text-xs">
+                  YTD
+                </div>
+                <div className="w-16 text-center bg-blue-500 border-r border-blue-600 py-1 text-xs">
+                  Ann
+                </div>
+                <div className="w-12 text-center bg-blue-500 border-r border-blue-600 py-1 text-xs">
+                  New
+                </div>
+                <div className="w-12 text-center bg-blue-500 border-r border-blue-600 py-1 text-xs">
+                  Used
+                </div>
+                <div className="flex-1 text-right bg-blue-500 py-1 pr-2 font-semibold rounded-r-md text-xs">
+                  Units
+                </div>
               </div>
-              <div className="w-16 text-center bg-blue-500 border-r border-blue-600 py-1 text-xs">
-                PVR
-              </div>
-              <div className="w-20 text-center bg-blue-500 border-r border-blue-600 py-1 text-xs">
-                Gross
-              </div>
-              <div className="w-14 text-center bg-blue-500 border-r border-blue-600 py-1 text-xs">
-                Avg
-              </div>
-              <div className="w-14 text-center bg-blue-500 border-r border-blue-600 py-1 text-xs">
-                Last
-              </div>
-              <div className="w-16 text-center bg-blue-500 border-r border-blue-600 py-1 text-xs">
-                YTD
-              </div>
-              <div className="w-16 text-center bg-blue-500 border-r border-blue-600 py-1 text-xs">
-                Ann
-              </div>
-              <div className="w-12 text-center bg-blue-500 border-r border-blue-600 py-1 text-xs">
-                New
-              </div>
-              <div className="w-12 text-center bg-blue-500 border-r border-blue-600 py-1 text-xs">
-                Used
-              </div>
-              <div className="flex-1 text-right bg-blue-500 py-1 pr-2 font-semibold rounded-r-md text-xs">
-                Units
-              </div>
-            </div>
 
-            {/* Leaderboard Entries */}
-            <div>
-              {[
-                {
-                  name: 'Michael Scott',
-                  units: 14,
-                  frontGross: 18200,
-                  backGross: 14300,
-                  totalGross: 32500,
-                  avgMonth: 12,
-                  lastMonth: 15,
-                  ytd: 82,
-                  annualPace: 144,
-                  newUnits: 9,
-                  usedUnits: 5,
-                  pvr: 2321,
-                },
-                {
-                  name: 'Jim Halpert',
-                  units: 12,
-                  frontGross: 16400,
-                  backGross: 12500,
-                  totalGross: 28900,
-                  avgMonth: 10,
-                  lastMonth: 11,
-                  ytd: 65,
-                  annualPace: 120,
-                  newUnits: 7,
-                  usedUnits: 5,
-                  pvr: 2408,
-                },
-                {
-                  name: 'Dwight Schrute',
-                  units: 11,
-                  frontGross: 14800,
-                  backGross: 11600,
-                  totalGross: 26400,
-                  avgMonth: 9,
-                  lastMonth: 10,
-                  ytd: 58,
-                  annualPace: 108,
-                  newUnits: 4,
-                  usedUnits: 7,
-                  pvr: 2400,
-                },
-                {
-                  name: 'Pam Beesly',
-                  units: 9,
-                  frontGross: 11900,
-                  backGross: 9800,
-                  totalGross: 21700,
-                  avgMonth: 8,
-                  lastMonth: 7,
-                  ytd: 48,
-                  annualPace: 96,
-                  newUnits: 5,
-                  usedUnits: 4,
-                  pvr: 2411,
-                },
-                {
-                  name: 'Stanley Hudson',
-                  units: 8,
-                  frontGross: 10500,
-                  backGross: 8700,
-                  totalGross: 19200,
-                  avgMonth: 7,
-                  lastMonth: 9,
-                  ytd: 42,
-                  annualPace: 84,
-                  newUnits: 3,
-                  usedUnits: 5,
-                  pvr: 2400,
-                },
-                {
-                  name: 'Kevin Malone',
-                  units: 7,
-                  frontGross: 9200,
-                  backGross: 7800,
-                  totalGross: 17000,
-                  avgMonth: 6,
-                  lastMonth: 8,
-                  ytd: 38,
-                  annualPace: 76,
-                  newUnits: 2,
-                  usedUnits: 5,
-                  pvr: 2429,
-                },
-                {
-                  name: 'Andy Bernard',
-                  units: 6,
-                  frontGross: 8500,
-                  backGross: 6900,
-                  totalGross: 15400,
-                  avgMonth: 5,
-                  lastMonth: 6,
-                  ytd: 32,
-                  annualPace: 72,
-                  newUnits: 4,
-                  usedUnits: 2,
-                  pvr: 2567,
-                },
-                {
-                  name: 'Phyllis Vance',
-                  units: 5,
-                  frontGross: 7800,
-                  backGross: 6200,
-                  totalGross: 14000,
-                  avgMonth: 4,
-                  lastMonth: 5,
-                  ytd: 28,
-                  annualPace: 60,
-                  newUnits: 1,
-                  usedUnits: 4,
-                  pvr: 2800,
-                },
-              ].map((person, index) => (
-                <div
-                  key={index}
-                  className={`flex items-center py-1 ${
-                    index !== 7 ? 'border-b' : ''
-                  } border-gray-100 text-xs hover:bg-gray-50 bg-white`}
-                >
-                  <div className="w-8 flex justify-center">
-                    <div
-                      className={`w-4 h-4 rounded-full flex items-center justify-center
+              {/* Leaderboard Entries */}
+              <div>
+                {[
+                  {
+                    name: 'Michael Scott',
+                    units: 14,
+                    frontGross: 18200,
+                    backGross: 14300,
+                    totalGross: 32500,
+                    avgMonth: 12,
+                    lastMonth: 15,
+                    ytd: 82,
+                    annualPace: 144,
+                    newUnits: 9,
+                    usedUnits: 5,
+                    pvr: 2321,
+                  },
+                  {
+                    name: 'Jim Halpert',
+                    units: 12,
+                    frontGross: 16400,
+                    backGross: 12500,
+                    totalGross: 28900,
+                    avgMonth: 10,
+                    lastMonth: 11,
+                    ytd: 65,
+                    annualPace: 120,
+                    newUnits: 7,
+                    usedUnits: 5,
+                    pvr: 2408,
+                  },
+                  {
+                    name: 'Dwight Schrute',
+                    units: 11,
+                    frontGross: 14800,
+                    backGross: 11600,
+                    totalGross: 26400,
+                    avgMonth: 9,
+                    lastMonth: 10,
+                    ytd: 58,
+                    annualPace: 108,
+                    newUnits: 4,
+                    usedUnits: 7,
+                    pvr: 2400,
+                  },
+                  {
+                    name: 'Pam Beesly',
+                    units: 9,
+                    frontGross: 11900,
+                    backGross: 9800,
+                    totalGross: 21700,
+                    avgMonth: 8,
+                    lastMonth: 7,
+                    ytd: 48,
+                    annualPace: 96,
+                    newUnits: 5,
+                    usedUnits: 4,
+                    pvr: 2411,
+                  },
+                  {
+                    name: 'Stanley Hudson',
+                    units: 8,
+                    frontGross: 10500,
+                    backGross: 8700,
+                    totalGross: 19200,
+                    avgMonth: 7,
+                    lastMonth: 9,
+                    ytd: 42,
+                    annualPace: 84,
+                    newUnits: 3,
+                    usedUnits: 5,
+                    pvr: 2400,
+                  },
+                  {
+                    name: 'Kevin Malone',
+                    units: 7,
+                    frontGross: 9200,
+                    backGross: 7800,
+                    totalGross: 17000,
+                    avgMonth: 6,
+                    lastMonth: 8,
+                    ytd: 38,
+                    annualPace: 76,
+                    newUnits: 2,
+                    usedUnits: 5,
+                    pvr: 2429,
+                  },
+                  {
+                    name: 'Andy Bernard',
+                    units: 6,
+                    frontGross: 8500,
+                    backGross: 6900,
+                    totalGross: 15400,
+                    avgMonth: 5,
+                    lastMonth: 6,
+                    ytd: 32,
+                    annualPace: 72,
+                    newUnits: 4,
+                    usedUnits: 2,
+                    pvr: 2567,
+                  },
+                  {
+                    name: 'Phyllis Vance',
+                    units: 5,
+                    frontGross: 7800,
+                    backGross: 6200,
+                    totalGross: 14000,
+                    avgMonth: 4,
+                    lastMonth: 5,
+                    ytd: 28,
+                    annualPace: 60,
+                    newUnits: 1,
+                    usedUnits: 4,
+                    pvr: 2800,
+                  },
+                ].map((person, index) => (
+                  <div
+                    key={index}
+                    className={`flex items-center py-1 ${
+                      index !== 7 ? 'border-b' : ''
+                    } border-gray-100 text-xs hover:bg-gray-50 bg-white`}
+                  >
+                    <div className="w-8 flex justify-center">
+                      <div
+                        className={`w-4 h-4 rounded-full flex items-center justify-center
                       ${
                         index === 0
                           ? 'bg-yellow-100 text-yellow-600'
                           : index === 1
-                          ? 'bg-gray-100 text-gray-600'
-                          : index === 2
-                          ? 'bg-amber-100 text-amber-600'
-                          : 'bg-white border-r border-gray-200 text-blue-500'
+                            ? 'bg-gray-100 text-gray-600'
+                            : index === 2
+                              ? 'bg-amber-100 text-amber-600'
+                              : 'bg-white border-r border-gray-200 text-blue-500'
                       }`}
-                    >
-                      <span className="text-xs font-bold">{index + 1}</span>
+                      >
+                        <span className="text-xs font-bold">{index + 1}</span>
+                      </div>
+                    </div>
+                    <div className="w-24 flex-shrink-0 font-medium truncate bg-blue-50 text-xs px-1">
+                      {person.name.split(' ')[0]}
+                    </div>
+                    <div className="w-16 text-center text-xs">{person.pvr}</div>
+                    <div className="w-20 text-center text-xs">
+                      {(person.totalGross / 1000).toFixed(0)}k
+                    </div>
+                    <div className="w-14 text-center text-xs">{person.avgMonth}</div>
+                    <div className="w-14 text-center text-xs">{person.lastMonth}</div>
+                    <div className="w-16 text-center text-xs">{person.ytd}</div>
+                    <div className="w-16 text-center text-xs">{person.annualPace}</div>
+                    <div className="w-12 text-center text-xs">{person.newUnits}</div>
+                    <div className="w-12 text-center text-xs">{person.usedUnits}</div>
+                    <div className="flex-1 text-right pr-2">
+                      <span className="text-sm font-bold text-indigo-700">{person.units}</span>
                     </div>
                   </div>
-                  <div className="w-24 flex-shrink-0 font-medium truncate bg-blue-50 text-xs px-1">{person.name.split(' ')[0]}</div>
-                  <div className="w-16 text-center text-xs">
-                    {person.pvr}
-                  </div>
-                  <div className="w-20 text-center text-xs">
-                    {(person.totalGross/1000).toFixed(0)}k
-                  </div>
-                  <div className="w-14 text-center text-xs">{person.avgMonth}</div>
-                  <div className="w-14 text-center text-xs">{person.lastMonth}</div>
-                  <div className="w-16 text-center text-xs">{person.ytd}</div>
-                  <div className="w-16 text-center text-xs">{person.annualPace}</div>
-                  <div className="w-12 text-center text-xs">{person.newUnits}</div>
-                  <div className="w-12 text-center text-xs">{person.usedUnits}</div>
-                  <div className="flex-1 text-right pr-2">
-                    <span className="text-sm font-bold text-indigo-700">{person.units}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
 
-            <div className="mt-2 pt-2 text-center">
-              <Button variant="ghost" size="sm" className="text-xs text-blue-600">
-                View All Salespeople
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+              <div className="mt-2 pt-2 text-center">
+                <Button variant="ghost" size="sm" className="text-xs text-blue-600">
+                  View All Salespeople
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* My Deals section (3/5 width) */}
         <div className="md:col-span-3">
           <Card className="flex-grow border hover:shadow-md transition-shadow h-full">
-          <CardHeader className="pb-2 border-b bg-white">
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-lg font-medium flex items-center text-black">
-                <FileText className="mr-2 h-5 w-5 text-blue-500" />
-                My Deals
-              </CardTitle>
-              <div
-                className={`h-3 w-3 rounded-full ${
-                  performanceColor === 'green'
-                    ? 'bg-white border-r border-blue-500'
-                    : performanceColor === 'yellow'
-                    ? 'bg-blue-500'
-                    : 'bg-blue-500'
-                }`}
-              ></div>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className="overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="text-left border-b">
-                      <th className="pb-2 font-medium text-xs text-gray-700">STOCK #</th>
-                      <th className="pb-2 font-medium text-xs text-gray-700">CUSTOMER</th>
-                      <th className="pb-2 font-medium text-xs text-gray-700 text-right">FRONT</th>
-                      <th className="pb-2 font-medium text-xs text-gray-700 text-right">BACK</th>
-                      <th className="pb-2 font-medium text-xs text-gray-700 text-right">TOTAL</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentDeals.slice(0, 10).map((deal, index) => (
-                      <tr
-                        key={deal.id || deal.dealNumber}
-                        className={`${
-                          index !== currentDeals.slice(0, 10).length - 1 ? 'border-b' : ''
-                        } ${
-                          deal.vehicleType === 'N' || deal.isNew
-                            ? 'bg-white border-r border-gray-200'
-                            : ''
-                        }`}
-                      >
-                        <td className="py-3 text-sm">{deal.stockNumber}</td>
-                        <td className="py-3 text-sm">{deal.lastName || deal.customer}</td>
-                        <td
-                          className={`py-3 text-sm text-right ${
-                            (deal.frontEndGross || deal.frontGross || 0) === 0
-                              ? 'text-red-500 font-medium'
+            <CardHeader className="pb-2 border-b bg-white">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-lg font-medium flex items-center text-black">
+                  <FileText className="mr-2 h-5 w-5 text-blue-500" />
+                  My Deals
+                </CardTitle>
+                <div
+                  className={`h-3 w-3 rounded-full ${
+                    performanceColor === 'green'
+                      ? 'bg-white border-r border-blue-500'
+                      : performanceColor === 'yellow'
+                        ? 'bg-blue-500'
+                        : 'bg-blue-500'
+                  }`}
+                ></div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <div className="overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="text-left border-b">
+                        <th className="pb-2 font-medium text-xs text-gray-700">STOCK #</th>
+                        <th className="pb-2 font-medium text-xs text-gray-700">CUSTOMER</th>
+                        <th className="pb-2 font-medium text-xs text-gray-700 text-right">FRONT</th>
+                        <th className="pb-2 font-medium text-xs text-gray-700 text-right">BACK</th>
+                        <th className="pb-2 font-medium text-xs text-gray-700 text-right">TOTAL</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {currentDeals.slice(0, 10).map((deal, index) => (
+                        <tr
+                          key={deal.id || deal.dealNumber}
+                          className={`${
+                            index !== currentDeals.slice(0, 10).length - 1 ? 'border-b' : ''
+                          } ${
+                            deal.vehicleType === 'N' || deal.isNew
+                              ? 'bg-white border-r border-gray-200'
                               : ''
                           }`}
                         >
-                          ${(deal.frontEndGross || deal.frontGross || 0).toLocaleString()}
-                        </td>
-                        <td className="py-3 text-sm text-right">
-                          ${(deal.backEndGross || deal.profit || 0).toLocaleString()}
-                        </td>
-                        <td className="py-3 text-sm font-medium text-right">
-                          $
-                          {(
-                            (deal.frontEndGross || deal.frontGross || 0) +
-                            (deal.backEndGross || deal.profit || 0)
-                          ).toLocaleString()}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                          <td className="py-3 text-sm">{deal.stockNumber}</td>
+                          <td className="py-3 text-sm">{deal.lastName || deal.customer}</td>
+                          <td
+                            className={`py-3 text-sm text-right ${
+                              (deal.frontEndGross || deal.frontGross || 0) === 0
+                                ? 'text-red-500 font-medium'
+                                : ''
+                            }`}
+                          >
+                            ${(deal.frontEndGross || deal.frontGross || 0).toLocaleString()}
+                          </td>
+                          <td className="py-3 text-sm text-right">
+                            ${(deal.backEndGross || deal.profit || 0).toLocaleString()}
+                          </td>
+                          <td className="py-3 text-sm font-medium text-right">
+                            $
+                            {(
+                              (deal.frontEndGross || deal.frontGross || 0) +
+                              (deal.backEndGross || deal.profit || 0)
+                            ).toLocaleString()}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
 
-            <div className="mt-8">
-              <div className="bg-white rounded-lg border border-blue-100 p-4">
-                <h3 className="font-semibold text-blue-700 mb-2">Deal Performance</h3>
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div>
-                    <div className="text-xs text-gray-500">Avg Front</div>
-                    <div className="font-bold text-blue-700">
-                      ${Math.round(totalFrontEndGross / MOCK_DEALS.length).toLocaleString()}
+              <div className="mt-8">
+                <div className="bg-white rounded-lg border border-blue-100 p-4">
+                  <h3 className="font-semibold text-blue-700 mb-2">Deal Performance</h3>
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                      <div className="text-xs text-gray-500">Avg Front</div>
+                      <div className="font-bold text-blue-700">
+                        ${Math.round(totalFrontEndGross / MOCK_DEALS.length).toLocaleString()}
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500">Avg Back</div>
-                    <div className="font-bold text-blue-700">
-                      ${Math.round(totalBackEndGross / MOCK_DEALS.length).toLocaleString()}
+                    <div>
+                      <div className="text-xs text-gray-500">Avg Back</div>
+                      <div className="font-bold text-blue-700">
+                        ${Math.round(totalBackEndGross / MOCK_DEALS.length).toLocaleString()}
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500">Avg Total</div>
-                    <div className="font-bold text-blue-700">
-                      ${Math.round(totalGross / MOCK_DEALS.length).toLocaleString()}
+                    <div>
+                      <div className="text-xs text-gray-500">Avg Total</div>
+                      <div className="font-bold text-blue-700">
+                        ${Math.round(totalGross / MOCK_DEALS.length).toLocaleString()}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-          <CardFooter className="border-t px-6 py-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="ml-auto flex items-center text-blue-600 text-sm"
-            >
-              View All Deals
-              <ArrowRight className="ml-1 h-4 w-4" />
-            </Button>
-          </CardFooter>
-        </Card>
+            </CardContent>
+            <CardFooter className="border-t px-6 py-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="ml-auto flex items-center text-blue-600 text-sm"
+              >
+                View All Deals
+                <ArrowRight className="ml-1 h-4 w-4" />
+              </Button>
+            </CardFooter>
+          </Card>
         </div>
       </div>
 

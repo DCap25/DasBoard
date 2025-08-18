@@ -98,7 +98,7 @@ const GoalTracking: React.FC = () => {
       console.log('[GoalTracking] Goal data loaded:', data);
     } catch (error) {
       console.error('[GoalTracking] Error fetching goal data:', error);
-      
+
       // Check if it's a database column error (user might be on wrong dashboard)
       if (error && typeof error === 'object' && 'code' in error && error.code === '42703') {
         console.warn('[GoalTracking] Database schema mismatch - user may be on wrong dashboard');
@@ -217,10 +217,10 @@ const GoalTracking: React.FC = () => {
                 goalProgress.status === 'on-track'
                   ? 'bg-green-500'
                   : goalProgress.status === 'slightly-behind'
-                  ? 'bg-amber-500'
-                  : goalProgress.status === 'behind'
-                  ? 'bg-red-500'
-                  : 'bg-gray-400'
+                    ? 'bg-amber-500'
+                    : goalProgress.status === 'behind'
+                      ? 'bg-red-500'
+                      : 'bg-gray-400'
               } animate-pulse shadow-md`}
               title={`Status: ${goalProgress.status}`}
             ></div>
@@ -269,8 +269,8 @@ const GoalTracking: React.FC = () => {
                     goalProgress.status === 'on-track'
                       ? 'bg-green-500'
                       : goalProgress.status === 'slightly-behind'
-                      ? 'bg-amber-500'
-                      : 'bg-red-500'
+                        ? 'bg-amber-500'
+                        : 'bg-red-500'
                   }`}
                   style={{ width: `${getProgressPercentage()}%` }}
                 ></div>

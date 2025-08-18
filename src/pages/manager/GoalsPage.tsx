@@ -279,10 +279,10 @@ const GoalsPage = () => {
                     overallProgress.percentage >= 90
                       ? 'bg-green-500'
                       : overallProgress.percentage >= 70
-                      ? 'bg-blue-500'
-                      : overallProgress.percentage >= 50
-                      ? 'bg-amber-500'
-                      : 'bg-red-500'
+                        ? 'bg-blue-500'
+                        : overallProgress.percentage >= 50
+                          ? 'bg-amber-500'
+                          : 'bg-red-500'
                   }`}
                   style={{ width: `${Math.min(overallProgress.percentage, 100)}%` }}
                 ></div>
@@ -375,10 +375,10 @@ const GoalsPage = () => {
                                   progress >= 90
                                     ? 'bg-green-500'
                                     : progress >= 70
-                                    ? 'bg-blue-500'
-                                    : progress >= 50
-                                    ? 'bg-amber-500'
-                                    : 'bg-red-500'
+                                      ? 'bg-blue-500'
+                                      : progress >= 50
+                                        ? 'bg-amber-500'
+                                        : 'bg-red-500'
                                 }`}
                                 style={{ width: `${Math.min(progress, 100)}%` }}
                               ></div>
@@ -496,10 +496,10 @@ const GoalsPage = () => {
                                   progress >= 90
                                     ? 'bg-green-500'
                                     : progress >= 70
-                                    ? 'bg-blue-500'
-                                    : progress >= 50
-                                    ? 'bg-amber-500'
-                                    : 'bg-red-500'
+                                      ? 'bg-blue-500'
+                                      : progress >= 50
+                                        ? 'bg-amber-500'
+                                        : 'bg-red-500'
                                 }`}
                                 style={{ width: `${Math.min(progress, 100)}%` }}
                               ></div>

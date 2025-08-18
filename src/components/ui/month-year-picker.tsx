@@ -58,7 +58,7 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
     <div className="relative">
       <select
         value={selectedMonth}
-        onChange={(e) => {
+        onChange={e => {
           if (e.target.value === 'custom') {
             setIsCustomMode(true);
           } else {
@@ -73,20 +73,20 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
         <option value="last-quarter">Last Quarter</option>
         <option value="ytd">Year to Date</option>
         <option value="last-year">Last Year</option>
-        
+
         {availableMonths.length > 0 && (
           <optgroup label="Archived Months">
-            {availableMonths.map((month) => (
+            {availableMonths.map(month => (
               <option key={month} value={month}>
                 {formatMonthDisplay(month)}
               </option>
             ))}
           </optgroup>
         )}
-        
+
         <option value="custom">Custom</option>
       </select>
-      
+
       <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
 
       {isCustomMode && (
@@ -95,35 +95,31 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
             <Calendar className="h-4 w-4 text-blue-500" />
             <span className="font-medium text-sm">Select Custom Date</span>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
-                Month
-              </label>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Month</label>
               <select
                 value={customMonth}
-                onChange={(e) => setCustomMonth(parseInt(e.target.value))}
+                onChange={e => setCustomMonth(parseInt(e.target.value))}
                 className="w-full border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
-                {months.map((month) => (
+                {months.map(month => (
                   <option key={month.value} value={month.value}>
                     {month.label}
                   </option>
                 ))}
               </select>
             </div>
-            
+
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
-                Year
-              </label>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Year</label>
               <select
                 value={customYear}
-                onChange={(e) => setCustomYear(parseInt(e.target.value))}
+                onChange={e => setCustomYear(parseInt(e.target.value))}
                 className="w-full border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
-                {years.map((year) => (
+                {years.map(year => (
                   <option key={year} value={year}>
                     {year}
                   </option>
@@ -131,7 +127,7 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
               </select>
             </div>
           </div>
-          
+
           <div className="flex gap-2 mt-3">
             <button
               onClick={handleCustomDateSubmit}

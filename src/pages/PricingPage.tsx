@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  User, 
-  Building2, 
+import {
+  ArrowLeft,
+  User,
+  Building2,
   ArrowRight,
   Check,
   Users,
@@ -12,7 +12,7 @@ import {
   X,
   Percent,
   Copy,
-  Mail
+  Mail,
 } from 'lucide-react';
 import { useTranslation } from '../contexts/TranslationContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
@@ -44,7 +44,7 @@ export default function PricingPage() {
       setEmailError(t('pricing.discountPopup.validEmailRequired'));
       return;
     }
-    
+
     setEmailError('');
     setDiscountCodeRevealed(true);
   };
@@ -60,18 +60,18 @@ export default function PricingPage() {
   };
 
   const handleSingleFinanceManager = () => {
-    navigate('/simple-signup', { 
-      state: { 
-        signupType: 'single_finance_manager' 
-      } 
+    navigate('/simple-signup', {
+      state: {
+        signupType: 'single_finance_manager',
+      },
     });
   };
 
   const handleDealershipGroup = () => {
     navigate('/signup', {
       state: {
-        signupType: 'dealership_group'
-      }
+        signupType: 'dealership_group',
+      },
     });
   };
 
@@ -152,28 +152,35 @@ export default function PricingPage() {
       <section className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            
             {/* Single Finance Manager Option */}
             <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 hover:border-blue-500 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/20">
               <div className="text-center mb-8">
                 <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
                   <User className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-4">{t('pricing.pricingPage.singleFinance.title')}</h2>
+                <h2 className="text-2xl font-bold text-white mb-4">
+                  {t('pricing.pricingPage.singleFinance.title')}
+                </h2>
                 <p className="text-gray-400 mb-6">
                   {t('pricing.pricingPage.singleFinance.description')}
                 </p>
-                <div className="text-lg text-gray-500 line-through mb-1">{t('pricing.pricingPage.singleFinance.originalPrice')}</div>
-                <div className="text-3xl font-bold text-blue-400 mb-2">{t('pricing.pricingPage.singleFinance.price')}</div>
+                <div className="text-lg text-gray-500 line-through mb-1">
+                  {t('pricing.pricingPage.singleFinance.originalPrice')}
+                </div>
+                <div className="text-3xl font-bold text-blue-400 mb-2">
+                  {t('pricing.pricingPage.singleFinance.price')}
+                </div>
               </div>
 
               <div className="space-y-4 mb-8">
-                {(t('pricing.pricingPage.singleFinance.features') as string[]).map((feature, index) => (
-                  <div key={index} className="flex items-center">
-                    <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
-                    <span className="text-gray-300">{feature}</span>
-                  </div>
-                ))}
+                {(t('pricing.pricingPage.singleFinance.features') as string[]).map(
+                  (feature, index) => (
+                    <div key={index} className="flex items-center">
+                      <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
+                      <span className="text-gray-300">{feature}</span>
+                    </div>
+                  )
+                )}
               </div>
 
               <button
@@ -201,27 +208,35 @@ export default function PricingPage() {
                 <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Building2 className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-4">{t('pricing.pricingPage.dealership.title')}</h2>
+                <h2 className="text-2xl font-bold text-white mb-4">
+                  {t('pricing.pricingPage.dealership.title')}
+                </h2>
                 <p className="text-gray-400 mb-6">
                   {t('pricing.pricingPage.dealership.description')}
                 </p>
-                <div className="text-3xl font-bold text-white mb-2">{t('pricing.pricingPage.dealership.price')}</div>
-                <div className="text-sm text-gray-500">{t('pricing.pricingPage.dealership.priceSubtext')}</div>
+                <div className="text-3xl font-bold text-white mb-2">
+                  {t('pricing.pricingPage.dealership.price')}
+                </div>
+                <div className="text-sm text-gray-500">
+                  {t('pricing.pricingPage.dealership.priceSubtext')}
+                </div>
               </div>
 
               <div className="space-y-4 mb-8">
-                {(t('pricing.pricingPage.dealership.features') as string[]).map((feature, index) => {
-                  let IconComponent = Check;
-                  if (index === 1) IconComponent = Users;
-                  if (index === 2) IconComponent = TrendingUp;
-                  if (index === 3) IconComponent = Shield;
-                  return (
-                    <div key={index} className="flex items-center">
-                      <IconComponent className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
-                      <span className="text-white">{feature}</span>
-                    </div>
-                  );
-                })}
+                {(t('pricing.pricingPage.dealership.features') as string[]).map(
+                  (feature, index) => {
+                    let IconComponent = Check;
+                    if (index === 1) IconComponent = Users;
+                    if (index === 2) IconComponent = TrendingUp;
+                    if (index === 3) IconComponent = Shield;
+                    return (
+                      <div key={index} className="flex items-center">
+                        <IconComponent className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
+                        <span className="text-white">{feature}</span>
+                      </div>
+                    );
+                  }
+                )}
               </div>
 
               <button
@@ -236,7 +251,6 @@ export default function PricingPage() {
                 {t('pricing.pricingPage.dealership.setupTime')}
               </div>
             </div>
-
           </div>
         </div>
       </section>
@@ -244,34 +258,42 @@ export default function PricingPage() {
       {/* Info Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-800/30">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-white mb-8">{t('pricing.pricingPage.benefits.title')}</h2>
-          
+          <h2 className="text-3xl font-bold text-white mb-8">
+            {t('pricing.pricingPage.benefits.title')}
+          </h2>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <TrendingUp className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">{t('pricing.pricingPage.benefits.performance.title')}</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">
+                {t('pricing.pricingPage.benefits.performance.title')}
+              </h3>
               <p className="text-gray-400 text-sm">
                 {t('pricing.pricingPage.benefits.performance.description')}
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Users className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">{t('pricing.pricingPage.benefits.operations.title')}</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">
+                {t('pricing.pricingPage.benefits.operations.title')}
+              </h3>
               <p className="text-gray-400 text-sm">
                 {t('pricing.pricingPage.benefits.operations.description')}
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Shield className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">{t('pricing.pricingPage.benefits.security.title')}</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">
+                {t('pricing.pricingPage.benefits.security.title')}
+              </h3>
               <p className="text-gray-400 text-sm">
                 {t('pricing.pricingPage.benefits.security.description')}
               </p>
@@ -280,7 +302,8 @@ export default function PricingPage() {
 
           <div className="mt-12 p-6 bg-gray-800 rounded-lg border border-gray-700">
             <p className="text-gray-300 text-sm">
-              <strong>{t('pricing.pricingPage.helpText.title')}</strong> {t('pricing.pricingPage.helpText.description')}
+              <strong>{t('pricing.pricingPage.helpText.title')}</strong>{' '}
+              {t('pricing.pricingPage.helpText.description')}
             </p>
           </div>
         </div>
@@ -293,7 +316,10 @@ export default function PricingPage() {
             <p>{t('pricing.pricingPage.footer.copyright')}</p>
             <p className="mt-2 text-sm">
               {t('pricing.pricingPage.footer.support')}{' '}
-              <a href={`mailto:${t('pricing.pricingPage.footer.email')}`} className="text-blue-400 hover:text-blue-300">
+              <a
+                href={`mailto:${t('pricing.pricingPage.footer.email')}`}
+                className="text-blue-400 hover:text-blue-300"
+              >
                 {t('pricing.pricingPage.footer.email')}
               </a>
             </p>
@@ -314,17 +340,27 @@ export default function PricingPage() {
 
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                {discountCodeRevealed ? <Percent className="w-8 h-8 text-white" /> : <Mail className="w-8 h-8 text-white" />}
+                {discountCodeRevealed ? (
+                  <Percent className="w-8 h-8 text-white" />
+                ) : (
+                  <Mail className="w-8 h-8 text-white" />
+                )}
               </div>
 
               <h3 className="text-3xl font-bold text-gray-800 mb-6">
-                {discountCodeRevealed ? t('pricing.discountPopup.yourDiscountCode') : t('pricing.discountPopup.specialSummerSavings')}
+                {discountCodeRevealed
+                  ? t('pricing.discountPopup.yourDiscountCode')
+                  : t('pricing.discountPopup.specialSummerSavings')}
               </h3>
-              
+
               {!discountCodeRevealed ? (
                 <>
                   <p className="text-lg text-gray-600 mb-6">
-                    Get <span className="text-blue-600 font-bold text-xl">{t('pricing.discountPopup.tenPercentOff')}</span> {t('pricing.discountPopup.firstThreeMonths')}
+                    Get{' '}
+                    <span className="text-blue-600 font-bold text-xl">
+                      {t('pricing.discountPopup.tenPercentOff')}
+                    </span>{' '}
+                    {t('pricing.discountPopup.firstThreeMonths')}
                   </p>
 
                   <div className="mb-6">
@@ -336,7 +372,7 @@ export default function PricingPage() {
                       <input
                         type="email"
                         value={discountEmail}
-                        onChange={(e) => {
+                        onChange={e => {
                           setDiscountEmail(e.target.value);
                           if (emailError) setEmailError('');
                         }}
@@ -344,12 +380,10 @@ export default function PricingPage() {
                           emailError ? 'border-red-500' : 'border-blue-200'
                         }`}
                         placeholder={t('pricing.discountPopup.emailPlaceholder')}
-                        onKeyPress={(e) => e.key === 'Enter' && handleEmailSubmit()}
+                        onKeyPress={e => e.key === 'Enter' && handleEmailSubmit()}
                       />
                     </div>
-                    {emailError && (
-                      <p className="text-red-500 text-base mt-2">{emailError}</p>
-                    )}
+                    {emailError && <p className="text-red-500 text-base mt-2">{emailError}</p>}
                   </div>
 
                   <div className="flex space-x-3">
@@ -370,19 +404,31 @@ export default function PricingPage() {
               ) : (
                 <>
                   <p className="text-lg text-gray-600 mb-6">
-                    {t('pricing.discountPopup.thankYouMessage')} <span className="text-blue-600 font-bold text-xl">{t('pricing.discountPopup.tenPercentOff')}</span> discount code:
+                    {t('pricing.discountPopup.thankYouMessage')}{' '}
+                    <span className="text-blue-600 font-bold text-xl">
+                      {t('pricing.discountPopup.tenPercentOff')}
+                    </span>{' '}
+                    discount code:
                   </p>
 
                   <div className="bg-blue-50 rounded-lg p-6 mb-6 border-2 border-blue-500">
-                    <p className="text-base text-gray-600 mb-3">{t('pricing.discountPopup.discountCodeLabel')}</p>
+                    <p className="text-base text-gray-600 mb-3">
+                      {t('pricing.discountPopup.discountCodeLabel')}
+                    </p>
                     <div className="flex items-center justify-between">
-                      <span className="text-3xl font-bold text-blue-600 tracking-wider">SAVE10</span>
+                      <span className="text-3xl font-bold text-blue-600 tracking-wider">
+                        SAVE10
+                      </span>
                       <button
                         onClick={copyDiscountCode}
                         className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg text-base transition-colors shadow-sm hover:shadow-md"
                       >
                         <Copy className="w-5 h-5" />
-                        <span>{discountCopied ? t('pricing.discountPopup.copied') : t('pricing.discountPopup.copy')}</span>
+                        <span>
+                          {discountCopied
+                            ? t('pricing.discountPopup.copied')
+                            : t('pricing.discountPopup.copy')}
+                        </span>
                       </button>
                     </div>
                   </div>

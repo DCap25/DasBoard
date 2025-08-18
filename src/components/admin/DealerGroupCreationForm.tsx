@@ -33,7 +33,7 @@ export function DealerGroupCreationForm({ onSuccess }: { onSuccess?: () => void 
         // Calculate dealership count for each manufacturer
         const manufacturersWithCount = await Promise.all(
           (data || []).map(async manufacturer => {
-            const { count, error: countError } = await supabase
+            const { count } = await supabase
               .from('dealerships')
               .select('*', { count: 'exact', head: true })
               .eq('manufacturer_id', manufacturer.id);
@@ -116,7 +116,7 @@ export function DealerGroupCreationForm({ onSuccess }: { onSuccess?: () => void 
       }
 
       // Use the associate_manufacturers function we created
-      const { data: funcData, error: funcError } = await supabase.rpc(
+      const { error: funcError } = await supabase.rpc(
         'associate_manufacturers_with_dealer_group',
         {
           p_group_id: data.id,
@@ -157,56 +157,75 @@ export function DealerGroupCreationForm({ onSuccess }: { onSuccess?: () => void 
   };
 
   return (
-    <Card className="w-full max-w-lg">
-      <CardHeader>
-        <CardTitle>Create New Dealer Group</CardTitle>
+    <Card className="w-full max-w-lg mx-auto">
+      <CardHeader className="px-4 sm:px-6">
+        <CardTitle className="text-lg sm:text-xl">Create New Dealer Group</CardTitle>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="groupName">Group Name</Label>
+      <CardContent className="px-4 sm:px-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <div className="space-y-2 sm:space-y-3">
+            <Label htmlFor="groupName" className="text-sm sm:text-base font-medium">
+              Group Name
+            </Label>
             <Input
               id="groupName"
               value={groupName}
               onChange={e => setGroupName(e.target.value)}
               placeholder="Enter dealer group name"
               required
+              className="text-base sm:text-sm"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label className="block mb-2">Select Manufacturers</Label>
-            <div className="border rounded-md p-3 max-h-60 overflow-y-auto space-y-2">
+          <div className="space-y-2 sm:space-y-3">
+            <Label className="block text-sm sm:text-base font-medium">Select Manufacturers</Label>
+            <div className="border rounded-md p-3 sm:p-4 max-h-48 sm:max-h-60 overflow-y-auto space-y-3 sm:space-y-2">
               {manufacturers.map(manufacturer => (
-                <div key={manufacturer.id} className="flex items-center space-x-2">
+                <div
+                  key={manufacturer.id}
+                  className="flex items-center space-x-3 sm:space-x-2 py-1"
+                >
                   <Checkbox
                     id={`manufacturer-${manufacturer.id}`}
                     checked={selectedManufacturers.includes(manufacturer.id)}
                     onCheckedChange={checked =>
                       handleManufacturerChange(manufacturer.id, checked === true)
                     }
+                    className="h-5 w-5 sm:h-4 sm:w-4"
                   />
                   <label
                     htmlFor={`manufacturer-${manufacturer.id}`}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    className="text-sm sm:text-sm font-medium leading-relaxed cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-1"
                   >
                     {manufacturer.name} ({manufacturer.dealership_count} dealerships)
                   </label>
                 </div>
               ))}
               {manufacturers.length === 0 && (
-                <p className="text-sm text-gray-500">No manufacturers available</p>
+                <p className="text-sm text-gray-500 text-center py-4">No manufacturers available</p>
               )}
             </div>
           </div>
 
-          <div className="bg-slate-50 p-3 rounded-md">
-            <p className="text-sm font-medium">Summary</p>
-            <p className="text-sm">Selected manufacturers: {selectedManufacturers.length}</p>
-            <p className="text-sm">Total dealerships: {totalDealerships}</p>
+          <div className="bg-slate-50 p-3 sm:p-4 rounded-md">
+            <p className="text-sm sm:text-base font-medium mb-2">Summary</p>
+            <div className="space-y-1">
+              <p className="text-xs sm:text-sm">
+                Selected manufacturers:{' '}
+                <span className="font-medium">{selectedManufacturers.length}</span>
+              </p>
+              <p className="text-xs sm:text-sm">
+                Total dealerships: <span className="font-medium">{totalDealerships}</span>
+              </p>
+            </div>
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button
+            type="submit"
+            className="w-full text-base sm:text-sm"
+            disabled={loading}
+            size="lg"
+          >
             {loading ? 'Creating...' : 'Create Dealer Group'}
           </Button>
         </form>

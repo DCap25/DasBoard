@@ -44,26 +44,30 @@ export default function TermsPage() {
 
             <div className="space-y-8 text-gray-300">
               <section>
-                <p>
-                  {t('legal.terms.intro')}
-                </p>
+                <p>{t('legal.terms.intro')}</p>
               </section>
 
               {/* Acceptance */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.terms.sections.acceptance.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.terms.sections.acceptance.title')}
+                </h2>
                 <p>{t('legal.terms.sections.acceptance.content')}</p>
               </section>
 
               {/* Service */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.terms.sections.service.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.terms.sections.service.title')}
+                </h2>
                 <p>{t('legal.terms.sections.service.content')}</p>
               </section>
 
               {/* Account */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.terms.sections.account.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.terms.sections.account.title')}
+                </h2>
                 <p className="mb-4">{t('legal.terms.sections.account.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
                   {(t('legal.terms.sections.account.items') as string[]).map((item, index) => (
@@ -74,7 +78,9 @@ export default function TermsPage() {
 
               {/* Subscription */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.terms.sections.subscription.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.terms.sections.subscription.title')}
+                </h2>
                 <p className="mb-4">{t('legal.terms.sections.subscription.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
                   {(t('legal.terms.sections.subscription.items') as string[]).map((item, index) => (
@@ -85,7 +91,9 @@ export default function TermsPage() {
 
               {/* Usage */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.terms.sections.usage.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.terms.sections.usage.title')}
+                </h2>
                 <p className="mb-4">{t('legal.terms.sections.usage.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
                   {(t('legal.terms.sections.usage.items') as string[]).map((item, index) => (
@@ -96,7 +104,9 @@ export default function TermsPage() {
 
               {/* Intellectual */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.terms.sections.intellectual.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.terms.sections.intellectual.title')}
+                </h2>
                 <p className="mb-4">{t('legal.terms.sections.intellectual.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
                   {(t('legal.terms.sections.intellectual.items') as string[]).map((item, index) => (
@@ -108,13 +118,17 @@ export default function TermsPage() {
 
               {/* Privacy */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.terms.sections.privacy.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.terms.sections.privacy.title')}
+                </h2>
                 <p>{t('legal.terms.sections.privacy.content')}</p>
               </section>
 
               {/* Availability */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.terms.sections.availability.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.terms.sections.availability.title')}
+                </h2>
                 <p className="mb-4">{t('legal.terms.sections.availability.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
                   {(t('legal.terms.sections.availability.items') as string[]).map((item, index) => (
@@ -125,7 +139,9 @@ export default function TermsPage() {
 
               {/* Termination */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.terms.sections.termination.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.terms.sections.termination.title')}
+                </h2>
                 <p className="mb-4">{t('legal.terms.sections.termination.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
                   {(t('legal.terms.sections.termination.items') as string[]).map((item, index) => (
@@ -136,7 +152,9 @@ export default function TermsPage() {
 
               {/* Disclaimers */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.terms.sections.disclaimers.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.terms.sections.disclaimers.title')}
+                </h2>
                 <p className="mb-4">{t('legal.terms.sections.disclaimers.content')}</p>
                 <ul className="list-disc list-inside space-y-2">
                   {(t('legal.terms.sections.disclaimers.items') as string[]).map((item, index) => (
@@ -147,31 +165,41 @@ export default function TermsPage() {
 
               {/* Indemnification */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.terms.sections.indemnification.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.terms.sections.indemnification.title')}
+                </h2>
                 <p>{t('legal.terms.sections.indemnification.content')}</p>
               </section>
 
               {/* Governing */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.terms.sections.governing.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.terms.sections.governing.title')}
+                </h2>
                 <p>{t('legal.terms.sections.governing.content')}</p>
               </section>
 
               {/* Changes */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.terms.sections.changes.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.terms.sections.changes.title')}
+                </h2>
                 <p>{t('legal.terms.sections.changes.content')}</p>
               </section>
 
               {/* Entire */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.terms.sections.entire.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.terms.sections.entire.title')}
+                </h2>
                 <p>{t('legal.terms.sections.entire.content')}</p>
               </section>
 
               {/* Contact */}
               <section>
-                <h2 className="text-xl font-semibold text-white mb-4">{t('legal.terms.sections.contact.title')}</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  {t('legal.terms.sections.contact.title')}
+                </h2>
                 <p>{t('legal.terms.sections.contact.content')}</p>
                 <div className="mt-2 bg-gray-700/50 p-4 rounded-lg">
                   <p>
