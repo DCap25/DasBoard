@@ -45,6 +45,12 @@ export default function SingleFinanceSettings() {
 
   // Helper to resolve a consistent user ID with enhanced fallback mechanisms
   const getUserId = (): string | null => {
+    // First, try to use the cached resolved user ID
+    if (resolvedUserId) {
+      console.log('[Settings] Using cached resolved user ID:', resolvedUserId);
+      return resolvedUserId;
+    }
+    
     // Try the secure user ID helper first
     let userId = getConsistentUserId(user);
     
@@ -68,6 +74,18 @@ export default function SingleFinanceSettings() {
       }
     }
     
+    // Last resort: create a demo user ID if we're in development or if user has email
+    if (!userId && user?.email) {
+      userId = `demo_${user.email.replace(/[^a-zA-Z0-9]/g, '_')}`;
+      console.log('[Settings] Created demo user ID:', userId);
+    }
+    
+    // Cache the resolved user ID for future use
+    if (userId && userId !== resolvedUserId) {
+      setResolvedUserId(userId);
+      console.log('[Settings] Cached new resolved user ID:', userId);
+    }
+    
     debugUserId('SingleFinanceSettings', user, localUserId);
     console.log('[Settings] Final resolved user ID:', userId);
     console.log('[Settings] User object details:', {
@@ -76,14 +94,9 @@ export default function SingleFinanceSettings() {
       userId: user?.id,
       userEmail: user?.email,
       localUserId,
-      resolvedUserId: userId
+      resolvedUserId: userId,
+      cachedUserId: resolvedUserId
     });
-    
-    // Last resort: create a demo user ID if we're in development or if user has email
-    if (!userId && user?.email) {
-      userId = `demo_${user.email.replace(/[^a-zA-Z0-9]/g, '_')}`;
-      console.log('[Settings] Created demo user ID:', userId);
-    }
     
     return userId;
   };
@@ -95,6 +108,7 @@ export default function SingleFinanceSettings() {
       
       // Clear current state
       setLocalUserId(null);
+      setResolvedUserId(null);
       
       // Try to get fresh session
       const { data, error } = await supabase.auth.getSession();
@@ -104,6 +118,7 @@ export default function SingleFinanceSettings() {
       
       if (data?.session?.user?.id) {
         setLocalUserId(data.session.user.id);
+        setResolvedUserId(data.session.user.id);
         console.log('[Settings] Manual refresh successful:', data.session.user.id);
         toast({
           title: 'Success',
@@ -142,6 +157,7 @@ export default function SingleFinanceSettings() {
         if (!cancelled && asyncUserId) {
           console.log('[Settings] Async getUserId resolved:', asyncUserId);
           setLocalUserId(asyncUserId);
+          setResolvedUserId(asyncUserId);
           return;
         }
         
@@ -157,6 +173,7 @@ export default function SingleFinanceSettings() {
           console.log('[Settings] Supabase session user ID:', uid);
           if (!cancelled && uid) {
             setLocalUserId(uid);
+            setResolvedUserId(uid);
           }
         }
         
@@ -171,6 +188,7 @@ export default function SingleFinanceSettings() {
             if (storageUserId) {
               console.log('[Settings] Found user ID in localStorage:', storageUserId);
               setLocalUserId(storageUserId);
+              setResolvedUserId(storageUserId);
             }
           }
         }
@@ -204,6 +222,74 @@ export default function SingleFinanceSettings() {
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [authDebugMode, setAuthDebugMode] = useState(false);
+  const [resolvedUserId, setResolvedUserId] = useState<string | null>(null);
+
+  // Immediate user ID resolution on component mount
+  useEffect(() => {
+    const immediateResolveUserId = async () => {
+      try {
+        console.log('[Settings] Immediate user ID resolution attempt');
+        
+        // Try all available methods immediately
+        let userId = null;
+        
+        // Method 1: From user context
+        if (user?.id) {
+          userId = user.id;
+          console.log('[Settings] Found user ID from context:', userId);
+        }
+        
+        // Method 2: From Supabase session
+        if (!userId) {
+          try {
+            const { data } = await supabase.auth.getSession();
+            userId = data?.session?.user?.id || null;
+            if (userId) {
+              console.log('[Settings] Found user ID from Supabase session:', userId);
+            }
+          } catch (error) {
+            console.warn('[Settings] Error getting Supabase session:', error);
+          }
+        }
+        
+        // Method 3: From localStorage
+        if (!userId && typeof window !== 'undefined') {
+          try {
+            const tokenKey = Object.keys(localStorage).find(key => 
+              key.startsWith('sb-') && key.endsWith('-auth-token')
+            );
+            if (tokenKey) {
+              const tokenData = JSON.parse(localStorage.getItem(tokenKey) || '{}');
+              userId = tokenData?.currentSession?.user?.id || tokenData?.user?.id;
+              if (userId) {
+                console.log('[Settings] Found user ID from localStorage:', userId);
+              }
+            }
+          } catch (error) {
+            console.warn('[Settings] Error reading localStorage:', error);
+          }
+        }
+        
+        // Method 4: Demo user from email
+        if (!userId && user?.email) {
+          userId = `demo_${user.email.replace(/[^a-zA-Z0-9]/g, '_')}`;
+          console.log('[Settings] Created demo user ID:', userId);
+        }
+        
+        if (userId) {
+          setLocalUserId(userId);
+          setResolvedUserId(userId);
+          console.log('[Settings] Immediate resolution successful:', userId);
+        } else {
+          console.warn('[Settings] Immediate resolution failed');
+        }
+      } catch (error) {
+        console.error('[Settings] Error in immediate user ID resolution:', error);
+      }
+    };
+    
+    immediateResolveUserId();
+  }, []); // Run only once on mount
 
   // Pay configuration state
   const [payConfig, setPayConfig] = useState<PayConfig>({
@@ -291,6 +377,7 @@ export default function SingleFinanceSettings() {
           const { data } = await supabase.auth.getSession();
           if (data?.session?.user?.id) {
             setLocalUserId(data.session.user.id);
+            setResolvedUserId(data.session.user.id);
             console.log('[Settings] Force-resolved user ID:', data.session.user.id);
           }
         } catch (error) {
