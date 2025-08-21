@@ -192,12 +192,16 @@ export default function HomePage() {
             <div className="relative">
               <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 shadow-2xl">
                 <div className="aspect-video rounded-lg overflow-hidden relative">
-                  <img
-                    src={dashboardImages[currentImageIndex].src}
-                    alt={`The DAS Board ${dashboardImages[currentImageIndex].title}`}
-                    className="w-full h-full object-cover transition-opacity duration-1000"
-                    key={currentImageIndex}
-                  />
+                  {dashboardImages.map((image, index) => (
+                    <img
+                      key={index}
+                      src={image.src}
+                      alt={`The DAS Board ${image.title}`}
+                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[2000ms] ease-in-out ${
+                        index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+                      }`}
+                    />
+                  ))}
                 </div>
                 <div className="text-center mt-4">
                   <p className="text-gray-300 text-lg font-semibold">
