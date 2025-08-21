@@ -329,15 +329,92 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // =================== STATE ===================
   
-  // Core auth state
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [role, setRole] = useState<UserRole | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<AuthError | null>(null);
+  // Generate error ID for debugging state management issues
+  const generateErrorId = useCallback(() => {
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substr(2, 9);
+    return `error_${timestamp}_${random}`;
+  }, []);
   
-  // Session state with enhanced security monitoring
-  const [hasSession, setHasSession] = useState<boolean>(false);
-  const [sessionHealth, setSessionHealth] = useState<SessionHealth>({
+  // RUNTIME SAFETY: Variable definition guard to prevent ReferenceErrors
+  const ensureVariableDefined = useCallback(<T>(variable: T | undefined, varName: string, defaultValue: T): T => {
+    if (typeof variable === 'undefined') {
+      const errorId = generateErrorId();
+      console.warn(`[RUNTIME_SAFETY] ${errorId} Variable '${varName}' is undefined, using default:`, defaultValue);
+      return defaultValue;
+    }
+    return variable;
+  }, [generateErrorId]);
+  
+  // Safe state setters with error boundary protection
+  const safeSetState = useCallback(<T>(setter: React.Dispatch<React.SetStateAction<T>>, value: T, stateName: string) => {
+    try {
+      // RUNTIME SAFETY: Check if setter is defined before using
+      if (typeof setter === 'undefined') {
+        const errorId = generateErrorId();
+        console.error(`[RUNTIME_SAFETY] ${errorId} Setter for '${stateName}' is undefined, cannot update state`);
+        return;
+      }
+      
+      // RUNTIME SAFETY: Check if mountedRef is defined and accessible
+      const isMounted = ensureVariableDefined(mountedRef?.current, 'mountedRef.current', false);
+      
+      if (isMounted) {
+        setter(value);
+      }
+    } catch (error) {
+      const errorId = generateErrorId();
+      console.error(`[STATE_MANAGEMENT] ${errorId} Failed to set ${stateName}:`, error);
+      // Don't re-throw to prevent cascade failures
+    }
+  }, [generateErrorId, ensureVariableDefined]);
+  
+  // Core auth state with safe initialization
+  const [user, setUserUnsafe] = useState<AuthUser | null>(null);
+  const [role, setRoleUnsafe] = useState<UserRole | null>(null);
+  const [loading, setLoadingUnsafe] = useState<boolean>(true);
+  const [error, setErrorUnsafe] = useState<AuthError | null>(null);
+  
+  // Environment error state - handles missing Supabase environment variables
+  // Fix for ReferenceError: envError is not defined at line 1376
+  const [envError, setEnvErrorUnsafe] = useState<string | null>(null);
+  
+  // Safe setters
+  const setUser = useCallback((value: AuthUser | null) => safeSetState(setUserUnsafe, value, 'user'), [safeSetState]);
+  const setRole = useCallback((value: UserRole | null) => safeSetState(setRoleUnsafe, value, 'role'), [safeSetState]);
+  const setLoading = useCallback((value: boolean) => safeSetState(setLoadingUnsafe, value, 'loading'), [safeSetState]);
+  const setError = useCallback((value: AuthError | null) => {
+    if (value) {
+      const errorId = generateErrorId();
+      console.error(`[AUTH_ERROR] ${errorId}:`, value);
+    }
+    safeSetState(setErrorUnsafe, value, 'error');
+  }, [safeSetState, generateErrorId]);
+  
+  // Safe setter for environment error state
+  // Fix for ReferenceError: envError setter needed for proper state management
+  const setEnvError = useCallback((value: string | null) => {
+    // RUNTIME SAFETY: Ensure all dependencies are defined before proceeding
+    const safeValue = ensureVariableDefined(value, 'envError value', null);
+    const safeGenerateErrorId = ensureVariableDefined(generateErrorId, 'generateErrorId', () => 'fallback_error_id');
+    const safeSafeSetState = ensureVariableDefined(safeSetState, 'safeSetState', () => {});
+    
+    if (safeValue) {
+      const errorId = safeGenerateErrorId();
+      console.error(`[ENV_ERROR] ${errorId}:`, safeValue);
+    }
+    
+    // RUNTIME SAFETY: Check if setter function exists before calling
+    if (typeof setEnvErrorUnsafe !== 'undefined') {
+      safeSafeSetState(setEnvErrorUnsafe, safeValue, 'envError');
+    } else {
+      console.error('[RUNTIME_SAFETY] setEnvErrorUnsafe is undefined, cannot set environment error');
+    }
+  }, [safeSetState, generateErrorId, ensureVariableDefined]);
+  
+  // Session state with enhanced security monitoring and safe setters
+  const [hasSession, setHasSessionUnsafe] = useState<boolean>(false);
+  const [sessionHealth, setSessionHealthUnsafe] = useState<SessionHealth>({
     isValid: false,
     expiresAt: null,
     lastChecked: 0,
@@ -347,26 +424,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     exceedsMaxAge: false,
   });
   
-  // User data state
-  const [dealershipId, setDealershipId] = useState<number | null>(null);
-  const [isGroupAdmin, setIsGroupAdmin] = useState<boolean>(false);
-  const [authCheckComplete, setAuthCheckComplete] = useState<boolean>(false);
+  // Safe session setters
+  const setHasSession = useCallback((value: boolean) => safeSetState(setHasSessionUnsafe, value, 'hasSession'), [safeSetState]);
+  const setSessionHealth = useCallback((value: SessionHealth) => safeSetState(setSessionHealthUnsafe, value, 'sessionHealth'), [safeSetState]);
   
-  // Security state
-  const [rateLimitState, setRateLimitState] = useState<RateLimitState>({
+  // User data state with safe setters
+  const [dealershipId, setDealershipIdUnsafe] = useState<number | null>(null);
+  const [isGroupAdmin, setIsGroupAdminUnsafe] = useState<boolean>(false);
+  const [authCheckComplete, setAuthCheckCompleteUnsafe] = useState<boolean>(false);
+  
+  // Safe user data setters
+  const setDealershipId = useCallback((value: number | null) => safeSetState(setDealershipIdUnsafe, value, 'dealershipId'), [safeSetState]);
+  const setIsGroupAdmin = useCallback((value: boolean) => safeSetState(setIsGroupAdminUnsafe, value, 'isGroupAdmin'), [safeSetState]);
+  const setAuthCheckComplete = useCallback((value: boolean) => safeSetState(setAuthCheckCompleteUnsafe, value, 'authCheckComplete'), [safeSetState]);
+  
+  // Security state with safe setters
+  const [rateLimitState, setRateLimitStateUnsafe] = useState<RateLimitState>({
     attempts: 0,
     firstAttempt: 0,
     lockedUntil: null,
     isLocked: false,
   });
   
-  const [mfaConfig, setMfaConfig] = useState<MFAConfig | null>(null);
+  const [mfaConfig, setMfaConfigUnsafe] = useState<MFAConfig | null>(null);
   
-  // Component lifecycle refs
+  // Safe security setters
+  const setRateLimitState = useCallback((value: RateLimitState) => safeSetState(setRateLimitStateUnsafe, value, 'rateLimitState'), [safeSetState]);
+  const setMfaConfig = useCallback((value: MFAConfig | null) => safeSetState(setMfaConfigUnsafe, value, 'mfaConfig'), [safeSetState]);
+  
+  // Component lifecycle refs with error tracking
   const mountedRef = useRef<boolean>(true);
   const authListenerRef = useRef<{ data: { subscription: any } } | null>(null);
   const healthCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const initRef = useRef<boolean>(false);
+  const errorLogRef = useRef<Set<string>>(new Set()); // Track logged errors to prevent spam
   
   // Security: Rate limiting storage (in production, use Redis or database)
   const rateLimitStorage = useRef<Map<string, RateLimitState>>(new Map());
@@ -761,7 +852,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // =================== INITIALIZATION ===================
 
   /**
-   * Security: Enhanced authentication initialization with security monitoring
+   * Security: Enhanced authentication initialization with comprehensive error handling
    */
   useEffect(() => {
     if (initRef.current) return;
@@ -770,96 +861,213 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let initTimeout: NodeJS.Timeout;
 
     const initializeAuth = async (): Promise<void> => {
+      const initErrorId = generateErrorId();
+      
       try {
-        console.log('[Security] Initializing authentication with security monitoring');
+        console.log(`[AUTH_INIT] ${initErrorId} Initializing authentication with security monitoring`);
 
-        const client = await getSecureSupabaseClient();
-
-        // Get initial session on mount/reload
-        const { data: { session }, error } = await client.auth.getSession();
-        
-        if (error) {
-          console.error('[Security] Initial session fetch error:', error);
-          setError(error);
+        // Safe client initialization
+        let client;
+        try {
+          client = await getSecureSupabaseClient();
+        } catch (clientError) {
+          const clientErrorId = generateErrorId();
+          console.error(`[STATE_MANAGEMENT] ${clientErrorId} Failed to get Supabase client:`, clientError);
+          throw new Error(`Supabase client initialization failed: ${clientError}`);
         }
 
-        // Process initial session
-        await handleAuthStateChange(session);
+        // Safe initial session fetch with detailed error handling
+        let session = null;
+        try {
+          const sessionResult = await client.auth.getSession();
+          if (sessionResult.error) {
+            const sessionErrorId = generateErrorId();
+            console.error(`[STATE_MANAGEMENT] ${sessionErrorId} Initial session fetch error:`, sessionResult.error);
+            setError(sessionResult.error);
+          } else {
+            session = sessionResult.data?.session || null;
+            console.log(`[AUTH_INIT] ${initErrorId} Session fetch successful, session exists:`, !!session);
+          }
+        } catch (sessionError) {
+          const sessionErrorId = generateErrorId();
+          console.error(`[STATE_MANAGEMENT] ${sessionErrorId} Session fetch threw exception:`, sessionError);
+          setError(new Error(`Session fetch failed: ${sessionError}`));
+        }
 
-        // Set up auth state listener for real-time updates
+        // Safe session processing
+        try {
+          await handleAuthStateChange(session);
+        } catch (handleError) {
+          const handleErrorId = generateErrorId();
+          console.error(`[STATE_MANAGEMENT] ${handleErrorId} handleAuthStateChange failed:`, handleError);
+          // Don't throw here, continue with initialization
+        }
+
+        // Safe auth state listener setup
         if (mountedRef.current) {
-          console.log('[Security] Setting up secure auth state listener');
-          
-          const { data: authListener } = client.auth.onAuthStateChange(
-            async (event, newSession) => {
-              if (!mountedRef.current) return;
-              
-              console.log(`[Security] Auth event: ${event} for session: ${getSecureSessionId(newSession)}`);
-              
-              // Security: Handle different auth events with appropriate logging
-              switch (event) {
-                case 'SIGNED_IN':
-                  console.log('[Security] User signed in successfully');
-                  break;
-                case 'SIGNED_OUT':
-                  console.log('[Security] User signed out');
-                  break;
-                case 'TOKEN_REFRESHED':
-                  console.log('[Security] Token refreshed');
-                  break;
-                case 'USER_UPDATED':
-                  console.log('[Security] User profile updated');
-                  break;
-                case 'PASSWORD_RECOVERY':
-                  console.log('[Security] Password recovery initiated');
-                  break;
-                default:
-                  console.log(`[Security] Unknown auth event: ${event}`);
+          try {
+            console.log(`[AUTH_INIT] ${initErrorId} Setting up secure auth state listener`);
+            
+            const { data: authListener } = client.auth.onAuthStateChange(
+              async (event, newSession) => {
+                const listenerErrorId = generateErrorId();
+                
+                try {
+                  if (!mountedRef.current) {
+                    console.log(`[AUTH_LISTENER] ${listenerErrorId} Component unmounted, ignoring event: ${event}`);
+                    return;
+                  }
+                  
+                  console.log(`[AUTH_LISTENER] ${listenerErrorId} Auth event: ${event} for session: ${getSecureSessionId(newSession)}`);
+                  
+                  // Security: Handle different auth events with appropriate logging
+                  switch (event) {
+                    case 'SIGNED_IN':
+                      console.log(`[AUTH_LISTENER] ${listenerErrorId} User signed in successfully`);
+                      break;
+                    case 'SIGNED_OUT':
+                      console.log(`[AUTH_LISTENER] ${listenerErrorId} User signed out`);
+                      break;
+                    case 'TOKEN_REFRESHED':
+                      console.log(`[AUTH_LISTENER] ${listenerErrorId} Token refreshed`);
+                      break;
+                    case 'USER_UPDATED':
+                      console.log(`[AUTH_LISTENER] ${listenerErrorId} User profile updated`);
+                      break;
+                    case 'PASSWORD_RECOVERY':
+                      console.log(`[AUTH_LISTENER] ${listenerErrorId} Password recovery initiated`);
+                      break;
+                    default:
+                      console.log(`[AUTH_LISTENER] ${listenerErrorId} Unknown auth event: ${event}`);
+                  }
+
+                  // Safe auth state change processing
+                  try {
+                    await handleAuthStateChange(newSession);
+                  } catch (changeError) {
+                    const changeErrorId = generateErrorId();
+                    console.error(`[STATE_MANAGEMENT] ${changeErrorId} Auth state change handler failed:`, changeError);
+                    // Don't throw to prevent listener from breaking
+                  }
+                } catch (listenerError) {
+                  const listenerInnerErrorId = generateErrorId();
+                  console.error(`[STATE_MANAGEMENT] ${listenerInnerErrorId} Auth listener callback failed:`, listenerError);
+                  // Don't throw to prevent auth system from breaking
+                }
               }
+            );
 
-              // Process the auth state change
-              await handleAuthStateChange(newSession);
-            }
-          );
-
-          authListenerRef.current = { data: { subscription: authListener.subscription } };
+            authListenerRef.current = { data: { subscription: authListener.subscription } };
+          } catch (listenerSetupError) {
+            const listenerSetupErrorId = generateErrorId();
+            console.error(`[STATE_MANAGEMENT] ${listenerSetupErrorId} Failed to setup auth listener:`, listenerSetupError);
+            // Continue without listener
+          }
         }
 
-        console.log('[Security] Authentication initialized successfully');
+        console.log(`[AUTH_INIT] ${initErrorId} Authentication initialized successfully`);
 
       } catch (error) {
-        console.error('[Security] Auth initialization failed:', error);
+        const finalErrorId = generateErrorId();
+        console.error(`[STATE_MANAGEMENT] ${finalErrorId} Auth initialization failed:`, error);
         
-        if (mountedRef.current) {
-          setError(error instanceof Error ? error : new Error('Auth initialization failed'));
+        try {
+          if (mountedRef.current) {
+            setError(error instanceof Error ? error : new Error('Auth initialization failed'));
+            setLoading(false);
+            setAuthCheckComplete(true);
+          }
+        } catch (setStateError) {
+          const setStateErrorId = generateErrorId();
+          console.error(`[STATE_MANAGEMENT] ${setStateErrorId} Failed to set error state after init failure:`, setStateError);
+          // Last resort: force app to recoverable state
+          try {
+            if (mountedRef.current) {
+              setLoadingUnsafe(false);
+              setAuthCheckCompleteUnsafe(true);
+            }
+          } catch (forceSetError) {
+            const forceErrorId = generateErrorId();
+            console.error(`[STATE_MANAGEMENT] ${forceErrorId} CRITICAL: Cannot set basic state, app may be unstable:`, forceSetError);
+          }
+        }
+      }
+    };
+
+    // Security: Extended safety timeout to prevent stuck loading state
+    initTimeout = setTimeout(() => {
+      const timeoutErrorId = generateErrorId();
+      
+      try {
+        if (mountedRef.current && loading) {
+          console.warn(`[STATE_MANAGEMENT] ${timeoutErrorId} Initialization timeout - completing auth check`);
           setLoading(false);
           setAuthCheckComplete(true);
         }
+      } catch (timeoutError) {
+        console.error(`[STATE_MANAGEMENT] ${timeoutErrorId} Failed to handle initialization timeout:`, timeoutError);
+        // Force basic state update
+        try {
+          if (mountedRef.current) {
+            setLoadingUnsafe(false);
+            setAuthCheckCompleteUnsafe(true);
+          }
+        } catch (forceError) {
+          const forceErrorId = generateErrorId();
+          console.error(`[STATE_MANAGEMENT] ${forceErrorId} CRITICAL: Cannot recover from timeout:`, forceError);
+        }
       }
-    };
+    }, 15000); // Extended from 10s to 15s
 
-    // Security: Safety timeout to prevent stuck loading state
-    initTimeout = setTimeout(() => {
-      if (mountedRef.current && loading) {
-        console.warn('[Security] Initialization timeout - completing auth check');
+    // Safe authentication initialization start
+    try {
+      initializeAuth();
+    } catch (syncError) {
+      const syncErrorId = generateErrorId();
+      console.error(`[STATE_MANAGEMENT] ${syncErrorId} Synchronous initialization error:`, syncError);
+      // Ensure app doesn't get stuck
+      if (mountedRef.current) {
         setLoading(false);
         setAuthCheckComplete(true);
+        setError(new Error(`Initialization sync error: ${syncError}`));
       }
-    }, 10000);
+    }
 
-    // Start initialization
-    initializeAuth();
-
+    // Safe cleanup function
     return () => {
-      clearTimeout(initTimeout);
+      const cleanupErrorId = generateErrorId();
       
-      // Clean up auth listener
-      if (authListenerRef.current?.data?.subscription) {
-        console.log('[Security] Cleaning up auth listener');
-        authListenerRef.current.data.subscription.unsubscribe();
+      try {
+        mountedRef.current = false;
+        
+        if (initTimeout) {
+          clearTimeout(initTimeout);
+        }
+        
+        // Clean up auth listener with error handling
+        if (authListenerRef.current?.data?.subscription) {
+          try {
+            console.log(`[AUTH_CLEANUP] ${cleanupErrorId} Cleaning up auth listener`);
+            authListenerRef.current.data.subscription.unsubscribe();
+          } catch (unsubError) {
+            console.error(`[STATE_MANAGEMENT] ${cleanupErrorId} Failed to unsubscribe auth listener:`, unsubError);
+          }
+          authListenerRef.current = null;
+        }
+        
+        if (healthCheckIntervalRef.current) {
+          try {
+            clearInterval(healthCheckIntervalRef.current);
+          } catch (intervalError) {
+            console.error(`[STATE_MANAGEMENT] ${cleanupErrorId} Failed to clear health check interval:`, intervalError);
+          }
+          healthCheckIntervalRef.current = null;
+        }
+      } catch (cleanupError) {
+        console.error(`[STATE_MANAGEMENT] ${cleanupErrorId} Cleanup failed:`, cleanupError);
       }
     };
-  }, []); // Empty dependency array - only run once
+  }, [generateErrorId, loading]); // Include dependencies for proper cleanup
 
   // =================== SESSION MONITORING ===================
 
@@ -1170,46 +1378,102 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   /**
    * Security: Memoized context value with security features
+   * RUNTIME SAFETY: All variables checked for undefined before usage
    */
   const contextValue = useMemo<AuthContextType>(
-    () => ({
-      // Core auth state
-      user,
-      role,
-      loading,
-      error,
+    () => {
+      // RUNTIME SAFETY: Ensure all state variables are defined with safe defaults
+      const safeUser = ensureVariableDefined(user, 'user', null);
+      const safeRole = ensureVariableDefined(role, 'role', null);
+      const safeLoading = ensureVariableDefined(loading, 'loading', true);
+      const safeError = ensureVariableDefined(error, 'error', null);
+      const safeEnvError = ensureVariableDefined(envError, 'envError', null);
+      const safeHasSession = ensureVariableDefined(hasSession, 'hasSession', false);
+      const safeSessionHealth = ensureVariableDefined(sessionHealth, 'sessionHealth', {
+        isValid: false,
+        expiresAt: null,
+        lastChecked: 0,
+        needsRefresh: false,
+        createdAt: 0,
+        refreshAttempts: 0,
+        exceedsMaxAge: false,
+      });
+      const safeDealershipId = ensureVariableDefined(dealershipId, 'dealershipId', null);
+      const safeIsGroupAdmin = ensureVariableDefined(isGroupAdmin, 'isGroupAdmin', false);
+      const safeRateLimitState = ensureVariableDefined(rateLimitState, 'rateLimitState', {
+        attempts: 0,
+        firstAttempt: 0,
+        lockedUntil: null,
+        isLocked: false,
+      });
+      const safeMfaConfig = ensureVariableDefined(mfaConfig, 'mfaConfig', null);
+      const safeAuthCheckComplete = ensureVariableDefined(authCheckComplete, 'authCheckComplete', false);
       
-      // Session management
-      hasSession,
-      sessionHealth,
-      refreshSession,
+      // RUNTIME SAFETY: Ensure methods are defined with safe fallbacks
+      const safeRefreshSession = ensureVariableDefined(refreshSession, 'refreshSession', async () => {
+        console.warn('[RUNTIME_SAFETY] refreshSession undefined, using fallback');
+      });
+      const safeSignIn = ensureVariableDefined(signIn, 'signIn', async () => {
+        console.warn('[RUNTIME_SAFETY] signIn undefined, using fallback');
+      });
+      const safeSignUp = ensureVariableDefined(signUp, 'signUp', async () => {
+        console.warn('[RUNTIME_SAFETY] signUp undefined, using fallback');
+      });
+      const safeSignOut = ensureVariableDefined(signOut, 'signOut', async () => {
+        console.warn('[RUNTIME_SAFETY] signOut undefined, using fallback');
+      });
+      const safeCheckRateLimit = ensureVariableDefined(checkRateLimit, 'checkRateLimit', () => {
+        console.warn('[RUNTIME_SAFETY] checkRateLimit undefined, using fallback');
+        return true;
+      });
+      const safeResetRateLimit = ensureVariableDefined(resetRateLimit, 'resetRateLimit', () => {
+        console.warn('[RUNTIME_SAFETY] resetRateLimit undefined, using fallback');
+      });
+      const safeValidatePasswordStrength = ensureVariableDefined(validatePasswordStrength, 'validatePasswordStrength', () => {
+        console.warn('[RUNTIME_SAFETY] validatePasswordStrength undefined, using fallback');
+        return { isValid: false, errors: ['Password validation unavailable'] };
+      });
       
-      // User data
-      dealershipId,
-      isGroupAdmin,
-      
-      // Security features
-      rateLimitState,
-      mfaConfig,
-      
-      // Auth methods
-      signIn,
-      signUp,
-      signOut,
-      
-      // Security methods
-      checkRateLimit,
-      resetRateLimit,
-      validatePasswordStrength,
-      
-      // Utility
-      authCheckComplete,
-    }),
+      return {
+        // Core auth state
+        user: safeUser,
+        role: safeRole,
+        loading: safeLoading,
+        error: safeEnvError ? { message: safeEnvError } as AuthError : safeError, // Prioritize environment errors
+        
+        // Session management
+        hasSession: safeHasSession,
+        sessionHealth: safeSessionHealth,
+        refreshSession: safeRefreshSession,
+        
+        // User data
+        dealershipId: safeDealershipId,
+        isGroupAdmin: safeIsGroupAdmin,
+        
+        // Security features
+        rateLimitState: safeRateLimitState,
+        mfaConfig: safeMfaConfig,
+        
+        // Auth methods
+        signIn: safeSignIn,
+        signUp: safeSignUp,
+        signOut: safeSignOut,
+        
+        // Security methods
+        checkRateLimit: safeCheckRateLimit,
+        resetRateLimit: safeResetRateLimit,
+        validatePasswordStrength: safeValidatePasswordStrength,
+        
+        // Utility
+        authCheckComplete: safeAuthCheckComplete,
+      };
+    },
     [
       user,
       role,
       loading,
       error,
+      envError, // Include environment error state in dependencies
       hasSession,
       sessionHealth,
       refreshSession,
@@ -1223,6 +1487,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       checkRateLimit,
       resetRateLimit,
       authCheckComplete,
+      ensureVariableDefined, // Include runtime safety dependency
     ]
   );
 

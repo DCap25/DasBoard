@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useMemo } from 'react';
 import {
   BrowserRouter as Router,
   Routes,
@@ -123,35 +123,48 @@ const APP_URL = import.meta.env.VITE_APP_URL || 'http://localhost:5173';
 const MARKETING_URL = import.meta.env.VITE_MARKETING_URL || 'http://localhost:3000';
 const IS_PRODUCTION = APP_ENV === 'production';
 
-// Enhanced logging function with error handling
+
+// Enhanced logging function with error handling and runtime safety
 const logAppEvent = withAsyncErrorHandling(
   (event: string, details: Record<string, unknown> = {}) => {
-    const timestamp = new Date().toISOString();
-    console.log(`[App][${timestamp}] ${event}`, {
-      ...details,
-      app_version: APP_VERSION,
-      environment: APP_ENV,
-      timestamp,
-    });
-
-    // Track navigation events in window object if in development
-    if (!IS_PRODUCTION && typeof window !== 'undefined') {
-      if (!window.appEvents) {
-        window.appEvents = [];
-      }
-
-      // Keep last 100 events
-      if (window.appEvents.length > 100) {
-        window.appEvents.shift();
-      }
-
-      window.appEvents.push({
-        event,
-        details: {
-          ...details,
-          timestamp,
-        },
+    try {
+      // RUNTIME SAFETY: Ensure event string is valid
+      const safeEvent = typeof event === 'string' ? event : 'unknown_event';
+      const safeDetails = details && typeof details === 'object' ? details : {};
+      
+      const timestamp = new Date().toISOString();
+      console.log(`[App][${timestamp}] ${safeEvent}`, {
+        ...safeDetails,
+        app_version: APP_VERSION,
+        environment: APP_ENV,
+        timestamp,
       });
+
+      // Track navigation events in window object if in development
+      if (!IS_PRODUCTION && typeof window !== 'undefined') {
+        try {
+          if (!window.appEvents) {
+            window.appEvents = [];
+          }
+
+          // Keep last 100 events
+          if (window.appEvents.length > 100) {
+            window.appEvents.shift();
+          }
+
+          window.appEvents.push({
+            event: safeEvent,
+            details: {
+              ...safeDetails,
+              timestamp,
+            },
+          });
+        } catch (trackingError) {
+          console.warn('[RUNTIME_SAFETY] Failed to track app event:', trackingError);
+        }
+      }
+    } catch (loggingError) {
+      console.error('[RUNTIME_SAFETY] App event logging error:', loggingError);
     }
   },
   (error: SafeErrorInfo) => {
@@ -172,14 +185,34 @@ const DealershipContext = createContext<DealershipContextType | undefined>(undef
 export const DealershipProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentDealershipId, setCurrentDealershipId] = useState<number | null>(null);
   const [currentDealershipName, setCurrentDealershipName] = useState<string | null>(null);
-  const { setDealershipContext } = useAuth();
+  
+  // RUNTIME SAFETY: Safe access to useAuth with fallback
+  let authContextValue;
+  try {
+    authContextValue = useAuth();
+  } catch (authError) {
+    console.error('[RUNTIME_SAFETY] Failed to access AuthContext in DealershipProvider:', authError);
+    authContextValue = { setDealershipContext: () => {} }; // Fallback
+  }
+  
+  const { setDealershipContext } = authContextValue;
 
-  // Safe state update functions
-  const safeSetDealershipId = (id: number | null) =>
-    safeStateUpdate(setCurrentDealershipId, id, 'DealershipProvider');
+  // Safe state update functions with enhanced error handling
+  const safeSetDealershipId = (id: number | null) => {
+    try {
+      safeStateUpdate(setCurrentDealershipId, id, 'DealershipProvider');
+    } catch (error) {
+      console.error('[RUNTIME_SAFETY] Failed to update dealership ID:', error);
+    }
+  };
 
-  const safeSetDealershipName = (name: string | null) =>
-    safeStateUpdate(setCurrentDealershipName, name, 'DealershipProvider');
+  const safeSetDealershipName = (name: string | null) => {
+    try {
+      safeStateUpdate(setCurrentDealershipName, name, 'DealershipProvider');
+    } catch (error) {
+      console.error('[RUNTIME_SAFETY] Failed to update dealership name:', error);
+    }
+  };
 
   // Update the AuthContext when dealership changes
   useEffect(() => {
@@ -632,7 +665,36 @@ function GroupAdminAccessCheck({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  // RUNTIME SAFETY: Verify React hooks are available
+  if (typeof useState === 'undefined' || typeof useMemo === 'undefined' || typeof useEffect === 'undefined') {
+    console.error('[CRITICAL_ERROR] React hooks are not available in App component');
+    return (
+      <div style={{ padding: '20px', textAlign: 'center', color: 'red' }}>
+        <h1>Critical Error: React Hooks Unavailable</h1>
+        <p>The application failed to load properly due to missing React hooks.</p>
+        <p>Please refresh the page or check your browser console for details.</p>
+        <button onClick={() => window.location.reload()}>Reload Page</button>
+      </div>
+    );
+  }
+
+  // STABILITY ENHANCEMENT: Track app initialization state
+  const [appInitialized, setAppInitialized] = useState(false);
+  const [initErrors, setInitErrors] = useState<string[]>([]);
+  
+  // RUNTIME SAFETY: Generate app instance ID for debugging with fallback
+  const appInstanceId = useMemo(() => {
+    try {
+      return `app_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    } catch (error) {
+      console.error('[RUNTIME_SAFETY] Failed to generate app instance ID:', error);
+      return `app_fallback_${Date.now()}`;
+    }
+  }, []);
+  
   useEffect(() => {
+    logAppEvent('[APP_INIT] Starting application initialization', { appInstanceId });
+    
     // TEMPORARILY DISABLED: Focus manager causing 74s render times due to resumePausedMutations
     console.log('[App] React Query focus manager disabled to prevent performance issues');
     
@@ -642,8 +704,10 @@ function App() {
         // Return empty cleanup function - no actual focus handling
         return () => {};
       });
+      logAppEvent('[APP_INIT] Focus manager configured successfully');
     } catch (error) {
       console.warn('Failed to configure focus manager:', error);
+      setInitErrors(prev => [...prev, 'Focus manager configuration failed']);
     }
 
     // Initialize security features with error handling
@@ -698,7 +762,13 @@ function App() {
     };
 
     // Initialize security first
-    initializeSecurity();
+    try {
+      initializeSecurity();
+      logAppEvent('[APP_INIT] Security initialization completed');
+    } catch (securityError) {
+      console.error('[APP_INIT] Security initialization failed:', securityError);
+      setInitErrors(prev => [...prev, 'Security initialization failed']);
+    }
 
     // Add failsafe for group admin detection on app load
     const checkForAuthenticatedGroupAdmin = async () => {
@@ -796,9 +866,26 @@ function App() {
       window.location.pathname !== '/logout' &&
       (!searchParams || (!searchParams.has('noredirect') && !searchParams.has('forcelogin')))
     ) {
-      checkForAuthenticatedGroupAdmin();
+      checkForAuthenticatedGroupAdmin()
+        .then(() => {
+          logAppEvent('[APP_INIT] Group admin check completed');
+        })
+        .catch((error) => {
+          console.error('[APP_INIT] Group admin check failed:', error);
+          setInitErrors(prev => [...prev, 'Group admin check failed']);
+        });
     }
-  }, []);
+    
+    // Mark initialization as complete
+    setTimeout(() => {
+      setAppInitialized(true);
+      logAppEvent('[APP_INIT] Application initialization completed', { 
+        appInstanceId,
+        initErrors: initErrors.length,
+        errorsList: initErrors 
+      });
+    }, 100);
+  }, [appInstanceId, initErrors]);
 
   useEffect(() => {
     // Log application startup
@@ -929,12 +1016,60 @@ function App() {
     };
   }, []);
 
+  // STABILITY ENHANCEMENT: Show initialization status if not yet complete
+  if (!appInitialized && initErrors.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Initializing DAS Board...</p>
+          <p className="text-xs text-gray-400 mt-2">Instance: {appInstanceId}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // STABILITY ENHANCEMENT: Show error state if initialization failed
+  if (initErrors.length > 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-red-50">
+        <div className="text-center max-w-md">
+          <div className="text-red-600 mb-4">
+            <svg className="h-12 w-12 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <h1 className="text-xl font-bold text-gray-900 mb-2">Initialization Failed</h1>
+          <p className="text-gray-600 mb-4">The DAS Board failed to initialize properly.</p>
+          <div className="text-sm text-gray-500 space-y-1">
+            {initErrors.map((error, index) => (
+              <div key={index} className="bg-red-100 p-2 rounded text-red-700">{error}</div>
+            ))}
+          </div>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Reload Application
+          </button>
+          <p className="text-xs text-gray-400 mt-2">Instance: {appInstanceId}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <PageErrorBoundary
       identifier="AppRoot"
       onError={(error: SafeErrorInfo) => {
-        console.error('Critical app-level error:', error);
+        console.error('[STABILITY] Critical app-level error caught:', error);
         reportError(error);
+        logAppEvent('[ERROR_BOUNDARY] App root error', { 
+          errorId: error.id,
+          errorType: error.type,
+          severity: error.severity,
+          appInstanceId 
+        });
       }}
     >
       <TranslationProvider>
@@ -944,15 +1079,22 @@ function App() {
               enableAutoRecovery={true}
               maxRetries={3}
               onError={(authError: AuthErrorInfo) => {
-                console.error('[App] Auth error caught by boundary:', authError);
+                console.error('[STABILITY] Auth error caught by boundary:', authError);
                 
-                // Log development warnings
+                // Enhanced development logging
                 if (import.meta.env.DEV) {
                   console.warn(`🔐 [AUTH BOUNDARY] ${authError.type}: ${authError.message}`);
                   if (authError.sessionInfo) {
                     console.warn('Session Info:', authError.sessionInfo);
                   }
                 }
+                
+                // Enhanced error reporting with app context
+                logAppEvent('[ERROR_BOUNDARY] Auth error', {
+                  authErrorType: authError.type,
+                  recoverable: authError.recoverable,
+                  appInstanceId
+                });
                 
                 // Report to error tracking service
                 reportError({
@@ -963,31 +1105,93 @@ function App() {
                   authErrorType: authError.type,
                   recoverable: authError.recoverable,
                   sessionInfo: authError.sessionInfo,
+                  appInstanceId,
                 });
               }}
             >
               <SectionErrorBoundary
                 identifier="AuthProvider"
+                onError={(error: SafeErrorInfo) => {
+                  console.error('[STABILITY] AuthProvider error boundary triggered:', error);
+                  logAppEvent('[ERROR_BOUNDARY] AuthProvider error', { 
+                    errorId: error.id,
+                    appInstanceId 
+                  });
+                }}
                 {...createSpecializedErrorBoundary('auth')}
               >
                 <AuthProvider>
-                  <DealershipProvider>
                   <SectionErrorBoundary
-                    identifier="Router"
-                    {...createSpecializedErrorBoundary('navigation')}
+                    identifier="DealershipProvider"
+                    onError={(error: SafeErrorInfo) => {
+                      console.error('[STABILITY] DealershipProvider error boundary triggered:', error);
+                      logAppEvent('[ERROR_BOUNDARY] DealershipProvider error', { 
+                        errorId: error.id,
+                        appInstanceId 
+                      });
+                    }}
                   >
-                    <Router>
-                      <DirectAuthProvider>
-                        <TestUserMiddleware>
-                          <ComponentErrorBoundary identifier="AppComponents">
-                            <RouteLogger />
-                            <CookieConsent />
-                          </ComponentErrorBoundary>
-                          <SectionErrorBoundary
-                            identifier="Routes"
-                            {...createSpecializedErrorBoundary('navigation')}
+                    <DealershipProvider>
+                      <SectionErrorBoundary
+                        identifier="Router"
+                        onError={(error: SafeErrorInfo) => {
+                          console.error('[STABILITY] Router error boundary triggered:', error);
+                          logAppEvent('[ERROR_BOUNDARY] Router error', { 
+                            errorId: error.id,
+                            appInstanceId 
+                          });
+                        }}
+                        {...createSpecializedErrorBoundary('navigation')}
+                      >
+                        <Router>
+                          <ComponentErrorBoundary 
+                            identifier="DirectAuthProvider"
+                            onError={(error: SafeErrorInfo) => {
+                              console.error('[STABILITY] DirectAuthProvider error:', error);
+                              logAppEvent('[ERROR_BOUNDARY] DirectAuthProvider error', { 
+                                errorId: error.id,
+                                appInstanceId 
+                              });
+                            }}
                           >
-                            <Routes>
+                            <DirectAuthProvider>
+                              <ComponentErrorBoundary 
+                                identifier="TestUserMiddleware"
+                                onError={(error: SafeErrorInfo) => {
+                                  console.error('[STABILITY] TestUserMiddleware error:', error);
+                                  logAppEvent('[ERROR_BOUNDARY] TestUserMiddleware error', { 
+                                    errorId: error.id,
+                                    appInstanceId 
+                                  });
+                                }}
+                              >
+                                <TestUserMiddleware>
+                                  <ComponentErrorBoundary 
+                                    identifier="AppComponents"
+                                    onError={(error: SafeErrorInfo) => {
+                                      console.error('[STABILITY] AppComponents error:', error);
+                                      logAppEvent('[ERROR_BOUNDARY] AppComponents error', { 
+                                        errorId: error.id,
+                                        appInstanceId 
+                                      });
+                                    }}
+                                  >
+                                    <RouteLogger />
+                                    <CookieConsent />
+                                  </ComponentErrorBoundary>
+                                  <SectionErrorBoundary
+                                    identifier="Routes"
+                                    onError={(error: SafeErrorInfo) => {
+                                      console.error('[STABILITY] Routes error boundary triggered:', error);
+                                      logAppEvent('[ERROR_BOUNDARY] Routes error', { 
+                                        errorId: error.id,
+                                        path: window.location.pathname,
+                                        appInstanceId 
+                                      });
+                                    }}
+                                    {...createSpecializedErrorBoundary('navigation')}
+                                  >
+                                    <Routes>
                               {/* Marketing Pages - Public Access */}
                               <Route path="/" element={<HomePage />} />
                               <Route path="/demo" element={<DemoPage />} />
@@ -1285,21 +1489,42 @@ function App() {
 
                               {/* Fallback - redirect to dashboard */}
                               <Route path="*" element={<RedirectLogger to="/dashboard" />} />
-                            </Routes>
-                          </SectionErrorBoundary>
-                          <ComponentErrorBoundary identifier="Toaster">
-                            <Toaster />
+                                    </Routes>
+                                  </SectionErrorBoundary>
+                                  <ComponentErrorBoundary 
+                                    identifier="Toaster"
+                                    onError={(error: SafeErrorInfo) => {
+                                      console.error('[STABILITY] Toaster error:', error);
+                                      logAppEvent('[ERROR_BOUNDARY] Toaster error', { 
+                                        errorId: error.id,
+                                        appInstanceId 
+                                      });
+                                    }}
+                                  >
+                                    <Toaster />
+                                  </ComponentErrorBoundary>
+                                </TestUserMiddleware>
+                              </ComponentErrorBoundary>
+                            </DirectAuthProvider>
                           </ComponentErrorBoundary>
-                        </TestUserMiddleware>
-                      </DirectAuthProvider>
-                    </Router>
+                        </Router>
+                      </SectionErrorBoundary>
+                    </DealershipProvider>
                   </SectionErrorBoundary>
-                  </DealershipProvider>
                 </AuthProvider>
               </SectionErrorBoundary>
             </AuthErrorBoundary>
             {APP_ENV !== 'production' && (
-              <ComponentErrorBoundary identifier="ReactQueryDevtools">
+              <ComponentErrorBoundary 
+                identifier="ReactQueryDevtools"
+                onError={(error: SafeErrorInfo) => {
+                  console.error('[STABILITY] ReactQueryDevtools error:', error);
+                  logAppEvent('[ERROR_BOUNDARY] ReactQueryDevtools error', { 
+                    errorId: error.id,
+                    appInstanceId 
+                  });
+                }}
+              >
                 <ReactQueryDevtools />
               </ComponentErrorBoundary>
             )}

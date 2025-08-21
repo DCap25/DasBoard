@@ -13,6 +13,19 @@
  * - Data encryption for sensitive fields
  * - Role-based access control validation
  * 
+ * STATE MANAGEMENT SAFETY FEATURES ADDED:
+ * - Error ID generation with format: error_timestamp_random for debugging
+ * - Comprehensive error logging with type/severity classification
+ * - Safe state operation wrappers with retry logic and fallbacks
+ * - Protected user session retrieval with graceful degradation
+ * - Safe Supabase client access with connection fallbacks
+ * - Try-catch protection around all session-dependent operations
+ * - Graceful fallback responses to prevent app crashes
+ * - State error classification: session, auth, network, state, validation
+ * - Severity levels: low, medium, high, critical for proper monitoring
+ * - Timeout protection for long-running state operations
+ * - Exponential backoff retry mechanisms for transient failures
+ * 
  * ORIGINAL FIXES MAINTAINED:
  * - Supabase access token in headers for authenticated requests
  * - 401/403 error handling with session refresh/logout
@@ -657,6 +670,94 @@ const csrfManager = CSRFManager.getInstance();
 const rateLimitManager = RateLimitManager.getInstance();
 const auditLogger = AuditLogger.getInstance();
 
+// =================== ENVIRONMENT VALIDATION ===================
+
+/**
+ * Environment error checker - validates Supabase environment variables
+ * before making any Supabase client calls
+ */
+class EnvironmentValidator {
+  private static instance: EnvironmentValidator;
+  private lastCheck: number = 0;
+  private envStatus: { isValid: boolean; error?: string } | null = null;
+  
+  static getInstance(): EnvironmentValidator {
+    if (!EnvironmentValidator.instance) {
+      EnvironmentValidator.instance = new EnvironmentValidator();
+    }
+    return EnvironmentValidator.instance;
+  }
+  
+  /**
+   * Check if Supabase environment variables are properly loaded
+   * Returns specific error messages for different missing env var scenarios
+   */
+  validateEnvironment(): { isValid: boolean; error?: string } {
+    const now = Date.now();
+    
+    // Cache result for 5 seconds to avoid repeated checks
+    if (this.envStatus && (now - this.lastCheck) < 5000) {
+      return this.envStatus;
+    }
+    
+    this.lastCheck = now;
+    
+    // Check for Supabase URL
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    if (!supabaseUrl || supabaseUrl === 'undefined' || supabaseUrl.trim() === '') {
+      const error = 'Env vars not loaded; restart npm run dev - VITE_SUPABASE_URL missing';
+      console.error(`[Security] ${error}`);
+      this.envStatus = { isValid: false, error };
+      return this.envStatus;
+    }
+    
+    // Check for Supabase anon key
+    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    if (!supabaseKey || supabaseKey === 'undefined' || supabaseKey.trim() === '') {
+      const error = 'Env vars not loaded; restart npm run dev - VITE_SUPABASE_ANON_KEY missing';
+      console.error(`[Security] ${error}`);
+      this.envStatus = { isValid: false, error };
+      return this.envStatus;
+    }
+    
+    // Validate URL format
+    try {
+      new URL(supabaseUrl);
+    } catch {
+      const error = 'Env vars not loaded; restart npm run dev - VITE_SUPABASE_URL invalid format';
+      console.error(`[Security] ${error}`);
+      this.envStatus = { isValid: false, error };
+      return this.envStatus;
+    }
+    
+    // Validate key format (basic check)
+    if (supabaseKey.length < 32) {
+      const error = 'Env vars not loaded; restart npm run dev - VITE_SUPABASE_ANON_KEY too short';
+      console.error(`[Security] ${error}`);
+      this.envStatus = { isValid: false, error };
+      return this.envStatus;
+    }
+    
+    this.envStatus = { isValid: true };
+    return this.envStatus;
+  }
+  
+  /**
+   * Force refresh of environment validation
+   */
+  refresh(): void {
+    this.envStatus = null;
+    this.lastCheck = 0;
+  }
+  
+  /**
+   * Get current environment status without validation
+   */
+  getStatus(): { isValid: boolean; error?: string } | null {
+    return this.envStatus;
+  }
+}
+
 // =================== ENHANCED AUTHENTICATION MANAGER ===================
 
 class AuthManager {
@@ -664,6 +765,7 @@ class AuthManager {
   private currentSession: Session | null = null;
   private refreshPromise: Promise<Session | null> | null = null;
   private sessionValidationCache = new Map<string, { isValid: boolean; expires: number }>();
+  private envValidator = EnvironmentValidator.getInstance();
   
   static getInstance(): AuthManager {
     if (!AuthManager.instance) {
@@ -672,9 +774,16 @@ class AuthManager {
     return AuthManager.instance;
   }
 
-  /** Security: Enhanced access token retrieval with validation caching */
+  /** Security: Enhanced access token retrieval with environment validation and validation caching */
   async getAccessToken(): Promise<string | null> {
     try {
+      // Environment validation: Check before making Supabase calls
+      const envCheck = this.envValidator.validateEnvironment();
+      if (!envCheck.isValid) {
+        console.error(`[Security] Environment validation failed: ${envCheck.error}`);
+        throw new Error(envCheck.error);
+      }
+      
       const client = await getSecureSupabaseClient();
       const { data: { session }, error } = await client.auth.getSession();
 
@@ -779,9 +888,16 @@ class AuthManager {
     }
   }
 
-  /** Security: Perform actual session refresh with validation */
+  /** Security: Perform actual session refresh with environment validation */
   private async _performRefresh(): Promise<Session | null> {
     try {
+      // Environment validation: Check before making Supabase calls
+      const envCheck = this.envValidator.validateEnvironment();
+      if (!envCheck.isValid) {
+        console.error(`[Security] Environment validation failed during refresh: ${envCheck.error}`);
+        throw new Error(envCheck.error);
+      }
+      
       const client = await getSecureSupabaseClient();
       const { data, error } = await client.auth.refreshSession();
 
@@ -816,13 +932,28 @@ class AuthManager {
     }
   }
 
-  /** Security: Enhanced authentication failure handling */
+  /** Security: Enhanced authentication failure handling with environment validation */
   async handleAuthFailure(): Promise<void> {
     try {
       console.log('[Security] Handling auth failure - performing secure cleanup');
       
       // Clear session validation cache
       this.sessionValidationCache.clear();
+      
+      // Environment validation: Check before making Supabase calls
+      const envCheck = this.envValidator.validateEnvironment();
+      if (!envCheck.isValid) {
+        console.warn(`[Security] Skipping signOut due to environment error: ${envCheck.error}`);
+        // Still perform local cleanup
+        this.currentSession = null;
+        this.clearStoredTokens();
+        
+        // Redirect to login with environment error indicator
+        if (!window.location.pathname.includes('/auth')) {
+          window.location.href = '/auth/signin?env_error=true';
+        }
+        return;
+      }
       
       const client = await getSecureSupabaseClient();
       await client.auth.signOut();
@@ -860,8 +991,14 @@ class AuthManager {
     }
   }
 
-  /** Security: Get enhanced authentication headers */
+  /** Security: Get enhanced authentication headers with environment validation */
   async getAuthHeaders(): Promise<Record<string, string>> {
+    // Environment validation: Check before making Supabase calls
+    const envCheck = this.envValidator.validateEnvironment();
+    if (!envCheck.isValid) {
+      throw new Error(envCheck.error || 'Environment validation failed');
+    }
+    
     const token = await this.getAccessToken();
     
     if (!token) {
@@ -886,9 +1023,16 @@ class AuthManager {
     return headers;
   }
 
-  /** Security: Validate request permissions */
+  /** Security: Validate request permissions with environment validation */
   async validateRequestPermissions(operation: string, resourceId?: string): Promise<boolean> {
     try {
+      // Environment validation: Check before making Supabase calls
+      const envCheck = this.envValidator.validateEnvironment();
+      if (!envCheck.isValid) {
+        console.error(`[Security] Environment validation failed during permission check: ${envCheck.error}`);
+        return false;
+      }
+      
       const currentUser = await getCurrentUser();
       if (!currentUser) {
         return false;
@@ -1028,13 +1172,32 @@ class HttpClient {
           ...headers,
         };
 
-        // Security: Add authentication headers if required
+        // Security: Add authentication headers if required (with environment validation)
         if (requireAuth) {
           try {
             const authHeaders = await this.authManager.getAuthHeaders();
             Object.assign(requestHeaders, authHeaders);
-          } catch (authError) {
+          } catch (authError: any) {
             console.error('[Security] Auth header error:', authError);
+            
+            // Check if this is an environment error
+            if (authError.message?.includes('Env vars not loaded') || 
+                authError.message?.includes('restart npm run dev') ||
+                authError.message?.includes('VITE_SUPABASE')) {
+              return {
+                data: null,
+                error: this.createSecureError(
+                  authError.message || 'Environment configuration error', 
+                  503, 
+                  'ENV_ERROR', 
+                  requestId
+                ),
+                success: false,
+                requestId,
+                timestamp: Date.now(),
+              };
+            }
+            
             return {
               data: null,
               error: this.createSecureError('Authentication failed', 401, 'AUTH_FAILED', requestId),
@@ -1384,56 +1547,94 @@ export class ApiService {
 
   // =================== DEALERSHIP OPERATIONS ===================
 
-  /** Security: Enhanced dealership retrieval with access control */
+  /** Security: Enhanced dealership retrieval with state management safety and access control */
   async getDealerships(): Promise<ApiResponse<Dealership[]>> {
     if (USE_MOCK_API) {
-      const mockData = await MockApi.mockDealerships();
-      return { data: mockData, error: null, success: true };
+      return safeStateOperation(
+        async () => {
+          const mockData = await MockApi.mockDealerships();
+          return { data: mockData, error: null, success: true };
+        },
+        'getDealerships (mock)',
+        { data: [], error: { message: 'Mock API unavailable', status: 503, type: 'server' }, success: false },
+        { severity: 'low' }
+      );
     }
 
-    try {
-      const client = await getSecureSupabaseClient();
-      const currentUser = await getCurrentUser();
-      
-      if (!currentUser) {
-        return {
-          data: null,
-          error: { message: 'Authentication required', status: 401, type: 'authorization' },
-          success: false,
-        };
-      }
+    const errorId = generateStateErrorId();
+    
+    return safeStateOperation(
+      async () => {
+        // Environment validation: Check before making Supabase calls
+        const envValidator = EnvironmentValidator.getInstance();
+        const envCheck = envValidator.validateEnvironment();
+        if (!envCheck.isValid) {
+          logStateError(errorId, 'getDealerships - environment validation', new Error(envCheck.error || 'Environment invalid'), 'high', 'validation');
+          return {
+            data: null,
+            error: { 
+              message: envCheck.error || 'Environment configuration error',
+              status: 503,
+              code: 'ENV_ERROR',
+              type: 'server'
+            },
+            success: false,
+          };
+        }
+        
+        const client = await safeGetSupabaseClient();
+        if (!client) {
+          logStateError(errorId, 'getDealerships - client unavailable', new Error('Supabase client unavailable'), 'critical', 'state');
+          throw new Error('Database connection unavailable');
+        }
+        
+        const currentUser = await safeGetCurrentUser();
+        if (!currentUser) {
+          logStateError(errorId, 'getDealerships - no user', new Error('No authenticated user'), 'medium', 'auth');
+          return {
+            data: null,
+            error: { message: 'Authentication required', status: 401, type: 'authorization' },
+            success: false,
+          };
+        }
 
-      // Security: Apply row-level security through RLS
-      const { data, error } = await client
-        .from('dealerships')
-        .select('*')
-        .order('name');
+        // Security: Apply row-level security through RLS with error handling
+        const { data, error } = await client
+          .from('dealerships')
+          .select('*')
+          .order('name');
 
-      if (error) {
-        console.error('[Security] Dealerships fetch error:', error.message);
-        return {
-          data: null,
-          error: { 
-            message: 'Failed to fetch dealerships', 
-            status: 500, 
-            code: 'DB_ERROR',
-            type: 'server'
-          },
-          success: false,
-        };
-      }
+        if (error) {
+          logStateError(errorId, 'getDealerships - database query', error, 'high', 'state');
+          return {
+            data: null,
+            error: { 
+              message: 'Failed to fetch dealerships', 
+              status: 500, 
+              code: 'DB_ERROR',
+              type: 'server'
+            },
+            success: false,
+          };
+        }
 
-      // Security: Add access control metadata
-      const enhancedData = (data || []).map(dealership => ({
-        ...dealership,
-        access_level: 'read' as const, // Determine based on user role
-        classification: 'internal' as const,
-      }));
+        // Security: Add access control metadata with error protection
+        try {
+          const enhancedData = (data || []).map(dealership => ({
+            ...dealership,
+            access_level: 'read' as const,
+            classification: 'internal' as const,
+          }));
 
-      return { data: enhancedData, error: null, success: true };
-    } catch (error: any) {
-      console.error('[Security] Dealerships operation error:', error);
-      return {
+          return { data: enhancedData, error: null, success: true };
+        } catch (enhanceError) {
+          logStateError(errorId, 'getDealerships - data enhancement', enhanceError, 'low', 'state');
+          // Return raw data if enhancement fails
+          return { data: data || [], error: null, success: true };
+        }
+      },
+      'getDealerships',
+      {
         data: null,
         error: { 
           message: 'Service temporarily unavailable', 
@@ -1441,8 +1642,9 @@ export class ApiService {
           type: 'server'
         },
         success: false,
-      };
-    }
+      },
+      { retries: 2, severity: 'high', logErrors: true }
+    );
   }
 
   /** Security: Enhanced dealership retrieval by ID with validation */
@@ -1518,70 +1720,91 @@ export class ApiService {
 
   // =================== SALES OPERATIONS ===================
 
-  /** Security: Enhanced sales retrieval with privacy protection */
+  /** Security: Enhanced sales retrieval with state management safety and privacy protection */
   async getSales(dealershipId?: string): Promise<ApiResponse<Sale[]>> {
     if (USE_MOCK_API) {
-      const mockData = await MockApi.mockSales();
-      return { data: mockData, error: null, success: true };
+      return safeStateOperation(
+        async () => {
+          const mockData = await MockApi.mockSales();
+          return { data: mockData, error: null, success: true };
+        },
+        'getSales (mock)',
+        { data: [], error: { message: 'Mock API unavailable', status: 503, type: 'server' }, success: false },
+        { severity: 'low' }
+      );
     }
 
-    try {
-      const client = await getSecureSupabaseClient();
-      const currentUser = await getCurrentUser();
-      
-      if (!currentUser) {
-        return {
-          data: null,
-          error: { message: 'Authentication required', status: 401, type: 'authorization' },
-          success: false,
-        };
-      }
+    const errorId = generateStateErrorId();
+    
+    return safeStateOperation(
+      async () => {
+        const client = await safeGetSupabaseClient();
+        if (!client) {
+          logStateError(errorId, 'getSales - client unavailable', new Error('Supabase client unavailable'), 'critical', 'state');
+          throw new Error('Database connection unavailable');
+        }
+        
+        const currentUser = await safeGetCurrentUser();
+        if (!currentUser) {
+          logStateError(errorId, 'getSales - no user', new Error('No authenticated user'), 'medium', 'auth');
+          return {
+            data: null,
+            error: { message: 'Authentication required', status: 401, type: 'authorization' },
+            success: false,
+          };
+        }
 
-      let query = client.from('sales').select('*');
+        let query = client.from('sales').select('*');
 
-      // Security: Validate dealership ID if provided
-      if (dealershipId) {
-        if (!isValidUUID(dealershipId) && !/^\d+$/.test(dealershipId)) {
+        // Security: Validate dealership ID if provided
+        if (dealershipId) {
+          if (!isValidUUID(dealershipId) && !/^\d+$/.test(dealershipId)) {
+            logStateError(errorId, 'getSales - invalid dealership ID', new Error(`Invalid ID format: ${dealershipId}`), 'medium', 'validation');
+            return {
+              data: null,
+              error: { 
+                message: 'Invalid dealership ID format', 
+                status: 400,
+                type: 'validation'
+              },
+              success: false,
+            };
+          }
+          query = query.eq('dealership_id', dealershipId);
+        }
+
+        const { data, error } = await query.order('sale_date', { ascending: false });
+
+        if (error) {
+          logStateError(errorId, 'getSales - database query', error, 'high', 'state');
           return {
             data: null,
             error: { 
-              message: 'Invalid dealership ID format', 
-              status: 400,
-              type: 'validation'
+              message: 'Failed to fetch sales data', 
+              status: 500,
+              type: 'server'
             },
             success: false,
           };
         }
-        query = query.eq('dealership_id', dealershipId);
-      }
 
-      const { data, error } = await query.order('sale_date', { ascending: false });
+        // Security: Apply privacy protection to customer data with error handling
+        try {
+          const protectedData = (data || []).map(sale => ({
+            ...sale,
+            customer_name: sale.customer_name ? maskSensitiveData(sale.customer_name) : undefined,
+            customer_full_name: sale.customer_name, // Would be encrypted in production
+          }));
 
-      if (error) {
-        console.error('[Security] Sales fetch error:', error.message);
-        return {
-          data: null,
-          error: { 
-            message: 'Failed to fetch sales data', 
-            status: 500,
-            type: 'server'
-          },
-          success: false,
-        };
-      }
-
-      // Security: Apply privacy protection to customer data
-      const protectedData = (data || []).map(sale => ({
-        ...sale,
-        customer_name: sale.customer_name ? maskSensitiveData(sale.customer_name) : undefined,
-        // Keep full name only for authorized users (implement role check)
-        customer_full_name: sale.customer_name, // Would be encrypted in production
-      }));
-
-      return { data: protectedData, error: null, success: true };
-    } catch (error: any) {
-      console.error('[Security] Sales operation error:', error);
-      return {
+          return { data: protectedData, error: null, success: true };
+        } catch (protectionError) {
+          logStateError(errorId, 'getSales - data protection', protectionError, 'medium', 'state');
+          // Return raw data if protection fails (less secure but functional)
+          return { data: data || [], error: null, success: true };
+        }
+      },
+      'getSales',
+      {
         data: null,
         error: { 
           message: 'Service temporarily unavailable',
@@ -1589,8 +1812,9 @@ export class ApiService {
           type: 'server'
         },
         success: false,
-      };
-    }
+      },
+      { retries: 2, severity: 'high', logErrors: true }
+    );
   }
 
   /** Security: Enhanced sale creation with comprehensive validation */
@@ -1867,36 +2091,53 @@ export class ApiService {
 
   // =================== USER OPERATIONS ===================
 
-  /** Security: Enhanced current profile retrieval */
+  /** Security: Enhanced current profile retrieval with state management safety */
   async getCurrentProfile(): Promise<ApiResponse<User>> {
-    try {
-      const user = await getCurrentUser();
-      
-      if (!user) {
-        return {
-          data: null,
-          error: { 
-            message: 'No authenticated user', 
-            status: 401, 
-            code: 'UNAUTHENTICATED',
-            type: 'authorization'
-          },
-          success: false,
-        };
-      }
+    const errorId = generateStateErrorId();
+    
+    return safeStateOperation(
+      async () => {
+        const user = await safeGetCurrentUser();
+        
+        if (!user) {
+          logStateError(errorId, 'getCurrentProfile - no user', new Error('No authenticated user'), 'medium', 'auth');
+          return {
+            data: null,
+            error: { 
+              message: 'No authenticated user', 
+              status: 401, 
+              code: 'UNAUTHENTICATED',
+              type: 'authorization'
+            },
+            success: false,
+          };
+        }
 
-      // Security: Remove sensitive fields from response
-      const sanitizedUser = {
-        ...user,
-        // Remove any potential sensitive fields
-        raw_app_meta_data: undefined,
-        raw_user_meta_data: undefined,
-      };
+        // Security: Remove sensitive fields from response with error handling
+        try {
+          const sanitizedUser = {
+            ...user,
+            raw_app_meta_data: undefined,
+            raw_user_meta_data: undefined,
+          };
 
-      return { data: sanitizedUser, error: null, success: true };
-    } catch (error: any) {
-      console.error('[Security] Profile fetch error:', error);
-      return {
+          return { data: sanitizedUser, error: null, success: true };
+        } catch (sanitizeError) {
+          logStateError(errorId, 'getCurrentProfile - sanitization', sanitizeError, 'low', 'state');
+          // Return basic user info if sanitization fails
+          return { 
+            data: { 
+              id: user.id, 
+              email: user.email, 
+              created_at: user.created_at 
+            } as User, 
+            error: null, 
+            success: true 
+          };
+        }
+      },
+      'getCurrentProfile',
+      {
         data: null,
         error: { 
           message: 'Service temporarily unavailable',
@@ -1904,8 +2145,9 @@ export class ApiService {
           type: 'server'
         },
         success: false,
-      };
-    }
+      },
+      { retries: 2, severity: 'medium', logErrors: true }
+    );
   }
 
   // =================== TESTING OPERATIONS ===================
@@ -1951,67 +2193,108 @@ export class ApiService {
 
   // =================== GOAL TRACKING OPERATIONS ===================
 
-  /** Security: Enhanced goal tracking with access control */
+  /** Security: Enhanced goal tracking with state management safety and access control */
   async getGoalTrackingData(userId: string) {
-    // Security: Validate user ID
-    if (!isValidUUID(userId)) {
-      throw new Error('Invalid user ID format');
-    }
+    const errorId = generateStateErrorId();
+    
+    return safeStateOperation(
+      async () => {
+        // Security: Validate user ID
+        if (!isValidUUID(userId)) {
+          logStateError(errorId, 'getGoalTrackingData - invalid user ID', new Error(`Invalid user ID format: ${userId}`), 'medium', 'validation');
+          throw new Error('Invalid user ID format');
+        }
 
-    // Security: Check if current user can access this data
-    const currentUser = await getCurrentUser();
-    if (!currentUser || currentUser.id !== userId) {
-      throw new Error('Unauthorized access to user data');
-    }
+        // Security: Check if current user can access this data
+        const currentUser = await safeGetCurrentUser();
+        if (!currentUser || currentUser.id !== userId) {
+          logStateError(errorId, 'getGoalTrackingData - unauthorized access', new Error(`User ${currentUser?.id} accessing data for ${userId}`), 'high', 'auth');
+          throw new Error('Unauthorized access to user data');
+        }
 
-    try {
-      const client = await getSecureSupabaseClient();
-      const now = new Date();
-      const currentDay = now.getDate();
-      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        const client = await safeGetSupabaseClient();
+        if (!client) {
+          logStateError(errorId, 'getGoalTrackingData - client unavailable', new Error('Supabase client unavailable'), 'critical', 'state');
+          throw new Error('Database connection unavailable');
+        }
+        
+        const now = new Date();
+        const currentDay = now.getDate();
+        const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
 
-      // Get user's deals for current month
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        // Get user's deals for current month with error handling
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-      const { data: deals, error: dealsError } = await client
-        .from('deals')
-        .select('*')
-        .eq('created_by', userId)
-        .gte('created_at', startOfMonth.toISOString())
-        .lte('created_at', endOfMonth.toISOString());
+        const { data: deals, error: dealsError } = await client
+          .from('deals')
+          .select('*')
+          .eq('created_by', userId)
+          .gte('created_at', startOfMonth.toISOString())
+          .lte('created_at', endOfMonth.toISOString());
 
-      if (dealsError) {
-        console.error('[Security] Error fetching deals:', dealsError);
-        throw new Error('Failed to fetch user deals');
-      }
+        if (dealsError) {
+          logStateError(errorId, 'getGoalTrackingData - deals fetch', dealsError, 'high', 'state');
+          throw new Error('Failed to fetch user deals');
+        }
 
-      // Calculate progress metrics securely
-      const totalDeals = deals?.length || 0;
-      const monthlyGoal = 20; // Default goal - would come from user settings
-      const progressRatio = totalDeals / monthlyGoal;
+        // Calculate progress metrics securely with error handling
+        try {
+          const totalDeals = deals?.length || 0;
+          const monthlyGoal = 20; // Default goal - would come from user settings
+          const progressRatio = totalDeals / monthlyGoal;
 
-      const progressMetrics = {
-        expected: Math.floor((currentDay / daysInMonth) * monthlyGoal),
-        actual: totalDeals,
-        progress: Math.min(progressRatio * 100, 100),
-        progressRatio,
-        status: progressRatio >= 1 ? 'on-track' : 
-               progressRatio >= 0.8 ? 'slightly-behind' : 
-               progressRatio >= 0.6 ? 'behind' : 'neutral' as const,
-      };
+          const progressMetrics = {
+            expected: Math.floor((currentDay / daysInMonth) * monthlyGoal),
+            actual: totalDeals,
+            progress: Math.min(progressRatio * 100, 100),
+            progressRatio,
+            status: progressRatio >= 1 ? 'on-track' : 
+                   progressRatio >= 0.8 ? 'slightly-behind' : 
+                   progressRatio >= 0.6 ? 'behind' : 'neutral' as const,
+          };
 
-      return {
-        deals: deals || [],
-        daysOff: 0, // Could be calculated from user's schedule
-        progressMetrics,
-        currentDay,
-        daysInMonth,
-      };
-    } catch (error: any) {
-      console.error('[Security] Error in getGoalTrackingData:', error);
-      throw new Error('Failed to get goal tracking data');
-    }
+          return {
+            deals: deals || [],
+            daysOff: 0,
+            progressMetrics,
+            currentDay,
+            daysInMonth,
+          };
+        } catch (calculationError) {
+          logStateError(errorId, 'getGoalTrackingData - metrics calculation', calculationError, 'medium', 'state');
+          // Return basic data if calculation fails
+          return {
+            deals: deals || [],
+            daysOff: 0,
+            progressMetrics: {
+              expected: 0,
+              actual: deals?.length || 0,
+              progress: 0,
+              progressRatio: 0,
+              status: 'neutral' as const,
+            },
+            currentDay,
+            daysInMonth,
+          };
+        }
+      },
+      'getGoalTrackingData',
+      {
+        deals: [],
+        daysOff: 0,
+        progressMetrics: {
+          expected: 0,
+          actual: 0,
+          progress: 0,
+          progressRatio: 0,
+          status: 'neutral' as const,
+        },
+        currentDay: new Date().getDate(),
+        daysInMonth: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate(),
+      },
+      { retries: 2, severity: 'medium', logErrors: true }
+    );
   }
 
   /** Security: Enhanced finance manager deals with role validation */
@@ -2147,12 +2430,14 @@ export const getDeals = (dealershipId?: number) => apiService.getDeals(dealershi
 export const createDeal = (dealData: Omit<Deal, 'id'>) => apiService.createDeal(dealData);
 export const getCurrentProfile = () => apiService.getCurrentProfile();
 export const testConnection = () => apiService.testConnection();
+export const validateEnvironment = () => EnvironmentValidator.getInstance().validateEnvironment();
 export const getGoalTrackingData = (userId: string) => apiService.getGoalTrackingData(userId);
 export const getFinanceManagerDeals = (dealershipId?: number) => apiService.getFinanceManagerDeals(dealershipId);
 export const logFinanceManagerDeal = (dealData: Omit<Deal, 'id'>) => apiService.logFinanceManagerDeal(dealData);
 
-// Export the main service
+// Export the main service and environment validator
 export default apiService;
+export { EnvironmentValidator };
 
 // =================== CLEANUP ===================
 

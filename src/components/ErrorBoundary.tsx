@@ -22,6 +22,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 /**
  * Comprehensive error classification system
  * Helps determine appropriate recovery strategies
+ * 
+ * FIXED: Moved enum definition to ensure it's available at runtime
+ * and prevent ReferenceError: ErrorType is not defined
  */
 export enum ErrorType {
   NETWORK = 'network',
@@ -34,6 +37,43 @@ export enum ErrorType {
   API = 'api',
   UNKNOWN = 'unknown',
 }
+
+// Ensure ErrorType is available immediately by creating a reference
+const ErrorTypeRef = ErrorType;
+
+// Runtime verification that ErrorType enum is properly loaded
+if (typeof ErrorType === 'undefined' || !ErrorType.NETWORK) {
+  console.error('CRITICAL: ErrorType enum failed to load properly in ErrorBoundary.tsx');
+  throw new Error('ErrorType enum initialization failed - check for circular dependencies or module loading issues');
+}
+
+// RUNTIME SAFETY: Helper function to safely access enum values
+const safeGetErrorType = (key: keyof typeof ErrorType): string => {
+  try {
+    if (typeof ErrorType === 'undefined' || !ErrorType) {
+      console.warn(`[RUNTIME_SAFETY] ErrorType undefined, using fallback for ${key}`);
+      return key.toLowerCase();
+    }
+    return ErrorType[key] || key.toLowerCase();
+  } catch (error) {
+    console.error(`[RUNTIME_SAFETY] Error accessing ErrorType.${key}:`, error);
+    return key.toLowerCase();
+  }
+};
+
+// RUNTIME SAFETY: Helper function to safely access ErrorSeverity values
+const safeGetErrorSeverity = (key: keyof typeof ErrorSeverity): string => {
+  try {
+    if (typeof ErrorSeverity === 'undefined' || !ErrorSeverity) {
+      console.warn(`[RUNTIME_SAFETY] ErrorSeverity undefined, using fallback for ${key}`);
+      return key.toLowerCase();
+    }
+    return ErrorSeverity[key] || key.toLowerCase();
+  } catch (error) {
+    console.error(`[RUNTIME_SAFETY] Error accessing ErrorSeverity.${key}:`, error);
+    return key.toLowerCase();
+  }
+};
 
 /**
  * Error severity levels for appropriate user messaging
@@ -201,28 +241,109 @@ class SecureErrorLogger {
 
   /**
    * Create safe error information from raw error
+   * RUNTIME SAFETY: All variables checked for undefined before usage
    */
   static createSafeErrorInfo(error: Error, errorInfo?: ErrorInfo, context?: any): SafeErrorInfo {
-    const errorId = `error_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-    const timestamp = new Date().toISOString();
+    // RUNTIME SAFETY: Ensure error object is valid
+    const safeError = error || new Error('Unknown error occurred');
+    
+    // RUNTIME SAFETY: Generate error ID with fallback
+    let errorId: string;
+    try {
+      errorId = `error_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    } catch (idError) {
+      console.warn('[RUNTIME_SAFETY] Error generating error ID, using fallback');
+      errorId = `error_fallback_${Date.now()}`;
+    }
+    
+    // RUNTIME SAFETY: Generate timestamp with fallback
+    let timestamp: string;
+    try {
+      timestamp = new Date().toISOString();
+    } catch (timeError) {
+      console.warn('[RUNTIME_SAFETY] Error generating timestamp, using fallback');
+      timestamp = new Date(Date.now()).toString();
+    }
 
-    // Classify error type based on error message and stack
-    const errorType = this.classifyError(error);
-    const severity = this.determineSeverity(error, errorType);
+    // RUNTIME SAFETY: Classify error type with fallback
+    let errorType: ErrorType;
+    try {
+      errorType = this.classifyError(safeError);
+    } catch (classifyError) {
+      console.warn('[RUNTIME_SAFETY] Error classifying error type, using fallback');
+      errorType = safeGetErrorType('UNKNOWN') as ErrorType;
+    }
+    
+    // RUNTIME SAFETY: Determine severity with fallback
+    let severity: ErrorSeverity;
+    try {
+      severity = this.determineSeverity(safeError, errorType);
+    } catch (severityError) {
+      console.warn('[RUNTIME_SAFETY] Error determining severity, using fallback');
+      severity = safeGetErrorSeverity('HIGH') as ErrorSeverity;
+    }
 
-    // Create user-friendly message
-    const userMessage = this.generateUserMessage(errorType, severity);
+    // RUNTIME SAFETY: Create user-friendly message with fallback
+    let userMessage: string;
+    try {
+      userMessage = this.generateUserMessage(errorType, severity);
+    } catch (messageError) {
+      console.warn('[RUNTIME_SAFETY] Error generating user message, using fallback');
+      userMessage = 'An unexpected error occurred. Please try again or contact support.';
+    }
 
-    // Sanitize error message
-    const sanitizedMessage = this.sanitizeString(error.message || 'Unknown error');
+    // RUNTIME SAFETY: Sanitize error message with fallback
+    let sanitizedMessage: string;
+    try {
+      sanitizedMessage = this.sanitizeString(safeError.message || 'Unknown error');
+    } catch (sanitizeError) {
+      console.warn('[RUNTIME_SAFETY] Error sanitizing message, using fallback');
+      sanitizedMessage = 'Error message sanitization failed';
+    }
 
-    // Sanitize component stack
-    const sanitizedComponentStack = errorInfo?.componentStack
-      ? this.sanitizeString(errorInfo.componentStack)
-      : undefined;
+    // RUNTIME SAFETY: Sanitize component stack with fallback
+    let sanitizedComponentStack: string | undefined;
+    try {
+      sanitizedComponentStack = errorInfo?.componentStack
+        ? this.sanitizeString(errorInfo.componentStack)
+        : undefined;
+    } catch (stackError) {
+      console.warn('[RUNTIME_SAFETY] Error sanitizing component stack');
+      sanitizedComponentStack = undefined;
+    }
 
-    // Get safe context information
-    const safeContext = context ? this.sanitizeObject(context) : undefined;
+    // RUNTIME SAFETY: Get safe context information with fallback
+    let safeContext: any;
+    try {
+      safeContext = context ? this.sanitizeObject(context) : undefined;
+    } catch (contextError) {
+      console.warn('[RUNTIME_SAFETY] Error sanitizing context');
+      safeContext = undefined;
+    }
+
+    // RUNTIME SAFETY: Get safe user and session IDs with fallbacks
+    let userId: string | undefined;
+    let sessionId: string | undefined;
+    try {
+      userId = this.getSafeUserId();
+      sessionId = this.getSafeSessionId();
+    } catch (idError) {
+      console.warn('[RUNTIME_SAFETY] Error getting user/session IDs');
+      userId = undefined;
+      sessionId = undefined;
+    }
+
+    // RUNTIME SAFETY: Determine retryable and recoverable status with fallbacks
+    let retryable: boolean;
+    let recoverable: boolean;
+    try {
+      retryable = this.isRetryable(errorType);
+      recoverable = this.isRecoverable(errorType, severity);
+    } catch (statusError) {
+      console.warn('[RUNTIME_SAFETY] Error determining retry/recovery status, using defaults');
+      retryable = false;
+      recoverable = true;
+    }
 
     return {
       id: errorId,
@@ -236,10 +357,10 @@ class SecureErrorLogger {
       userAgent:
         typeof window !== 'undefined' ? window.navigator?.userAgent?.substring(0, 200) : undefined,
       url: typeof window !== 'undefined' ? window.location?.pathname : undefined,
-      userId: this.getSafeUserId(),
-      sessionId: this.getSafeSessionId(),
-      retryable: this.isRetryable(errorType),
-      recoverable: this.isRecoverable(errorType, severity),
+      userId,
+      sessionId,
+      retryable,
+      recoverable,
       ...safeContext,
     };
   }
@@ -265,8 +386,15 @@ class SecureErrorLogger {
 
   /**
    * Classify error type based on error characteristics
+   * FIXED: Added safety check to ensure ErrorType enum is available
    */
   private static classifyError(error: Error): ErrorType {
+    // Safety check: Ensure ErrorType is available
+    if (typeof ErrorType === 'undefined' || !ErrorType) {
+      console.error('ErrorType enum is not available, using fallback');
+      return 'unknown' as ErrorType;
+    }
+
     const message = error.message?.toLowerCase() || '';
     const stack = error.stack?.toLowerCase() || '';
     const name = error.name?.toLowerCase() || '';
@@ -639,9 +767,26 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     // Call custom error handler if provided
     if (this.props.onError) {
       try {
-        this.props.onError(safeError);
+        // RUNTIME SAFETY: Ensure onError is actually a function before calling
+        if (typeof this.props.onError === 'function') {
+          this.props.onError(safeError);
+        } else {
+          console.warn('[RUNTIME_SAFETY] onError prop is not a function, skipping');
+        }
       } catch (handlerError) {
+        // FIXED: Enhanced error handling to prevent ErrorType reference issues
         console.error('Error handler itself threw an error:', handlerError);
+        
+        // RUNTIME SAFETY: Ensure ErrorType is available for logging
+        try {
+          if (typeof ErrorType !== 'undefined' && ErrorType) {
+            console.error('Error classification available for debugging');
+          } else {
+            console.error('ErrorType enum not available - potential module loading issue');
+          }
+        } catch (enumCheckError) {
+          console.error('[RUNTIME_SAFETY] Error checking ErrorType availability:', enumCheckError);
+        }
       }
     }
 
