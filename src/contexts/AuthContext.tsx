@@ -337,7 +337,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
   
   // RUNTIME SAFETY: Variable definition guard to prevent ReferenceErrors
-  const ensureVariableDefined = useCallback(<T>(variable: T | undefined, varName: string, defaultValue: T): T => {
+  const ensureVariableDefined = useCallback(<T,>(variable: T | undefined, varName: string, defaultValue: T): T => {
     if (typeof variable === 'undefined') {
       const errorId = generateErrorId();
       console.warn(`[RUNTIME_SAFETY] ${errorId} Variable '${varName}' is undefined, using default:`, defaultValue);
@@ -347,7 +347,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [generateErrorId]);
   
   // Safe state setters with error boundary protection
-  const safeSetState = useCallback(<T>(setter: React.Dispatch<React.SetStateAction<T>>, value: T, stateName: string) => {
+  const safeSetState = useCallback(<T,>(setter: React.Dispatch<React.SetStateAction<T>>, value: T, stateName: string) => {
     try {
       // RUNTIME SAFETY: Check if setter is defined before using
       if (typeof setter === 'undefined') {
