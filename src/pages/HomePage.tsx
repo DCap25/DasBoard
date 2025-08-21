@@ -348,7 +348,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold text-white mb-6">{t('home.cta.title')}</h2>
           <p className="text-xl text-gray-300 mb-8">{t('home.cta.subtitle')}</p>
@@ -373,11 +373,11 @@ export default function HomePage() {
             </div>
             <div>
               <h4 className="text-lg font-semibold text-white mb-3">{t('footer.product')}</h4>
-              <ul className="space-y-1">
+              <ul className="space-y-0.5">
                 <li>
                   <button
                     onClick={() => navigate('/')}
-                    className="text-gray-400 hover:text-white transition-colors"
+                    className="text-gray-400 hover:text-white transition-colors text-sm block py-0.5"
                   >
                     {t('footer.home')}
                   </button>
@@ -385,7 +385,7 @@ export default function HomePage() {
                 <li>
                   <button
                     onClick={() => navigate('/screenshots')}
-                    className="text-gray-400 hover:text-white transition-colors"
+                    className="text-gray-400 hover:text-white transition-colors text-sm block py-0.5"
                   >
                     {t('footer.screenshots')}
                   </button>
@@ -393,7 +393,7 @@ export default function HomePage() {
                 <li>
                   <button
                     onClick={() => navigate('/pricing')}
-                    className="text-gray-400 hover:text-white transition-colors"
+                    className="text-gray-400 hover:text-white transition-colors text-sm block py-0.5"
                   >
                     {t('footer.pricing')}
                   </button>
@@ -401,7 +401,7 @@ export default function HomePage() {
                 <li>
                   <button
                     onClick={() => navigate('/about')}
-                    className="text-gray-400 hover:text-white transition-colors"
+                    className="text-gray-400 hover:text-white transition-colors text-sm block py-0.5"
                   >
                     {t('footer.aboutUs')}
                   </button>
@@ -410,11 +410,11 @@ export default function HomePage() {
             </div>
             <div>
               <h4 className="text-lg font-semibold text-white mb-3">{t('footer.legal')}</h4>
-              <ul className="space-y-1">
+              <ul className="space-y-0.5">
                 <li>
                   <button
                     onClick={() => navigate('/legal/terms')}
-                    className="text-gray-400 hover:text-white transition-colors"
+                    className="text-gray-400 hover:text-white transition-colors text-sm block py-0.5"
                   >
                     {t('footer.terms')}
                   </button>
@@ -422,7 +422,7 @@ export default function HomePage() {
                 <li>
                   <button
                     onClick={() => navigate('/legal/privacy')}
-                    className="text-gray-400 hover:text-white transition-colors"
+                    className="text-gray-400 hover:text-white transition-colors text-sm block py-0.5"
                   >
                     {t('footer.privacy')}
                   </button>
@@ -430,7 +430,7 @@ export default function HomePage() {
                 <li>
                   <button
                     onClick={() => navigate('/legal/subscription')}
-                    className="text-gray-400 hover:text-white transition-colors"
+                    className="text-gray-400 hover:text-white transition-colors text-sm block py-0.5"
                   >
                     {t('footer.subscription')}
                   </button>
