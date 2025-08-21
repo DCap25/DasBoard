@@ -404,11 +404,19 @@ export default function DemoPage() {
               <button
                 key={demo.id}
                 onClick={() => setCurrentDemo(demo.id)}
-                className={`transition-all duration-300 ${
+                className={`transition-all duration-300 rounded-full border-0 p-0 ${
                   currentDemo === demo.id
-                    ? 'w-3 h-3 bg-blue-500 rounded-full'
-                    : 'w-2 h-2 bg-gray-500 hover:bg-gray-400 rounded-full'
+                    ? 'bg-blue-500'
+                    : 'bg-gray-500 hover:bg-gray-400'
                 }`}
+                style={{
+                  width: '8px !important',
+                  height: '8px !important',
+                  minWidth: '8px',
+                  minHeight: '8px',
+                  padding: '0',
+                  border: 'none'
+                }}
                 aria-label={`Go to ${demo.title}`}
               />
             ))}
