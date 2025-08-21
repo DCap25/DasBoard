@@ -199,15 +199,15 @@ export default function HomePage() {
                     key={currentImageIndex}
                   />
                   {/* Slide indicators */}
-                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1.5">
                     {dashboardImages.map((_, index) => (
                       <button
                         key={index}
                         onClick={() => setCurrentImageIndex(index)}
-                        className={`w-3 h-3 rounded-full transition-colors ${
+                        className={`w-1.5 h-1.5 rounded-full transition-colors ${
                           index === currentImageIndex
-                            ? 'bg-blue-500'
-                            : 'bg-gray-500 hover:bg-gray-400'
+                            ? 'bg-blue-400'
+                            : 'bg-gray-400 hover:bg-gray-300'
                         }`}
                         aria-label={`Go to slide ${index + 1}`}
                       />
