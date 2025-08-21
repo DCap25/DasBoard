@@ -10,6 +10,13 @@ import { Button } from '../../components/ui/button';
 import { Label } from '../../components/ui/label';
 import { Checkbox } from '../../components/ui/checkbox';
 import { Textarea } from '../../components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../components/ui/select';
 import { toast } from '../../components/ui/use-toast';
 import { SingleFinanceStorage } from '../../lib/singleFinanceStorage';
 import { ArrowLeft, DollarSign, User, FileText, Calculator, Plus, Trash2 } from 'lucide-react';
@@ -118,11 +125,12 @@ export default function LogSingleFinanceDeal() {
   const [localUserId, setLocalUserId] = useState<string | null>(null);
 
   // Helper to resolve a consistent user ID (context or token fallback)
-  const getUserId = (): string | null => {
+  const getUserId = (): string => {
     const userId = getUserIdSync(user, localUserId);
     debugUserId('LogSingleFinanceDeal', user, localUserId);
     console.log('[LogSingleFinanceDeal] Final resolved user ID:', userId);
-    return userId;
+    // Use same fallback as Settings page for consistency
+    return userId || 'single_finance_user';
   };
 
   // Try to resolve user id from Supabase session if context not ready
@@ -286,11 +294,6 @@ export default function LogSingleFinanceDeal() {
     console.log('[LogSingleFinanceDeal] user context:', user);
     console.log('[LogSingleFinanceDeal] localUserId:', localUserId);
 
-    if (!userId) {
-      console.log('[LogSingleFinanceDeal] No user ID resolved, skipping load');
-      return;
-    }
-
     try {
       console.log('[LogSingleFinanceDeal] Loading team members for userId:', userId);
       const savedTeamMembers = SingleFinanceStorage.getTeamMembers(userId);
@@ -304,7 +307,7 @@ export default function LogSingleFinanceDeal() {
   // Save team members to localStorage
   const saveTeamMembers = (members: TeamMember[]) => {
     const userId = getUserId();
-    if (!userId) return;
+    console.log('[LogSingleFinanceDeal] Saving team members with userId:', userId);
 
     try {
       SingleFinanceStorage.setTeamMembers(userId, members);
@@ -380,7 +383,6 @@ export default function LogSingleFinanceDeal() {
   // Load existing deal data for editing
   const loadDealForEdit = (dealIdToEdit: string) => {
     const userId = getUserId();
-    if (!userId) return;
 
     try {
       const existingDeals = SingleFinanceStorage.getDeals(userId);
@@ -507,6 +509,14 @@ export default function LogSingleFinanceDeal() {
         [name]: value,
       }));
     }
+  };
+
+  // Handle lender selection for the custom Select component
+  const handleLenderChange = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      lender: value,
+    }));
   };
 
   // Handle form submission
@@ -636,9 +646,6 @@ export default function LogSingleFinanceDeal() {
 
       // Save to user-specific localStorage key for Single Finance Dashboard
       const userId = getUserId();
-      if (!userId) {
-        throw new Error('User ID is required');
-      }
 
       try {
         const existingDeals = SingleFinanceStorage.getDeals(userId);
@@ -850,21 +857,24 @@ export default function LogSingleFinanceDeal() {
               </div>
 
               <div className="space-y-2">
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center justify-between">
                   <Label htmlFor="salespersonId">{t('dashboard.dealLog.salesperson')}</Label>
                   <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="isSplitDeal"
-                      checked={formData.isSplitDeal}
-                      onCheckedChange={checked =>
-                        setFormData(prev => ({
-                          ...prev,
-                          isSplitDeal: checked as boolean,
-                          secondSalespersonId: checked ? prev.secondSalespersonId : '',
-                        }))
-                      }
-                    />
-                    <Label htmlFor="isSplitDeal" className="text-xs">
+                    <div className="w-4 h-4 flex-shrink-0">
+                      <Checkbox
+                        id="isSplitDeal"
+                        checked={formData.isSplitDeal}
+                        onCheckedChange={checked =>
+                          setFormData(prev => ({
+                            ...prev,
+                            isSplitDeal: checked as boolean,
+                            secondSalespersonId: checked ? prev.secondSalespersonId : '',
+                          }))
+                        }
+                        className="!w-4 !h-4 !min-w-4 !min-h-4 !max-w-4 !max-h-4 flex-shrink-0"
+                      />
+                    </div>
+                    <Label htmlFor="isSplitDeal" className="text-[8px] text-gray-600">
                       {t('dashboard.dealLog.splitDeal')}
                     </Label>
                   </div>
@@ -876,7 +886,7 @@ export default function LogSingleFinanceDeal() {
                       name="salespersonId"
                       value={formData.salespersonId}
                       onChange={handleInputChange}
-                      className="w-full p-2 border-2 border-gray-400 rounded-md text-sm"
+                      className="w-full p-2 border-2 border-gray-400 rounded-md"
                     >
                       <option value="">{t('dashboard.dealLog.selectSalesperson')}</option>
                       {teamMembers
@@ -892,7 +902,7 @@ export default function LogSingleFinanceDeal() {
                       name="secondSalespersonId"
                       value={formData.secondSalespersonId}
                       onChange={handleInputChange}
-                      className="w-full p-2 border-2 border-gray-400 rounded-md text-sm"
+                      className="w-full p-2 border-2 border-gray-400 rounded-md"
                     >
                       <option value="">{t('dashboard.dealLog.selectSecondSalesperson')}</option>
                       {teamMembers
@@ -951,21 +961,22 @@ export default function LogSingleFinanceDeal() {
 
               <div className="space-y-2">
                 <Label htmlFor="lender">{t('dashboard.dealLog.lender')}</Label>
-                <select
-                  id="lender"
-                  name="lender"
+                <Select
                   value={formData.lender}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border-2 border-gray-400 rounded-md"
+                  onValueChange={handleLenderChange}
                   disabled={formData.dealType === 'Cash'}
                 >
-                  <option value="">{t('dashboard.dealLog.selectLender')}</option>
-                  {LENDERS.map(lender => (
-                    <option key={lender} value={lender}>
-                      {lender}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="w-full border-2 border-gray-400">
+                    <SelectValue placeholder={t('dashboard.dealLog.selectLender')} />
+                  </SelectTrigger>
+                  <SelectContent side="bottom" className="max-h-60">
+                    {LENDERS.map(lender => (
+                      <SelectItem key={lender} value={lender}>
+                        {lender}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">

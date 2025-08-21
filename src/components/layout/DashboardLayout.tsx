@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { supabase } from '../../lib/supabaseClient';
 import { Button } from '../ui/button';
 import {
   Home,
@@ -22,9 +23,72 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'The DAS Board' }) => {
-  const { signOut, user, userRole, dealershipId, currentDealershipName } = useAuth();
+  const { signOut, user, userRole, dealershipId, currentDealershipName, loading, hasSession } = useAuth();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Mobile menu state
+  const [fallbackUser, setFallbackUser] = useState<any>(null);
+  
+  // Fetch user data directly from Supabase if auth context doesn't provide it
+  useEffect(() => {
+    const fetchFallbackUser = async () => {
+      if (!user) {
+        console.log('[DashboardLayout] No user from context, fetching from Supabase...');
+        try {
+          const { data } = await supabase.auth.getSession();
+          if (data?.session?.user) {
+            console.log('[DashboardLayout] Found fallback user:', data.session.user.email);
+            setFallbackUser(data.session.user);
+          }
+        } catch (error) {
+          console.error('[DashboardLayout] Error fetching fallback user:', error);
+        }
+      }
+    };
+    
+    fetchFallbackUser();
+  }, [user]);
+  
+  // Use effective user (context or fallback)
+  const effectiveUser = user || fallbackUser;
+  
+  // Create a display name from available data
+  const getDisplayName = () => {
+    if (effectiveUser?.user_metadata?.full_name) {
+      return effectiveUser.user_metadata.full_name;
+    }
+    if (effectiveUser?.email) {
+      // Try to extract a name from the email
+      const emailPart = effectiveUser.email.split('@')[0];
+      if (effectiveUser.email === 'dan.caplan@sportdurst.com') {
+        return 'Dan Caplan';
+      }
+      // Convert email username to a readable name (dan.caplan -> Dan Caplan)
+      const name = emailPart.replace(/[._]/g, ' ')
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+      return name;
+    }
+    
+    return 'Single Finance User';
+  };
+  
+  // Debug user data  
+  console.log('[DashboardLayout] Auth data:', {
+    hasUser: !!user,
+    hasFallbackUser: !!fallbackUser,
+    userFromContext: user,
+    fallbackUserFromSupabase: fallbackUser,
+    effectiveUserEmail: effectiveUser?.email,
+    userMetadata: effectiveUser?.user_metadata,
+    fullName: effectiveUser?.user_metadata?.full_name,
+    displayName: getDisplayName(),
+    currentPath: location.pathname,
+    userRole,
+    dealershipId,
+    authLoading: loading,
+    hasSession: hasSession
+  });
 
   const handleSignOut = () => {
     // Navigate to the dedicated logout page instead of calling signOut
@@ -84,9 +148,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Th
             </div>
             <div>
               <p className="text-sm font-medium text-white">
-                {user?.user_metadata?.full_name || user?.email || 'User'}
+                {getDisplayName()}
               </p>
-              <p className="text-xs text-blue-100">{user?.email}</p>
+              <p className="text-xs text-blue-100">
+                {effectiveUser?.email || 'User'}
+              </p>
             </div>
           </div>
 

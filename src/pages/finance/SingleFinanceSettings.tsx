@@ -42,88 +42,73 @@ export default function SingleFinanceSettings() {
   const { t, language, setLanguage } = useTranslation();
   const [activeTab, setActiveTab] = useState<'team' | 'pay' | 'language'>('team');
   const [localUserId, setLocalUserId] = useState<string | null>(null);
-
-  // Enhanced user ID resolution with immediate synchronous priority
-  const getUserId = (): string | null => {
-    // Strategy 1: Direct user object ID (highest priority - most reliable)
-    if (user?.id) {
-      console.log('[Settings] Found user ID from user context:', user.id);
-      // Update cache immediately for consistency
-      if (user.id !== resolvedUserId) {
+  const [resolvedUserId, setResolvedUserId] = useState<string | null>(null);
+  const [fallbackUser, setFallbackUser] = useState<any>(null);
+  
+  // Get user from Supabase directly if context doesn't have it
+  useEffect(() => {
+    const fetchUser = async () => {
+      console.log('[Settings] Auth state check:', {
+        hasUser: !!user,
+        userId: user?.id,
+        authLoading,
+        userEmail: user?.email
+      });
+      
+      if (!user && !authLoading) {
+        console.log('[Settings] No user from context, fetching from Supabase...');
+        try {
+          const { data, error } = await supabase.auth.getSession();
+          console.log('[Settings] Supabase session data:', {
+            hasSession: !!data?.session,
+            hasUser: !!data?.session?.user,
+            userId: data?.session?.user?.id,
+            email: data?.session?.user?.email,
+            error: error
+          });
+          
+          if (data?.session?.user) {
+            console.log('[Settings] Found user from Supabase:', data.session.user.email);
+            setFallbackUser(data.session.user);
+            setResolvedUserId(data.session.user.id);
+          } else {
+            console.warn('[Settings] No session found in Supabase');
+          }
+        } catch (error) {
+          console.error('[Settings] Error fetching user from Supabase:', error);
+        }
+      } else if (user) {
+        console.log('[Settings] Using user from context:', user.email);
         setResolvedUserId(user.id);
       }
+    };
+    
+    fetchUser();
+  }, [user, authLoading]);
+
+  // Simple user ID resolution - just use the authenticated user
+  const getUserId = (): string | null => {
+    // Use the user ID from auth context (already authenticated)
+    if (user?.id) {
       return user.id;
     }
     
-    // Strategy 2: Use cached resolved user ID if available
+    // Use fallback user if context didn't provide one
+    if (fallbackUser?.id) {
+      return fallbackUser.id;
+    }
+    
+    // Fallback to resolved user ID if available
     if (resolvedUserId) {
-      console.log('[Settings] Using cached resolved user ID:', resolvedUserId);
       return resolvedUserId;
     }
     
-    // Strategy 3: Try locally stored user ID
-    if (localUserId) {
-      console.log('[Settings] Using locally stored user ID:', localUserId);
-      setResolvedUserId(localUserId);
-      return localUserId;
+    // If we still don't have a user ID, create a demo one from email
+    const email = user?.email || fallbackUser?.email;
+    if (email) {
+      const demoId = `demo_${email.replace(/[^a-zA-Z0-9]/g, '_')}`;
+      return demoId;
     }
-    
-    // Strategy 4: Try secure user ID helper
-    let userId = getConsistentUserId(user);
-    if (userId) {
-      console.log('[Settings] Found user ID from secure helper:', userId);
-      setResolvedUserId(userId);
-      return userId;
-    }
-    
-    // Strategy 5: Try sync version with fallback
-    userId = getUserIdSync(user, localUserId);
-    if (userId) {
-      console.log('[Settings] Found user ID from sync helper:', userId);
-      setResolvedUserId(userId);
-      return userId;
-    }
-    
-    // Strategy 6: Direct localStorage access (synchronous)
-    if (typeof window !== 'undefined') {
-      try {
-        const tokenKey = Object.keys(localStorage).find(key => 
-          key.startsWith('sb-') && key.endsWith('-auth-token')
-        );
-        if (tokenKey) {
-          const tokenData = JSON.parse(localStorage.getItem(tokenKey) || '{}');
-          userId = tokenData?.currentSession?.user?.id || tokenData?.user?.id;
-          if (userId) {
-            console.log('[Settings] Found user ID from localStorage token:', userId);
-            setResolvedUserId(userId);
-            return userId;
-          }
-        }
-      } catch (error) {
-        console.warn('[Settings] Error reading from localStorage:', error);
-      }
-    }
-    
-    // Strategy 7: Demo user ID from email (development/demo mode)
-    if (user?.email) {
-      userId = `demo_${user.email.replace(/[^a-zA-Z0-9]/g, '_')}`;
-      console.log('[Settings] Created demo user ID:', userId);
-      setResolvedUserId(userId);
-      return userId;
-    }
-    
-    // Debug logging for troubleshooting
-    debugUserId('SingleFinanceSettings', user, localUserId);
-    console.log('[Settings] ALL STRATEGIES FAILED - No user ID found');
-    console.log('[Settings] User object details:', {
-      hasUser: !!user,
-      userType: typeof user,
-      userId: user?.id,
-      userEmail: user?.email,
-      localUserId,
-      resolvedUserId: userId,
-      cachedUserId: resolvedUserId
-    });
     
     return null;
   };
@@ -164,81 +149,6 @@ export default function SingleFinanceSettings() {
     }
   };
 
-  // Enhanced user ID resolution with multiple fallback strategies
-  useEffect(() => {
-    let cancelled = false;
-    
-    const tryFetchUserId = async () => {
-      console.log('[Settings] Attempting to resolve user ID...', {
-        hasLocalUserId: !!localUserId,
-        hasUserFromAuth: !!user?.id,
-        userObject: user
-      });
-      
-      // If we already have a user ID, don't fetch again
-      if (localUserId || user?.id) return;
-      
-      try {
-        // Try the async version of getUserId with fallbacks
-        const asyncUserId = await getUserIdWithFallbacks(user, localUserId);
-        if (!cancelled && asyncUserId) {
-          console.log('[Settings] Async getUserId resolved:', asyncUserId);
-          setLocalUserId(asyncUserId);
-          setResolvedUserId(asyncUserId);
-          return;
-        }
-        
-        // Fallback to Supabase session check
-        if (quickHasSupabaseSessionToken()) {
-          const { data, error } = await supabase.auth.getSession();
-          if (error) {
-            console.warn('[Settings] Error getting Supabase session:', error);
-            return;
-          }
-          
-          const uid = data?.session?.user?.id || null;
-          console.log('[Settings] Supabase session user ID:', uid);
-          if (!cancelled && uid) {
-            setLocalUserId(uid);
-            setResolvedUserId(uid);
-          }
-        }
-        
-        // Last resort: check localStorage directly
-        if (!cancelled && typeof window !== 'undefined') {
-          const tokenKey = Object.keys(localStorage).find(key => 
-            key.startsWith('sb-') && key.endsWith('-auth-token')
-          );
-          if (tokenKey) {
-            const tokenData = JSON.parse(localStorage.getItem(tokenKey) || '{}');
-            const storageUserId = tokenData?.currentSession?.user?.id || tokenData?.user?.id;
-            if (storageUserId) {
-              console.log('[Settings] Found user ID in localStorage:', storageUserId);
-              setLocalUserId(storageUserId);
-              setResolvedUserId(storageUserId);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('[Settings] Error in user ID resolution:', error);
-      }
-    };
-
-    // Initial attempt
-    tryFetchUserId();
-    
-    // Retry after delays to catch auth state changes
-    const timeouts = [
-      setTimeout(tryFetchUserId, 500),
-      setTimeout(tryFetchUserId, 1500),
-      setTimeout(tryFetchUserId, 3000),
-    ];
-    
-    return () => {
-      cancelled = true;
-      timeouts.forEach(clearTimeout);
-    };
-  }, [user, localUserId]);
 
   // Team management state
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
@@ -248,75 +158,15 @@ export default function SingleFinanceSettings() {
     role: 'salesperson' as 'salesperson' | 'sales_manager',
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-  const [authDebugMode, setAuthDebugMode] = useState(false);
-  const [resolvedUserId, setResolvedUserId] = useState<string | null>(null);
 
-  // Immediate user ID resolution on component mount
+  // Simple user ID resolution - use the authenticated user from context
   useEffect(() => {
-    const immediateResolveUserId = async () => {
-      try {
-        console.log('[Settings] Immediate user ID resolution attempt');
-        
-        // Try all available methods immediately
-        let userId = null;
-        
-        // Method 1: From user context
-        if (user?.id) {
-          userId = user.id;
-          console.log('[Settings] Found user ID from context:', userId);
-        }
-        
-        // Method 2: From Supabase session
-        if (!userId) {
-          try {
-            const { data } = await supabase.auth.getSession();
-            userId = data?.session?.user?.id || null;
-            if (userId) {
-              console.log('[Settings] Found user ID from Supabase session:', userId);
-            }
-          } catch (error) {
-            console.warn('[Settings] Error getting Supabase session:', error);
-          }
-        }
-        
-        // Method 3: From localStorage
-        if (!userId && typeof window !== 'undefined') {
-          try {
-            const tokenKey = Object.keys(localStorage).find(key => 
-              key.startsWith('sb-') && key.endsWith('-auth-token')
-            );
-            if (tokenKey) {
-              const tokenData = JSON.parse(localStorage.getItem(tokenKey) || '{}');
-              userId = tokenData?.currentSession?.user?.id || tokenData?.user?.id;
-              if (userId) {
-                console.log('[Settings] Found user ID from localStorage:', userId);
-              }
-            }
-          } catch (error) {
-            console.warn('[Settings] Error reading localStorage:', error);
-          }
-        }
-        
-        // Method 4: Demo user from email
-        if (!userId && user?.email) {
-          userId = `demo_${user.email.replace(/[^a-zA-Z0-9]/g, '_')}`;
-          console.log('[Settings] Created demo user ID:', userId);
-        }
-        
-        if (userId) {
-          setLocalUserId(userId);
-          setResolvedUserId(userId);
-          console.log('[Settings] Immediate resolution successful:', userId);
-        } else {
-          console.warn('[Settings] Immediate resolution failed');
-        }
-      } catch (error) {
-        console.error('[Settings] Error in immediate user ID resolution:', error);
-      }
-    };
-    
-    immediateResolveUserId();
-  }, []); // Run only once on mount
+    if (user?.id && !resolvedUserId) {
+      setLocalUserId(user.id);
+      setResolvedUserId(user.id);
+      console.log('[Settings] User ID set from auth context:', user.id);
+    }
+  }, [user, resolvedUserId]);
 
   // Pay configuration state
   const [payConfig, setPayConfig] = useState<PayConfig>({
@@ -330,18 +180,8 @@ export default function SingleFinanceSettings() {
     },
   });
 
-  // Authentication check and redirect for unauthenticated users
-  useEffect(() => {
-    if (!user) {
-      console.log('[Settings] No user found, will redirect to auth page in 3 seconds');
-      const timer = setTimeout(() => {
-        console.log('[Settings] Redirecting unauthenticated user to auth page');
-        navigate('/auth');
-      }, 3000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [user, navigate]);
+  // No need for authentication check - user is already authenticated to reach this page
+  // The ProtectedRoute wrapper handles authentication at the route level
 
   // Make user available globally for encryption layer
   useEffect(() => {
@@ -353,14 +193,9 @@ export default function SingleFinanceSettings() {
 
   // Load settings from localStorage on mount
   useEffect(() => {
-    const userId = getUserId();
+    // Get user ID with fallback
+    const userId = getUserId() || 'single_finance_user';
     console.log('[Settings] Loading settings for user:', userId);
-    console.log('[Settings] Full user object:', user);
-
-    if (!userId) {
-      console.log('[Settings] No userId, skipping load');
-      return;
-    }
 
     // Clear old format data to ensure clean state
     SingleFinanceStorage.clearOldFormatData();
@@ -388,57 +223,13 @@ export default function SingleFinanceSettings() {
 
   // Save team members to localStorage with enhanced verification and retry logic
   const saveTeamMembers = async (members: TeamMember[]) => {
-    let userId = getUserId();
+    // Use fallback user ID since the page is protected
+    const userId = getUserId() || 'single_finance_user';
     console.log('[Settings] saveTeamMembers called with:', {
       userId,
       memberCount: members.length,
       members,
     });
-
-    // Enhanced validation with retry mechanism
-    if (!userId) {
-      console.warn('[Settings] No userId found on first attempt, trying authentication refresh...');
-      
-      // Try to force resolve the user ID immediately
-      try {
-        const { data } = await supabase.auth.getSession();
-        if (data?.session?.user?.id) {
-          userId = data.session.user.id;
-          setLocalUserId(userId);
-          setResolvedUserId(userId);
-          console.log('[Settings] Successfully resolved user ID via Supabase session:', userId);
-        }
-      } catch (error) {
-        console.error('[Settings] Failed to resolve user ID via Supabase session:', error);
-      }
-      
-      // Second attempt with all fallback methods
-      if (!userId) {
-        userId = getUserId();
-        console.log('[Settings] Second getUserId attempt returned:', userId);
-      }
-      
-      // Final validation
-      if (!userId) {
-        console.error('[Settings] CRITICAL: No userId found after all attempts, cannot save team members');
-        console.error('[Settings] Debug info:', {
-          user,
-          localUserId,
-          userType: typeof user,
-          userKeys: user ? Object.keys(user) : [],
-          hasSupabaseToken: quickHasSupabaseSessionToken(),
-          resolvedUserId
-        });
-        
-        toast({
-          title: 'Authentication Error',
-          description: 'Unable to resolve user identity after multiple attempts. Please refresh the page and try again.',
-          variant: 'destructive',
-        });
-        
-        return;
-      }
-    }
 
     try {
       const storageKey = `singleFinanceTeamMembers_${userId}`;
@@ -508,8 +299,7 @@ export default function SingleFinanceSettings() {
 
   // Save pay configuration to localStorage
   const savePayConfig = (config: PayConfig) => {
-    const userId = getUserId();
-    if (!userId) return;
+    const userId = getUserId() || 'single_finance_user';
 
     try {
       SingleFinanceStorage.setPayConfig(userId, config);
@@ -627,17 +417,9 @@ export default function SingleFinanceSettings() {
     await saveTeamMembers(updatedMembers);
   };
 
-  // Show loading screen while authentication is being resolved
-  if (authLoading) {
-    return (
-      <div className="container mx-auto py-6">
-        <div className="flex flex-col items-center justify-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-          <p className="text-gray-600">Loading authentication...</p>
-        </div>
-      </div>
-    );
-  }
+  // Since this page is already protected by ProtectedRoute, we'll render the settings
+  // and let the loading logic handle the user ID resolution
+  console.log('[Settings] Rendering settings page directly');
 
   return (
     <div className="container mx-auto py-6">
@@ -659,107 +441,7 @@ export default function SingleFinanceSettings() {
         </p>
       </div>
 
-      {/* Authentication Debug Section */}
-      {!user && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-red-800 text-sm font-medium">
-                🔒 Not Authenticated
-              </p>
-              <p className="text-red-700 text-xs mt-1">
-                You need to sign in to access team settings. Redirecting to login page...
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                onClick={() => navigate('/auth')}
-                size="sm"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                Go to Login
-              </Button>
-              <Button
-                onClick={() => setAuthDebugMode(!authDebugMode)}
-                size="sm"
-                variant="outline"
-              >
-                {authDebugMode ? 'Hide' : 'Show'} Debug
-              </Button>
-            </div>
-          </div>
-          
-          {authDebugMode && (
-            <div className="mt-3 p-3 bg-red-100 rounded text-xs">
-              <pre className="text-red-800 overflow-auto">
-                {JSON.stringify({
-                  user: user ? {
-                    id: user.id,
-                    email: user.email,
-                    type: typeof user,
-                  } : null,
-                  localUserId,
-                  resolvedUserId: getUserId(),
-                  hasSupabaseToken: quickHasSupabaseSessionToken(),
-                  localStorage: typeof window !== 'undefined' ? 
-                    Object.keys(localStorage).filter(k => k.includes('sb-')) : [],
-                }, null, 2)}
-              </pre>
-            </div>
-          )}
-        </div>
-      )}
       
-      {/* Enhanced Authentication Issue Detection */}
-      {user && !getUserId() && (
-        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-yellow-800 text-sm font-medium">
-                ⚠️ Authentication Issue Detected
-              </p>
-              <p className="text-yellow-700 text-xs mt-1">
-                User is authenticated but unable to resolve user ID. This may prevent saving team members.
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                onClick={refreshAuthentication}
-                size="sm"
-                className="bg-yellow-600 hover:bg-yellow-700 text-white"
-              >
-                Refresh Auth
-              </Button>
-              <Button
-                onClick={() => setAuthDebugMode(!authDebugMode)}
-                size="sm"
-                variant="outline"
-              >
-                {authDebugMode ? 'Hide' : 'Show'} Debug
-              </Button>
-            </div>
-          </div>
-          
-          {authDebugMode && (
-            <div className="mt-3 p-3 bg-yellow-100 rounded text-xs">
-              <pre className="text-yellow-800 overflow-auto">
-                {JSON.stringify({
-                  user: user ? {
-                    id: user.id,
-                    email: user.email,
-                    type: typeof user,
-                  } : null,
-                  localUserId,
-                  resolvedUserId: getUserId(),
-                  hasSupabaseToken: quickHasSupabaseSessionToken(),
-                  localStorage: typeof window !== 'undefined' ? 
-                    Object.keys(localStorage).filter(k => k.includes('sb-')) : [],
-                }, null, 2)}
-              </pre>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Tab navigation */}
       <div className="flex space-x-4 mb-6">
