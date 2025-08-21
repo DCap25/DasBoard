@@ -141,6 +141,7 @@ export default function SimpleSignup() {
           data: {
             full_name: formData.fullName,
             role: 'single_finance_manager',
+            preferred_language: language,
           },
         },
       });

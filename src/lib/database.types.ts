@@ -19,6 +19,7 @@ export interface Database {
           role: string;
           dealership_id: number;
           is_group_admin?: boolean;
+          preferred_language?: string;
           created_at?: string;
           updated_at?: string;
         };
@@ -29,6 +30,7 @@ export interface Database {
           role: string;
           dealership_id: number;
           is_group_admin?: boolean;
+          preferred_language?: string;
         };
         Update: {
           id?: string;
@@ -37,6 +39,7 @@ export interface Database {
           role?: string;
           dealership_id?: number;
           is_group_admin?: boolean;
+          preferred_language?: string;
         };
       };
       deals: {

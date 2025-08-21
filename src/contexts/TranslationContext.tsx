@@ -60,6 +60,38 @@ export function TranslationProvider({ children }: TranslationProviderProps) {
     }
   }, []);
 
+  // Listen for storage changes (when language is set from another component)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'app-language' && e.newValue) {
+        const newLang = e.newValue as Language;
+        if (AVAILABLE_LANGUAGES.includes(newLang)) {
+          setLanguageState(newLang);
+          console.log('[TranslationContext] Language updated from storage:', newLang);
+        }
+      }
+    };
+
+    // Also check periodically for same-window updates
+    const checkLanguage = () => {
+      const currentLang = localStorage.getItem('app-language') as Language;
+      if (currentLang && currentLang !== language && AVAILABLE_LANGUAGES.includes(currentLang)) {
+        setLanguageState(currentLang);
+        console.log('[TranslationContext] Language updated from localStorage:', currentLang);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Check every second for same-window updates
+    const interval = setInterval(checkLanguage, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, [language]);
+
   const setLanguage = (lang: Language) => {
     if (!AVAILABLE_LANGUAGES.includes(lang)) {
       console.error(`Unsupported language: ${lang}`);

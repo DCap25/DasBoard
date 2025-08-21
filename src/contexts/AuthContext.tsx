@@ -730,7 +730,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Fallback to profiles table (legacy schema)
       const { data: profileData, error: profileError } = await client
         .from('profiles')
-        .select('role, dealership_id, is_group_admin')
+        .select('role, dealership_id, is_group_admin, preferred_language')
         .eq('id', userId)
         .maybeSingle();
 
@@ -757,6 +757,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Set group admin status
         if (profileData.is_group_admin) {
           setIsGroupAdmin(true);
+        }
+
+        // Apply user's preferred language
+        if (profileData.preferred_language) {
+          localStorage.setItem('app-language', profileData.preferred_language);
+          // The TranslationContext will pick this up on next render
+          console.log('[Auth] Applied user preferred language:', profileData.preferred_language);
         }
       }
     } catch (error) {
@@ -807,6 +814,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           };
 
           setUser(authUser);
+
+          // Check for preferred language in user metadata
+          if (session.user.user_metadata?.preferred_language) {
+            localStorage.setItem('app-language', session.user.user_metadata.preferred_language);
+            console.log('[Auth] Applied language from user metadata:', session.user.user_metadata.preferred_language);
+          }
 
           // Fetch additional user data (role, dealership, etc.)
           await fetchUserData(session.user.id);
