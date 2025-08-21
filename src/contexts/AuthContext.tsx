@@ -759,12 +759,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setIsGroupAdmin(true);
         }
 
-        // Apply user's preferred language
-        if (profileData.preferred_language) {
-          localStorage.setItem('app-language', profileData.preferred_language);
-          // The TranslationContext will pick this up on next render
-          console.log('[Auth] Applied user preferred language:', profileData.preferred_language);
-        }
+        // Language preference handling temporarily disabled until preferred_language column is added to database
       }
     } catch (error) {
       console.error('[Security] Error fetching user data:', error);
