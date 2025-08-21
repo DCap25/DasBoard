@@ -197,7 +197,7 @@ export default function HomePage() {
                       key={index}
                       src={image.src}
                       alt={`The DAS Board ${image.title}`}
-                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[2000ms] ease-in-out ${
+                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[3000ms] ease-in-out ${
                         index === currentImageIndex ? 'opacity-100' : 'opacity-0'
                       }`}
                     />
@@ -372,8 +372,8 @@ export default function HomePage() {
               <p className="text-gray-400">{t('footer.industry')}</p>
             </div>
             <div>
-              <h4 className="text-lg font-semibold text-white mb-4">{t('footer.product')}</h4>
-              <ul className="space-y-2">
+              <h4 className="text-lg font-semibold text-white mb-3">{t('footer.product')}</h4>
+              <ul className="space-y-1">
                 <li>
                   <button
                     onClick={() => navigate('/')}
@@ -409,8 +409,8 @@ export default function HomePage() {
               </ul>
             </div>
             <div>
-              <h4 className="text-lg font-semibold text-white mb-4">{t('footer.legal')}</h4>
-              <ul className="space-y-2">
+              <h4 className="text-lg font-semibold text-white mb-3">{t('footer.legal')}</h4>
+              <ul className="space-y-1">
                 <li>
                   <button
                     onClick={() => navigate('/legal/terms')}
@@ -438,7 +438,7 @@ export default function HomePage() {
               </ul>
             </div>
             <div>
-              <h4 className="text-lg font-semibold text-white mb-4">{t('footer.contact')}</h4>
+              <h4 className="text-lg font-semibold text-white mb-3">{t('footer.contact')}</h4>
               <p className="text-gray-400 mb-2">{t('footer.support')}</p>
               <p className="text-blue-400">support@thedasboard.com</p>
             </div>
