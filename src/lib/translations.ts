@@ -467,7 +467,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
       signupNow: 'Sign Up Now!',
       viewScreenshots: 'View Screenshots',
       mission:
-        '"The DAS Board redefines dealership success, empowering Sales Managers to optimize teams and Finance Managers to maximize profits with key sales insights, and Sales People to stay on top of their deals." - Tyler Durden',
+        '"The DAS Board redefines dealership success, empowering Sales Managers to optimize teams and Finance Managers to maximize profits with key sales insights, and Sales People to stay on top of their deals." - Dan Caplan',
       features: {
         title: 'Key Features',
         subtitle: 'Everything you need to manage your dealership operations effectively',
@@ -682,7 +682,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
       subtitle:
         'Passionate professionals dedicated to revolutionizing dealership management through innovative technology and data-driven insights.',
       founderVision: {
-        title: 'Why I Created The DAS Board – Tyler Durden, CEO and Founder',
+        title: 'Why I Created The DAS Board – Dan Caplan, CEO and Founder',
         paragraph1:
           "With over 27 years of experience in the automotive dealership industry, I've seen firsthand the challenges managers face in balancing their roles as leaders and performers. As a seasoned professional, I founded The DAS Board to address a critical gap I observed: while Sales Managers excel at selling cars, they often struggle to effectively manage their sales teams.",
         paragraph2:
@@ -694,9 +694,9 @@ export const translations: Record<Language, Translations | Partial<Translations>
         title: 'Our Team',
         members: {
           tyler: {
-            name: 'Tyler Durden',
+            name: 'Dan Caplan',
             role: 'CEO & Founder',
-            bio: 'Drawing on extensive experience in dealership management, Tyler Durden founded The DAS Board to foster a culture where informed and motivated employees thrive, driving productivity through transparent, data-driven tools that empower automotive teams.',
+            bio: 'Drawing on extensive experience in dealership management, Dan Caplan founded The DAS Board to foster a culture where informed and motivated employees thrive, driving productivity through transparent, data-driven tools that empower automotive teams.',
           },
           sarah: {
             name: 'Sarah Conner',
@@ -1745,7 +1745,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
       signupNow: '¡Regístrate Ahora!',
       viewScreenshots: 'Ver Capturas',
       mission:
-        '"El DAS Board redefine el éxito del concesionario, capacitando a los Gerentes de Ventas para optimizar equipos y a los Gerentes Financieros para maximizar las ganancias con información clave de ventas, y a los Vendedores para mantenerse al tanto de sus ofertas." - Tyler Durden',
+        '"El DAS Board redefine el éxito del concesionario, capacitando a los Gerentes de Ventas para optimizar equipos y a los Gerentes Financieros para maximizar las ganancias con información clave de ventas, y a los Vendedores para mantenerse al tanto de sus ofertas." - Dan Caplan',
       features: {
         title: 'Características Clave',
         subtitle:
@@ -1879,7 +1879,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
       subtitle:
         'Profesionales apasionados dedicados a revolucionar la gestión de concesionarios a través de tecnología innovadora e insights basados en datos.',
       founderVision: {
-        title: 'Por qué Creé The DAS Board – Tyler Durden, CEO y Fundador',
+        title: 'Por qué Creé The DAS Board – Dan Caplan, CEO y Fundador',
         paragraph1:
           'Con más de 27 años de experiencia en la industria de concesionarios automotrices, he visto de primera mano los desafíos que enfrentan los gerentes al equilibrar sus roles como líderes y ejecutores. Como profesional experimentado, fundé The DAS Board para abordar una brecha crítica que observé: mientras que los Gerentes de Ventas sobresalen vendiendo autos, a menudo luchan para gestionar efectivamente sus equipos de ventas.',
         paragraph2:
@@ -1891,9 +1891,9 @@ export const translations: Record<Language, Translations | Partial<Translations>
         title: 'Nuestro Equipo',
         members: {
           tyler: {
-            name: 'Tyler Durden',
+            name: 'Dan Caplan',
             role: 'CEO y Fundador',
-            bio: 'Basándose en una amplia experiencia en gestión de concesionarios, Tyler Durden fundó The DAS Board para fomentar una cultura donde los empleados informados y motivados prosperen, impulsando la productividad a través de herramientas transparentes basadas en datos que empoderan a los equipos automotrices.',
+            bio: 'Basándose en una amplia experiencia en gestión de concesionarios, Dan Caplan fundó The DAS Board para fomentar una cultura donde los empleados informados y motivados prosperen, impulsando la productividad a través de herramientas transparentes basadas en datos que empoderan a los equipos automotrices.',
           },
           sarah: {
             name: 'Sarah Conner',
@@ -2790,7 +2790,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
       signupNow: 'Inscrivez-vous Maintenant !',
       viewScreenshots: "Voir les captures d'écran",
       mission:
-        '"The DAS Board redéfinit le succès des concessionnaires, permettant aux directeurs des ventes d\'optimiser les équipes et aux gestionnaires financiers de maximiser les profits avec des insights de vente clés, et aux vendeurs de rester au top de leurs affaires." - Tyler Durden',
+        '"The DAS Board redéfinit le succès des concessionnaires, permettant aux directeurs des ventes d\'optimiser les équipes et aux gestionnaires financiers de maximiser les profits avec des insights de vente clés, et aux vendeurs de rester au top de leurs affaires." - Dan Caplan',
       features: {
         title: 'Fonctionnalités clés',
         subtitle:
@@ -2924,7 +2924,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
       subtitle:
         'Professionnels passionnés dédiés à révolutionner la gestion des concessionnaires grâce à une technologie innovante et des insights basés sur les données.',
       founderVision: {
-        title: "Pourquoi j'ai créé The DAS Board – Tyler Durden, PDG et fondateur",
+        title: "Pourquoi j'ai créé The DAS Board – Dan Caplan, PDG et fondateur",
         paragraph1:
           "Avec plus de 27 ans d'expérience dans l'industrie des concessionnaires automobiles, j'ai vu de première main les défis auxquels les gestionnaires font face pour équilibrer leurs rôles de leaders et de performeurs. En tant que professionnel expérimenté, j'ai fondé The DAS Board pour combler un écart critique que j'ai observé : bien que les directeurs des ventes excellent à vendre des voitures, ils ont souvent du mal à gérer efficacement leurs équipes de vente.",
         paragraph2:
@@ -2936,9 +2936,9 @@ export const translations: Record<Language, Translations | Partial<Translations>
         title: 'Notre équipe',
         members: {
           tyler: {
-            name: 'Tyler Durden',
+            name: 'Dan Caplan',
             role: 'PDG et fondateur',
-            bio: "S'appuyant sur une vaste expérience en gestion de concessionnaires, Tyler Durden a fondé The DAS Board pour favoriser une culture où les employés informés et motivés prospèrent, stimulant la productivité grâce à des outils transparents et basés sur les données qui autonomisent les équipes automobiles.",
+            bio: "S'appuyant sur une vaste expérience en gestion de concessionnaires, Dan Caplan a fondé The DAS Board pour favoriser une culture où les employés informés et motivés prospèrent, stimulant la productivité grâce à des outils transparents et basés sur les données qui autonomisent les équipes automobiles.",
           },
           sarah: {
             name: 'Sarah Conner',
@@ -3821,7 +3821,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
       signupNow: 'Jetzt Anmelden!',
       viewScreenshots: 'Screenshots ansehen',
       mission:
-        '"Das DAS Board definiert den Erfolg von Autohäusern neu und befähigt Verkaufsleiter, Teams zu optimieren, und Finanzmanager, Gewinne mit wichtigen Verkaufseinblicken zu maximieren, und Verkäufer, ihre Geschäfte im Blick zu behalten." - Tyler Durden',
+        '"Das DAS Board definiert den Erfolg von Autohäusern neu und befähigt Verkaufsleiter, Teams zu optimieren, und Finanzmanager, Gewinne mit wichtigen Verkaufseinblicken zu maximieren, und Verkäufer, ihre Geschäfte im Blick zu behalten." - Dan Caplan',
       features: {
         title: 'Hauptfunktionen',
         subtitle: 'Alles was Sie brauchen, um Ihre Autohaus-Operationen effektiv zu verwalten',
@@ -3954,7 +3954,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
       subtitle:
         'Leidenschaftliche Profis, die sich der Revolutionierung des Autohaus-Managements durch innovative Technologie und datengesteuerte Einblicke widmen.',
       founderVision: {
-        title: 'Warum ich Das DAS Board erstellt habe – Tyler Durden, CEO und Gründer',
+        title: 'Warum ich Das DAS Board erstellt habe – Dan Caplan, CEO und Gründer',
         paragraph1:
           'Mit über 27 Jahren Erfahrung in der Automobilhändler-Branche habe ich aus erster Hand die Herausforderungen gesehen, denen sich Manager gegenübersehen, wenn sie ihre Rollen als Führungskräfte und Leistungsträger ausbalancieren. Als erfahrener Profi gründete ich Das DAS Board, um eine kritische Lücke zu schließen, die ich beobachtet hatte: Während Verkaufsleiter beim Verkauf von Autos hervorragend sind, haben sie oft Schwierigkeiten, ihre Verkaufsteams effektiv zu führen.',
         paragraph2:
@@ -3966,9 +3966,9 @@ export const translations: Record<Language, Translations | Partial<Translations>
         title: 'Unser Team',
         members: {
           tyler: {
-            name: 'Tyler Durden',
+            name: 'Dan Caplan',
             role: 'CEO & Gründer',
-            bio: 'Aufbauend auf umfangreicher Erfahrung im Autohaus-Management gründete Tyler Durden Das DAS Board, um eine Kultur zu fördern, in der informierte und motivierte Mitarbeiter gedeihen und die Produktivität durch transparente, datengesteuerte Tools steigern, die Automobilteams stärken.',
+            bio: 'Aufbauend auf umfangreicher Erfahrung im Autohaus-Management gründete Dan Caplan Das DAS Board, um eine Kultur zu fördern, in der informierte und motivierte Mitarbeiter gedeihen und die Produktivität durch transparente, datengesteuerte Tools steigern, die Automobilteams stärken.',
           },
           sarah: {
             name: 'Sarah Conner',
@@ -4729,7 +4729,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
       founderVision: {
         title: 'Vize zakladatele',
         paragraph1:
-          'Jsem Tyler Durden, CEO a zakladatel The DAS Board. S více než 27 lety zkušeností v automobilovém průmyslu jsem viděl, jak se dealerství potýkají s neefektivními systémy a nedostatkem poznatků v reálném čase.',
+          'Jsem Dan Caplan, CEO a zakladatel The DAS Board. S více než 27 lety zkušeností v automobilovém průmyslu jsem viděl, jak se dealerství potýkají s neefektivními systémy a nedostatkem poznatků v reálném čase.',
         paragraph2:
           'Vytvořil jsem The DAS Board, abych poskytl dealerstvím nástroje, které potřebují nejen k přežití, ale k prosperitě v dnešním konkurenčním prostředí. Naše platforma poskytuje poznatky v reálném čase, které pomáhají týmům dosáhnout svých cílů a zvýšit ziskovost.',
         paragraph3:
@@ -4739,7 +4739,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
         title: 'Náš tým',
         members: {
           tyler: {
-            name: 'Tyler Durden',
+            name: 'Dan Caplan',
             role: 'CEO & Zakladatel',
             bio: 'S více než 27 lety zkušeností v automobilovém průmyslu přináší Tyler rozsáhlé znalosti z řízení dealerství a operací. Jeho vize pro The DAS Board vychází z hlubokého porozumění výzvám, kterým dealerství čelí každý den.',
           },
@@ -5620,7 +5620,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
       founderVision: {
         title: 'Visione del fondatore',
         paragraph1:
-          'Sono Tyler Durden, CEO e fondatore di The DAS Board. Con oltre 27 anni di esperienza nel settore automobilistico, ho visto le concessionarie lottare con sistemi inefficienti e mancanza di insights in tempo reale.',
+          'Sono Dan Caplan, CEO e fondatore di The DAS Board. Con oltre 27 anni di esperienza nel settore automobilistico, ho visto le concessionarie lottare con sistemi inefficienti e mancanza di insights in tempo reale.',
         paragraph2:
           "Ho creato The DAS Board per fornire alle concessionarie gli strumenti di cui hanno bisogno non solo per sopravvivere, ma per prosperare nell'ambiente competitivo di oggi. La nostra piattaforma fornisce insights in tempo reale che aiutano i team a raggiungere i loro obiettivi e aumentare la redditività.",
         paragraph3:
@@ -5630,7 +5630,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
         title: 'Il nostro team',
         members: {
           tyler: {
-            name: 'Tyler Durden',
+            name: 'Dan Caplan',
             role: 'CEO & Fondatore',
             bio: 'Con oltre 27 anni di esperienza nel settore automobilistico, Tyler porta una vasta conoscenza della gestione e delle operazioni delle concessionarie. La sua visione per The DAS Board nasce da una profonda comprensione delle sfide che le concessionarie affrontano ogni giorno.',
           },
@@ -6417,7 +6417,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
       founderVision: {
         title: 'Wizja założyciela',
         paragraph1:
-          'Tyler Durden, CEO i Założyciel The DAS Board, wnosi ponad 27 lat doświadczenia w branży motoryzacyjnej. Jego głęboka znajomość operacji salonów i zarządzania zespołami napędza jego wizję przyszłości zarządzania salonami.',
+          'Dan Caplan, CEO i Założyciel The DAS Board, wnosi ponad 27 lat doświadczenia w branży motoryzacyjnej. Jego głęboka znajomość operacji salonów i zarządzania zespołami napędza jego wizję przyszłości zarządzania salonami.',
         paragraph2:
           'The DAS Board powstał z frustracji brakiem inteligentnych, zorientowanych na dane narzędzi zarządzania w branży motoryzacyjnej. Tyler zobaczył, jak salony walczą z przestarzałymi systemami i postanowił stworzyć rozwiązanie, które rzeczywiście rozumie unikalne potrzeby dealerów samochodowych.',
         paragraph3:
@@ -6427,7 +6427,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
         title: 'Nasz zespół',
         members: {
           tyler: {
-            name: 'Tyler Durden',
+            name: 'Dan Caplan',
             role: 'CEO i Założyciel',
             bio: 'Z ponad 27-letnim doświadczeniem w branży motoryzacyjnej, Tyler wnosi bogate doświadczenie w zarządzaniu salonami i operacjach. Jego wizja The DAS Board wywodzi się z głębokiego zrozumienia wyzwań, z jakimi salony mierzą się każdego dnia.',
           },
@@ -7083,7 +7083,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
       signupNow: 'Inscreva-se Agora!',
       viewScreenshots: 'Ver Capturas de Tela',
       mission:
-        '"O DAS Board redefine o sucesso da concessionária, capacitando Gerentes de Vendas para otimizar equipes e Gerentes Financeiros para maximizar lucros com insights-chave de vendas, e Vendedores para ficarem por dentro de seus negócios." - Tyler Durden',
+        '"O DAS Board redefine o sucesso da concessionária, capacitando Gerentes de Vendas para otimizar equipes e Gerentes Financeiros para maximizar lucros com insights-chave de vendas, e Vendedores para ficarem por dentro de seus negócios." - Dan Caplan',
       features: {
         title: 'Principais Recursos',
         subtitle:
@@ -7217,7 +7217,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
       subtitle:
         'Profissionais apaixonados dedicados a revolucionar o gerenciamento de concessionárias através de tecnologia inovadora e insights baseados em dados.',
       founderVision: {
-        title: 'Por que Criei O DAS Board – Tyler Durden, CEO e Fundador',
+        title: 'Por que Criei O DAS Board – Dan Caplan, CEO e Fundador',
         paragraph1:
           'Com mais de 27 anos de experiência na indústria de concessionárias automotivas, testemunhei em primeira mão os desafios que os gerentes enfrentam ao equilibrar seus papéis como líderes e executores. Como profissional experiente, fundei O DAS Board para abordar uma lacuna crítica que observei: enquanto os Gerentes de Vendas se destacam em vender carros, frequentemente lutam para gerenciar efetivamente suas equipes de vendas.',
         paragraph2:
@@ -7229,9 +7229,9 @@ export const translations: Record<Language, Translations | Partial<Translations>
         title: 'Nossa Equipe',
         members: {
           tyler: {
-            name: 'Tyler Durden',
+            name: 'Dan Caplan',
             role: 'CEO e Fundador',
-            bio: 'Baseando-se em ampla experiência em gerenciamento de concessionárias, Tyler Durden fundou O DAS Board para fomentar uma cultura onde funcionários informados e motivados prosperam, impulsionando produtividade através de ferramentas transparentes baseadas em dados que capacitam equipes automotivas.',
+            bio: 'Baseando-se em ampla experiência em gerenciamento de concessionárias, Dan Caplan fundou O DAS Board para fomentar uma cultura onde funcionários informados e motivados prosperam, impulsionando produtividade através de ferramentas transparentes baseadas em dados que capacitam equipes automotivas.',
           },
           sarah: {
             name: 'Sarah Conner',
@@ -7886,7 +7886,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
       signupNow: 'Εγγραφή Τώρα!',
       viewScreenshots: 'Δείτε Στιγμιότυπα',
       mission:
-        '"Το DAS Board επαναπροσδιορίζει την επιτυχία των αντιπροσωπειών, ενδυναμώνοντας τους Διευθυντές Πωλήσεων να βελτιστοποιούν τις ομάδες και τους Χρηματοοικονομικούς Διευθυντές να μεγιστοποιούν τα κέρδη με βασικές πληροφορίες πωλήσεων, και τους Πωλητές να παραμένουν στην κορυφή των συμφωνιών τους." - Tyler Durden',
+        '"Το DAS Board επαναπροσδιορίζει την επιτυχία των αντιπροσωπειών, ενδυναμώνοντας τους Διευθυντές Πωλήσεων να βελτιστοποιούν τις ομάδες και τους Χρηματοοικονομικούς Διευθυντές να μεγιστοποιούν τα κέρδη με βασικές πληροφορίες πωλήσεων, και τους Πωλητές να παραμένουν στην κορυφή των συμφωνιών τους." - Dan Caplan',
       features: {
         title: 'Βασικά Χαρακτηριστικά',
         subtitle:
@@ -8020,7 +8020,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
       subtitle:
         'Παθιασμένοι επαγγελματίες αφοσιωμένοι στην επανάσταση της διαχείρισης αντιπροσωπειών μέσω καινοτόμου τεχνολογίας και πληροφοριών βασισμένων σε δεδομένα.',
       founderVision: {
-        title: 'Γιατί Δημιούργησα το DAS Board – Tyler Durden, CEO και Ιδρυτής',
+        title: 'Γιατί Δημιούργησα το DAS Board – Dan Caplan, CEO και Ιδρυτής',
         paragraph1:
           'Με πάνω από 27 χρόνια εμπειρίας στη βιομηχανία αντιπροσωπειών αυτοκινήτων, έχω δει από πρώτο χέρι τις προκλήσεις που αντιμετωπίζουν οι διευθυντές στην εξισορρόπηση των ρόλων τους ως ηγέτες και εκτελεστές. Ως έμπειρος επαγγελματίας, ίδρυσα το DAS Board για να αντιμετωπίσω ένα κρίσιμο κενό που παρατήρησα: ενώ οι Διευθυντές Πωλήσεων διαπρέπουν στην πώληση αυτοκινήτων, συχνά δυσκολεύονται να διαχειριστούν αποτελεσματικά τις ομάδες πωλήσεων τους.',
         paragraph2:
@@ -8032,9 +8032,9 @@ export const translations: Record<Language, Translations | Partial<Translations>
         title: 'Η Ομάδα μας',
         members: {
           tyler: {
-            name: 'Tyler Durden',
+            name: 'Dan Caplan',
             role: 'CEO & Ιδρυτής',
-            bio: 'Βασιζόμενος σε εκτεταμένη εμπειρία στη διαχείριση αντιπροσωπειών, ο Tyler Durden ίδρυσε το DAS Board για να προωθήσει μια κουλτούρα όπου οι ενημερωμένοι και παρακινημένοι εργαζόμενοι ευδοκιμούν, οδηγώντας την παραγωγικότητα μέσω διαφανών, βασισμένων σε δεδομένα εργαλείων που ενδυναμώνουν τις αυτοκινητιστικές ομάδες.',
+            bio: 'Βασιζόμενος σε εκτεταμένη εμπειρία στη διαχείριση αντιπροσωπειών, ο Dan Caplan ίδρυσε το DAS Board για να προωθήσει μια κουλτούρα όπου οι ενημερωμένοι και παρακινημένοι εργαζόμενοι ευδοκιμούν, οδηγώντας την παραγωγικότητα μέσω διαφανών, βασισμένων σε δεδομένα εργαλείων που ενδυναμώνουν τις αυτοκινητιστικές ομάδες.',
           },
           sarah: {
             name: 'Sarah Conner',
@@ -8690,7 +8690,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
       signupNow: 'Nu Aanmelden!',
       viewScreenshots: 'Bekijk Screenshots',
       mission:
-        '"Het DAS Board herdefiniëert dealership succes, maakt Sales Managers mogelijk om teams te optimaliseren en Finance Managers om winsten te maximaliseren met belangrijke verkoop inzichten, en Verkopers om bovenop hun deals te blijven." - Tyler Durden',
+        '"Het DAS Board herdefiniëert dealership succes, maakt Sales Managers mogelijk om teams te optimaliseren en Finance Managers om winsten te maximaliseren met belangrijke verkoop inzichten, en Verkopers om bovenop hun deals te blijven." - Dan Caplan',
       features: {
         title: 'Belangrijke Functies',
         subtitle: 'Alles wat u nodig heeft om uw dealership operaties effectief te beheren',
@@ -8917,7 +8917,7 @@ export const translations: Record<Language, Translations | Partial<Translations>
       subtitle:
         'Gepassioneerde professionals toegewijd aan het revolutioneren van dealership management door innovatieve technologie en data-gedreven inzichten.',
       founderVision: {
-        title: 'Waarom Ik Het DAS Board Creëerde – Tyler Durden, CEO en Oprichter',
+        title: 'Waarom Ik Het DAS Board Creëerde – Dan Caplan, CEO en Oprichter',
         paragraph1:
           "Met meer dan 27 jaar ervaring in de automotive dealership industrie, heb ik uit de eerste hand de uitdagingen gezien waarmee managers geconfronteerd worden bij het balanceren van hun rollen als leiders en presteerders. Als ervaren professional, stichtte ik Het DAS Board om een kritieke kloof aan te pakken die ik observeerde: hoewel Sales Managers uitblinken in het verkopen van auto's, worstelen ze vaak om hun sales teams effectief te managen.",
         paragraph2:
@@ -8929,9 +8929,9 @@ export const translations: Record<Language, Translations | Partial<Translations>
         title: 'Ons Team',
         members: {
           tyler: {
-            name: 'Tyler Durden',
+            name: 'Dan Caplan',
             role: 'CEO & Oprichter',
-            bio: 'Met uitgebreide ervaring in dealership management, stichtte Tyler Durden Het DAS Board om een cultuur te bevorderen waar geïnformeerde en gemotiveerde werknemers floreren, productiviteit stimuleren door transparante, data-gedreven tools die automotive teams versterken.',
+            bio: 'Met uitgebreide ervaring in dealership management, stichtte Dan Caplan Het DAS Board om een cultuur te bevorderen waar geïnformeerde en gemotiveerde werknemers floreren, productiviteit stimuleren door transparante, data-gedreven tools die automotive teams versterken.',
           },
           sarah: {
             name: 'Sarah Conner',
