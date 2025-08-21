@@ -207,18 +207,18 @@
         // Add mobile-specific error reporting here
       });
       
-      // Service Worker registration for mobile PWA features
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-          navigator.serviceWorker.register('/sw.js')
-            .then(function(registration) {
-              console.log('SW registered: ', registration);
-            })
-            .catch(function(registrationError) {
-              console.log('SW registration failed: ', registrationError);
-            });
-        });
-      }
+      // Service Worker registration disabled until sw.js is created
+      // if ('serviceWorker' in navigator) {
+      //   window.addEventListener('load', function() {
+      //     navigator.serviceWorker.register('/sw.js')
+      //       .then(function(registration) {
+      //         console.log('SW registered: ', registration);
+      //       })
+      //       .catch(function(registrationError) {
+      //         console.log('SW registration failed: ', registrationError);
+      //       });
+      //   });
+      // }
       
       // Mobile app install prompt handling
       let deferredPrompt;
