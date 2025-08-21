@@ -92,7 +92,6 @@ export default function SimpleSignup() {
           promo_applied: true,
           status: 'approved',
           stripe_payment_status: 'free_promotional',
-          preferred_language: language,
         })
         .select()
         .single();
@@ -142,7 +141,6 @@ export default function SimpleSignup() {
           data: {
             full_name: formData.fullName,
             role: 'single_finance_manager',
-            preferred_language: language,
           },
         },
       });
