@@ -760,6 +760,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         // Language preference handling temporarily disabled until preferred_language column is added to database
+        // This comment forces cache invalidation
       }
     } catch (error) {
       console.error('[Security] Error fetching user data:', error);
