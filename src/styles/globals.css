@@ -24,6 +24,12 @@
   body {
     @apply bg-gray-50 text-gray-900;
 
+    /* Global scale reduction to make site less overwhelming */
+    transform: scale(0.95);
+    transform-origin: top left;
+    width: 105.26%;
+    height: 105.26%;
+
     /* Mobile-specific optimizations */
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: none;
