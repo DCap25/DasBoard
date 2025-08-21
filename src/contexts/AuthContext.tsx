@@ -730,7 +730,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Fallback to profiles table (legacy schema)
       const { data: profileData, error: profileError } = await client
         .from('profiles')
-        .select('role, dealership_id, is_group_admin, preferred_language')
+        .select('role, dealership_id, is_group_admin')
         .eq('id', userId)
         .maybeSingle();
 
