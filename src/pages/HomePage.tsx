@@ -198,21 +198,6 @@ export default function HomePage() {
                     className="w-full h-full object-cover transition-opacity duration-1000"
                     key={currentImageIndex}
                   />
-                  {/* Slide indicators */}
-                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1.5">
-                    {dashboardImages.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setCurrentImageIndex(index)}
-                        className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                          index === currentImageIndex
-                            ? 'bg-blue-400'
-                            : 'bg-gray-400 hover:bg-gray-300'
-                        }`}
-                        aria-label={`Go to slide ${index + 1}`}
-                      />
-                    ))}
-                  </div>
                 </div>
                 <div className="text-center mt-4">
                   <p className="text-gray-300 text-lg font-semibold">
