@@ -90,18 +90,18 @@ export default function SingleFinanceWelcome() {
   const steps = [
     {
       number: '1',
-      title: 'Log Your First Deal',
-      description: 'Click "Log New Deal" to start tracking your F&I performance',
+      title: 'Go to Settings',
+      description: 'Click Settings and Enter Team Members - Sales People and Sales Managers',
     },
     {
       number: '2',
-      title: 'Add Product Details',
-      description: 'Enter VSC, GAP, PPM, and other product profits for each deal',
+      title: 'Add Pay Metrics',
+      description: 'Click Pay to set up commission rates so you can estimate your pay',
     },
     {
       number: '3',
-      title: 'Track Your Progress',
-      description: 'Watch your metrics update in real-time as you log deals',
+      title: 'Log Your First Deal',
+      description: 'Click "Log New Deal" to start tracking your F&I performance and earnings',
     },
   ];
 
