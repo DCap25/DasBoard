@@ -1,4 +1,4 @@
-// React import removed as it's not needed in modern React
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
@@ -18,6 +18,44 @@ import LanguageSwitcher from '../components/LanguageSwitcher';
 export default function HomePage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  // Dashboard images for slideshow
+  const dashboardImages = [
+    {
+      src: '/images/SPDASH.JPG',
+      title: 'Sales Dashboard',
+      description: 'Track sales performance and metrics'
+    },
+    {
+      src: '/images/FINANCEMNG_DASH.JPG',
+      title: 'Finance Manager Dashboard',
+      description: 'Manage finance operations and deals'
+    },
+    {
+      src: '/images/SALESMNG_DASH.JPG',
+      title: 'Sales Manager Dashboard',
+      description: 'Oversee sales team performance'
+    },
+    {
+      src: '/images/GMDASH.JPG',
+      title: 'General Manager Dashboard',
+      description: 'Complete dealership overview'
+    }
+  ];
+
+  // Slideshow state
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Auto-advance slideshow every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => 
+        (prevIndex + 1) % dashboardImages.length
+      );
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [dashboardImages.length]);
 
   const features = [
     {
@@ -153,15 +191,36 @@ export default function HomePage() {
             </div>
             <div className="relative">
               <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 shadow-2xl">
-                <div className="aspect-video rounded-lg overflow-hidden">
+                <div className="aspect-video rounded-lg overflow-hidden relative">
                   <img
-                    src="/images/FINANCEMNG_DASH.JPG"
-                    alt="The DAS Board Finance Manager Dashboard"
-                    className="w-full h-full object-cover"
+                    src={dashboardImages[currentImageIndex].src}
+                    alt={`The DAS Board ${dashboardImages[currentImageIndex].title}`}
+                    className="w-full h-full object-cover transition-opacity duration-1000"
+                    key={currentImageIndex}
                   />
+                  {/* Slide indicators */}
+                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                    {dashboardImages.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentImageIndex(index)}
+                        className={`w-3 h-3 rounded-full transition-colors ${
+                          index === currentImageIndex
+                            ? 'bg-blue-500'
+                            : 'bg-gray-500 hover:bg-gray-400'
+                        }`}
+                        aria-label={`Go to slide ${index + 1}`}
+                      />
+                    ))}
+                  </div>
                 </div>
                 <div className="text-center mt-4">
-                  <p className="text-gray-300 text-lg">Finance Manager Dashboard</p>
+                  <p className="text-gray-300 text-lg font-semibold">
+                    {dashboardImages[currentImageIndex].title}
+                  </p>
+                  <p className="text-gray-400 text-sm mt-1">
+                    {dashboardImages[currentImageIndex].description}
+                  </p>
                 </div>
               </div>
             </div>
