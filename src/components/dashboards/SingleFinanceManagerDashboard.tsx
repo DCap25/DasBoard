@@ -214,101 +214,11 @@ const SingleFinanceManagerDashboard = () => {
     };
   }, [loadDealsFromLocalStorage, user, localUserId]);
 
-  // Function to fetch deals from the schema
+  // Function to fetch deals from the schema - DISABLED for Single Finance Manager
   const fetchDealsFromSchema = async () => {
-    if (!schemaName) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      console.log(`[SingleFinanceManagerDashboard] Fetching deals from schema: ${schemaName}`);
-
-      // Build filter based on time period
-      const filter: Record<string, any> = {};
-
-      const today = new Date();
-      const currentMonth = today.getMonth();
-      const currentYear = today.getFullYear();
-
-      if (timePeriod === 'this-month') {
-        const startDate = new Date(currentYear, currentMonth, 1);
-        const endDate = new Date(currentYear, currentMonth + 1, 0);
-        filter.sale_date = {
-          start: startDate.toISOString().split('T')[0],
-          end: endDate.toISOString().split('T')[0],
-        };
-      } else if (timePeriod === 'last-month') {
-        const startDate = new Date(currentYear, currentMonth - 1, 1);
-        const endDate = new Date(currentYear, currentMonth, 0);
-        filter.sale_date = {
-          start: startDate.toISOString().split('T')[0],
-          end: endDate.toISOString().split('T')[0],
-        };
-      } else if (timePeriod === 'last-quarter') {
-        const quarterStartMonth = Math.floor(currentMonth / 3) * 3 - 3;
-        const startDate = new Date(currentYear, quarterStartMonth, 1);
-        const endDate = new Date(currentYear, quarterStartMonth + 3, 0);
-        filter.sale_date = {
-          start: startDate.toISOString().split('T')[0],
-          end: endDate.toISOString().split('T')[0],
-        };
-      } else if (timePeriod === 'ytd') {
-        const startDate = new Date(currentYear, 0, 1);
-        filter.sale_date = {
-          start: startDate.toISOString().split('T')[0],
-          end: today.toISOString().split('T')[0],
-        };
-      } else if (timePeriod === 'last-year') {
-        const startDate = new Date(currentYear - 1, 0, 1);
-        const endDate = new Date(currentYear - 1, 11, 31);
-        filter.sale_date = {
-          start: startDate.toISOString().split('T')[0],
-          end: endDate.toISOString().split('T')[0],
-        };
-      }
-
-      // Fetch deals from the schema
-      const result = await getFinanceManagerDeals(schemaName, {
-        limit: 50,
-        sortBy: 'created_at',
-        sortDirection: 'desc',
-        filter,
-      });
-
-      if (result.success) {
-        console.log(`[SingleFinanceManagerDashboard] Fetched ${result.deals.length} deals`);
-
-        // Map the schema deal format to the component's Deal interface
-        const formattedDeals: Deal[] = result.deals.map(schemaDeal => ({
-          id: schemaDeal.deal_number || String(schemaDeal.id),
-          customer: schemaDeal.customer_name,
-          vehicle: schemaDeal.vehicle,
-          vin: schemaDeal.vin || '',
-          saleDate: schemaDeal.sale_date,
-          salesperson: 'Self', // Finance manager deals are self-originated
-          amount: schemaDeal.amount,
-          status: schemaDeal.status,
-          products: Array.isArray(schemaDeal.products)
-            ? schemaDeal.products
-            : typeof schemaDeal.products === 'string'
-              ? JSON.parse(schemaDeal.products)
-              : [],
-          profit: schemaDeal.profit,
-          created_at: schemaDeal.created_at,
-        }));
-
-        setDeals(formattedDeals);
-      } else {
-        console.error('[SingleFinanceManagerDashboard] Error fetching deals:', result.error);
-        setError(t('dashboard.singleFinance.errors.failedToLoad'));
-      }
-    } catch (err) {
-      console.error('[SingleFinanceManagerDashboard] Exception fetching deals:', err);
-      setError(t('dashboard.singleFinance.errors.unexpectedError'));
-    } finally {
-      setLoading(false);
-    }
+    console.log('[SingleFinanceManagerDashboard] Schema fetching disabled - using localStorage only');
+    // Single Finance Manager uses localStorage only, not database schema
+    return;
   };
 
   useEffect(() => {
