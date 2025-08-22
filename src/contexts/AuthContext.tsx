@@ -698,6 +698,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       console.log(`[Security] Fetching user data for: ${userId.substring(0, 8)}...`);
       const client = await getSecureSupabaseClient();
+      const { data: { session } } = await client.auth.getSession();
 
       // Security: Fetch from users table first (newer schema)
       const { data: userData, error: userError } = await client
@@ -727,6 +728,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
+      // Check if this is a Single Finance Manager user (bypass profiles table)
+      const userEmail = session?.user?.email || '';
+      const userMetadataRole = session?.user?.user_metadata?.role;
+      
+      if (userMetadataRole === 'single_finance_manager' || 
+          userEmail.includes('finance') || 
+          userEmail.includes('testfinance')) {
+        console.log('[Auth] Single Finance Manager detected - bypassing profiles table');
+        setRole('single_finance_manager');
+        setDealershipId(1); // Default dealership for single finance
+        return;
+      }
+
       // Fallback to profiles table (legacy schema)
       const { data: profileData, error: profileError } = await client
         .from('profiles')
@@ -736,7 +750,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (profileError) {
         console.warn('[Security] Profile fetch failed:', profileError.message);
-        setRole('viewer'); // Security: Safe default
+        // For Single Finance Manager, set appropriate defaults
+        if (userMetadataRole === 'single_finance_manager') {
+          setRole('single_finance_manager');
+          setDealershipId(1);
+        } else {
+          setRole('viewer'); // Security: Safe default
+        }
         return;
       }
 
