@@ -97,6 +97,7 @@ import TestUserMiddleware from './components/auth/TestUserMiddleware';
 import DemoPage from './pages/DemoPage';
 
 // Add global type declaration for app event tracking
+// Cache bust: 2025-01-23-v2
 declare global {
   interface Window {
     appEvents?: Array<{
