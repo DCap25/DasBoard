@@ -700,7 +700,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const client = await getSecureSupabaseClient();
       const { data: { session } } = await client.auth.getSession();
 
+      // Enhanced 500 Error Handling: Comprehensive Supabase response logging
+      console.log('[Auth] Starting user data fetch with enhanced 500 error tracking');
+
       // Security: Fetch from users table first (newer schema)
+      const usersQueryStartTime = Date.now();
       const { data: userData, error: userError } = await client
         .from('users')
         .select(`
@@ -713,15 +717,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('id', userId)
         .maybeSingle();
 
+      const usersQueryDuration = Date.now() - usersQueryStartTime;
+
+      // Enhanced 500 Error Handling: Log detailed Supabase response for users table
+      console.log('[Auth] Users table query response:', {
+        queryDuration: `${usersQueryDuration}ms`,
+        hasData: !!userData,
+        hasError: !!userError,
+        errorCode: userError?.code || 'none',
+        errorMessage: userError?.message || 'none',
+        errorDetails: userError?.details || 'none',
+        dataStructure: userData ? {
+          hasDealershipId: 'dealership_id' in userData,
+          hasRoleId: 'role_id' in userData,
+          hasRoles: 'roles' in userData,
+          roleValue: userData.roles?.name || 'none'
+        } : 'no data'
+      });
+
+      // Enhanced 500 Error Handling: Check for 500 errors specifically
+      if (userError && (userError.message?.includes('500') || userError.code === '500')) {
+        console.error('[Auth] 500 error detected in users table query:', userError);
+        console.warn('[User Message] Role data temporarily unavailable due to database maintenance.');
+        // Don't return here, continue to fallback logic
+      }
+
       if (!userError && userData) {
+        console.log('[Auth] Successfully retrieved user data from users table');
+        
         // Security: Validate role with current user context
         if (userData.roles?.name) {
           const validatedRole = validateRole(userData.roles.name, role || undefined);
+          console.log('[Auth] Setting role from users table:', validatedRole);
           setRole(validatedRole);
         }
 
         // Set dealership ID
         if (userData.dealership_id) {
+          console.log('[Auth] Setting dealership ID from users table:', userData.dealership_id);
           setDealershipId(userData.dealership_id);
         }
 
@@ -732,58 +765,119 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const userEmail = session?.user?.email || '';
       const userMetadataRole = session?.user?.user_metadata?.role;
       
+      // Enhanced 500 Error Handling: Log user metadata for debugging
+      console.log('[Auth] User metadata analysis:', {
+        emailPattern: userEmail ? `${userEmail.substring(0, 3)}...` : 'none',
+        metadataRole: userMetadataRole || 'none',
+        isFinanceUser: userEmail.includes('finance') || userEmail.includes('testfinance'),
+        isSingleFinanceManager: userMetadataRole === 'single_finance_manager'
+      });
+      
       if (userMetadataRole === 'single_finance_manager' || 
           userEmail.includes('finance') || 
           userEmail.includes('testfinance')) {
-        console.log('[Auth] Single Finance Manager detected - bypassing profiles table');
+        console.log('[Auth] Single Finance Manager detected - bypassing profiles table to avoid 500 errors');
         setRole('single_finance_manager');
         setDealershipId(1); // Default dealership for single finance
         return;
       }
 
-      // Fallback to profiles table (legacy schema)
+      // Enhanced 500 Error Handling: Fallback to profiles table with comprehensive logging
+      console.log('[Auth] Attempting profiles table query as fallback');
+      const profilesQueryStartTime = Date.now();
+      
       const { data: profileData, error: profileError } = await client
         .from('profiles')
         .select('role, dealership_id, is_group_admin')
         .eq('id', userId)
         .maybeSingle();
 
+      const profilesQueryDuration = Date.now() - profilesQueryStartTime;
+
+      // Enhanced 500 Error Handling: Log detailed Supabase response for profiles table
+      console.log('[Auth] Profiles table query response:', {
+        queryDuration: `${profilesQueryDuration}ms`,
+        hasData: !!profileData,
+        hasError: !!profileError,
+        errorCode: profileError?.code || 'none',
+        errorMessage: profileError?.message || 'none',
+        errorDetails: profileError?.details || 'none',
+        dataStructure: profileData ? {
+          hasRole: 'role' in profileData,
+          hasDealershipId: 'dealership_id' in profileData,
+          hasGroupAdmin: 'is_group_admin' in profileData,
+          roleValue: profileData.role || 'none'
+        } : 'no data'
+      });
+
       if (profileError) {
         console.warn('[Security] Profile fetch failed:', profileError.message);
+        
+        // Enhanced 500 Error Handling: Check for 500 errors specifically in profiles query
+        if (profileError.message?.includes('500') || profileError.code === '500') {
+          console.error('[Auth] 500 error detected in profiles table query:', profileError);
+          console.warn('[User Message] Profile data temporarily unavailable due to database maintenance.');
+        }
+        
         // For Single Finance Manager, set appropriate defaults
         if (userMetadataRole === 'single_finance_manager') {
+          console.log('[Auth] Setting Single Finance Manager defaults due to profile error');
           setRole('single_finance_manager');
           setDealershipId(1);
         } else {
+          console.log('[Auth] Setting viewer role as safe default due to profile error');
           setRole('viewer'); // Security: Safe default
         }
         return;
       }
 
       if (profileData) {
+        console.log('[Auth] Successfully retrieved profile data from profiles table');
+        
         // Security: Validate and set role
         if (profileData.role) {
           const validatedRole = validateRole(profileData.role, role || undefined);
+          console.log('[Auth] Setting role from profiles table:', validatedRole);
           setRole(validatedRole);
         } else {
+          console.log('[Auth] No role in profile data, setting viewer as default');
           setRole('viewer'); // Security: Safe default
         }
 
         // Set dealership ID
         if (profileData.dealership_id) {
+          console.log('[Auth] Setting dealership ID from profiles table:', profileData.dealership_id);
           setDealershipId(profileData.dealership_id);
         }
 
         // Set group admin status
         if (profileData.is_group_admin) {
+          console.log('[Auth] Setting group admin status from profiles table:', profileData.is_group_admin);
           setIsGroupAdmin(true);
         }
 
         // Language preference handling temporarily disabled until preferred_language column is added to database
         // This comment forces cache invalidation
       }
-    } catch (error) {
+    } catch (error: any) {
+      // Enhanced 500 Error Handling: Comprehensive error logging and fallbacks
       console.error('[Security] Error fetching user data:', error);
+      
+      // Check if this is a 500 error
+      if (error?.message?.includes('500') || error?.code === '500') {
+        console.error('[Auth] 500 error caught in fetchUserData:', error);
+        console.warn('[User Message] User data temporarily unavailable due to database maintenance.');
+      }
+      
+      // Enhanced error context logging
+      console.error('[Auth] fetchUserData error context:', {
+        errorMessage: error?.message || 'unknown',
+        errorCode: error?.code || 'unknown',
+        errorName: error?.name || 'unknown',
+        userId: userId.substring(0, 8) + '...',
+        timestamp: new Date().toISOString()
+      });
+      
       setRole('viewer'); // Security: Safe default on error
     }
   }, [role]);

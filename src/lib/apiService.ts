@@ -635,6 +635,118 @@ class AuditLogger {
   }
 }
 
+// =================== STATE MANAGEMENT UTILITY FUNCTIONS ===================
+
+/** State Management: Generate unique error ID for debugging */
+function generateStateErrorId(): string {
+  return `error_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+}
+
+/** State Management: Log state-related errors with classification */
+function logStateError(
+  errorId: string, 
+  operation: string, 
+  error: any, 
+  severity: 'low' | 'medium' | 'high' | 'critical' = 'medium',
+  type: 'session' | 'auth' | 'network' | 'state' | 'validation' = 'state'
+): void {
+  const errorMessage = error?.message || 'Unknown error';
+  const errorCode = error?.code || 'UNKNOWN';
+  
+  console.error(`[StateError:${severity}:${type}] ${operation} [${errorId}]: ${errorMessage}`, {
+    errorId,
+    operation,
+    severity,
+    type,
+    errorCode,
+    timestamp: new Date().toISOString()
+  });
+}
+
+/** State Management: Safe state operation wrapper with retry logic */
+async function safeStateOperation<T>(
+  operation: () => Promise<T>,
+  operationName: string,
+  fallbackValue: T,
+  options: {
+    retries?: number;
+    timeout?: number;
+    severity?: 'low' | 'medium' | 'high' | 'critical';
+    logErrors?: boolean;
+  } = {}
+): Promise<T> {
+  const { retries = 1, timeout = 10000, severity = 'medium', logErrors = true } = options;
+  const errorId = generateStateErrorId();
+  
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      // Timeout protection
+      const timeoutPromise = new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error(`Operation timeout after ${timeout}ms`)), timeout)
+      );
+      
+      const result = await Promise.race([operation(), timeoutPromise]);
+      return result;
+    } catch (error: any) {
+      if (logErrors) {
+        logStateError(errorId, `${operationName} (attempt ${attempt}/${retries})`, error, severity);
+      }
+      
+      // Check for 500 errors specifically
+      if (error?.status === 500 || error?.code === '500' || error?.message?.includes('500')) {
+        console.error(`[Supabase 500] Database error in ${operationName}: ${error.message || 'Unknown 500 error'}`);
+        
+        // For role-based calls, add user message
+        if (operationName.includes('finance') || operationName.includes('manager') || operationName.includes('promotion')) {
+          console.warn(`[User Message] 500 error in ${operationName}: Service temporarily unavailable. Please try again in a moment.`);
+        }
+        
+        // Retry for 500 errors
+        if (attempt < retries) {
+          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000); // Exponential backoff up to 5s
+          console.log(`[Retry] Retrying ${operationName} in ${delay}ms due to 500 error...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+      }
+      
+      // Don't retry on final attempt or non-500 errors
+      if (attempt === retries || (error?.status && error.status < 500 && error.status !== 429)) {
+        if (logErrors) {
+          console.error(`[StateOperation] ${operationName} failed after ${retries} attempts [${errorId}]`);
+        }
+        return fallbackValue;
+      }
+      
+      // Retry delay for other errors
+      const delay = Math.min(500 * attempt, 2000);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  
+  return fallbackValue;
+}
+
+/** State Management: Safe Supabase client retrieval */
+async function safeGetSupabaseClient() {
+  try {
+    return await getSecureSupabaseClient();
+  } catch (error: any) {
+    console.error('[StateError] Failed to get Supabase client:', error.message);
+    return null;
+  }
+}
+
+/** State Management: Safe current user retrieval */
+async function safeGetCurrentUser() {
+  try {
+    return await getCurrentUser();
+  } catch (error: any) {
+    console.error('[StateError] Failed to get current user:', error.message);
+    return null;
+  }
+}
+
 // =================== CONFIGURATION ===================
 
 // Environment detection and configuration
@@ -1294,6 +1406,36 @@ class HttpClient {
           // Security: Handle HTTP errors
           const error = await this.handleHttpError(response, requestId);
           
+          // Enhanced 500 Error Handling: Specific handling for Supabase 500 errors
+          if (response.status === 500) {
+            console.error(`[Supabase 500] Database error during ${method} ${url}: ${error.message || 'Unknown database error'}`);
+            
+            // Log specific 500 error with context
+            const errorDetails = {
+              url,
+              method,
+              requestId,
+              attempt,
+              maxRetries: retries,
+              timestamp: new Date().toISOString()
+            };
+            console.error('[Supabase 500] Error details:', errorDetails);
+            
+            // For role-based operations, add user-friendly message
+            if (url.includes('finance') || url.includes('manager') || url.includes('promotion') || 
+                url.includes('deals') || url.includes('sales') || url.includes('profile')) {
+              console.warn('[User Message] Service temporarily unavailable due to database maintenance. Please try again in a moment.');
+            }
+            
+            // Always retry 500 errors with exponential backoff
+            if (attempt < retries) {
+              const retryDelay = Math.min(1000 * Math.pow(2, attempt - 1), 8000); // Up to 8 seconds
+              console.log(`[Retry] Retrying ${method} ${url} in ${retryDelay}ms due to 500 error (attempt ${attempt + 1}/${retries})`);
+              await new Promise(resolve => setTimeout(resolve, retryDelay));
+              continue;
+            }
+          }
+          
           // Security: Handle authentication errors
           if ((response.status === 401 || response.status === 403) && !skipTokenRefresh) {
             console.warn(`[Security] Auth error ${response.status}, handling... [${requestId}]`);
@@ -1309,7 +1451,7 @@ class HttpClient {
 
           lastError = error;
 
-          // Don't retry client errors (4xx) except 401/403/429
+          // Don't retry client errors (4xx) except 401/403/429/500
           if (response.status >= 400 && response.status < 500 && 
               ![401, 403, 429].includes(response.status)) {
             break;
@@ -1321,12 +1463,28 @@ class HttpClient {
           if (fetchError.name === 'AbortError') {
             lastError = this.createSecureError('Request timeout', 408, 'TIMEOUT', requestId);
           } else {
-            lastError = this.createSecureError(
-              'Network error occurred',
-              0,
-              'NETWORK_ERROR',
-              requestId
-            );
+            // Enhanced 500 Error Handling: Check for network-level 500 errors
+            const errorMessage = fetchError.message || 'Network error occurred';
+            
+            if (errorMessage.includes('500') || errorMessage.includes('Internal Server Error') ||
+                errorMessage.includes('database') || errorMessage.includes('postgres')) {
+              console.error(`[Supabase 500] Network-level database error: ${errorMessage}`);
+              console.warn('[User Message] Network connectivity issue with database. Please check your connection and try again.');
+              
+              lastError = this.createSecureError(
+                'Database connectivity issue. Please try again.',
+                500,
+                'NETWORK_DB_ERROR',
+                requestId
+              );
+            } else {
+              lastError = this.createSecureError(
+                'Network error occurred',
+                0,
+                'NETWORK_ERROR',
+                requestId
+              );
+            }
           }
         }
 
@@ -1401,7 +1559,7 @@ class HttpClient {
     return 'unknown';
   }
 
-  /** Security: Enhanced HTTP error handling with secure logging */
+  /** Security: Enhanced HTTP error handling with secure logging and 500 error focus */
   private async handleHttpError(response: Response, requestId: string): Promise<ApiError> {
     let errorMessage = `Request failed`;
     let errorCode = response.status.toString();
@@ -1423,8 +1581,36 @@ class HttpClient {
       // Use default error message if parsing fails
     }
 
-    // Security: Log error without exposing sensitive details
-    console.warn(`[Security] HTTP Error ${response.status} [${requestId}]: ${maskSensitiveData(errorMessage)}`);
+    // Enhanced 500 Error Handling: Specific handling for database errors
+    if (response.status === 500) {
+      console.error(`[Supabase 500] Database error [${requestId}]: ${maskSensitiveData(errorMessage)}`);
+      
+      // Check for specific Supabase error patterns
+      if (errorMessage.includes('database') || errorMessage.includes('postgres') || 
+          errorMessage.includes('relation') || errorMessage.includes('column')) {
+        console.error(`[Supabase 500] Database schema or connection issue detected`);
+        errorMessage = 'Database temporarily unavailable. Please try again in a moment.';
+      } else if (errorMessage.includes('timeout') || errorMessage.includes('connection')) {
+        console.error(`[Supabase 500] Database connection timeout detected`);
+        errorMessage = 'Database connection timeout. Please try again.';
+      } else {
+        console.error(`[Supabase 500] Generic database error detected`);
+        errorMessage = 'Service temporarily unavailable due to database maintenance.';
+      }
+      
+      // Log additional context for 500 errors
+      console.error(`[Supabase 500] Response details:`, {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url,
+        headers: Object.fromEntries(response.headers.entries()),
+        requestId,
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      // Security: Log non-500 errors normally
+      console.warn(`[Security] HTTP Error ${response.status} [${requestId}]: ${maskSensitiveData(errorMessage)}`);
+    }
 
     return this.createSecureError(errorMessage, response.status, errorCode, requestId);
   }
@@ -1598,7 +1784,7 @@ export class ApiService {
           };
         }
 
-        // Security: Apply row-level security through RLS with error handling
+        // Security: Apply row-level security through RLS with enhanced 500 error handling
         const { data, error } = await client
           .from('dealerships')
           .select('*')
@@ -1606,12 +1792,27 @@ export class ApiService {
 
         if (error) {
           logStateError(errorId, 'getDealerships - database query', error, 'high', 'state');
+          
+          // Enhanced 500 Error Handling: Check for database-specific errors
+          const errorMessage = error.message || 'Unknown database error';
+          const isDbError = errorMessage.includes('database') || errorMessage.includes('postgres') || 
+                           errorMessage.includes('connection') || errorMessage.includes('timeout') ||
+                           errorMessage.includes('relation') || errorMessage.includes('column');
+          
+          if (isDbError) {
+            console.error(`[Supabase 500] Database error in getDealerships: ${errorMessage}`);
+            console.warn('[User Message] Database temporarily unavailable. Please refresh the page or try again in a moment.');
+            
+            // Track 500 error in global monitor
+            DatabaseErrorMonitor.getInstance().track500Error('getDealerships', error, { dealershipQuery: true });
+          }
+          
           return {
             data: null,
             error: { 
-              message: 'Failed to fetch dealerships', 
-              status: 500, 
-              code: 'DB_ERROR',
+              message: isDbError ? 'Database temporarily unavailable. Please try again in a moment.' : 'Failed to fetch dealerships', 
+              status: isDbError ? 500 : (error.code === 'PGRST116' ? 404 : 500), 
+              code: isDbError ? 'DB_500_ERROR' : 'DB_ERROR',
               type: 'server'
             },
             success: false,
@@ -2332,6 +2533,26 @@ export class ApiService {
 
       if (error) {
         console.error('[Security] Finance manager deals fetch error:', error);
+        
+        // Enhanced 500 Error Handling: Specific handling for finance manager operations
+        const errorMessage = error.message || 'Unknown database error';
+        const isDbError = errorMessage.includes('database') || errorMessage.includes('postgres') || 
+                         errorMessage.includes('connection') || errorMessage.includes('timeout') ||
+                         errorMessage.includes('relation') || errorMessage.includes('column');
+        
+        if (isDbError) {
+          console.error(`[Supabase 500] Database error in getFinanceManagerDeals: ${errorMessage}`);
+          console.warn('[User Message] Finance manager data temporarily unavailable due to database maintenance. Please try again in a moment.');
+          
+          // Track 500 error in global monitor for finance operations
+          DatabaseErrorMonitor.getInstance().track500Error('getFinanceManagerDeals', error, { 
+            financeOperation: true, 
+            dealershipId: dealershipId || 'none' 
+          });
+          
+          throw new Error('Finance manager data temporarily unavailable. Please try again in a moment.');
+        }
+        
         throw new Error('Failed to fetch finance manager deals');
       }
 
@@ -2375,6 +2596,26 @@ export class ApiService {
 
       if (error) {
         console.error('[Security] Finance manager deal creation error:', error);
+        
+        // Enhanced 500 Error Handling: Specific handling for finance manager deal logging
+        const errorMessage = error.message || 'Unknown database error';
+        const isDbError = errorMessage.includes('database') || errorMessage.includes('postgres') || 
+                         errorMessage.includes('connection') || errorMessage.includes('timeout') ||
+                         errorMessage.includes('relation') || errorMessage.includes('column');
+        
+        if (isDbError) {
+          console.error(`[Supabase 500] Database error in logFinanceManagerDeal: ${errorMessage}`);
+          console.warn('[User Message] Unable to save deal due to database maintenance. Please try again in a moment.');
+          
+          // Track 500 error in global monitor for finance logging operations
+          DatabaseErrorMonitor.getInstance().track500Error('logFinanceManagerDeal', error, { 
+            financeLogging: true, 
+            dealData: { stockNumber: dealData.stock_number, dealType: dealData.deal_type } 
+          });
+          
+          throw new Error('Unable to save deal. Please try again in a moment.');
+        }
+        
         throw new Error('Failed to log finance manager deal');
       }
 
@@ -2434,6 +2675,77 @@ export const validateEnvironment = () => EnvironmentValidator.getInstance().vali
 export const getGoalTrackingData = (userId: string) => apiService.getGoalTrackingData(userId);
 export const getFinanceManagerDeals = (dealershipId?: number) => apiService.getFinanceManagerDeals(dealershipId);
 export const logFinanceManagerDeal = (dealData: Omit<Deal, 'id'>) => apiService.logFinanceManagerDeal(dealData);
+
+// =================== GLOBAL 500 ERROR MONITORING ===================
+
+/** Global 500 Error Monitor: Centralized monitoring for database errors */
+export class DatabaseErrorMonitor {
+  private static instance: DatabaseErrorMonitor;
+  private errorCount = 0;
+  private lastErrorTime = 0;
+  private errorThreshold = 5; // Alert after 5 errors in short time
+  private timeWindow = 60000; // 1 minute window
+
+  static getInstance(): DatabaseErrorMonitor {
+    if (!DatabaseErrorMonitor.instance) {
+      DatabaseErrorMonitor.instance = new DatabaseErrorMonitor();
+    }
+    return DatabaseErrorMonitor.instance;
+  }
+
+  /** Monitor and track 500 errors across the application */
+  track500Error(operation: string, error: any, context?: any): void {
+    const now = Date.now();
+    
+    // Reset counter if outside time window
+    if (now - this.lastErrorTime > this.timeWindow) {
+      this.errorCount = 0;
+    }
+    
+    this.errorCount++;
+    this.lastErrorTime = now;
+    
+    // Log the error with full context
+    console.error(`[DB Error Monitor] 500 error #${this.errorCount} in ${operation}:`, {
+      error: error.message || 'Unknown error',
+      errorCode: error.code,
+      operation,
+      context,
+      timestamp: new Date().toISOString(),
+      errorCount: this.errorCount
+    });
+    
+    // Alert if threshold exceeded
+    if (this.errorCount >= this.errorThreshold) {
+      console.error(`[DB Error Monitor] ALERT: ${this.errorCount} database errors in ${this.timeWindow/1000} seconds!`);
+      console.warn('[User Message] Multiple database issues detected. Please contact support if problems persist.');
+      
+      // Could trigger additional monitoring/alerting here
+      // e.g., send to error tracking service, show user notification, etc.
+    }
+  }
+
+  /** Get current error statistics */
+  getStats(): { errorCount: number; lastErrorTime: number; isHealthy: boolean } {
+    const isHealthy = this.errorCount < this.errorThreshold || 
+                     (Date.now() - this.lastErrorTime) > this.timeWindow;
+    
+    return {
+      errorCount: this.errorCount,
+      lastErrorTime: this.lastErrorTime,
+      isHealthy
+    };
+  }
+
+  /** Reset error tracking */
+  reset(): void {
+    this.errorCount = 0;
+    this.lastErrorTime = 0;
+  }
+}
+
+// Export the global monitor instance
+export const dbErrorMonitor = DatabaseErrorMonitor.getInstance();
 
 // Export the main service and environment validator
 export default apiService;

@@ -339,10 +339,543 @@ npm run build --verbose
 ### Need More Help?
 - Check the **ReferenceError Issues** section above for runtime errors
 - Review the "Common Dev Issues" section for environment problems
+- Check the **500 Error Troubleshooting** section below for Finance Manager login issues
 - Check `NETLIFY_ENV_SETUP.md` for deployment issues
 - Ensure `.env.example` matches your setup
 - Verify Supabase project settings and API keys
 - Run `npm run test:providers` to verify provider functionality
+
+## 500 Error Troubleshooting for Finance Manager Login
+
+### Overview
+
+Finance Manager login 500 errors are typically caused by database configuration issues, environment variable mismatches, or Supabase RLS (Row Level Security) policy conflicts. This section provides comprehensive troubleshooting steps specifically for resolving these issues.
+
+### Quick Diagnosis
+
+#### Step 1: Check Browser Console
+Open browser DevTools (F12) and look for:
+```javascript
+// Key error patterns that indicate 500 error causes:
+[500 Prevention] 500 likely from env mismatch
+[500 Prevention] Role fetch 500 error detected  
+[500 Prevention] Database error in getCurrentUser
+[Auth] 500 error detected in users table query
+```
+
+#### Step 2: Verify Environment Variables Post-Login
+```javascript
+// Run in browser console after login attempt:
+console.log('Environment Check:', {
+  url: import.meta.env.VITE_SUPABASE_URL,
+  keyPresent: !!import.meta.env.VITE_SUPABASE_ANON_KEY,
+  keyFormat: import.meta.env.VITE_SUPABASE_ANON_KEY?.startsWith('eyJ')
+});
+
+// If any show as undefined or false, restart dev server:
+// Ctrl+C, then npm run dev
+```
+
+### Environment-Related 500 Errors
+
+#### Problem: "500 likely from env mismatch" Error
+
+**Symptoms:**
+- Login succeeds but role fetching fails with 500 error
+- Console shows `[500 Prevention] Environment variables missing post-login`
+- Dashboard flashes briefly then shows errors
+
+**Root Cause:** Environment variables become unavailable after dev server restart or environment file changes
+
+**Solution Steps:**
+```bash
+# Step 1: Stop development server
+Ctrl+C
+
+# Step 2: Verify .env file exists and has correct format
+cat .env | grep VITE_SUPABASE
+# Should show:
+# VITE_SUPABASE_URL=https://yourproject.supabase.co
+# VITE_SUPABASE_ANON_KEY=eyJ...
+
+# Step 3: Restart development server (CRITICAL)
+npm run dev
+
+# Step 4: Test login again
+# Environment variables are only loaded on server startup!
+```
+
+#### Problem: Environment Variables Work Locally But Fail on Netlify
+
+**For Netlify Deployments:**
+
+1. **Check Netlify Environment Variables**
+   ```bash
+   # Login to Netlify CLI
+   npm install -g netlify-cli
+   netlify login
+   
+   # Check current environment variables
+   netlify env:list
+   
+   # Should show VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
+   ```
+
+2. **Set Missing Environment Variables**
+   ```bash
+   # Set environment variables in Netlify
+   netlify env:set VITE_SUPABASE_URL "https://yourproject.supabase.co"
+   netlify env:set VITE_SUPABASE_ANON_KEY "eyJ..."
+   
+   # Or set via Netlify Dashboard:
+   # Go to Site Settings > Environment Variables
+   # Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
+   ```
+
+3. **Trigger New Deployment**
+   ```bash
+   # Deploy with new environment variables
+   netlify deploy --prod
+   
+   # Or trigger through Git:
+   git commit --allow-empty -m "Trigger deployment with env vars"
+   git push origin main
+   ```
+
+### Database-Related 500 Errors
+
+#### Problem: RLS Policy Conflicts for Finance Managers
+
+**Symptoms:**
+- Finance Manager can login but cannot access role data
+- Console shows database permission errors
+- 500 errors specifically during role fetch operations
+
+**Diagnosis: Check Supabase Logs**
+1. Go to [Supabase Dashboard](https://supabase.com/dashboard)
+2. Select your project
+3. Go to Logs > API
+4. Filter by "500" or "error"
+5. Look for RLS policy violations:
+
+```sql
+-- Common RLS error patterns:
+-- "permission denied for table profiles"
+-- "RLS policy violation"
+-- "no policy for SELECT operation"
+```
+
+**Solution: Verify RLS Policies**
+```sql
+-- Check existing RLS policies for profiles table
+SELECT schemaname, tablename, policyname, roles, cmd, qual 
+FROM pg_policies 
+WHERE tablename = 'profiles';
+
+-- Ensure Finance Manager access policy exists:
+-- Policy should allow single_finance_manager role to read their own profile
+CREATE POLICY "Finance managers can access their profile" 
+ON profiles FOR SELECT 
+TO authenticated
+USING (
+  auth.uid() = id AND 
+  role = 'single_finance_manager'
+);
+```
+
+**Alternative: Check Enhanced RLS Policies**
+If using the enhanced promotion system, verify these policies exist:
+```sql
+-- Check for schema-based Finance Manager access
+SELECT * FROM pg_policies 
+WHERE tablename = 'profiles' 
+AND policyname LIKE '%finance%';
+
+-- Should include policies for:
+-- - Schema-based access control
+-- - Role hierarchy support  
+-- - Finance manager specific permissions
+```
+
+#### Problem: Database Triggers Causing 500 Errors
+
+**Check for Problematic Triggers:**
+```sql
+-- List all triggers on profiles table
+SELECT trigger_name, event_manipulation, action_statement
+FROM information_schema.triggers 
+WHERE event_object_table = 'profiles';
+
+-- Check for validation triggers that might fail:
+-- - Email validation triggers
+-- - Role validation triggers
+-- - Audit log triggers
+```
+
+**Common Trigger Issues:**
+1. **Strict validation** that rejects Finance Manager data
+2. **Missing columns** referenced in trigger functions
+3. **Cascade failures** from related table triggers
+
+**Debug Trigger Execution:**
+```sql
+-- Enable trigger debugging (if available)
+SET log_statement = 'all';
+SET log_min_messages = 'debug1';
+
+-- Or add logging to trigger functions:
+CREATE OR REPLACE FUNCTION debug_profile_trigger()
+RETURNS TRIGGER AS $$
+BEGIN
+  RAISE NOTICE 'Profile trigger executed for user: %', NEW.id;
+  RAISE NOTICE 'User role: %', NEW.role;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+```
+
+### Local Testing for Role Query Validation
+
+#### Test Role Queries Locally
+
+**Method 1: Direct Supabase Query Testing**
+```javascript
+// Test in browser console after login:
+async function testRoleQuery() {
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(
+      import.meta.env.VITE_SUPABASE_URL,
+      import.meta.env.VITE_SUPABASE_ANON_KEY
+    );
+    
+    // Get current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    console.log('User:', user, 'Error:', userError);
+    
+    if (user) {
+      // Test role query that's causing 500 errors
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role, dealership_id, is_group_admin')
+        .eq('id', user.id)
+        .single();
+      
+      console.log('Profile:', profile, 'Error:', profileError);
+      
+      // If error, it will show the exact 500 error cause
+      if (profileError) {
+        console.error('Role Query Failed:', {
+          code: profileError.code,
+          message: profileError.message,
+          details: profileError.details
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Test failed:', error);
+  }
+}
+
+// Run the test
+testRoleQuery();
+```
+
+**Method 2: Test Enhanced Role Fetching**
+```javascript
+// Test the enhanced role fetching logic:
+async function testEnhancedRoleQuery() {
+  try {
+    // Import the enhanced client
+    const { getSecureSupabaseClient, getCurrentUser } = await import('./src/lib/supabaseClient.ts');
+    
+    // Test environment validation
+    const { validateEnvironmentForAuth } = await import('./src/lib/supabaseClient.ts');
+    const envResult = await validateEnvironmentForAuth();
+    console.log('Environment Validation:', envResult);
+    
+    // Test current user with enhanced error handling
+    const user = await getCurrentUser();
+    console.log('Enhanced User Result:', user);
+    
+  } catch (error) {
+    console.error('Enhanced test failed:', error);
+    // This will show detailed 500 error information
+  }
+}
+
+testEnhancedRoleQuery();
+```
+
+#### Test Finance Manager Schema Access
+```javascript
+// Test schema-based Finance Manager access:
+async function testFinanceManagerAccess() {
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(
+      import.meta.env.VITE_SUPABASE_URL,
+      import.meta.env.VITE_SUPABASE_ANON_KEY
+    );
+    
+    // Test users table query (newer schema)
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select(`dealership_id, role_id, roles(name)`)
+        .eq('id', user.id)
+        .maybeSingle();
+      
+      console.log('Users table result:', userData, userError);
+      
+      // Test profiles table query (legacy schema)  
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('role, dealership_id, is_group_admin')
+        .eq('id', user.id)
+        .maybeSingle();
+        
+      console.log('Profiles table result:', profileData, profileError);
+    }
+  } catch (error) {
+    console.error('Finance Manager test failed:', error);
+  }
+}
+
+testFinanceManagerAccess();
+```
+
+### Deployment-Specific Solutions
+
+#### Netlify Deployment Commands for 500 Error Resolution
+
+**Initial Deployment Setup:**
+```bash
+# Install Netlify CLI
+npm install -g netlify-cli
+
+# Login to Netlify
+netlify login
+
+# Initialize Netlify in project
+netlify init
+
+# Set environment variables for production
+netlify env:set VITE_SUPABASE_URL "https://yourproject.supabase.co"
+netlify env:set VITE_SUPABASE_ANON_KEY "your_actual_anon_key_here"
+netlify env:set VITE_ENVIRONMENT "production"
+
+# Deploy to production
+netlify deploy --prod
+```
+
+**Environment Variable Troubleshooting:**
+```bash
+# Check all environment variables
+netlify env:list
+
+# Test environment variable loading in Netlify
+netlify dev --live
+# This runs your app with Netlify's environment variables
+
+# If variables are missing, set them:
+netlify env:set VITE_SUPABASE_URL "https://yourproject.supabase.co"
+netlify env:set VITE_SUPABASE_ANON_KEY "eyJ..."
+
+# Redeploy after setting variables
+netlify deploy --prod
+```
+
+**Build Command Troubleshooting:**
+```bash
+# Test build locally with production environment
+npm run build
+
+# If build fails with environment errors:
+# 1. Check .env.production exists
+# 2. Copy variables from Netlify dashboard
+# 3. Test build again
+
+# Debug Netlify build process
+netlify build --debug
+
+# View deployment logs
+netlify logs:function --name=edge-functions
+```
+
+#### Vercel Deployment Commands
+
+**Initial Setup:**
+```bash
+# Install Vercel CLI
+npm install -g vercel
+
+# Login to Vercel
+vercel login
+
+# Deploy from project directory
+vercel
+
+# Set environment variables
+vercel env add VITE_SUPABASE_URL production
+vercel env add VITE_SUPABASE_ANON_KEY production
+vercel env add VITE_ENVIRONMENT production
+
+# Redeploy with new environment variables
+vercel --prod
+```
+
+#### Environment Variable Verification Commands
+
+**For Any Deployment Platform:**
+```bash
+# Local environment verification
+node -e "
+require('dotenv').config();
+console.log('URL:', process.env.VITE_SUPABASE_URL ? 'SET' : 'MISSING');
+console.log('KEY:', process.env.VITE_SUPABASE_ANON_KEY ? 'SET' : 'MISSING');
+console.log('URL Format:', process.env.VITE_SUPABASE_URL?.includes('supabase.co') ? 'VALID' : 'INVALID');
+console.log('KEY Format:', process.env.VITE_SUPABASE_ANON_KEY?.startsWith('eyJ') ? 'VALID' : 'INVALID');
+"
+
+# Test production build with environment
+npm run build 2>&1 | grep -i "environment\|missing\|undefined"
+
+# Verify environment in production bundle
+grep -r "undefined.*VITE_SUPABASE" dist/ || echo "Environment variables properly bundled"
+```
+
+### Advanced Troubleshooting
+
+#### Database Connection Testing
+```bash
+# Test database connectivity from command line
+npx @supabase/cli@latest gen types typescript --project-id your-project-id
+
+# If this fails, check:
+# 1. Project ID is correct
+# 2. API keys are valid  
+# 3. Network connectivity to Supabase
+```
+
+#### RLS Policy Testing
+```sql
+-- Test RLS policies as Finance Manager user
+-- Run in Supabase SQL editor with Finance Manager JWT:
+
+-- Set JWT token (get from browser after login)
+SELECT auth.jwt();
+
+-- Test profile access
+SELECT * FROM profiles WHERE id = auth.uid();
+
+-- Test users table access  
+SELECT * FROM users WHERE id = auth.uid();
+
+-- If queries fail, check:
+-- 1. RLS is enabled: SELECT relrowsecurity FROM pg_class WHERE relname = 'profiles';
+-- 2. Policies exist: SELECT * FROM pg_policies WHERE tablename = 'profiles';
+-- 3. User role is correct: SELECT role FROM profiles WHERE id = auth.uid();
+```
+
+#### Performance and Timeout Issues
+```javascript
+// Test API response times to identify slow queries
+async function testAPIPerformance() {
+  const start = Date.now();
+  
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(
+      import.meta.env.VITE_SUPABASE_URL,
+      import.meta.env.VITE_SUPABASE_ANON_KEY
+    );
+    
+    const { data, error } = await supabase.auth.getSession();
+    const duration = Date.now() - start;
+    
+    console.log(`Auth session took ${duration}ms`);
+    
+    if (duration > 5000) {
+      console.warn('Slow API response detected - may cause 500 timeouts');
+    }
+    
+    if (error) {
+      console.error('API Error:', error);
+    }
+    
+  } catch (error) {
+    console.error('Performance test failed:', error);
+  }
+}
+
+testAPIPerformance();
+```
+
+### Common Error Patterns and Solutions
+
+| Error Pattern | Root Cause | Solution |
+|---------------|------------|----------|
+| `[500 Prevention] Environment variables missing post-login` | Dev server needs restart | Stop server (Ctrl+C) and run `npm run dev` |
+| `[Auth] 500 error detected in users table query` | Database schema mismatch | Check if users table exists and has correct columns |
+| `permission denied for table profiles` | RLS policy missing | Add Finance Manager RLS policy to profiles table |
+| `Role fetch 500 error detected` | Environment or database issue | Check both environment variables and database access |
+| `API key validation failed` | Wrong or expired API key | Get fresh anon key from Supabase dashboard |
+| `Network connectivity issues` | Wrong URL or network problems | Verify VITE_SUPABASE_URL format and accessibility |
+
+### Emergency Recovery Steps
+
+If Finance Manager login is completely broken:
+
+1. **Immediate Environment Reset:**
+   ```bash
+   # Stop all processes
+   Ctrl+C
+   
+   # Clear any cached environment
+   rm -rf node_modules/.vite
+   
+   # Verify environment file
+   cat .env | grep VITE_SUPABASE
+   
+   # Fresh start
+   npm run dev
+   ```
+
+2. **Database Bypass for Testing:**
+   ```javascript
+   // Temporarily test without database queries
+   // In browser console:
+   localStorage.setItem('debug-skip-role-fetch', 'true');
+   // This will bypass role fetching for testing
+   ```
+
+3. **Fallback Authentication:**
+   ```javascript
+   // Test basic auth without role fetching
+   async function testBasicAuth() {
+     const { createClient } = await import('@supabase/supabase-js');
+     const supabase = createClient(
+       import.meta.env.VITE_SUPABASE_URL,
+       import.meta.env.VITE_SUPABASE_ANON_KEY
+     );
+     
+     const { data: { session }, error } = await supabase.auth.getSession();
+     console.log('Basic auth result:', session ? 'SUCCESS' : 'FAILED', error);
+   }
+   
+   testBasicAuth();
+   ```
+
+4. **Contact Support Checklist:**
+   - Browser console logs (screenshot)
+   - Environment variable status (without revealing keys)
+   - Supabase project logs (last 1 hour)
+   - Steps attempted from this guide
+   - Deployment platform (Netlify/Vercel/etc.)
+
+This comprehensive troubleshooting guide should resolve most Finance Manager login 500 errors. The key is systematic diagnosis starting with environment variables, then database access, and finally deployment-specific issues.
 
 ## License
 
