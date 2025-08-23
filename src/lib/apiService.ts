@@ -663,7 +663,7 @@ function logStateError(
   });
 }
 
-/** State Management: Safe state operation wrapper with retry logic */
+/** Enhanced: Safe state operation wrapper with comprehensive retry logic and 500 error handling */
 async function safeStateOperation<T>(
   operation: () => Promise<T>,
   operationName: string,
@@ -673,47 +673,178 @@ async function safeStateOperation<T>(
     timeout?: number;
     severity?: 'low' | 'medium' | 'high' | 'critical';
     logErrors?: boolean;
+    enableEnvironmentCheck?: boolean;
   } = {}
 ): Promise<T> {
-  const { retries = 1, timeout = 10000, severity = 'medium', logErrors = true } = options;
+  const { retries = 3, timeout = 15000, severity = 'medium', logErrors = true, enableEnvironmentCheck = true } = options;
   const errorId = generateStateErrorId();
   
-  for (let attempt = 1; attempt <= retries; attempt++) {
+  // Enhanced: Pre-operation environment check for 500 error prevention
+  if (enableEnvironmentCheck) {
     try {
-      // Timeout protection
-      const timeoutPromise = new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error(`Operation timeout after ${timeout}ms`)), timeout)
-      );
+      const envValidator = EnvironmentValidator.getInstance();
+      const envCheck = envValidator.validateEnvironment();
+      if (!envCheck.isValid) {
+        console.warn(`[500 Prevention] Environment issues detected before ${operationName}:`);
+        envCheck.errors.forEach(error => console.warn(`[500 Prevention] ⚠️  ${error}`));
+        console.warn('[500 Prevention] This may cause 500 errors - consider environment restart');
+      }
+    } catch (envCheckError) {
+      console.warn(`[500 Prevention] Environment check failed for ${operationName}:`, envCheckError.message);
+    }
+  }
+  
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    // Enhanced try-catch with comprehensive error handling
+    try {
+      console.log(`[Safe Operation] ${operationName} attempt ${attempt}/${retries}`);
+      
+      // Timeout protection with enhanced error details
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          const timeoutError = new Error(`Operation timeout after ${timeout}ms in ${operationName}`);
+          timeoutError.name = 'OperationTimeoutError';
+          reject(timeoutError);
+        }, timeout);
+      });
       
       const result = await Promise.race([operation(), timeoutPromise]);
+      
+      // Success - log if this was a retry
+      if (attempt > 1) {
+        console.log(`[Safe Operation] ${operationName} succeeded on attempt ${attempt}/${retries}`);
+      }
+      
       return result;
+      
     } catch (error: any) {
       if (logErrors) {
         logStateError(errorId, `${operationName} (attempt ${attempt}/${retries})`, error, severity);
       }
       
-      // Check for 500 errors specifically
-      if (error?.status === 500 || error?.code === '500' || error?.message?.includes('500')) {
-        console.error(`[Supabase 500] Database error in ${operationName}: ${error.message || 'Unknown 500 error'}`);
+      const errorMessage = error?.message?.toLowerCase() || '';
+      const statusCode = error?.status || 0;
+      const errorCode = error?.code || '';
+      
+      // Enhanced 500 Error Handling: Comprehensive detection and logging
+      const is500Error = statusCode === 500 || errorCode === '500' || errorMessage.includes('500');
+      const isDatabaseError = errorMessage.includes('database') || errorMessage.includes('supabase') || 
+                              errorMessage.includes('postgresql') || errorMessage.includes('connection');
+      const isTriggerError = errorMessage.includes('trigger') || errorMessage.includes('function');
+      const isRLSError = errorMessage.includes('policy') || errorMessage.includes('rls') || 
+                         errorMessage.includes('permission') || errorMessage.includes('unauthorized');
+      
+      if (is500Error || isDatabaseError) {
+        // Enhanced logging with specific error categorization
+        if (is500Error) {
+          console.error(`[500 Prevention] Supabase DB error—check triggers/RLS in ${operationName}: ${error.message || 'Unknown 500 error'}`);
+        }
         
-        // For role-based calls, add user message
-        if (operationName.includes('finance') || operationName.includes('manager') || operationName.includes('promotion')) {
+        if (isTriggerError) {
+          console.error(`[500 Prevention] Database trigger error in ${operationName} - check database triggers`);
+          console.error(`[500 Prevention] Trigger error details: ${error.message}`);
+        }
+        
+        if (isRLSError) {
+          console.error(`[500 Prevention] RLS policy error in ${operationName} - check Row Level Security policies`);
+          console.error(`[500 Prevention] RLS error details: ${error.message}`);
+        }
+        
+        if (errorMessage.includes('timeout')) {
+          console.error(`[500 Prevention] Database timeout in ${operationName} - check database performance`);
+        }
+        
+        if (errorMessage.includes('connection')) {
+          console.error(`[500 Prevention] Database connection error in ${operationName} - check environment configuration`);
+        }
+        
+        // Track 500 errors globally
+        try {
+          DatabaseErrorMonitor.getInstance().track500Error(operationName, error, {
+            attempt,
+            totalRetries: retries,
+            is500Error,
+            isDatabaseError,
+            isTriggerError,
+            isRLSError
+          });
+        } catch (monitorError) {
+          console.warn('[Monitor] Failed to track 500 error:', monitorError.message);
+        }
+        
+        // Enhanced user messaging for different operation types
+        if (operationName.includes('finance') || operationName.includes('manager')) {
+          console.warn(`[User Message] Finance operation temporarily unavailable due to database error. Please try again in a moment.`);
+        } else if (operationName.includes('deal') || operationName.includes('log')) {
+          console.warn(`[User Message] Unable to save deal data due to database error. Please try again shortly.`);
+        } else if (operationName.includes('profile') || operationName.includes('role')) {
+          console.warn(`[User Message] User profile temporarily unavailable. Please refresh the page.`);
+        } else {
           console.warn(`[User Message] 500 error in ${operationName}: Service temporarily unavailable. Please try again in a moment.`);
         }
         
-        // Retry for 500 errors
+        // Enhanced retry logic for 500/database errors
         if (attempt < retries) {
-          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000); // Exponential backoff up to 5s
-          console.log(`[Retry] Retrying ${operationName} in ${delay}ms due to 500 error...`);
-          await new Promise(resolve => setTimeout(resolve, delay));
+          // Different backoff strategies based on error type
+          let retryDelay;
+          if (isTriggerError || isRLSError) {
+            // Slower backoff for trigger/RLS errors (likely need manual fix)
+            retryDelay = Math.min(2000 * Math.pow(2, attempt - 1), 10000); // Up to 10s
+          } else if (errorMessage.includes('timeout')) {
+            // Longer backoff for timeout errors
+            retryDelay = Math.min(3000 * Math.pow(2, attempt - 1), 15000); // Up to 15s
+          } else {
+            // Standard exponential backoff for 500 errors
+            retryDelay = Math.min(1000 * Math.pow(2, attempt - 1), 8000); // Up to 8s
+          }
+          
+          console.log(`[Retry] Retrying ${operationName} in ${retryDelay}ms due to database error (attempt ${attempt + 1}/${retries})...`);
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          continue; // Continue retry loop
+        } else {
+          console.error(`[500 Prevention] Max retries reached for ${operationName} - database error persists`);
+        }
+      }
+      
+      // Enhanced handling for network errors
+      if (errorMessage.includes('network') || errorMessage.includes('fetch') || 
+          errorMessage.includes('connection') || error.name === 'OperationTimeoutError') {
+        console.error(`[Network] Network error in ${operationName}: ${error.message}`);
+        
+        if (attempt < retries) {
+          const retryDelay = Math.min(2000 * attempt, 6000); // Linear backoff up to 6s
+          console.log(`[Retry] Retrying ${operationName} in ${retryDelay}ms due to network error...`);
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
           continue;
         }
       }
       
-      // Don't retry on final attempt or non-500 errors
-      if (attempt === retries || (error?.status && error.status < 500 && error.status !== 429)) {
-        if (logErrors) {
-          console.error(`[StateOperation] ${operationName} failed after ${retries} attempts [${errorId}]`);
+      // Enhanced handling for authentication errors
+      if (statusCode === 401 || statusCode === 403 || errorMessage.includes('unauthorized')) {
+        console.error(`[Auth] Authentication error in ${operationName}: ${error.message}`);
+        console.error(`[Auth] This may indicate environment configuration issues`);
+        
+        // Don't retry auth errors (except once for token refresh)
+        if (attempt === 1) {
+          console.log(`[Auth] Attempting one retry for potential token refresh...`);
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          continue;
+        }
+      }
+      
+      // Don't retry on final attempt or client errors (except specific retryable ones)
+      if (attempt === retries || (statusCode >= 400 && statusCode < 500 && statusCode !== 429 && !is500Error)) {
+        if (logErrors && attempt === retries) {
+          console.error(`[Safe Operation] ${operationName} failed after ${retries} attempts:`, error.message);
+          if (is500Error || isDatabaseError) {
+            console.error('[Safe Operation] Final failure was due to database/500 error - check Supabase configuration');
+          }
+        }
+        
+        // Enhanced fallback with error context
+        console.warn(`[Safe Operation] Returning fallback value for ${operationName} after ${retries} attempts`);
+        if (is500Error || isDatabaseError) {
+          console.warn('[Safe Operation] Fallback due to persistent database errors - user experience may be degraded');
         }
         return fallbackValue;
       }
@@ -1473,17 +1604,28 @@ class HttpClient {
               
               lastError = this.createSecureError(
                 'Database connectivity issue. Please try again.',
-                500,
-                'NETWORK_DB_ERROR',
+                isDatabase500Error ? 500 : 503,
+                isDatabase500Error ? 'DB_500_ERROR' : 'NETWORK_DB_ERROR',
                 requestId
               );
             } else {
               lastError = this.createSecureError(
                 'Network error occurred',
-                0,
+                503,
                 'NETWORK_ERROR',
                 requestId
               );
+            }
+            
+            // Enhanced retry logic for network-level errors
+            if ((isDatabase500Error || errorCategory === 'connection') && attempt < retries) {
+              const retryDelay = isDatabase500Error ? 
+                Math.min(1500 * Math.pow(2, attempt - 1), 10000) : // Database errors: up to 10s
+                Math.min(1000 * attempt, 5000); // Network errors: linear up to 5s
+              
+              console.log(`[Retry] Retrying ${method} ${url} in ${retryDelay}ms due to ${errorCategory} error (attempt ${attempt + 1}/${retries})`);
+              await new Promise(resolve => setTimeout(resolve, retryDelay));
+              continue;
             }
           }
         }
@@ -1496,12 +1638,42 @@ class HttpClient {
         }
 
       } catch (error: any) {
-        lastError = this.createSecureError(
-          'Request failed',
-          0,
-          'REQUEST_FAILED',
-          requestId
-        );
+        // Enhanced try-catch error handling with 500 error detection
+        const errorMessage = error.message?.toLowerCase() || '';
+        const is500Error = errorMessage.includes('500') || error.status === 500;
+        
+        if (is500Error) {
+          console.error('[500 Prevention] Supabase DB error—check triggers/RLS in request processing');
+          console.error(`[Request Error] 500-level error during ${method} ${url}:`, error.message);
+          
+          // Track the 500 error
+          try {
+            DatabaseErrorMonitor.getInstance().track500Error(`REQUEST_${method}_${url}`, error, {
+              attempt,
+              maxRetries: retries,
+              category: 'request_processing',
+              isRequestError: true
+            });
+          } catch (monitorError) {
+            console.warn('[Monitor] Failed to track request 500 error:', monitorError.message);
+          }
+          
+          lastError = this.createSecureError(
+            'Database service error during request processing. Please try again.',
+            500,
+            'REQUEST_DB_ERROR',
+            requestId
+          );
+        } else {
+          console.error(`[Request Error] General error during ${method} ${url}:`, error.message);
+          
+          lastError = this.createSecureError(
+            'Request processing failed',
+            503,
+            'REQUEST_FAILED',
+            requestId
+          );
+        }
       }
     }
 

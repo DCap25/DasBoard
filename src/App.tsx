@@ -922,31 +922,169 @@ function App() {
             console.warn(`[DEBUG AUTH] User authenticated: ${session.user.email}`);
 
             try {
-              // Check if user is a group admin using the initialized client
-              const { data, error } = await supabaseClient
-                .from('profiles')
-                .select('is_group_admin, role')
-                .eq('id', session.user.id)
-                .maybeSingle();
+              // Enhanced error handling for profiles query
+              console.log('[DEBUG AUTH] Starting profiles query for user:', session.user.id);
+              
+              // Check cache first to prevent redundant queries
+              const cacheKey = `profile_${session.user.id}`;
+              const cachedProfile = localStorage.getItem(cacheKey);
+              const now = Date.now();
+              
+              if (cachedProfile) {
+                try {
+                  const { data: cachedData, timestamp } = JSON.parse(cachedProfile);
+                  const isExpired = now - timestamp > 5 * 60 * 1000; // 5 minutes
+                  
+                  if (!isExpired && cachedData) {
+                    console.warn('[DEBUG AUTH] Using cached profile data:', cachedData);
+                    
+                    if (cachedData.is_group_admin) {
+                      console.warn('[DEBUG AUTH] User is a group admin (cached), should be redirected to /group-admin');
+                    } else {
+                      console.warn('[DEBUG AUTH] User is NOT a group admin (cached)');
+                    }
+                    
+                    return; // Skip database query if we have fresh cached data
+                  }
+                } catch (cacheError) {
+                  console.warn('[DEBUG AUTH] Cache parse error, proceeding with database query:', cacheError);
+                }
+              }
 
-              if (!error && data) {
-                console.warn('[DEBUG AUTH] User profile data:', data);
+              // Enhanced profiles query with retry logic and comprehensive error handling
+              let profileData = null;
+              let profileError = null;
+              let retryCount = 0;
+              const maxRetries = 3;
+
+              while (retryCount < maxRetries && !profileData) {
+                try {
+                  console.log(`[DEBUG AUTH] Profiles query attempt ${retryCount + 1}/${maxRetries}`);
+                  
+                  const { data, error } = await supabaseClient
+                    .from('profiles')
+                    .select('is_group_admin, role')
+                    .eq('id', session.user.id)
+                    .maybeSingle();
+
+                  if (error) {
+                    profileError = error;
+                    console.error(`[DEBUG AUTH] Profiles query error (attempt ${retryCount + 1}):`, error);
+                    
+                    // Check for specific 500 error patterns
+                    if (error.code === 'PGRST301' || error.message?.includes('500') || error.message?.includes('Internal Server Error')) {
+                      console.error('[PROFILES 500 ERROR] Database server error detected:', {
+                        code: error.code,
+                        message: error.message,
+                        details: error.details,
+                        hint: error.hint,
+                        userId: session.user.id,
+                        userEmail: session.user.email,
+                        attempt: retryCount + 1
+                      });
+                      
+                      // If this is a 500 error, wait before retry
+                      if (retryCount < maxRetries - 1) {
+                        const backoffMs = Math.pow(2, retryCount) * 1000; // Exponential backoff: 1s, 2s, 4s
+                        console.log(`[DEBUG AUTH] Waiting ${backoffMs}ms before retry...`);
+                        await new Promise(resolve => setTimeout(resolve, backoffMs));
+                      }
+                    } else {
+                      // For non-500 errors, break immediately
+                      console.error('[DEBUG AUTH] Non-retryable error:', error);
+                      break;
+                    }
+                  } else if (data) {
+                    profileData = data;
+                    console.warn('[DEBUG AUTH] Profile query successful:', data);
+                    
+                    // Cache successful result for 5 minutes
+                    try {
+                      localStorage.setItem(cacheKey, JSON.stringify({
+                        data: profileData,
+                        timestamp: now
+                      }));
+                      console.log('[DEBUG AUTH] Profile data cached successfully');
+                    } catch (cacheError) {
+                      console.warn('[DEBUG AUTH] Failed to cache profile data:', cacheError);
+                    }
+                    
+                    break;
+                  } else {
+                    console.warn('[DEBUG AUTH] Profile query returned no data');
+                    break;
+                  }
+                } catch (queryError) {
+                  profileError = queryError;
+                  console.error(`[DEBUG AUTH] Query exception (attempt ${retryCount + 1}):`, queryError);
+                  
+                  if (retryCount < maxRetries - 1) {
+                    const backoffMs = Math.pow(2, retryCount) * 1000;
+                    console.log(`[DEBUG AUTH] Waiting ${backoffMs}ms before retry after exception...`);
+                    await new Promise(resolve => setTimeout(resolve, backoffMs));
+                  }
+                }
+                
+                retryCount++;
+              }
+
+              // Process the results
+              if (profileData) {
+                console.warn('[DEBUG AUTH] User profile data:', profileData);
                 console.warn(
-                  `[DEBUG AUTH] is_group_admin: ${data.is_group_admin}, role: ${data.role}`
+                  `[DEBUG AUTH] is_group_admin: ${profileData.is_group_admin}, role: ${profileData.role}`
                 );
 
-                if (data.is_group_admin) {
+                if (profileData.is_group_admin) {
                   console.warn(
                     '[DEBUG AUTH] User is a group admin, should be redirected to /group-admin'
                   );
                 } else {
                   console.warn('[DEBUG AUTH] User is NOT a group admin');
                 }
-              } else if (error) {
-                console.error('[DEBUG AUTH] Error fetching user profile:', error);
+              } else if (profileError) {
+                console.error('[DEBUG AUTH] All profile query attempts failed:', profileError);
+                
+                // Try to use any previously cached data as emergency fallback
+                try {
+                  const emergencyCache = localStorage.getItem(cacheKey);
+                  if (emergencyCache) {
+                    const { data: emergencyData } = JSON.parse(emergencyCache);
+                    if (emergencyData) {
+                      console.warn('[DEBUG AUTH] Using emergency cached profile data due to query failure:', emergencyData);
+                      
+                      if (emergencyData.is_group_admin) {
+                        console.warn('[DEBUG AUTH] User is a group admin (emergency cache)');
+                      } else {
+                        console.warn('[DEBUG AUTH] User is NOT a group admin (emergency cache)');
+                      }
+                    }
+                  }
+                } catch (emergencyError) {
+                  console.error('[DEBUG AUTH] Emergency cache access failed:', emergencyError);
+                }
+
+                // Log detailed error for debugging
+                logAppEvent('[AUTH ERROR] Profile query failed after all retries', {
+                  userId: session.user.id,
+                  userEmail: session.user.email,
+                  errorCode: profileError.code,
+                  errorMessage: profileError.message,
+                  maxRetries,
+                  finalAttempt: retryCount
+                });
               }
             } catch (error) {
               console.error('[DEBUG AUTH] Exception while fetching user profile:', error);
+              
+              // Enhanced error reporting
+              logAppEvent('[AUTH ERROR] Profile fetch exception', {
+                userId: session.user.id,
+                userEmail: session.user.email,
+                errorName: error.name,
+                errorMessage: error.message,
+                errorStack: error.stack
+              });
             }
           }
         });
