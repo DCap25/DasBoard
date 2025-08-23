@@ -695,8 +695,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
    * Security: Enhanced user data fetching with role validation
    */
   const fetchUserData = useCallback(async (userId: string): Promise<void> => {
+    // Enhanced type validation: Ensure userId is properly typed
+    if (!userId || typeof userId !== 'string') {
+      console.error(`[UUID_ERROR] Invalid userId type or value:`, {
+        userId,
+        type: typeof userId,
+        isNull: userId === null,
+        isUndefined: userId === undefined
+      });
+      setRole('viewer'); // Safe default
+      return;
+    }
     try {
+      // Enhanced UUID debugging: Check for malformed UUID with :1 suffix
       console.log(`[Security] Fetching user data for: ${userId.substring(0, 8)}...`);
+      console.log(`[UUID_DEBUG] Full userId received:`, {
+        userId: userId,
+        type: typeof userId,
+        length: userId?.length,
+        hasColonSuffix: userId?.includes(':'),
+        actualValue: JSON.stringify(userId)
+      });
+      
+      // Enhanced UUID validation: Check for :1 suffix and other malformations
+      if (userId?.includes(':')) {
+        console.error(`[UUID_ERROR] Malformed UUID detected with colon suffix: ${userId}`);
+        // Clean the UUID by removing :1 suffix if present
+        const cleanUserId = userId.split(':')[0];
+        console.log(`[UUID_FIX] Cleaned UUID: ${cleanUserId}`);
+        userId = cleanUserId;
+      }
+      
+      // Enhanced UUID validation: Comprehensive UUID format validation
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(userId)) {
+        console.error(`[UUID_ERROR] Invalid UUID format detected:`, {
+          userId: userId,
+          length: userId.length,
+          expectedFormat: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+        });
+        setRole('viewer'); // Safe default for invalid UUID
+        return;
+      }
+      
+      console.log(`[UUID_VALID] UUID format validated successfully: ${userId.substring(0, 8)}...`);
+      
       const client = await getSecureSupabaseClient();
       const { data: { session } } = await client.auth.getSession();
 
@@ -723,6 +766,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       try {
         const usersQueryStartTime = Date.now();
+        
+        // Enhanced query parameter logging: Log exact parameters before users query
+        console.log(`[QUERY_DEBUG] About to execute users query with parameters:`, {
+          table: 'users',
+          select: 'dealership_id, role_id, roles(name)',
+          eq_field: 'id',
+          eq_value: userId,
+          eq_value_type: typeof userId,
+          eq_value_length: userId?.length,
+          eq_value_json: JSON.stringify(userId)
+        });
+        
         const usersResult = await client
           .from('users')
           .select(`
@@ -743,6 +798,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
       } catch (queryError: any) {
         console.error('[Auth] Users table query failed with exception:', queryError);
+        
+        // Enhanced error logging: Show exact failed URL if available
+        if (queryError?.message?.includes('500') || queryError?.status === 500) {
+          console.error(`[UUID_ERROR] 500 error in users query with URL details:`, {
+            error: queryError,
+            message: queryError?.message,
+            status: queryError?.status,
+            url: queryError?.url || 'URL not available',
+            userId: userId,
+            userIdType: typeof userId
+          });
+        }
+        
         userError = queryError;
       }
 
@@ -796,6 +864,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       try {
         const profilesQueryStartTime = Date.now();
+        
+        // Enhanced query parameter logging: Log exact parameters before query
+        console.log(`[QUERY_DEBUG] About to execute profiles query with parameters:`, {
+          table: 'profiles',
+          select: 'role, dealership_id, is_group_admin',
+          eq_field: 'id',
+          eq_value: userId,
+          eq_value_type: typeof userId,
+          eq_value_length: userId?.length,
+          eq_value_json: JSON.stringify(userId)
+        });
+        
         const profilesResult = await client
           .from('profiles')
           .select('role, dealership_id, is_group_admin')
@@ -810,6 +890,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
       } catch (queryError: any) {
         console.error('[Auth] Profiles table query failed with exception:', queryError);
+        
+        // Enhanced error logging: Show exact failed URL if available
+        if (queryError?.message?.includes('500') || queryError?.status === 500) {
+          console.error(`[UUID_ERROR] 500 error with exact URL details:`, {
+            error: queryError,
+            message: queryError?.message,
+            status: queryError?.status,
+            url: queryError?.url || 'URL not available',
+            userId: userId,
+            userIdType: typeof userId
+          });
+        }
+        
         profileError = queryError;
       }
 
@@ -943,6 +1036,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             localStorage.setItem('app-language', session.user.user_metadata.preferred_language);
             console.log('[Auth] Applied language from user metadata:', session.user.user_metadata.preferred_language);
           }
+
+          // Enhanced UUID debugging: Log session.user.id before calling fetchUserData
+          console.log(`[UUID_DEBUG] About to call fetchUserData with session.user.id:`, {
+            sessionUserId: session.user.id,
+            type: typeof session.user.id,
+            length: session.user.id?.length,
+            hasColonSuffix: session.user.id?.includes(':'),
+            rawValue: JSON.stringify(session.user.id)
+          });
 
           // Fetch additional user data (role, dealership, etc.)
           await fetchUserData(session.user.id);
