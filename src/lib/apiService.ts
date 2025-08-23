@@ -2523,6 +2523,400 @@ export class ApiService {
     );
   }
 
+  /**
+   * Enhanced Profile Query with Supabase RPC Fallback for 500 Error Prevention
+   * 
+   * Production Fallback Strategy:
+   * 1. Prefer get_profile_robust RPC if available (handles database-level 500 errors)
+   * 2. Fallback to direct profiles table query with comprehensive error handling
+   * 3. Cache successful results for 10 minutes to reduce database load
+   * 4. Emergency fallback to safe defaults (viewer role, no group admin)
+   * 5. Netlify-specific logging for production debugging
+   * 
+   * @param userId - The user UUID to fetch profile data for
+   * @returns ApiResponse with profile data (role, is_group_admin, dealership_id)
+   */
+  async getUserProfileData(userId: string): Promise<ApiResponse<{
+    id: string;
+    role: string;
+    is_group_admin: boolean;
+    dealership_id?: number;
+    email?: string;
+  }>> {
+    const errorId = generateStateErrorId();
+    
+    return safeStateOperation(
+      async () => {
+        // Input validation: Ensure valid UUID format
+        if (!userId || typeof userId !== 'string') {
+          console.error(`[Profile Query] Invalid userId parameter:`, { userId, type: typeof userId });
+          throw new Error('Invalid user ID parameter');
+        }
+
+        // Enhanced UUID validation with malformed :1 suffix cleanup
+        let cleanUserId = userId;
+        if (userId.includes(':')) {
+          console.warn(`[Profile Query] Malformed UUID with colon suffix detected: ${userId}`);
+          cleanUserId = userId.split(':')[0];
+          console.log(`[Profile Query] Cleaned UUID: ${cleanUserId}`);
+        }
+
+        // UUID format validation
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (!uuidRegex.test(cleanUserId)) {
+          console.error(`[Profile Query] Invalid UUID format:`, { 
+            userId: cleanUserId, 
+            length: cleanUserId.length 
+          });
+          throw new Error('Invalid user ID format');
+        }
+
+        // Check cache first to prevent redundant database queries
+        const cacheKey = `profile_data_${cleanUserId}`;
+        const cachedData = this.getCachedProfileData(cacheKey);
+        if (cachedData) {
+          console.log(`[Profile Query] Using cached profile data for user: ${cleanUserId.substring(0, 8)}...`);
+          return { data: cachedData, error: null, success: true };
+        }
+
+        const client = await getSecureSupabaseClient();
+        let profileData = null;
+        let queryError = null;
+        let queryMethod = 'unknown';
+
+        // Strategy 1: Try get_profile_robust RPC first (preferred for production 500 error handling)
+        try {
+          console.log(`[Profile Query] Attempting get_profile_robust RPC for user: ${cleanUserId.substring(0, 8)}...`);
+          
+          const rpcStartTime = Date.now();
+          const { data: rpcProfile, error: rpcError } = await client.rpc('get_profile_robust', {
+            user_uuid: cleanUserId
+          });
+
+          const rpcDuration = Date.now() - rpcStartTime;
+          
+          if (rpcError) {
+            console.warn(`[Profile Query] get_profile_robust RPC failed (${rpcDuration}ms):`, {
+              error: rpcError.message || 'unknown',
+              code: rpcError.code || 'unknown',
+              userId: cleanUserId.substring(0, 8) + '...'
+            });
+            queryError = rpcError;
+            queryMethod = 'rpc_failed';
+          } else if (rpcProfile) {
+            console.log(`[Profile Query] get_profile_robust RPC successful (${rpcDuration}ms)`);
+            profileData = rpcProfile;
+            queryMethod = 'rpc_success';
+            
+            // Netlify Logging: Log successful RPC usage for production monitoring
+            if (typeof window !== 'undefined') {
+              console.log('[Netlify Profile] RPC Success:', {
+                method: 'get_profile_robust',
+                duration: rpcDuration,
+                hasData: !!rpcProfile,
+                timestamp: new Date().toISOString()
+              });
+            }
+          }
+        } catch (rpcException) {
+          console.warn(`[Profile Query] get_profile_robust RPC exception:`, rpcException);
+          queryError = rpcException;
+          queryMethod = 'rpc_exception';
+        }
+
+        // Strategy 2: Fallback to direct profiles table query if RPC failed
+        if (!profileData && queryError) {
+          console.log(`[Profile Query] Falling back to direct profiles query due to RPC failure`);
+          
+          try {
+            const directQueryStartTime = Date.now();
+            
+            // Direct profiles query with comprehensive error handling
+            const { data: directProfile, error: directError } = await client
+              .from('profiles')
+              .select('id, role, is_group_admin, dealership_id, email')
+              .eq('id', cleanUserId)
+              .single();
+
+            const directDuration = Date.now() - directQueryStartTime;
+
+            if (directError) {
+              console.error('Profile query error:', directError);
+              
+              // Enhanced 500 error detection and handling
+              if (directError.code === 'PGRST301' || 
+                  directError.message?.includes('500') || 
+                  directError.message?.includes('Internal Server Error')) {
+                
+                console.error(`[Profile Query] 500 error detected in direct profiles query:`, {
+                  error: directError.message || 'unknown',
+                  code: directError.code || 'unknown',
+                  details: directError.details || 'none',
+                  hint: directError.hint || 'none',
+                  userId: cleanUserId.substring(0, 8) + '...',
+                  duration: directDuration
+                });
+                
+                // Netlify Logging: Log 500 errors for production debugging
+                if (typeof window !== 'undefined') {
+                  console.error('[Netlify Profile] 500 Error:', {
+                    method: 'direct_query',
+                    error: directError.message,
+                    code: directError.code,
+                    userId: cleanUserId.substring(0, 8) + '...',
+                    duration: directDuration,
+                    timestamp: new Date().toISOString(),
+                    userAgent: navigator?.userAgent || 'unknown'
+                  });
+                }
+                
+                // Track database error for monitoring
+                DatabaseErrorMonitor.getInstance().track500Error('getUserProfileData', directError, {
+                  userId: cleanUserId.substring(0, 8) + '...',
+                  queryMethod: 'direct_profiles',
+                  duration: directDuration
+                });
+              }
+              
+              queryError = directError;
+              queryMethod = 'direct_failed';
+            } else if (directProfile) {
+              console.log(`[Profile Query] Direct profiles query successful (${directDuration}ms)`);
+              profileData = directProfile;
+              queryMethod = 'direct_success';
+              
+              // Netlify Logging: Log successful direct query
+              if (typeof window !== 'undefined') {
+                console.log('[Netlify Profile] Direct Query Success:', {
+                  method: 'direct_query',
+                  duration: directDuration,
+                  hasData: !!directProfile,
+                  timestamp: new Date().toISOString()
+                });
+              }
+            }
+          } catch (directException) {
+            console.error('Profile query error:', directException);
+            console.error(`[Profile Query] Direct profiles query exception:`, directException);
+            queryError = directException;
+            queryMethod = 'direct_exception';
+          }
+        }
+
+        // Strategy 3: Try emergency cached data if both queries failed
+        if (!profileData && queryError) {
+          console.warn(`[Profile Query] Both RPC and direct query failed, trying emergency cache`);
+          
+          const emergencyData = this.getEmergencyCachedProfileData(cacheKey);
+          if (emergencyData) {
+            console.warn(`[Profile Query] Using emergency cached profile data (expired but available)`);
+            
+            // Netlify Logging: Log emergency cache usage
+            if (typeof window !== 'undefined') {
+              console.warn('[Netlify Profile] Emergency Cache Used:', {
+                method: 'emergency_cache',
+                cacheAge: 'expired',
+                timestamp: new Date().toISOString()
+              });
+            }
+            
+            return { data: emergencyData, error: null, success: true };
+          }
+        }
+
+        // Strategy 4: Final fallback to safe defaults if all methods failed
+        if (!profileData) {
+          console.error(`[Profile Query] All query methods failed, using safe defaults`);
+          
+          // Log comprehensive failure details
+          console.error(`[Profile Query] Complete failure details:`, {
+            userId: cleanUserId.substring(0, 8) + '...',
+            lastError: queryError?.message || 'unknown',
+            queryMethod,
+            timestamp: new Date().toISOString()
+          });
+          
+          // Netlify Logging: Log complete failure for production investigation
+          if (typeof window !== 'undefined') {
+            console.error('[Netlify Profile] Complete Query Failure:', {
+              method: 'safe_defaults',
+              lastError: queryError?.message || 'unknown',
+              queryMethod,
+              timestamp: new Date().toISOString(),
+              userAgent: navigator?.userAgent || 'unknown'
+            });
+          }
+          
+          // Return safe defaults to prevent app crashes
+          const safeDefaults = {
+            id: cleanUserId,
+            role: 'viewer',
+            is_group_admin: false,
+            dealership_id: 1, // Default dealership
+            email: null
+          };
+          
+          return { 
+            data: safeDefaults, 
+            error: { 
+              message: 'Profile data temporarily unavailable, using safe defaults',
+              status: 500,
+              type: 'server'
+            }, 
+            success: false 
+          };
+        }
+
+        // Success: Cache the result and return
+        this.cacheProfileData(cacheKey, profileData);
+        
+        console.log(`[Profile Query] Successfully retrieved profile data via ${queryMethod}`);
+        
+        return { data: profileData, error: null, success: true };
+      },
+      'getUserProfileData',
+      {
+        data: null,
+        error: { 
+          message: 'Profile service temporarily unavailable',
+          status: 500,
+          type: 'server'
+        },
+        success: false,
+      },
+      { retries: 2, severity: 'high', logErrors: true }
+    );
+  }
+
+  /**
+   * Simplified Profile Role Query - focuses on role and group admin status only
+   * Uses the same fallback strategy as getUserProfileData but returns minimal data
+   * 
+   * @param userId - The user UUID to fetch role data for
+   * @returns ApiResponse with role and is_group_admin status
+   */
+  async getUserRole(userId: string): Promise<ApiResponse<{
+    role: string;
+    is_group_admin: boolean;
+  }>> {
+    const errorId = generateStateErrorId();
+    
+    return safeStateOperation(
+      async () => {
+        // Get full profile data using the robust fallback strategy
+        const profileResponse = await this.getUserProfileData(userId);
+        
+        if (!profileResponse.success || !profileResponse.data) {
+          console.warn(`[Profile Role] Failed to get profile data, using safe role defaults`);
+          return {
+            data: {
+              role: 'viewer',
+              is_group_admin: false
+            },
+            error: profileResponse.error,
+            success: false
+          };
+        }
+        
+        // Extract role and group admin status
+        const { role, is_group_admin } = profileResponse.data;
+        
+        console.log(`[Profile Role] Retrieved role data:`, { 
+          role, 
+          is_group_admin,
+          userId: userId.substring(0, 8) + '...'
+        });
+        
+        return {
+          data: {
+            role: role || 'viewer',
+            is_group_admin: is_group_admin || false
+          },
+          error: null,
+          success: true
+        };
+      },
+      'getUserRole',
+      {
+        data: {
+          role: 'viewer',
+          is_group_admin: false
+        },
+        error: { 
+          message: 'Role service temporarily unavailable',
+          status: 500,
+          type: 'server'
+        },
+        success: false,
+      },
+      { retries: 1, severity: 'medium', logErrors: true }
+    );
+  }
+
+  // =================== PROFILE CACHING UTILITIES ===================
+
+  /**
+   * Cache profile data with 10-minute expiration
+   * Helps reduce database load and improve performance in production
+   */
+  private cacheProfileData(cacheKey: string, profileData: any): void {
+    try {
+      const cacheEntry = {
+        data: profileData,
+        timestamp: Date.now(),
+        expiresAt: Date.now() + (10 * 60 * 1000) // 10 minutes
+      };
+      
+      localStorage.setItem(cacheKey, JSON.stringify(cacheEntry));
+      console.log(`[Profile Cache] Cached profile data with key: ${cacheKey}`);
+    } catch (cacheError) {
+      console.warn(`[Profile Cache] Failed to cache profile data:`, cacheError);
+    }
+  }
+
+  /**
+   * Get cached profile data if not expired
+   * Returns null if cache is expired or doesn't exist
+   */
+  private getCachedProfileData(cacheKey: string): any | null {
+    try {
+      const cachedEntry = localStorage.getItem(cacheKey);
+      if (!cachedEntry) return null;
+      
+      const { data, expiresAt } = JSON.parse(cachedEntry);
+      
+      if (Date.now() > expiresAt) {
+        console.log(`[Profile Cache] Cache expired for key: ${cacheKey}`);
+        localStorage.removeItem(cacheKey);
+        return null;
+      }
+      
+      console.log(`[Profile Cache] Using valid cached data for key: ${cacheKey}`);
+      return data;
+    } catch (cacheError) {
+      console.warn(`[Profile Cache] Error reading cache:`, cacheError);
+      return null;
+    }
+  }
+
+  /**
+   * Get emergency cached profile data even if expired
+   * Used as last resort when all database queries fail
+   */
+  private getEmergencyCachedProfileData(cacheKey: string): any | null {
+    try {
+      const cachedEntry = localStorage.getItem(cacheKey);
+      if (!cachedEntry) return null;
+      
+      const { data } = JSON.parse(cachedEntry);
+      console.warn(`[Profile Cache] Retrieved emergency cache data for key: ${cacheKey}`);
+      return data;
+    } catch (cacheError) {
+      console.warn(`[Profile Cache] Error reading emergency cache:`, cacheError);
+      return null;
+    }
+  }
+
   // =================== TESTING OPERATIONS ===================
 
   /** Security: Enhanced connection testing */
@@ -2847,6 +3241,10 @@ export const validateEnvironment = () => EnvironmentValidator.getInstance().vali
 export const getGoalTrackingData = (userId: string) => apiService.getGoalTrackingData(userId);
 export const getFinanceManagerDeals = (dealershipId?: number) => apiService.getFinanceManagerDeals(dealershipId);
 export const logFinanceManagerDeal = (dealData: Omit<Deal, 'id'>) => apiService.logFinanceManagerDeal(dealData);
+
+// Profile query exports with 500 error fallback support
+export const getUserProfileData = (userId: string) => apiService.getUserProfileData(userId);
+export const getUserRole = (userId: string) => apiService.getUserRole(userId);
 
 // =================== GLOBAL 500 ERROR MONITORING ===================
 

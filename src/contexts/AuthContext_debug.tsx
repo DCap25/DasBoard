@@ -1,5 +1,6 @@
 /**
  * Enhanced Authentication Context for The DAS Board
+ * DEBUG VERSION - Added comprehensive logging for 500 error debugging
  * 
  * SECURITY IMPROVEMENTS IMPLEMENTED:
  * - Enhanced input validation and sanitization
@@ -12,19 +13,12 @@
  * - Memory leak prevention
  * - Enhanced error handling with security-aware logging
  * 
- * SUPABASE RPC INTEGRATION:
- * - Replaced direct profiles table query with get_profile_robust RPC
- * - Enhanced 500 error handling with robust fallbacks
- * - Comprehensive prod redirect handling after auth flash
- * - Cached profile data with intelligent fallback mechanisms
- * 
- * ORIGINAL FIXES MAINTAINED:
- * - Session initialization on mount and app reload
- * - onAuthStateChange listener for real-time session updates  
- * - Token expiration handling with auto-refresh
- * - Proper loading and error states
- * - Secure role-based user data fetching
- * - Enhanced TypeScript typing
+ * DEBUG ADDITIONS:
+ * - Comprehensive console logging for Supabase operations
+ * - Status code logging for 500 errors
+ * - Single Finance Manager specific debugging
+ * - Profile table query debugging
+ * - Session fetch error details
  */
 
 import React, {
@@ -569,6 +563,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
    * Security: Enhanced session validation with comprehensive security checks
    */
   const validateSession = useCallback(async (session: Session | null): Promise<boolean> => {
+    console.log('[DEBUG-SESSION] Validating session:', {
+      hasSession: !!session,
+      hasAccessToken: !!session?.access_token,
+      hasUser: !!session?.user,
+      userId: session?.user?.id,
+      userEmail: session?.user?.email,
+      userRole: session?.user?.user_metadata?.role,
+    });
+
     if (!session?.access_token || !session.user) {
       setSessionHealth(prev => ({ 
         ...prev, 
@@ -677,12 +680,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const monitorSessionHealth = useCallback(async (): Promise<void> => {
     try {
       const client = await getSecureSupabaseClient();
+      
+      console.log('[DEBUG-HEALTH] Starting session health check');
       const { data: { session }, error } = await client.auth.getSession();
       
       if (error) {
-        console.error('[Security] Health check error:', error.message);
+        console.error('[DEBUG-HEALTH] Health check error:', {
+          message: error.message,
+          status: (error as any)?.status,
+          statusCode: (error as any)?.statusCode,
+          details: error,
+        });
         return;
       }
+
+      console.log('[DEBUG-HEALTH] Session health check result:', {
+        hasSession: !!session,
+        userId: session?.user?.id,
+        userEmail: session?.user?.email,
+      });
 
       const isValid = await validateSession(session);
       
@@ -698,265 +714,170 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // =================== USER DATA FETCHING ===================
 
   /**
-   * Enhanced user data fetching with Supabase get_profile_robust RPC integration
-   * Replaces direct profiles table queries with robust RPC for 500 error prevention
+   * Security: Enhanced user data fetching with role validation
+   * DEBUG: Added comprehensive logging for profile fetches
    */
   const fetchUserData = useCallback(async (userId: string): Promise<void> => {
-    // Enhanced type validation: Ensure userId is properly typed
-    if (!userId || typeof userId !== 'string') {
-      console.error(`[UUID_ERROR] Invalid userId type or value:`, {
-        userId,
-        type: typeof userId,
-        isNull: userId === null,
-        isUndefined: userId === undefined
-      });
-      setRole('viewer'); // Safe default
-      return;
-    }
-
     try {
-      // Enhanced UUID debugging: Check for malformed UUID with :1 suffix
-      console.log(`[RPC_INTEGRATION] Fetching user data for: ${userId.substring(0, 8)}...`);
-      console.log(`[UUID_DEBUG] Full userId received:`, {
-        userId: userId,
-        type: typeof userId,
-        length: userId?.length,
-        hasColonSuffix: userId?.includes(':'),
-        actualValue: JSON.stringify(userId)
-      });
-      
-      // Enhanced UUID validation: Check for :1 suffix and other malformations
-      if (userId?.includes(':')) {
-        console.error(`[UUID_ERROR] Malformed UUID detected with colon suffix: ${userId}`);
-        // Clean the UUID by removing :1 suffix if present
-        const cleanUserId = userId.split(':')[0];
-        console.log(`[UUID_FIX] Cleaned UUID: ${cleanUserId}`);
-        userId = cleanUserId;
-      }
-      
-      // Enhanced UUID validation: Comprehensive UUID format validation
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (!uuidRegex.test(userId)) {
-        console.error(`[UUID_ERROR] Invalid UUID format detected:`, {
-          userId: userId,
-          length: userId.length,
-          expectedFormat: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
-        });
-        setRole('viewer'); // Safe default for invalid UUID
-        return;
-      }
-      
-      console.log(`[UUID_VALID] UUID format validated successfully: ${userId.substring(0, 8)}...`);
-      
+      console.log(`[DEBUG-FETCH] Starting fetchUserData for userId: ${userId.substring(0, 8)}...`);
       const client = await getSecureSupabaseClient();
       const { data: { session } } = await client.auth.getSession();
+      
+      console.log('[DEBUG-FETCH] Session data in fetchUserData:', {
+        hasSession: !!session,
+        userId: session?.user?.id,
+        email: session?.user?.email,
+        metadata: session?.user?.user_metadata,
+        metadataRole: session?.user?.user_metadata?.role,
+      });
 
-      // Enhanced 500 Error Handling: Comprehensive Supabase response logging
-      console.log('[RPC_INTEGRATION] Starting user data fetch with get_profile_robust RPC');
+      // Security: Fetch from users table first (newer schema)
+      console.log('[DEBUG-FETCH] Attempting to fetch from users table');
+      const { data: userData, error: userError } = await client
+        .from('users')
+        .select(`
+          dealership_id,
+          role_id,
+          roles (
+            name
+          )
+        `)
+        .eq('id', userId)
+        .maybeSingle();
 
-      // Enhanced 500 Error Handling: Check for immediate bypass scenarios
+      console.log('[DEBUG-FETCH] Users table query result:', {
+        hasData: !!userData,
+        hasError: !!userError,
+        error: userError,
+        errorStatus: (userError as any)?.status,
+        errorCode: (userError as any)?.code,
+        data: userData,
+      });
+
+      if (!userError && userData) {
+        // Security: Validate role with current user context
+        if (userData.roles?.name) {
+          const validatedRole = validateRole(userData.roles.name, role || undefined);
+          console.log('[DEBUG-FETCH] Setting role from users table:', validatedRole);
+          setRole(validatedRole);
+        }
+
+        // Set dealership ID
+        if (userData.dealership_id) {
+          console.log('[DEBUG-FETCH] Setting dealership ID:', userData.dealership_id);
+          setDealershipId(userData.dealership_id);
+        }
+
+        return;
+      }
+
+      // Check if this is a Single Finance Manager user (bypass profiles table)
       const userEmail = session?.user?.email || '';
       const userMetadataRole = session?.user?.user_metadata?.role;
       
-      // Enhanced 500 Error Handling: Immediate bypass for known problematic scenarios
+      console.log('[DEBUG-SFM] Checking for Single Finance Manager:', {
+        userEmail,
+        userMetadataRole,
+        isFinanceEmail: userEmail.includes('finance'),
+        isTestFinanceEmail: userEmail.includes('testfinance'),
+        isSFMRole: userMetadataRole === 'single_finance_manager',
+      });
+      
       if (userMetadataRole === 'single_finance_manager' || 
           userEmail.includes('finance') || 
           userEmail.includes('testfinance')) {
-        console.log('[RPC_INTEGRATION] Single Finance Manager detected - using metadata to prevent 500 errors');
+        console.log('[DEBUG-SFM] Single Finance Manager detected - bypassing profiles table');
         setRole('single_finance_manager');
         setDealershipId(1); // Default dealership for single finance
-        setIsGroupAdmin(false);
         return;
       }
 
-      // RPC Integration: Use get_profile_robust instead of direct table queries
-      let profileData = null;
-      let profileError = null;
+      // Fallback to profiles table (legacy schema)
+      console.log('[DEBUG-FETCH] Attempting to fetch from profiles table');
+      console.log('[DEBUG-FETCH] Query details:', {
+        table: 'profiles',
+        select: 'role, dealership_id, is_group_admin',
+        userId: userId,
+      });
       
-      try {
-        const rpcStartTime = Date.now();
-        
-        // Enhanced query parameter logging: Log exact parameters before RPC call
-        console.log(`[RPC_DEBUG] About to execute get_profile_robust RPC with parameters:`, {
-          function: 'get_profile_robust',
-          parameter: 'user_uuid',
-          value: userId,
-          value_type: typeof userId,
-          value_length: userId?.length,
-          value_json: JSON.stringify(userId)
+      const { data: profileData, error: profileError } = await client
+        .from('profiles')
+        .select('role, dealership_id, is_group_admin')
+        .eq('id', userId)
+        .maybeSingle();
+
+      // Enhanced error logging for 500 errors
+      if (profileError) {
+        console.error('[DEBUG-FETCH] Profile fetch error details:', {
+          message: profileError.message,
+          status: (profileError as any)?.status,
+          statusCode: (profileError as any)?.statusCode,
+          code: (profileError as any)?.code,
+          details: profileError,
+          hint: (profileError as any)?.hint,
+          isServerError: (profileError as any)?.status === 500,
         });
         
-        // RPC Integration: Call get_profile_robust function
-        const { data: profile, error } = await client.rpc('get_profile_robust', { 
-          user_uuid: userId 
-        });
-        
-        profileData = profile;
-        profileError = error;
-        
-        const rpcDuration = Date.now() - rpcStartTime;
-        console.log('[RPC_INTEGRATION] get_profile_robust RPC completed in:', rpcDuration + 'ms');
-        
-      } catch (rpcError: any) {
-        console.error('[RPC_INTEGRATION] get_profile_robust RPC failed with exception:', rpcError);
-        
-        // Enhanced error logging: Show exact failed URL and RPC details
-        if (rpcError?.message?.includes('500') || rpcError?.status === 500) {
-          console.error(`[RPC_500_ERROR] 500 error in get_profile_robust RPC:`, {
-            error: rpcError,
-            message: rpcError?.message,
-            status: rpcError?.status,
-            url: rpcError?.url || 'RPC endpoint',
-            userId: userId,
-            userIdType: typeof userId
+        // Log if this is a 500 error
+        if ((profileError as any)?.status === 500 || profileError.message.includes('500')) {
+          console.error('[DEBUG-500] Server error fetching profile:', {
+            userId,
+            query: 'profiles.select(role, dealership_id, is_group_admin)',
+            error: profileError,
           });
         }
         
-        profileError = rpcError;
-      }
-
-      // Enhanced 500 Error Handling: Log detailed Supabase RPC response
-      console.log('[RPC_INTEGRATION] get_profile_robust RPC response:', {
-        hasData: !!profileData,
-        hasError: !!profileError,
-        errorCode: profileError?.code || 'none',
-        errorMessage: profileError?.message || 'none',
-        dataStructure: profileData ? {
-          hasId: 'id' in profileData,
-          hasRole: 'role' in profileData,
-          hasIsGroupAdmin: 'is_group_admin' in profileData,
-          hasDealershipId: 'dealership_id' in profileData,
-          roleValue: profileData.role || 'none',
-          isGroupAdminValue: profileData.is_group_admin || false
-        } : 'no data'
-      });
-
-      // RPC Integration: Handle RPC errors with comprehensive fallbacks
-      if (profileError) {
-        console.error('Profile access error:', profileError);
-        console.warn('[RPC_INTEGRATION] get_profile_robust RPC failed, using safe defaults');
-        
-        // Enhanced 500 Error Handling: Check for 500 errors specifically in RPC response
-        if (profileError.message?.includes('500') || profileError.code === '500') {
-          console.error('[RPC_INTEGRATION] 500 error detected in get_profile_robust RPC - setting safe defaults:', profileError);
-          console.warn('[User Message] Profile data temporarily unavailable, using safe defaults.');
+        // For Single Finance Manager, set appropriate defaults
+        if (userMetadataRole === 'single_finance_manager') {
+          console.log('[DEBUG-SFM] Setting SFM defaults after profile error');
+          setRole('single_finance_manager');
+          setDealershipId(1);
+        } else {
+          setRole('viewer'); // Security: Safe default
         }
-        
-        // RPC Integration: Return safe defaults on RPC failure
-        setRole('viewer');
-        setIsGroupAdmin(false);
-        setDealershipId(null);
         return;
       }
 
-      // RPC Integration: Process successful RPC response
+      console.log('[DEBUG-FETCH] Profile data retrieved:', {
+        hasData: !!profileData,
+        role: profileData?.role,
+        dealershipId: profileData?.dealership_id,
+        isGroupAdmin: profileData?.is_group_admin,
+      });
+
       if (profileData) {
-        console.log('[RPC_INTEGRATION] Successfully retrieved profile data from get_profile_robust RPC');
-        
-        // Update state with profile data from RPC response
-        if (profileData.id) {
-          console.log('[RPC_INTEGRATION] Profile ID from RPC:', profileData.id);
-        }
-        
-        // Security: Validate and set role from RPC response
+        // Security: Validate and set role
         if (profileData.role) {
           const validatedRole = validateRole(profileData.role, role || undefined);
-          console.log('[RPC_INTEGRATION] Setting role from RPC response:', validatedRole);
+          console.log('[DEBUG-FETCH] Setting role from profiles table:', validatedRole);
           setRole(validatedRole);
         } else {
-          console.log('[RPC_INTEGRATION] No role in RPC response, setting viewer as default');
+          console.log('[DEBUG-FETCH] No role in profile, setting viewer');
           setRole('viewer'); // Security: Safe default
         }
 
-        // Set group admin status from RPC response
-        if (typeof profileData.is_group_admin === 'boolean') {
-          console.log('[RPC_INTEGRATION] Setting group admin status from RPC:', profileData.is_group_admin);
-          setIsGroupAdmin(profileData.is_group_admin);
-        } else {
-          console.log('[RPC_INTEGRATION] No group admin status in RPC response, setting false as default');
-          setIsGroupAdmin(false);
-        }
-
-        // Set dealership ID from RPC response
+        // Set dealership ID
         if (profileData.dealership_id) {
-          console.log('[RPC_INTEGRATION] Setting dealership ID from RPC:', profileData.dealership_id);
+          console.log('[DEBUG-FETCH] Setting dealership ID from profile:', profileData.dealership_id);
           setDealershipId(profileData.dealership_id);
-        } else {
-          console.log('[RPC_INTEGRATION] No dealership ID in RPC response');
-          setDealershipId(null);
         }
 
-        // Prod Redirect Handling: Handle production redirects after dashboard flash
-        // Cache successful profile data for 10 minutes to prevent flash on subsequent loads
-        try {
-          const cacheKey = `robust_profile_${userId}`;
-          const cacheData = {
-            data: profileData,
-            timestamp: Date.now(),
-            source: 'get_profile_robust'
-          };
-          localStorage.setItem(cacheKey, JSON.stringify(cacheData));
-          console.log('[RPC_INTEGRATION] Profile data cached for prod redirect optimization');
-        } catch (cacheError) {
-          console.warn('[RPC_INTEGRATION] Failed to cache profile data:', cacheError);
+        // Set group admin status
+        if (profileData.is_group_admin) {
+          console.log('[DEBUG-FETCH] Setting group admin status:', true);
+          setIsGroupAdmin(true);
         }
 
-      } else {
-        console.warn('[RPC_INTEGRATION] get_profile_robust RPC returned no data');
-        
-        // Try to use cached data as fallback for prod redirect handling
-        try {
-          const cacheKey = `robust_profile_${userId}`;
-          const cachedProfile = localStorage.getItem(cacheKey);
-          
-          if (cachedProfile) {
-            const { data: cachedData, timestamp } = JSON.parse(cachedProfile);
-            const isExpired = Date.now() - timestamp > 10 * 60 * 1000; // 10 minutes
-            
-            if (!isExpired && cachedData) {
-              console.warn('[RPC_INTEGRATION] Using cached profile data for prod redirect handling:', cachedData);
-              
-              const validatedRole = validateRole(cachedData.role || 'viewer', role || undefined);
-              setRole(validatedRole);
-              setIsGroupAdmin(cachedData.is_group_admin || false);
-              setDealershipId(cachedData.dealership_id || null);
-              return;
-            }
-          }
-        } catch (cacheError) {
-          console.warn('[RPC_INTEGRATION] Cached profile data access failed:', cacheError);
-        }
-        
-        // Final fallback to safe defaults
-        setRole('viewer');
-        setIsGroupAdmin(false);
-        setDealershipId(null);
+        // Language preference handling temporarily disabled until preferred_language column is added to database
+        // This comment forces cache invalidation
       }
-
-    } catch (error: any) {
-      // Enhanced 500 Error Handling: Comprehensive error logging and fallbacks
-      console.error('[RPC_INTEGRATION] Error in fetchUserData:', error);
-      
-      // Check if this is a 500 error
-      if (error?.message?.includes('500') || error?.code === '500') {
-        console.error('[RPC_INTEGRATION] 500 error caught in fetchUserData:', error);
-        console.warn('[User Message] User data temporarily unavailable due to database maintenance.');
-      }
-      
-      // Enhanced error context logging for RPC integration
-      console.error('[RPC_INTEGRATION] fetchUserData error context:', {
-        errorMessage: error?.message || 'unknown',
-        errorCode: error?.code || 'unknown',
-        errorName: error?.name || 'unknown',
-        userId: userId.substring(0, 8) + '...',
-        timestamp: new Date().toISOString(),
-        rpcFunction: 'get_profile_robust'
+    } catch (error) {
+      console.error('[DEBUG-FETCH] Unexpected error in fetchUserData:', {
+        error,
+        message: (error as any)?.message,
+        stack: (error as any)?.stack,
       });
-      
-      // RPC Integration: Safe defaults on any error
       setRole('viewer'); // Security: Safe default on error
-      setIsGroupAdmin(false);
-      setDealershipId(null);
     }
   }, [role]);
 
@@ -964,13 +885,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   /**
    * Security: Enhanced auth state change handler with security monitoring
+   * DEBUG: Added comprehensive session logging
    */
   const handleAuthStateChange = useCallback(
     async (session: Session | null): Promise<void> => {
       if (!mountedRef.current) return;
 
       const sessionId = getSecureSessionId(session);
-      console.log(`[Security] Auth state change for session: ${sessionId}`);
+      console.log(`[DEBUG-AUTH] Auth state change triggered:`, {
+        sessionId,
+        hasSession: !!session,
+        userId: session?.user?.id,
+        userEmail: session?.user?.email,
+        userMetadata: session?.user?.user_metadata,
+      });
 
       try {
         if (session) {
@@ -978,7 +906,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const isValidSession = await validateSession(session);
           
           if (!isValidSession) {
-            console.warn(`[Security] Invalid session detected: ${sessionId}`);
+            console.warn(`[DEBUG-AUTH] Invalid session detected: ${sessionId}`);
             setHasSession(false);
             setUser(null);
             setRole(null);
@@ -1001,29 +929,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             isLocked: false,
           };
 
+          console.log('[DEBUG-AUTH] Setting user:', {
+            id: authUser.id,
+            email: authUser.email,
+            emailVerified: authUser.emailVerified,
+            metadata: authUser.user_metadata,
+          });
+
           setUser(authUser);
 
           // Check for preferred language in user metadata
           if (session.user.user_metadata?.preferred_language) {
             localStorage.setItem('app-language', session.user.user_metadata.preferred_language);
-            console.log('[Auth] Applied language from user metadata:', session.user.user_metadata.preferred_language);
+            console.log('[DEBUG-AUTH] Applied language from user metadata:', session.user.user_metadata.preferred_language);
           }
 
-          // Enhanced UUID debugging: Log session.user.id before calling fetchUserData
-          console.log(`[UUID_DEBUG] About to call fetchUserData with session.user.id:`, {
-            sessionUserId: session.user.id,
-            type: typeof session.user.id,
-            length: session.user.id?.length,
-            hasColonSuffix: session.user.id?.includes(':'),
-            rawValue: JSON.stringify(session.user.id)
-          });
-
-          // Fetch additional user data using get_profile_robust RPC
+          // Fetch additional user data (role, dealership, etc.)
+          console.log('[DEBUG-AUTH] Fetching user data for:', session.user.id);
           await fetchUserData(session.user.id);
 
         } else {
           // Security: Clear all auth state and perform secure cleanup
-          console.log('[Security] Clearing auth state');
+          console.log('[DEBUG-AUTH] Clearing auth state - no session');
           
           setHasSession(false);
           setUser(null);
@@ -1047,10 +974,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
       } catch (error) {
-        console.error('[Security] Auth state change error:', error);
+        console.error('[DEBUG-AUTH] Auth state change error:', {
+          error,
+          message: (error as any)?.message,
+          stack: (error as any)?.stack,
+        });
         setError(error instanceof Error ? error : new Error('Auth state change failed'));
       } finally {
         if (mountedRef.current) {
+          console.log('[DEBUG-AUTH] Auth check complete, setting loading to false');
           setLoading(false);
           setAuthCheckComplete(true);
         }
@@ -1063,6 +995,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   /**
    * Security: Enhanced authentication initialization with comprehensive error handling
+   * DEBUG: Added detailed initialization logging
    */
   useEffect(() => {
     if (initRef.current) return;
@@ -1074,49 +1007,74 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const initErrorId = generateErrorId();
       
       try {
-        console.log(`[AUTH_INIT] ${initErrorId} Initializing authentication with security monitoring`);
+        console.log(`[DEBUG-INIT] ${initErrorId} Starting authentication initialization`);
 
         // Safe client initialization
         let client;
         try {
           client = await getSecureSupabaseClient();
+          console.log('[DEBUG-INIT] Supabase client obtained successfully');
         } catch (clientError) {
           const clientErrorId = generateErrorId();
-          console.error(`[STATE_MANAGEMENT] ${clientErrorId} Failed to get Supabase client:`, clientError);
+          console.error(`[DEBUG-INIT] ${clientErrorId} Failed to get Supabase client:`, clientError);
           throw new Error(`Supabase client initialization failed: ${clientError}`);
         }
 
         // Safe initial session fetch with detailed error handling
         let session = null;
         try {
+          console.log('[DEBUG-INIT] Fetching initial session');
           const sessionResult = await client.auth.getSession();
+          
+          console.log('[DEBUG-INIT] Session fetch result:', {
+            hasError: !!sessionResult.error,
+            hasData: !!sessionResult.data,
+            hasSession: !!sessionResult.data?.session,
+            error: sessionResult.error,
+            errorStatus: (sessionResult.error as any)?.status,
+          });
+          
           if (sessionResult.error) {
             const sessionErrorId = generateErrorId();
-            console.error(`[STATE_MANAGEMENT] ${sessionErrorId} Initial session fetch error:`, sessionResult.error);
+            console.error(`[DEBUG-INIT] ${sessionErrorId} Initial session fetch error:`, {
+              error: sessionResult.error,
+              status: (sessionResult.error as any)?.status,
+              message: sessionResult.error.message,
+            });
             setError(sessionResult.error);
           } else {
             session = sessionResult.data?.session || null;
-            console.log(`[AUTH_INIT] ${initErrorId} Session fetch successful, session exists:`, !!session);
+            console.log(`[DEBUG-INIT] ${initErrorId} Session fetch successful:`, {
+              hasSession: !!session,
+              userId: session?.user?.id,
+              userEmail: session?.user?.email,
+              userRole: session?.user?.user_metadata?.role,
+            });
           }
         } catch (sessionError) {
           const sessionErrorId = generateErrorId();
-          console.error(`[STATE_MANAGEMENT] ${sessionErrorId} Session fetch threw exception:`, sessionError);
+          console.error(`[DEBUG-INIT] ${sessionErrorId} Session fetch threw exception:`, {
+            error: sessionError,
+            message: (sessionError as any)?.message,
+            stack: (sessionError as any)?.stack,
+          });
           setError(new Error(`Session fetch failed: ${sessionError}`));
         }
 
         // Safe session processing
         try {
+          console.log('[DEBUG-INIT] Processing initial session');
           await handleAuthStateChange(session);
         } catch (handleError) {
           const handleErrorId = generateErrorId();
-          console.error(`[STATE_MANAGEMENT] ${handleErrorId} handleAuthStateChange failed:`, handleError);
+          console.error(`[DEBUG-INIT] ${handleErrorId} handleAuthStateChange failed:`, handleError);
           // Don't throw here, continue with initialization
         }
 
         // Safe auth state listener setup
         if (mountedRef.current) {
           try {
-            console.log(`[AUTH_INIT] ${initErrorId} Setting up secure auth state listener`);
+            console.log(`[DEBUG-INIT] ${initErrorId} Setting up auth state listener`);
             
             const { data: authListener } = client.auth.onAuthStateChange(
               async (event, newSession) => {
@@ -1124,31 +1082,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 
                 try {
                   if (!mountedRef.current) {
-                    console.log(`[AUTH_LISTENER] ${listenerErrorId} Component unmounted, ignoring event: ${event}`);
+                    console.log(`[DEBUG-LISTENER] ${listenerErrorId} Component unmounted, ignoring event: ${event}`);
                     return;
                   }
                   
-                  console.log(`[AUTH_LISTENER] ${listenerErrorId} Auth event: ${event} for session: ${getSecureSessionId(newSession)}`);
+                  console.log(`[DEBUG-LISTENER] ${listenerErrorId} Auth event:`, {
+                    event,
+                    hasSession: !!newSession,
+                    sessionId: getSecureSessionId(newSession),
+                    userId: newSession?.user?.id,
+                    userEmail: newSession?.user?.email,
+                    userRole: newSession?.user?.user_metadata?.role,
+                  });
                   
                   // Security: Handle different auth events with appropriate logging
                   switch (event) {
                     case 'SIGNED_IN':
-                      console.log(`[AUTH_LISTENER] ${listenerErrorId} User signed in successfully`);
+                      console.log(`[DEBUG-LISTENER] ${listenerErrorId} User signed in:`, {
+                        userId: newSession?.user?.id,
+                        email: newSession?.user?.email,
+                        role: newSession?.user?.user_metadata?.role,
+                      });
                       break;
                     case 'SIGNED_OUT':
-                      console.log(`[AUTH_LISTENER] ${listenerErrorId} User signed out`);
+                      console.log(`[DEBUG-LISTENER] ${listenerErrorId} User signed out`);
                       break;
                     case 'TOKEN_REFRESHED':
-                      console.log(`[AUTH_LISTENER] ${listenerErrorId} Token refreshed`);
+                      console.log(`[DEBUG-LISTENER] ${listenerErrorId} Token refreshed`);
                       break;
                     case 'USER_UPDATED':
-                      console.log(`[AUTH_LISTENER] ${listenerErrorId} User profile updated`);
+                      console.log(`[DEBUG-LISTENER] ${listenerErrorId} User profile updated`);
                       break;
                     case 'PASSWORD_RECOVERY':
-                      console.log(`[AUTH_LISTENER] ${listenerErrorId} Password recovery initiated`);
+                      console.log(`[DEBUG-LISTENER] ${listenerErrorId} Password recovery initiated`);
                       break;
                     default:
-                      console.log(`[AUTH_LISTENER] ${listenerErrorId} Unknown auth event: ${event}`);
+                      console.log(`[DEBUG-LISTENER] ${listenerErrorId} Unknown auth event: ${event}`);
                   }
 
                   // Safe auth state change processing
@@ -1156,30 +1125,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     await handleAuthStateChange(newSession);
                   } catch (changeError) {
                     const changeErrorId = generateErrorId();
-                    console.error(`[STATE_MANAGEMENT] ${changeErrorId} Auth state change handler failed:`, changeError);
+                    console.error(`[DEBUG-LISTENER] ${changeErrorId} Auth state change handler failed:`, changeError);
                     // Don't throw to prevent listener from breaking
                   }
                 } catch (listenerError) {
                   const listenerInnerErrorId = generateErrorId();
-                  console.error(`[STATE_MANAGEMENT] ${listenerInnerErrorId} Auth listener callback failed:`, listenerError);
+                  console.error(`[DEBUG-LISTENER] ${listenerInnerErrorId} Auth listener callback failed:`, listenerError);
                   // Don't throw to prevent auth system from breaking
                 }
               }
             );
 
             authListenerRef.current = { data: { subscription: authListener.subscription } };
+            console.log('[DEBUG-INIT] Auth listener setup complete');
           } catch (listenerSetupError) {
             const listenerSetupErrorId = generateErrorId();
-            console.error(`[STATE_MANAGEMENT] ${listenerSetupErrorId} Failed to setup auth listener:`, listenerSetupError);
+            console.error(`[DEBUG-INIT] ${listenerSetupErrorId} Failed to setup auth listener:`, listenerSetupError);
             // Continue without listener
           }
         }
 
-        console.log(`[AUTH_INIT] ${initErrorId} Authentication initialized successfully`);
+        console.log(`[DEBUG-INIT] ${initErrorId} Authentication initialized successfully`);
 
       } catch (error) {
         const finalErrorId = generateErrorId();
-        console.error(`[STATE_MANAGEMENT] ${finalErrorId} Auth initialization failed:`, error);
+        console.error(`[DEBUG-INIT] ${finalErrorId} Auth initialization failed:`, {
+          error,
+          message: (error as any)?.message,
+          stack: (error as any)?.stack,
+        });
         
         try {
           if (mountedRef.current) {
@@ -1189,7 +1163,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         } catch (setStateError) {
           const setStateErrorId = generateErrorId();
-          console.error(`[STATE_MANAGEMENT] ${setStateErrorId} Failed to set error state after init failure:`, setStateError);
+          console.error(`[DEBUG-INIT] ${setStateErrorId} Failed to set error state after init failure:`, setStateError);
           // Last resort: force app to recoverable state
           try {
             if (mountedRef.current) {
@@ -1198,7 +1172,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
           } catch (forceSetError) {
             const forceErrorId = generateErrorId();
-            console.error(`[STATE_MANAGEMENT] ${forceErrorId} CRITICAL: Cannot set basic state, app may be unstable:`, forceSetError);
+            console.error(`[DEBUG-INIT] ${forceErrorId} CRITICAL: Cannot set basic state, app may be unstable:`, forceSetError);
           }
         }
       }
@@ -1210,12 +1184,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       try {
         if (mountedRef.current && loading) {
-          console.warn(`[STATE_MANAGEMENT] ${timeoutErrorId} Initialization timeout - completing auth check`);
+          console.warn(`[DEBUG-INIT] ${timeoutErrorId} Initialization timeout - completing auth check`);
           setLoading(false);
           setAuthCheckComplete(true);
         }
       } catch (timeoutError) {
-        console.error(`[STATE_MANAGEMENT] ${timeoutErrorId} Failed to handle initialization timeout:`, timeoutError);
+        console.error(`[DEBUG-INIT] ${timeoutErrorId} Failed to handle initialization timeout:`, timeoutError);
         // Force basic state update
         try {
           if (mountedRef.current) {
@@ -1224,7 +1198,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         } catch (forceError) {
           const forceErrorId = generateErrorId();
-          console.error(`[STATE_MANAGEMENT] ${forceErrorId} CRITICAL: Cannot recover from timeout:`, forceError);
+          console.error(`[DEBUG-INIT] ${forceErrorId} CRITICAL: Cannot recover from timeout:`, forceError);
         }
       }
     }, 15000); // Extended from 10s to 15s
@@ -1234,7 +1208,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       initializeAuth();
     } catch (syncError) {
       const syncErrorId = generateErrorId();
-      console.error(`[STATE_MANAGEMENT] ${syncErrorId} Synchronous initialization error:`, syncError);
+      console.error(`[DEBUG-INIT] ${syncErrorId} Synchronous initialization error:`, syncError);
       // Ensure app doesn't get stuck
       if (mountedRef.current) {
         setLoading(false);
@@ -1257,10 +1231,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Clean up auth listener with error handling
         if (authListenerRef.current?.data?.subscription) {
           try {
-            console.log(`[AUTH_CLEANUP] ${cleanupErrorId} Cleaning up auth listener`);
+            console.log(`[DEBUG-CLEANUP] ${cleanupErrorId} Cleaning up auth listener`);
             authListenerRef.current.data.subscription.unsubscribe();
           } catch (unsubError) {
-            console.error(`[STATE_MANAGEMENT] ${cleanupErrorId} Failed to unsubscribe auth listener:`, unsubError);
+            console.error(`[DEBUG-CLEANUP] ${cleanupErrorId} Failed to unsubscribe auth listener:`, unsubError);
           }
           authListenerRef.current = null;
         }
@@ -1269,12 +1243,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           try {
             clearInterval(healthCheckIntervalRef.current);
           } catch (intervalError) {
-            console.error(`[STATE_MANAGEMENT] ${cleanupErrorId} Failed to clear health check interval:`, intervalError);
+            console.error(`[DEBUG-CLEANUP] ${cleanupErrorId} Failed to clear health check interval:`, intervalError);
           }
           healthCheckIntervalRef.current = null;
         }
       } catch (cleanupError) {
-        console.error(`[STATE_MANAGEMENT] ${cleanupErrorId} Cleanup failed:`, cleanupError);
+        console.error(`[DEBUG-CLEANUP] ${cleanupErrorId} Cleanup failed:`, cleanupError);
       }
     };
   }, [generateErrorId, loading]); // Include dependencies for proper cleanup
@@ -1294,7 +1268,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
-    console.log('[Security] Starting secure session health monitoring');
+    console.log('[DEBUG-MONITOR] Starting session health monitoring');
 
     // Monitor session health at regular intervals
     healthCheckIntervalRef.current = setInterval(() => {
@@ -1318,6 +1292,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   /**
    * Security: Enhanced sign in with comprehensive security measures
+   * DEBUG: Added login attempt logging
    */
   const signIn = useCallback(async (
     email: string, 
@@ -1327,6 +1302,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // Security: Sanitize inputs
       const sanitizedEmail = sanitizeInput(email).toLowerCase();
+      
+      console.log('[DEBUG-SIGNIN] Sign in attempt:', {
+        email: sanitizedEmail,
+        rememberMe,
+      });
       
       // Security: Input validation
       if (!isValidEmail(sanitizedEmail)) {
@@ -1351,7 +1331,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(true);
       setError(null);
 
-      console.log(`[Security] Sign in attempt for: ${sanitizedEmail}`);
+      console.log(`[DEBUG-SIGNIN] Attempting sign in for: ${sanitizedEmail}`);
 
       const client = await getSecureSupabaseClient();
       
@@ -1361,6 +1341,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         options: {
           persistSession: rememberMe,
         },
+      });
+
+      console.log('[DEBUG-SIGNIN] Sign in result:', {
+        hasError: !!error,
+        hasData: !!data,
+        hasUser: !!data?.user,
+        hasSession: !!data?.session,
+        errorMessage: error?.message,
+        errorStatus: (error as any)?.status,
+        userId: data?.user?.id,
+        userEmail: data?.user?.email,
+        userRole: data?.user?.user_metadata?.role,
       });
 
       if (error) {
@@ -1377,7 +1369,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Security: Reset rate limiting on successful login
       resetRateLimit(sanitizedEmail);
 
-      console.log(`[Security] Sign in successful for: ${sanitizedEmail}`);
+      console.log(`[DEBUG-SIGNIN] Sign in successful for: ${sanitizedEmail}`);
 
       toast({
         title: 'Welcome back!',
@@ -1386,7 +1378,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     } catch (error) {
       const authError = error as AuthError;
-      console.error(`[Security] Sign in failed:`, authError.message);
+      console.error(`[DEBUG-SIGNIN] Sign in failed:`, {
+        message: authError.message,
+        status: (authError as any)?.status,
+        error: authError,
+      });
       
       setError(authError);
       
@@ -1414,6 +1410,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const sanitizedFirstName = sanitizeInput(userData.firstName);
       const sanitizedLastName = sanitizeInput(userData.lastName);
       
+      console.log('[DEBUG-SIGNUP] Sign up attempt:', {
+        email: sanitizedEmail,
+        firstName: sanitizedFirstName,
+        lastName: sanitizedLastName,
+        role: userData.role,
+      });
+      
       // Security: Input validation
       if (!isValidEmail(sanitizedEmail)) {
         throw new Error('Please enter a valid email address');
@@ -1439,7 +1442,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(true);
       setError(null);
 
-      console.log(`[Security] Sign up attempt for: ${sanitizedEmail}`);
+      console.log(`[DEBUG-SIGNUP] Creating account for: ${sanitizedEmail} with role: ${validatedRole}`);
 
       const client = await getSecureSupabaseClient();
 
@@ -1457,6 +1460,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
       });
 
+      console.log('[DEBUG-SIGNUP] Sign up result:', {
+        hasError: !!error,
+        hasData: !!data,
+        hasUser: !!data?.user,
+        errorMessage: error?.message,
+        userId: data?.user?.id,
+      });
+
       if (error) {
         throw error;
       }
@@ -1464,6 +1475,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.user) {
         // Security: Create profile with validated data
         try {
+          console.log('[DEBUG-SIGNUP] Creating profile for user:', data.user.id);
           await client.from('profiles').upsert({
             id: data.user.id,
             email: sanitizedEmail,
@@ -1473,12 +1485,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             created_at: new Date().toISOString(),
           });
         } catch (profileError) {
-          console.warn('[Security] Profile creation failed:', profileError);
+          console.warn('[DEBUG-SIGNUP] Profile creation failed:', profileError);
           // Security: In production, consider rolling back user creation
         }
       }
 
-      console.log(`[Security] Sign up successful for: ${sanitizedEmail}`);
+      console.log(`[DEBUG-SIGNUP] Sign up successful for: ${sanitizedEmail}`);
 
       toast({
         title: 'Account Created',
@@ -1487,7 +1499,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     } catch (error) {
       const authError = error as AuthError;
-      console.error('[Security] Sign up failed:', authError.message);
+      console.error('[DEBUG-SIGNUP] Sign up failed:', {
+        message: authError.message,
+        error: authError,
+      });
       
       setError(authError);
       
@@ -1508,14 +1523,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setLoading(true);
       
-      console.log('[Security] Initiating secure sign out');
+      console.log('[DEBUG-SIGNOUT] Initiating sign out');
 
       const client = await getSecureSupabaseClient();
       
       const { error } = await client.auth.signOut();
       
       if (error) {
-        console.error('[Security] Sign out error:', error);
+        console.error('[DEBUG-SIGNOUT] Sign out error:', error);
         // Don't throw - still clear local state
       }
 
@@ -1541,7 +1556,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Security: Perform secure token cleanup
       secureTokenCleanup();
 
-      console.log('[Security] Sign out completed successfully');
+      console.log('[DEBUG-SIGNOUT] Sign out completed successfully');
 
       toast({
         title: 'Signed Out',
@@ -1549,7 +1564,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
     } catch (error) {
-      console.error('[Security] Sign out failed:', error);
+      console.error('[DEBUG-SIGNOUT] Sign out failed:', error);
       // Security: Still clear state even if sign out fails
     } finally {
       setLoading(false);
@@ -1563,7 +1578,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
    */
   useEffect(() => {
     return () => {
-      console.log('[Security] Cleaning up AuthProvider with secure cleanup');
+      console.log('[DEBUG-CLEANUP] Cleaning up AuthProvider');
       mountedRef.current = false;
 
       // Clear health monitoring

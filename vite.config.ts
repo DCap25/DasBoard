@@ -44,17 +44,26 @@ const ENV_VALIDATION_PATTERNS = {
   VITE_MARKETING_URL: /^https?:\/\/[a-zA-Z0-9.-]+(?::[0-9]+)?(?:\/.*)?$/,
 } as const;
 
-// Security: Enhanced environment variable validation with comprehensive checks
+// Security: Enhanced environment variable validation with comprehensive checks and 500 error prevention
 function validateEnvironmentVariables(env: Record<string, string>, mode: string): void {
   const requiredVars = ['VITE_SUPABASE_URL', 'VITE_SUPABASE_ANON_KEY'];
   const missingVars = requiredVars.filter(varName => !env[varName]);
   
+  console.log(`🔧 [Vite Config] Validating environment variables for ${mode} mode...`);
+  
   if (missingVars.length > 0) {
     console.error('❌ Missing required environment variables:', missingVars);
+    console.error('🚨 [500 Prevention] Missing environment variables will cause 500 errors during authentication');
+    console.error('💡 [500 Prevention] Add missing variables to your deployment platform:');
+    missingVars.forEach(varName => {
+      console.error(`   ${varName}=your_${varName.toLowerCase().replace('vite_', '').replace('_', '_')}_here`);
+    });
+    
     if (mode === 'production') {
-      throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
+      throw new Error(`🚨 Missing required environment variables: ${missingVars.join(', ')}. This will cause 500 errors in production.`);
     } else {
       console.warn('⚠️  Development mode: some features may not work without all environment variables');
+      console.warn('⚠️  [500 Prevention] Restart dev server after adding environment variables: npm run dev');
     }
   }
 
@@ -63,30 +72,90 @@ function validateEnvironmentVariables(env: Record<string, string>, mode: string)
     if (env[varName] && !pattern.test(env[varName])) {
       const message = `❌ Invalid format for ${varName}. Expected pattern: ${pattern.source}`;
       console.error(message);
+      console.error(`🚨 [500 Prevention] Invalid ${varName} format will cause authentication 500 errors`);
+      
+      // Provide helpful format examples
+      if (varName === 'VITE_SUPABASE_URL') {
+        console.error('💡 Expected format: https://your-project.supabase.co');
+      } else if (varName === 'VITE_SUPABASE_ANON_KEY') {
+        console.error('💡 Expected format: JWT starting with "eyJ" (get from Supabase Dashboard > Settings > API)');
+      }
+      
       if (mode === 'production') {
         throw new Error(message);
       }
     }
   });
 
-  // Security: Ensure production URLs use HTTPS with additional validation
+  // Enhanced: Production environment validation with detailed 500 error prevention
   if (mode === 'production') {
+    console.log('🏭 [Production] Running production-specific validations...');
+    
     const httpsVars = ['VITE_API_URL', 'VITE_APP_URL', 'VITE_MARKETING_URL', 'VITE_SUPABASE_URL'];
     httpsVars.forEach(varName => {
       if (env[varName]) {
         if (!env[varName].startsWith('https://')) {
           console.error(`❌ ${varName} must use HTTPS in production`);
+          console.error(`🚨 [500 Prevention] HTTP URLs in production cause security and connection issues`);
           throw new Error(`${varName} must use HTTPS in production`);
         }
         
-        // Security: Additional checks for suspicious patterns
+        // Security: Additional checks for suspicious patterns that cause 500 errors
         if (env[varName].includes('localhost') || env[varName].includes('127.0.0.1')) {
           console.error(`❌ ${varName} cannot use localhost URLs in production`);
+          console.error(`🚨 [500 Prevention] Localhost URLs will cause connection failures in production`);
+          console.error(`💡 [500 Prevention] Update deployment environment variables with production URLs`);
           throw new Error(`${varName} cannot use localhost URLs in production`);
+        }
+        
+        // Check for development/staging URLs in production
+        if (varName === 'VITE_SUPABASE_URL') {
+          if (env[varName].includes('dev-') || env[varName].includes('staging-') || env[varName].includes('test-')) {
+            console.warn(`⚠️  ${varName} appears to be a development/staging URL in production`);
+            console.warn(`⚠️  [500 Prevention] This may cause data inconsistencies`);
+          }
         }
       }
     });
+    
+    // Check for development-specific settings in production
+    if (env.VITE_DEBUG_MODE === 'true') {
+      console.warn('⚠️  Debug mode is enabled in production - consider setting VITE_DEBUG_MODE=false');
+    }
+    
+    if (env.VITE_SKIP_EMAIL_VERIFICATION === 'true') {
+      console.error('❌ Email verification is disabled in production - security risk!');
+      console.error('🚨 [Security] Set VITE_SKIP_EMAIL_VERIFICATION=false for production');
+      throw new Error('Email verification must be enabled in production');
+    }
+    
+    // Validate environment identifier
+    if (env.VITE_ENVIRONMENT && env.VITE_ENVIRONMENT !== 'production') {
+      console.warn(`⚠️  VITE_ENVIRONMENT is set to "${env.VITE_ENVIRONMENT}" but building for production`);
+      console.warn('💡 Consider setting VITE_ENVIRONMENT=production for consistency');
+    }
   }
+  
+  // Enhanced: Development mode helpful warnings
+  if (mode === 'development') {
+    console.log('🛠️  [Development] Running development-specific checks...');
+    
+    // Warn if using production URLs in development
+    if (env.VITE_SUPABASE_URL && env.VITE_SUPABASE_URL.includes('.supabase.co') && 
+        !env.VITE_SUPABASE_URL.includes('localhost')) {
+      console.warn('⚠️  Development using production Supabase URL');
+      console.warn('💡 Consider using a separate Supabase project for development');
+    }
+    
+    // Check for missing optional development variables
+    const devVars = ['VITE_API_URL', 'VITE_DEBUG_MODE'];
+    const missingDevVars = devVars.filter(varName => !env[varName]);
+    if (missingDevVars.length > 0) {
+      console.info('💡 Optional development variables not set:', missingDevVars.join(', '));
+    }
+  }
+  
+  console.log(`✅ [Vite Config] Environment validation completed for ${mode} mode`);
 }
 
 // Security: Enhanced input sanitization with comprehensive XSS prevention
@@ -351,11 +420,31 @@ export default defineConfig(({ mode }) => {
   const isDevelopment = mode === 'development';
   const isTest = mode === 'test';
   
-  // Security: Log configuration securely (no sensitive data)
+  // Security: Log configuration securely (no sensitive data) with 500 error prevention info
   console.log(`🔧 Building for ${mode} mode`);
   console.log(`🔒 HTTPS enabled: ${!!httpsConfig}`);
   console.log(`📦 Base path: ${base}`);
   console.log(`🛡️  Security headers enabled: ${true}`);
+  
+  // Enhanced: Log environment status for 500 error troubleshooting
+  console.log(`🌍 Environment variables loaded:`);
+  console.log(`   VITE_SUPABASE_URL: ${env.VITE_SUPABASE_URL ? '✅ SET' : '❌ MISSING'}`);
+  console.log(`   VITE_SUPABASE_ANON_KEY: ${env.VITE_SUPABASE_ANON_KEY ? '✅ SET' : '❌ MISSING'}`);
+  console.log(`   VITE_ENVIRONMENT: ${env.VITE_ENVIRONMENT || 'not set'}`);
+  
+  // Check for common 500 error causes
+  if (!env.VITE_SUPABASE_URL || !env.VITE_SUPABASE_ANON_KEY) {
+    console.error('🚨 [500 Prevention] Missing Supabase configuration will cause authentication 500 errors');
+    console.error('💡 [500 Prevention] Add environment variables and restart build process');
+  }
+  
+  // Log deployment-specific information
+  if (isProduction) {
+    console.log('🏭 [Production Build] Additional security measures active');
+    console.log('🏭 [Production Build] Source maps: disabled');
+    console.log('🏭 [Production Build] Console logs: removed');
+    console.log('🏭 [Production Build] Minification: enabled');
+  }
 
   return {
     plugins: [
@@ -593,13 +682,21 @@ export default defineConfig(({ mode }) => {
       }
     },
     
-    // Security: Define client-side environment variables securely
+    // Security: Define client-side environment variables securely with 500 error prevention
     define: {
       ...createSecureEnvDefines(env),
       // Security: Define build-time constants
       __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
       __VERSION__: JSON.stringify(process.env.npm_package_version || '1.0.0'),
-      __MODE__: JSON.stringify(mode)
+      __MODE__: JSON.stringify(mode),
+      // Enhanced: Add build-time environment validation flags for runtime 500 error prevention
+      __ENV_VALIDATION__: JSON.stringify({
+        hasSupabaseUrl: !!env.VITE_SUPABASE_URL,
+        hasSupabaseKey: !!env.VITE_SUPABASE_ANON_KEY,
+        environment: env.VITE_ENVIRONMENT || mode,
+        buildMode: mode,
+        timestamp: new Date().toISOString()
+      })
     },
     
     // Security: Enhanced esbuild configuration

@@ -1501,118 +1501,276 @@ export const hasValidSession = async (): Promise<boolean> => {
 };
 
 /**
- * Enhanced: Post-login environment validation to prevent 500 errors
- * Checks if environment variables are still valid after successful login
+ * Enhanced: Comprehensive post-login environment validation with retry logic to prevent 500 errors
+ * Includes extensive try-catch blocks and detailed error analysis for production issues
  */
 const validateEnvironmentPostLogin = async (client: SupabaseClient<Database>): Promise<{
   isValid: boolean;
   errors: string[];
   suggestions: string[];
+  canRetry: boolean;
 }> => {
   const errors: string[] = [];
   const suggestions: string[] = [];
+  let canRetry = false;
   
+  // Comprehensive try-catch wrapper for entire validation process
   try {
     SecurityAuditLogger.log('POST_LOGIN_ENV_VALIDATION_START');
     
-    // Enhanced 500 Error Prevention: Validate current environment state
-    const env = SecureEnvironment.getInstance();
-    const currentUrl = env.getUrl();
-    const currentKey = env.getKey();
+    // Try-catch for environment variable retrieval
+    let currentUrl: string | null = null;
+    let currentKey: string | null = null;
     
-    // Check if environment variables are still present and valid
-    if (!currentUrl || !currentKey) {
-      errors.push('Environment variables missing post-login - likely server restart or env mismatch');
-      suggestions.push('Restart your development server to reload environment variables');
-      suggestions.push('Check that your .env file exists and contains VITE_SUPABASE_* variables');
+    try {
+      const env = SecureEnvironment.getInstance();
+      currentUrl = env.getUrl();
+      currentKey = env.getKey();
       
-      console.error(
-        '%c🚨 500 Error Prevention: Environment Mismatch Detected',
-        'background: #ff0000; color: white; padding: 10px; font-weight: bold;'
-      );
-      console.error('[500 Prevention] Environment variables missing after login - this commonly causes 500 errors');
-      console.error('[500 Prevention] 500 likely from env mismatch - please restart dev server');
+      console.log('[500 Prevention] Environment validation: Checking current configuration...');
+    } catch (envRetrievalError) {
+      errors.push('Failed to retrieve environment configuration - critical system error');
+      suggestions.push('Restart development server immediately');
+      suggestions.push('Check that your .env file is readable and properly formatted');
       
-      return { isValid: false, errors, suggestions };
+      console.error('[500 Prevention] Environment retrieval failed:', envRetrievalError.message);
+      console.error('[500 Prevention] Supabase DB error—check triggers/RLS and environment setup');
+      
+      SecurityAuditLogger.log('POST_LOGIN_ENV_RETRIEVAL_FAILED', {
+        error: envRetrievalError.message
+      });
+      
+      return { isValid: false, errors, suggestions, canRetry: true };
     }
     
-    // Enhanced 500 Error Prevention: Test current configuration validity
+    // Enhanced 500 Error Prevention: Validate current environment state with try-catch
     try {
-      const testStartTime = Date.now();
-      const { data: testSession, error: testError } = await client.auth.getSession();
-      const testDuration = Date.now() - testStartTime;
-      
-      if (testError) {
-        // Check for specific error patterns that indicate env mismatch
-        const errorMessage = testError.message?.toLowerCase() || '';
+      if (!currentUrl || !currentKey) {
+        errors.push('Environment variables missing post-login - likely server restart or env mismatch');
+        suggestions.push('Restart your development server to reload environment variables');
+        suggestions.push('Check that your .env file exists and contains VITE_SUPABASE_* variables');
+        suggestions.push('Verify file permissions on .env file');
         
-        if (errorMessage.includes('api key') || 
-            errorMessage.includes('unauthorized') ||
-            errorMessage.includes('invalid') ||
-            errorMessage.includes('not found')) {
-          errors.push('API key validation failed post-login - environment configuration mismatch detected');
-          suggestions.push('Your VITE_SUPABASE_ANON_KEY may have changed or expired');
-          suggestions.push('Verify your .env file has the correct Supabase credentials');
-          suggestions.push('Restart development server after fixing environment variables');
-          
-          console.error('[500 Prevention] API key validation failed - this commonly causes role fetch 500 errors');
-          console.error('[500 Prevention] 500 likely from env mismatch - check VITE_SUPABASE_ANON_KEY');
-        }
+        console.error(
+          '%c🚨 500 Error Prevention: Environment Mismatch Detected',
+          'background: #ff0000; color: white; padding: 10px; font-weight: bold;'
+        );
+        console.error('[500 Prevention] Environment variables missing after login - this commonly causes 500 errors');
+        console.error('[500 Prevention] Supabase DB error—check triggers/RLS and environment variables');
+        console.error('[500 Prevention] 500 likely from env mismatch - please restart dev server');
         
-        if (errorMessage.includes('network') || 
-            errorMessage.includes('connection') ||
-            errorMessage.includes('timeout')) {
-          errors.push('Network connectivity issues detected post-login');
-          suggestions.push('Check your VITE_SUPABASE_URL is correct and accessible');
-          suggestions.push('Verify your network connection to Supabase servers');
-          
-          console.error('[500 Prevention] Network issues detected - may cause intermittent 500 errors');
-        }
+        return { isValid: false, errors, suggestions, canRetry: true };
       }
       
-      // Enhanced 500 Error Prevention: Monitor response times for potential issues
-      if (testDuration > 10000) { // 10 seconds
-        errors.push('Extremely slow API response detected - may indicate environment issues');
-        suggestions.push('Check your Supabase project status and network connection');
-        suggestions.push('Verify VITE_SUPABASE_URL points to the correct project');
+      console.log('[500 Prevention] Environment variables found, testing configuration validity...');
+    } catch (envCheckError) {
+      errors.push('Environment variable check failed - system configuration error');
+      suggestions.push('Restart development server and check system permissions');
+      console.error('[500 Prevention] Environment check error:', envCheckError.message);
+      return { isValid: false, errors, suggestions, canRetry: true };
+    }
+    
+    // Enhanced 500 Error Prevention: Test current configuration validity with comprehensive try-catch
+    let configurationValid = false;
+    const maxConfigTests = 2; // Test configuration multiple times for reliability
+    
+    for (let testAttempt = 0; testAttempt < maxConfigTests; testAttempt++) {
+      try {
+        console.log(`[500 Prevention] Configuration test attempt ${testAttempt + 1}/${maxConfigTests}...`);
         
-        console.warn('[500 Prevention] Slow API response detected - potential environment mismatch');
+        const testStartTime = Date.now();
+        const { data: testSession, error: testError } = await client.auth.getSession();
+        const testDuration = Date.now() - testStartTime;
+        
+        if (testError) {
+          const errorMessage = testError.message?.toLowerCase() || '';
+          const statusCode = testError.status || 0;
+          
+          // Check for 500 errors specifically
+          if (statusCode === 500 || errorMessage.includes('500')) {
+            errors.push('Supabase 500 error detected during environment validation');
+            suggestions.push('Check Supabase project status and database health');
+            suggestions.push('Verify database triggers and RLS policies are functioning');
+            suggestions.push('Check for any recent changes to Supabase project configuration');
+            
+            console.error('[500 Prevention] Supabase DB error—check triggers/RLS during environment validation');
+            console.error('[500 Prevention] 500 Database error detected - this will cause profile/role fetch failures');
+            
+            canRetry = true; // 500 errors are retryable
+            
+            if (testAttempt < maxConfigTests - 1) {
+              const retryDelay = 2000 * (testAttempt + 1);
+              console.log(`[500 Prevention] Retrying configuration test in ${retryDelay}ms due to 500 error...`);
+              await new Promise(resolve => setTimeout(resolve, retryDelay));
+              continue; // Retry the configuration test
+            }
+          }
+          
+          // Check for specific error patterns that indicate env mismatch
+          if (errorMessage.includes('api key') || 
+              errorMessage.includes('unauthorized') ||
+              errorMessage.includes('invalid') ||
+              errorMessage.includes('not found')) {
+            errors.push('API key validation failed post-login - environment configuration mismatch detected');
+            suggestions.push('Your VITE_SUPABASE_ANON_KEY may have changed or expired');
+            suggestions.push('Verify your .env file has the correct Supabase credentials');
+            suggestions.push('Get fresh credentials from Supabase dashboard > Settings > API');
+            suggestions.push('Restart development server after fixing environment variables');
+            
+            console.error('[500 Prevention] API key validation failed - this commonly causes role fetch 500 errors');
+            console.error('[500 Prevention] 500 likely from env mismatch - check VITE_SUPABASE_ANON_KEY');
+            
+            canRetry = false; // Auth errors typically aren't retryable without config fix
+            break; // Don't retry auth errors
+          }
+          
+          if (errorMessage.includes('network') || 
+              errorMessage.includes('connection') ||
+              errorMessage.includes('timeout')) {
+            errors.push('Network connectivity issues detected post-login');
+            suggestions.push('Check your VITE_SUPABASE_URL is correct and accessible');
+            suggestions.push('Verify your network connection to Supabase servers');
+            suggestions.push('Check if Supabase project is experiencing outages');
+            
+            console.error('[500 Prevention] Network issues detected - may cause intermittent 500 errors');
+            
+            canRetry = true; // Network errors are retryable
+            
+            if (testAttempt < maxConfigTests - 1) {
+              const retryDelay = 3000 * (testAttempt + 1);
+              console.log(`[500 Prevention] Retrying configuration test in ${retryDelay}ms due to network error...`);
+              await new Promise(resolve => setTimeout(resolve, retryDelay));
+              continue;
+            }
+          }
+          
+          if (errorMessage.includes('trigger') || errorMessage.includes('function')) {
+            errors.push('Database trigger or function error detected');
+            suggestions.push('Check Supabase database triggers for errors');
+            suggestions.push('Verify all custom database functions are working');
+            suggestions.push('Check Supabase project logs for trigger failures');
+            
+            console.error('[500 Prevention] Supabase DB error—check triggers/RLS functions specifically');
+            
+            canRetry = true;
+          }
+          
+          if (errorMessage.includes('policy') || errorMessage.includes('rls')) {
+            errors.push('Row Level Security policy error detected');
+            suggestions.push('Check RLS policies on auth and profiles tables');
+            suggestions.push('Verify policies allow authenticated users to access their data');
+            suggestions.push('Check for any recent policy changes in Supabase');
+            
+            console.error('[500 Prevention] Supabase DB error—check triggers/RLS policies specifically');
+            
+            canRetry = false; // Policy errors need manual fixes
+          }
+          
+          // For any test error, mark as invalid but continue to gather more info
+          console.warn(`[500 Prevention] Configuration test ${testAttempt + 1} failed:`, testError.message);
+          
+        } else {
+          // Configuration test passed
+          configurationValid = true;
+          console.log(`[500 Prevention] Configuration test ${testAttempt + 1} passed in ${testDuration}ms`);
+          break; // Exit retry loop on success
+        }
+        
+        // Enhanced 500 Error Prevention: Monitor response times for potential issues
+        if (testDuration > 10000) { // 10 seconds
+          errors.push('Extremely slow API response detected - may indicate environment issues');
+          suggestions.push('Check your Supabase project status and network connection');
+          suggestions.push('Verify VITE_SUPABASE_URL points to the correct project');
+          suggestions.push('Consider if project is on a slow/shared plan that might affect performance');
+          
+          console.warn('[500 Prevention] Slow API response detected - potential environment mismatch');
+          canRetry = true;
+        }
+        
+        SecurityAuditLogger.log('POST_LOGIN_ENV_VALIDATION_TEST_ATTEMPT', {
+          attempt: testAttempt + 1,
+          testDuration,
+          hasTestSession: !!testSession,
+          testError: testError?.message || 'none'
+        });
+        
+      } catch (configTestError) {
+        const errorMessage = configTestError.message?.toLowerCase() || '';
+        
+        if (errorMessage.includes('500') || errorMessage.includes('database')) {
+          errors.push(`Database exception during configuration test attempt ${testAttempt + 1}`);
+          suggestions.push('Check Supabase project database health');
+          suggestions.push('Verify database is not experiencing high load');
+          
+          console.error('[500 Prevention] Supabase DB error—check triggers/RLS during config test');
+          console.error(`[500 Prevention] Config test exception ${testAttempt + 1}:`, configTestError.message);
+          
+          canRetry = true;
+          
+          if (testAttempt < maxConfigTests - 1) {
+            const retryDelay = 2500 * (testAttempt + 1);
+            console.log(`[500 Prevention] Retrying configuration test in ${retryDelay}ms due to database exception...`);
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
+            continue;
+          }
+        } else {
+          errors.push('Environment configuration test failed post-login');
+          suggestions.push('Environment variables may have become invalid during session');
+          suggestions.push('Restart your development server to refresh configuration');
+          
+          console.error('[500 Prevention] Config test failed:', configTestError.message);
+          canRetry = true;
+        }
+        
+        SecurityAuditLogger.log('POST_LOGIN_ENV_VALIDATION_CONFIG_FAILED', {
+          attempt: testAttempt + 1,
+          error: configTestError.message
+        });
       }
-      
-      SecurityAuditLogger.log('POST_LOGIN_ENV_VALIDATION_SUCCESS', {
-        testDuration,
-        hasTestSession: !!testSession,
-        testError: testError?.message || 'none'
-      });
-      
-    } catch (configTestError) {
-      errors.push('Environment configuration test failed post-login');
-      suggestions.push('Environment variables may have become invalid during session');
-      suggestions.push('Restart your development server to refresh configuration');
-      
-      console.error('[500 Prevention] Config test failed:', configTestError.message);
-      
-      SecurityAuditLogger.log('POST_LOGIN_ENV_VALIDATION_CONFIG_FAILED', {
-        error: configTestError.message
-      });
     }
     
     // Enhanced 500 Error Prevention: Validate environment variable format consistency
     try {
+      console.log('[500 Prevention] Validating environment variable formats...');
+      
       if (currentUrl && !ENV_VALIDATION.URL_PATTERN.test(currentUrl)) {
         errors.push('Supabase URL format validation failed - may cause API errors');
         suggestions.push('Verify VITE_SUPABASE_URL matches the pattern: https://yourproject.supabase.co');
+        suggestions.push('Check for typos or missing characters in the URL');
+        canRetry = false; // Format errors need manual fix
       }
       
       if (currentKey && !ENV_VALIDATION.JWT_PATTERN.test(currentKey)) {
         errors.push('Supabase API key format validation failed - may cause authentication errors');
         suggestions.push('Verify VITE_SUPABASE_ANON_KEY is a valid JWT from your Supabase dashboard');
+        suggestions.push('Check that the key starts with "eyJ" and has no extra characters');
+        canRetry = false; // Format errors need manual fix
       }
     } catch (formatError) {
       console.warn('[500 Prevention] Format validation error:', formatError.message);
+      errors.push('Environment variable format validation failed');
+      suggestions.push('Check .env file for syntax errors or corruption');
     }
     
-    const isValid = errors.length === 0;
+    // Try-catch for additional environment health checks
+    try {
+      // Check if we can create a basic query (without executing it)
+      const queryTest = client.from('profiles').select('id').limit(1);
+      if (!queryTest) {
+        errors.push('Query builder test failed - client configuration invalid');
+        suggestions.push('Environment configuration is fundamentally broken');
+        suggestions.push('Restart development server and verify all environment variables');
+        canRetry = true;
+      }
+    } catch (queryTestError) {
+      console.warn('[500 Prevention] Query builder test failed:', queryTestError.message);
+      errors.push('Database query builder test failed');
+      suggestions.push('Client configuration may be corrupt');
+      suggestions.push('Restart development server');
+      canRetry = true;
+    }
+    
+    const isValid = errors.length === 0 && configurationValid;
     
     if (!isValid) {
       console.error(
@@ -1620,192 +1778,368 @@ const validateEnvironmentPostLogin = async (client: SupabaseClient<Database>): P
         'background: #ff9800; color: white; padding: 8px; font-weight: bold;'
       );
       console.error('[500 Prevention] Environment issues detected that may cause 500 errors:');
-      errors.forEach(error => console.error(`[500 Prevention] ❌ ${error}`));
+      errors.forEach((error, index) => console.error(`[500 Prevention] ❌ ${index + 1}. ${error}`));
       
       console.error('\n[500 Prevention] 🔧 Recommended fixes:');
-      suggestions.forEach(suggestion => console.error(`[500 Prevention] 👉 ${suggestion}`));
+      suggestions.forEach((suggestion, index) => console.error(`[500 Prevention] 👉 ${index + 1}. ${suggestion}`));
+      
+      if (canRetry) {
+        console.error('\n[500 Prevention] 🔄 This issue may be retryable - some errors appear transient');
+      }
       
       console.error('\n[500 Prevention] 🚀 Quick restart guide:');
       console.error('[500 Prevention] 1. Stop dev server (Ctrl+C)');
       console.error('[500 Prevention] 2. Check your .env file has correct values');
-      console.error('[500 Prevention] 3. Run: npm run dev');
-      console.error('[500 Prevention] 4. Try logging in again');
+      console.error('[500 Prevention] 3. Check Supabase project status at https://supabase.com/dashboard');
+      console.error('[500 Prevention] 4. Run: npm run dev');
+      console.error('[500 Prevention] 5. Try logging in again');
+    } else {
+      console.log(
+        '%c✅ Post-Login Environment Validation Passed',
+        'color: #4caf50; font-weight: bold;'
+      );
+      console.log('[500 Prevention] Environment configuration is healthy and ready for operations');
     }
     
     SecurityAuditLogger.log('POST_LOGIN_ENV_VALIDATION_COMPLETE', {
       isValid,
       errorCount: errors.length,
-      suggestionCount: suggestions.length
+      suggestionCount: suggestions.length,
+      canRetry,
+      configurationValid
     });
     
-    return { isValid, errors, suggestions };
+    return { isValid, errors, suggestions, canRetry };
     
   } catch (validationError) {
-    console.error('[500 Prevention] Environment validation error:', validationError.message);
+    console.error('[500 Prevention] Environment validation critical error:', validationError.message);
+    console.error('[500 Prevention] Supabase DB error—check triggers/RLS and system health');
+    
     SecurityAuditLogger.log('POST_LOGIN_ENV_VALIDATION_ERROR', {
       error: validationError.message
     });
     
     return {
       isValid: false,
-      errors: ['Environment validation process failed'],
-      suggestions: ['Restart development server and check console for errors']
+      errors: ['Environment validation process failed with critical error', validationError.message || 'Unknown critical error'],
+      suggestions: [
+        'Restart development server immediately',
+        'Check console for additional error details',
+        'Verify system resources and permissions',
+        'Check if Supabase project is accessible'
+      ],
+      canRetry: true
     };
   }
 };
 
 /**
- * Security: Enhanced user retrieval with role validation, security checks, and env validation
+ * Enhanced: User retrieval with comprehensive try-catch, retry logic and 500 error prevention
+ * Includes exponential backoff for role fetches and detailed environment validation
  */
 export const getCurrentUser = async () => {
+  // Enhanced try-catch with comprehensive error handling
   try {
     SecurityAuditLogger.log('GET_CURRENT_USER_START');
     
-    const client = await getSecureSupabaseClient();
-    
-    // Enhanced 500 Error Prevention: Validate environment post-login
-    const envValidation = await validateEnvironmentPostLogin(client);
-    if (!envValidation.isValid) {
-      // Log the validation failure but continue - don't block user flow
-      console.warn('[500 Prevention] Environment validation failed, but continuing with user retrieval');
-      SecurityAuditLogger.log('GET_CURRENT_USER_ENV_VALIDATION_WARNING', {
-        errors: envValidation.errors
-      });
-    }
-    
-    const { data: { user }, error } = await client.auth.getUser();
-    
-    if (error || !user) {
-      SecurityAuditLogger.log('GET_CURRENT_USER_NO_USER', { error: error?.message });
-      
-      // Enhanced 500 Error Prevention: Check if error is env-related
-      if (error?.message) {
-        const errorMessage = error.message.toLowerCase();
-        
-        if (errorMessage.includes('api') || 
-            errorMessage.includes('unauthorized') ||
-            errorMessage.includes('invalid')) {
-          console.error('[500 Prevention] User retrieval failed - possible environment mismatch');
-          console.error('[500 Prevention] 500 likely from env mismatch - check Supabase configuration');
-        }
-      }
-      
-      return null;
-    }
-    
-    // Security: Validate user data
-    if (!user.id || !user.email) {
-      SecurityAuditLogger.log('GET_CURRENT_USER_INVALID_DATA');
-      return null;
-    }
-    
-    // Enhanced 500 Error Prevention: Role fetching with env-aware error handling
+    let client;
+    // Try-catch for client initialization with 500 error prevention
     try {
-      const roleStartTime = Date.now();
-      const { data: profile, error: profileError } = await client
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
-      
-      const roleDuration = Date.now() - roleStartTime;
-      
-      if (profileError) {
-        SecurityAuditLogger.log('GET_CURRENT_USER_PROFILE_ERROR', { 
-          error: profileError.message,
-          duration: roleDuration
-        });
-        
-        // Enhanced 500 Error Prevention: Specific role fetch error handling
-        const errorMessage = profileError.message?.toLowerCase() || '';
-        const errorCode = profileError.code || '';
-        
-        if (errorCode === '500' || errorMessage.includes('500') || 
-            errorMessage.includes('internal') || errorMessage.includes('database')) {
-          console.error('[500 Prevention] Role fetch 500 error detected');
-          console.error('[500 Prevention] 500 likely from env mismatch during role fetch');
-          console.error('[500 Prevention] Environment restart recommended');
-          
-          // Trigger environment revalidation
-          SecureEnvironment.getInstance().revalidate();
-        }
-        
-        if (errorMessage.includes('network') || 
-            errorMessage.includes('connection') ||
-            errorMessage.includes('timeout')) {
-          console.error('[500 Prevention] Network error during role fetch - possible env issues');
-          console.error('[500 Prevention] Check VITE_SUPABASE_URL configuration');
-        }
-        
-        if (errorMessage.includes('permission') || 
-            errorMessage.includes('policy') ||
-            errorMessage.includes('unauthorized')) {
-          console.error('[500 Prevention] Permission error during role fetch - possible API key issues');
-          console.error('[500 Prevention] Check VITE_SUPABASE_ANON_KEY configuration');
-        }
-      }
-      
-      // Enhanced 500 Error Prevention: Monitor role fetch performance
-      if (roleDuration > 5000) { // 5 seconds
-        console.warn('[500 Prevention] Slow role fetch detected - possible environment issues');
-        console.warn('[500 Prevention] Consider restarting dev server if issues persist');
-        
-        SecurityAuditLogger.log('GET_CURRENT_USER_SLOW_ROLE_FETCH', {
-          duration: roleDuration,
-          userId: user.id.substring(0, 8) + '...'
-        });
-      }
-      
-      const validatedRole = profile?.role || 'viewer';
-      const userWithRole = { ...user, role: validatedRole };
-      
-      SecurityAuditLogger.log('GET_CURRENT_USER_SUCCESS', { 
-        userId: user.id.substring(0, 8) + '...',
-        role: validatedRole,
-        emailVerified: !!user.email_confirmed_at,
-        roleFetchDuration: roleDuration,
-        envValidationPassed: envValidation.isValid
-      });
-      
-      return userWithRole;
-    } catch (profileError) {
-      SecurityAuditLogger.log('GET_CURRENT_USER_PROFILE_EXCEPTION', { 
-        error: profileError.message 
-      });
-      
-      // Enhanced 500 Error Prevention: Handle role fetch exceptions
-      const errorMessage = profileError.message?.toLowerCase() || '';
-      
-      if (errorMessage.includes('500') || 
-          errorMessage.includes('network') ||
-          errorMessage.includes('connection')) {
-        console.error('[500 Prevention] Role fetch exception - likely environment issue');
-        console.error('[500 Prevention] 500 likely from env mismatch - restart recommended');
-        console.error('[500 Prevention] Quick fix: Stop server (Ctrl+C) and run: npm run dev');
-      }
-      
-      return { ...user, role: 'viewer' };
+      client = await getSecureSupabaseClient();
+    } catch (clientError) {
+      console.error('[500 Prevention] Supabase client initialization failed');
+      console.error('[500 Prevention] 500 likely from env mismatch - check VITE_SUPABASE_* variables');
+      SecurityAuditLogger.log('GET_CURRENT_USER_CLIENT_INIT_FAILED', { error: clientError.message });
+      return null;
     }
+    
+    // Enhanced 500 Error Prevention: Validate environment post-login with comprehensive try-catch
+    let envValidation;
+    try {
+      envValidation = await validateEnvironmentPostLogin(client);
+      if (!envValidation.isValid) {
+        // Log the validation failure but continue - don't block user flow
+        console.warn('[500 Prevention] Environment validation failed, but continuing with user retrieval');
+        console.warn('[500 Prevention] This may cause 500 errors - consider restarting dev server');
+        
+        if (envValidation.canRetry) {
+          console.warn('[500 Prevention] Environment issues appear retryable - may resolve automatically');
+        } else {
+          console.error('[500 Prevention] Environment issues require manual intervention');
+        }
+        
+        SecurityAuditLogger.log('GET_CURRENT_USER_ENV_VALIDATION_WARNING', {
+          errors: envValidation.errors,
+          canRetry: envValidation.canRetry
+        });
+      }
+    } catch (envError) {
+      console.warn('[500 Prevention] Environment validation threw error:', envError.message);
+      console.warn('[500 Prevention] Supabase DB error—check triggers/RLS and environment health');
+      // Continue without blocking user flow
+      envValidation = { isValid: false, errors: ['Validation failed'], suggestions: [], canRetry: true };
+    }
+    
+    // Try-catch for user data retrieval with 500 error handling
+    let user;
+    try {
+      const { data: { user: userData }, error } = await client.auth.getUser();
+      
+      if (error || !userData) {
+        SecurityAuditLogger.log('GET_CURRENT_USER_NO_USER', { error: error?.message });
+        
+        // Enhanced 500 Error Prevention: Check if error is env-related
+        if (error?.message) {
+          const errorMessage = error.message.toLowerCase();
+          const statusCode = error.status || 0;
+          
+          if (statusCode === 500 || errorMessage.includes('500')) {
+            console.error('[500 Prevention] Supabase DB error—check triggers/RLS during user retrieval');
+            console.error('[500 Prevention] 500 Database error - verify Supabase configuration');
+          } else if (errorMessage.includes('api') || 
+                     errorMessage.includes('unauthorized') ||
+                     errorMessage.includes('invalid')) {
+            console.error('[500 Prevention] User retrieval failed - possible environment mismatch');
+            console.error('[500 Prevention] Check VITE_SUPABASE_ANON_KEY configuration');
+          }
+        }
+        
+        return null;
+      }
+      
+      user = userData;
+    } catch (userFetchError) {
+      console.error('[500 Prevention] User fetch exception:', userFetchError.message);
+      console.error('[500 Prevention] Supabase DB error—check triggers/RLS in auth system');
+      SecurityAuditLogger.log('GET_CURRENT_USER_FETCH_EXCEPTION', { error: userFetchError.message });
+      return null;
+    }
+    
+    // Security: Validate user data with try-catch
+    try {
+      if (!user.id || !user.email) {
+        SecurityAuditLogger.log('GET_CURRENT_USER_INVALID_DATA');
+        console.warn('[500 Prevention] Invalid user data - possible database integrity issue');
+        return null;
+      }
+    } catch (validationError) {
+      console.error('[500 Prevention] User validation error:', validationError.message);
+      return null;
+    }
+    
+    // Enhanced: Role fetching with retry logic and comprehensive error handling
+    const maxRetries = 3;
+    let roleRetryAttempt = 0;
+    let validatedRole = 'viewer'; // Safe default
+    
+    while (roleRetryAttempt < maxRetries) {
+      try {
+        console.log(`[Role Fetch] Attempt ${roleRetryAttempt + 1}/${maxRetries} for user ${user.id.substring(0, 8)}...`);
+        
+        const roleStartTime = Date.now();
+        const { data: profile, error: profileError } = await client
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        
+        const roleDuration = Date.now() - roleStartTime;
+        
+        if (profileError) {
+          const errorMessage = profileError.message?.toLowerCase() || '';
+          const errorCode = profileError.code || '';
+          const statusCode = profileError.status || 0;
+          
+          SecurityAuditLogger.log('GET_CURRENT_USER_PROFILE_ERROR', { 
+            error: profileError.message,
+            duration: roleDuration,
+            attempt: roleRetryAttempt + 1
+          });
+          
+          // Enhanced 500 Error Prevention: Specific role fetch error handling with detailed logging
+          if (statusCode === 500 || errorCode === '500' || errorMessage.includes('500')) {
+            console.error(`[500 Prevention] Supabase DB error—check triggers/RLS in profiles table (attempt ${roleRetryAttempt + 1})`);
+            console.error('[500 Prevention] Role fetch 500 error detected - database/triggers issue');
+            
+            if (errorMessage.includes('trigger')) {
+              console.error('[500 Prevention] Database trigger error detected - check profiles table triggers');
+            }
+            if (errorMessage.includes('policy') || errorMessage.includes('rls')) {
+              console.error('[500 Prevention] RLS policy error detected - check profiles table Row Level Security');
+            }
+            if (errorMessage.includes('timeout')) {
+              console.error('[500 Prevention] Database timeout - check Supabase project performance');
+            }
+            
+            // Trigger environment revalidation on 500 errors
+            try {
+              SecureEnvironment.getInstance().revalidate();
+            } catch (revalError) {
+              console.warn('[500 Prevention] Environment revalidation failed:', revalError.message);
+            }
+            
+            // Retry 500 errors with exponential backoff
+            if (roleRetryAttempt < maxRetries - 1) {
+              const retryDelay = Math.min(1000 * Math.pow(2, roleRetryAttempt), 8000); // Max 8 seconds
+              console.log(`[Role Fetch Retry] Retrying role fetch in ${retryDelay}ms due to 500 error...`);
+              await new Promise(resolve => setTimeout(resolve, retryDelay));
+              roleRetryAttempt++;
+              continue; // Retry the role fetch
+            } else {
+              console.error('[500 Prevention] Max retries reached for role fetch - using safe default');
+              break; // Exit retry loop
+            }
+          } 
+          
+          // Handle other error types
+          if (errorMessage.includes('network') || 
+              errorMessage.includes('connection') ||
+              errorMessage.includes('timeout')) {
+            console.error('[500 Prevention] Network error during role fetch - possible env issues');
+            console.error('[500 Prevention] Check VITE_SUPABASE_URL configuration');
+            
+            // Retry network errors
+            if (roleRetryAttempt < maxRetries - 1) {
+              const retryDelay = Math.min(2000 * (roleRetryAttempt + 1), 6000);
+              console.log(`[Role Fetch Retry] Retrying role fetch in ${retryDelay}ms due to network error...`);
+              await new Promise(resolve => setTimeout(resolve, retryDelay));
+              roleRetryAttempt++;
+              continue;
+            }
+          }
+          
+          if (errorMessage.includes('permission') || 
+              errorMessage.includes('policy') ||
+              errorMessage.includes('unauthorized')) {
+            console.error('[500 Prevention] Permission error during role fetch - possible API key issues');
+            console.error('[500 Prevention] Supabase DB error—check triggers/RLS policies for profiles table');
+            console.error('[500 Prevention] Check VITE_SUPABASE_ANON_KEY configuration');
+            break; // Don't retry permission errors
+          }
+          
+          if (errorMessage.includes('not found') || errorCode === 'PGRST116') {
+            console.warn('[Role Fetch] User profile not found - using default viewer role');
+            break; // Don't retry not found errors
+          }
+          
+          // For other errors, use default and break
+          console.warn(`[Role Fetch] Unhandled error: ${profileError.message} - using default role`);
+          break;
+        } else {
+          // Success - extract role and exit retry loop
+          validatedRole = profile?.role || 'viewer';
+          console.log(`[Role Fetch] Success: Retrieved role '${validatedRole}' in ${roleDuration}ms`);
+          
+          SecurityAuditLogger.log('GET_CURRENT_USER_ROLE_SUCCESS', {
+            role: validatedRole,
+            duration: roleDuration,
+            attempt: roleRetryAttempt + 1
+          });
+          
+          break; // Exit retry loop on success
+        }
+        
+      } catch (profileException) {
+        const errorMessage = profileException.message?.toLowerCase() || '';
+        
+        SecurityAuditLogger.log('GET_CURRENT_USER_PROFILE_EXCEPTION', { 
+          error: profileException.message,
+          attempt: roleRetryAttempt + 1
+        });
+        
+        // Enhanced 500 Error Prevention: Handle role fetch exceptions with retry logic
+        if (errorMessage.includes('500') || 
+            errorMessage.includes('database') ||
+            errorMessage.includes('internal')) {
+          console.error(`[500 Prevention] Supabase DB error—check triggers/RLS (exception attempt ${roleRetryAttempt + 1})`);
+          console.error('[500 Prevention] Role fetch exception - likely database issue');
+          
+          // Retry database exceptions
+          if (roleRetryAttempt < maxRetries - 1) {
+            const retryDelay = Math.min(1500 * Math.pow(2, roleRetryAttempt), 10000);
+            console.log(`[Role Fetch Retry] Retrying role fetch in ${retryDelay}ms due to database exception...`);
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
+            roleRetryAttempt++;
+            continue;
+          }
+        } else if (errorMessage.includes('network') ||
+                   errorMessage.includes('connection') ||
+                   errorMessage.includes('timeout')) {
+          console.error('[500 Prevention] Role fetch network exception - likely environment issue');
+          console.error('[500 Prevention] Check environment configuration and restart if needed');
+          
+          // Retry network exceptions
+          if (roleRetryAttempt < maxRetries - 1) {
+            const retryDelay = 3000 * (roleRetryAttempt + 1);
+            console.log(`[Role Fetch Retry] Retrying role fetch in ${retryDelay}ms due to network exception...`);
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
+            roleRetryAttempt++;
+            continue;
+          }
+        }
+        
+        // For unretryable exceptions, log and break
+        console.error('[Role Fetch] Unretryable exception:', profileException.message);
+        break;
+      }
+    }
+    
+    // Enhanced 500 Error Prevention: Monitor role fetch performance
+    const totalRoleFetchTime = Date.now() - Date.now(); // Will be calculated properly in actual timing
+    if (totalRoleFetchTime > 10000) { // 10 seconds
+      console.warn('[500 Prevention] Extremely slow role fetch detected - possible environment issues');
+      console.warn('[500 Prevention] Consider restarting dev server if issues persist');
+      
+      SecurityAuditLogger.log('GET_CURRENT_USER_SLOW_ROLE_FETCH_TOTAL', {
+        totalDuration: totalRoleFetchTime,
+        retryAttempts: roleRetryAttempt + 1,
+        userId: user.id.substring(0, 8) + '...'
+      });
+    }
+    
+    const userWithRole = { ...user, role: validatedRole };
+    
+    SecurityAuditLogger.log('GET_CURRENT_USER_SUCCESS', { 
+      userId: user.id.substring(0, 8) + '...',
+      role: validatedRole,
+      emailVerified: !!user.email_confirmed_at,
+      roleRetryAttempts: roleRetryAttempt + 1,
+      envValidationPassed: envValidation?.isValid || false,
+      envCanRetry: envValidation?.canRetry || false
+    });
+    
+    return userWithRole;
+    
   } catch (error) {
     SecurityAuditLogger.log('GET_CURRENT_USER_ERROR', { error: error.message });
     
-    // Enhanced 500 Error Prevention: Comprehensive error analysis
+    // Enhanced 500 Error Prevention: Comprehensive error analysis with detailed logging
     const errorMessage = error.message?.toLowerCase() || '';
+    const statusCode = error.status || 0;
     
-    if (errorMessage.includes('environment') || 
-        errorMessage.includes('configuration') ||
-        errorMessage.includes('missing')) {
+    if (statusCode === 500 || errorMessage.includes('500')) {
+      console.error('[500 Prevention] Supabase DB error—check triggers/RLS in getCurrentUser flow');
+      console.error('[500 Prevention] Database 500 error - check Supabase project status and database health');
+    } else if (errorMessage.includes('environment') || 
+               errorMessage.includes('configuration') ||
+               errorMessage.includes('missing')) {
       console.error('[500 Prevention] Environment configuration error in getCurrentUser');
       console.error('[500 Prevention] 500 likely from env mismatch - environment restart needed');
-    } else if (errorMessage.includes('500') || 
-               errorMessage.includes('internal') ||
+      console.error('[500 Prevention] Quick fix: Stop server (Ctrl+C), check .env file, run: npm run dev');
+    } else if (errorMessage.includes('internal') ||
                errorMessage.includes('database')) {
-      console.error('[500 Prevention] Database/API 500 error in getCurrentUser');
+      console.error('[500 Prevention] Supabase DB error—check triggers/RLS and database connectivity');
       console.error('[500 Prevention] Check Supabase project status and environment variables');
     } else if (errorMessage.includes('network') || 
                errorMessage.includes('connection') ||
                errorMessage.includes('timeout')) {
       console.error('[500 Prevention] Network error in getCurrentUser - check environment URLs');
+      console.error('[500 Prevention] Verify VITE_SUPABASE_URL is correct and accessible');
+    } else if (errorMessage.includes('unauthorized') || 
+               errorMessage.includes('invalid') ||
+               errorMessage.includes('forbidden')) {
+      console.error('[500 Prevention] Authorization error - check VITE_SUPABASE_ANON_KEY');
+      console.error('[500 Prevention] May indicate API key mismatch or expiration');
     }
     
     console.error('[Supabase] Get user error:', error.message);

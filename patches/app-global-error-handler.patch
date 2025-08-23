@@ -1,0 +1,297 @@
+/**
+ * App.tsx Global Supabase Error Handler Integration Patch
+ * 
+ * This patch integrates the global Supabase error handler into App.tsx
+ * to catch and log persistent 500 errors with detailed debugging information.
+ * 
+ * Apply this patch to: src/App.tsx
+ * 
+ * Key enhancements:
+ * - Wrap auth state change profiles query with global error handler
+ * - Extract and log error.details for 500 errors (e.g., 'UUID syntax error—check RLS')
+ * - Prevent redirects on errors with graceful fallback
+ * - Add comprehensive error analysis for production debugging
+ */
+
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -47,6 +47,10 @@ import {
+ } from './components/dashboards';
+ import AdminDashboardPage from './pages/AdminDashboardPage';
+ import AVPFullDashboard from './components/dashboards/AVPDashboard';
++
++// Enhanced: Import global Supabase error handler for comprehensive 500 error logging
++import { withSupabaseErrorHandling, globalSupabaseErrorHandler } from './lib/globalSupabaseErrorHandler';
++
+ import { GroupAdminDashboard } from './components/admin/GroupAdminDashboard';
+ import { supabase } from './lib/supabaseClient';
+ import { Loader2 } from 'lucide-react';
+@@ -920,104 +924,50 @@ function App() {
+           console.warn('[DEBUG AUTH] Auth state changed:', event);
+ 
+           if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
+             console.warn(`[DEBUG AUTH] User authenticated: ${session.user.email}`);
+ 
+-            try {
+-              // Enhanced error handling for profiles query
+-              console.log('[DEBUG AUTH] Starting profiles query for user:', session.user.id);
++            // Enhanced: Use global error handler for profiles query to catch persistent 500 errors
++            await withSupabaseErrorHandling(
++              async () => {
++                console.log('[DEBUG AUTH] Starting profiles query with global error handling:', session.user.id);
+               
+-              // Check cache first to prevent redundant queries
+-              const cacheKey = `profile_${session.user.id}`;
+-              const cachedProfile = localStorage.getItem(cacheKey);
+-              const now = Date.now();
++                // Check cache first to prevent redundant queries
++                const cacheKey = `profile_${session.user.id}`;
++                const cachedProfile = localStorage.getItem(cacheKey);
++                const now = Date.now();
+               
+-              if (cachedProfile) {
+-                try {
+-                  const { data: cachedData, timestamp } = JSON.parse(cachedProfile);
+-                  const isExpired = now - timestamp > 5 * 60 * 1000; // 5 minutes
++                if (cachedProfile) {
++                  try {
++                    const { data: cachedData, timestamp } = JSON.parse(cachedProfile);
++                    const isExpired = now - timestamp > 5 * 60 * 1000; // 5 minutes
+                   
+-                  if (!isExpired && cachedData) {
+-                    console.warn('[DEBUG AUTH] Using cached profile data:', cachedData);
++                    if (!isExpired && cachedData) {
++                      console.warn('[DEBUG AUTH] Using cached profile data:', cachedData);
+                     
+-                    if (cachedData.is_group_admin) {
+-                      console.warn('[DEBUG AUTH] User is a group admin (cached), should be redirected to /group-admin');
+-                    } else {
+-                      console.warn('[DEBUG AUTH] User is NOT a group admin (cached)');
+-                    }
++                      if (cachedData.is_group_admin) {
++                        console.warn('[DEBUG AUTH] User is a group admin (cached), should be redirected to /group-admin');
++                      } else {
++                        console.warn('[DEBUG AUTH] User is NOT a group admin (cached)');
++                      }
+                     
+-                    return; // Skip database query if we have fresh cached data
++                      return cachedData; // Skip database query if we have fresh cached data
++                    }
++                  } catch (cacheError) {
++                    console.warn('[DEBUG AUTH] Cache parse error, proceeding with database query:', cacheError);
+                   }
+-                } catch (cacheError) {
+-                  console.warn('[DEBUG AUTH] Cache parse error, proceeding with database query:', cacheError);
+                 }
+-              }
+ 
+-              // Enhanced profiles query with retry logic and comprehensive error handling
+-              let profileData = null;
+-              let profileError = null;
+-              let retryCount = 0;
+-              const maxRetries = 3;
+-
+-              while (retryCount < maxRetries && !profileData) {
+-                try {
+-                  console.log(`[DEBUG AUTH] Profiles query attempt ${retryCount + 1}/${maxRetries}`);
++                // Enhanced: Execute profiles query (global error handler will manage retries)
++                console.log('[DEBUG AUTH] Executing profiles query with global error handling');
+                   
+-                  const { data, error } = await supabaseClient
+-                    .from('profiles')
+-                    .select('is_group_admin, role')
+-                    .eq('id', session.user.id)
+-                    .maybeSingle();
+-
+-                  if (error) {
+-                    profileError = error;
+-                    console.error(`[DEBUG AUTH] Profiles query error (attempt ${retryCount + 1}):`, error);
+-                    
+-                    // Check for specific 500 error patterns
+-                    if (error.code === 'PGRST301' || error.message?.includes('500') || error.message?.includes('Internal Server Error')) {
+-                      console.error('[PROFILES 500 ERROR] Database server error detected:', {
+-                        code: error.code,
+-                        message: error.message,
+-                        details: error.details,
+-                        hint: error.hint,
+-                        userId: session.user.id,
+-                        userEmail: session.user.email,
+-                        attempt: retryCount + 1
+-                      });
++                const { data, error } = await supabaseClient
++                  .from('profiles')
++                  .select('is_group_admin, role')
++                  .eq('id', session.user.id)
++                  .maybeSingle();
++
++                if (error) {
++                  // Enhanced: Let global error handler manage this error (it will extract error.details)
++                  throw error;
++                }
++
++                if (data) {
++                  console.warn('[DEBUG AUTH] Profile query successful via global handler:', data);
+                       
+-                      // If this is a 500 error, wait before retry
+-                      if (retryCount < maxRetries - 1) {
+-                        const backoffMs = Math.pow(2, retryCount) * 1000; // Exponential backoff: 1s, 2s, 4s
+-                        console.log(`[DEBUG AUTH] Waiting ${backoffMs}ms before retry...`);
+-                        await new Promise(resolve => setTimeout(resolve, backoffMs));
+-                      }
+-                    } else {
+-                      // For non-500 errors, break immediately
+-                      console.error('[DEBUG AUTH] Non-retryable error:', error);
+-                      break;
+-                    }
+-                  } else if (data) {
+-                    profileData = data;
+-                    console.warn('[DEBUG AUTH] Profile query successful:', data);
+-                    
+-                    // Cache successful result for 5 minutes
+-                    try {
+-                      localStorage.setItem(cacheKey, JSON.stringify({
+-                        data: profileData,
+-                        timestamp: now
+-                      }));
+-                      console.log('[DEBUG AUTH] Profile data cached successfully');
+-                    } catch (cacheError) {
+-                      console.warn('[DEBUG AUTH] Failed to cache profile data:', cacheError);
+-                    }
+-                    
+-                    break;
+-                  } else {
+-                    console.warn('[DEBUG AUTH] Profile query returned no data');
+-                    break;
+-                  }
+-                } catch (queryError) {
+-                  profileError = queryError;
+-                  console.error(`[DEBUG AUTH] Query exception (attempt ${retryCount + 1}):`, queryError);
+-                  
+-                  if (retryCount < maxRetries - 1) {
+-                    const backoffMs = Math.pow(2, retryCount) * 1000;
+-                    console.log(`[DEBUG AUTH] Waiting ${backoffMs}ms before retry after exception...`);
+-                    await new Promise(resolve => setTimeout(resolve, backoffMs));
++                  // Cache successful result for 5 minutes
++                  try {
++                    localStorage.setItem(cacheKey, JSON.stringify({
++                      data,
++                      timestamp: now
++                    }));
++                    console.log('[DEBUG AUTH] Profile data cached successfully via global handler');
++                  } catch (cacheError) {
++                    console.warn('[DEBUG AUTH] Failed to cache profile data:', cacheError);
+                   }
++                    
++                  return data;
++                } else {
++                  console.warn('[DEBUG AUTH] Profile query returned no data via global handler');
++                  return null;
+                 }
+-                
+-                retryCount++;
+-              }
++              },
++              {
++                operation: 'auth_profiles_query',
++                table: 'profiles', 
++                userId: session.user.id,
++                userEmail: session.user.email
++              },
++              {
++                preventRedirect: true, // Enhanced: Prevent redirects on error
++                fallbackValue: null,   // Enhanced: Safe fallback value
++                maxRetries: 3,         // Enhanced: Retry 500 errors up to 3 times
++                retryDelay: 1000       // Enhanced: 1 second base delay with exponential backoff
++              }
++            ).then(profileData => {
++              // Enhanced: Process successful profile data or handle null fallback
++              if (profileData) {
++                console.warn('[DEBUG AUTH] User profile data from global handler:', profileData);
++                console.warn(
++                  `[DEBUG AUTH] is_group_admin: ${profileData.is_group_admin}, role: ${profileData.role}`
++                );
+ 
+-              // Process the results
+-              if (profileData) {
+-                console.warn('[DEBUG AUTH] User profile data:', profileData);
+-                console.warn(
+-                  `[DEBUG AUTH] is_group_admin: ${profileData.is_group_admin}, role: ${profileData.role}`
+-                );
+-
+-                if (profileData.is_group_admin) {
+-                  console.warn(
+-                    '[DEBUG AUTH] User is a group admin, should be redirected to /group-admin'
+-                  );
++                if (profileData.is_group_admin) {
++                  console.warn(
++                    '[DEBUG AUTH] User is a group admin, should be redirected to /group-admin'
++                  );
++                } else {
++                  console.warn('[DEBUG AUTH] User is NOT a group admin');
++                }
++              } else {
++                // Enhanced: Handle null fallback gracefully (global handler prevented crash)
++                console.warn('[DEBUG AUTH] No profile data available - using global handler fallback');
++                
++                // Try to use any previously cached data as emergency fallback
++                try {
++                  const emergencyCache = localStorage.getItem(`profile_${session.user.id}`);
++                  if (emergencyCache) {
++                    const { data: emergencyData } = JSON.parse(emergencyCache);
++                    if (emergencyData) {
++                      console.warn('[DEBUG AUTH] Using emergency cached profile data from global handler:', emergencyData);
++                      
++                      if (emergencyData.is_group_admin) {
++                        console.warn('[DEBUG AUTH] User is a group admin (emergency cache)');
++                      } else {
++                        console.warn('[DEBUG AUTH] User is NOT a group admin (emergency cache)');
++                      }
++                    }
++                  }
++                } catch (emergencyError) {
++                  console.error('[DEBUG AUTH] Emergency cache access failed:', emergencyError);
++                }
++              }
++            }).catch(enhancedError => {
++              // Enhanced: Handle final error from global handler (this includes comprehensive error analysis)
++              console.error('[DEBUG AUTH] Global error handler reported final failure:', enhancedError);
++              
++              if (enhancedError.type === 'uuid_syntax_error' || enhancedError.type === 'malformed_uuid') {
++                console.error('🆔 [UUID ERROR] Global handler detected UUID syntax issue:', enhancedError.suggestedFix);
++              }
++              
++              if (enhancedError.type === 'rls_policy_violation') {
++                console.error('🔒 [RLS ERROR] Global handler detected RLS policy issue:', enhancedError.suggestedFix);
++              }
++              
++              if (enhancedError.statusCode === 500) {
++                console.error('💥 [500 ERROR] Global handler extracted details:', enhancedError.supabaseDetails || 'No details available');
++              }
++              
++              // Log comprehensive error details for production debugging
++              logAppEvent('[GLOBAL ERROR HANDLER] Auth profile query failed', {
++                errorType: enhancedError.type,
++                userId: session.user.id,
++                userEmail: session.user.email,
++                statusCode: enhancedError.statusCode,
++                supabaseDetails: enhancedError.supabaseDetails,
++                suggestedFix: enhancedError.suggestedFix,
++                operationDuration: enhancedError.operationDuration
++              });
++            });
++          }
++        });
++
++        // Enhanced: Add global error handler initialization logging
++        console.log('[APP_INIT] Global Supabase error handler integrated for 500 error tracking');
++        
++        // Enhanced: Log current error statistics if in development
++        if (import.meta.env.DEV) {
++          const errorStats = globalSupabaseErrorHandler.getErrorStats();
++          if (errorStats.totalErrors > 0) {
++            console.warn('[DEBUG] Previous Supabase errors detected:', errorStats);
++          }
++        }
++        
++        // Store the subscription for cleanup
++        subscription = authSubscription;

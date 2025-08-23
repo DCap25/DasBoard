@@ -1,0 +1,298 @@
+/**
+ * supabaseClient.ts Global Error Handler Integration Patch
+ * 
+ * This patch integrates the global Supabase error handler into supabaseClient.ts
+ * to provide comprehensive error logging for all Supabase operations.
+ * 
+ * Apply this patch to: src/lib/supabaseClient.ts
+ * 
+ * Key enhancements:
+ * - Wrap all Supabase client methods with global error handling
+ * - Add comprehensive 500 error logging with error.details extraction
+ * - Enhance getCurrentUser function with detailed error analysis
+ * - Add global try-catch for database connection errors
+ * - Prevent redirects on authentication errors
+ */
+
+--- a/src/lib/supabaseClient.ts
++++ b/src/lib/supabaseClient.ts
+@@ -30,6 +30,9 @@
+ 
+ import { createClient, SupabaseClient, AuthError } from '@supabase/supabase-js';
+ import { Database } from './database.types';
++
++// Enhanced: Import global error handler for comprehensive error logging
++import { withSupabaseErrorHandling, globalSupabaseErrorHandler, SupabaseErrorType } from './globalSupabaseErrorHandler';
+ 
+ // =================== RUNTIME ENVIRONMENT VALIDATION ===================
+ 
+@@ -800,12 +803,22 @@ export async function getCurrentUser(): Promise<User | null> {
+   const client = await getSecureSupabaseClient();
+   
+   try {
+-    console.log('[getCurrentUser] Getting current user');
+-    const { data: { user }, error } = await client.auth.getUser();
++    console.log('[getCurrentUser] Getting current user with global error handling');
++    
++    // Enhanced: Use global error handler for getCurrentUser operation
++    const result = await withSupabaseErrorHandling(
++      async () => {
++        const { data: { user }, error } = await client.auth.getUser();
++        
++        if (error) {
++          // Let global error handler analyze and log this error
++          throw error;
++        }
++        
++        return user;
++      },
++      {
++        operation: 'get_current_user',
++        table: 'auth.users'
++      },
++      {
++        preventRedirect: true, // Don't redirect on auth errors
++        fallbackValue: null,   // Return null if user fetch fails
++        maxRetries: 2,         // Retry auth calls up to 2 times
++        retryDelay: 500        // Shorter delay for auth operations
++      }
++    );
+ 
+-    if (error) {
+-      console.error('[getCurrentUser] Error getting current user:', error);
+-      throw error;
+-    }
++    console.log('[getCurrentUser] Global error handler completed:', !!result);
++    return result;
+ 
+-    console.log('[getCurrentUser] Current user:', user ? user.email : 'none');
+-    return user;
+   } catch (error: any) {
+-    console.error('[getCurrentUser] Failed to get current user:', error);
++    // Enhanced: Comprehensive error logging for auth failures
++    console.error('[getCurrentUser] Global error handler reported failure:', error);
++    
++    // Log specific error types for debugging
++    if (error?.type === SupabaseErrorType.AUTH_TOKEN_EXPIRED) {
++      console.error('🕐 [AUTH ERROR] Token expired - session needs refresh');
++    } else if (error?.type === SupabaseErrorType.AUTH_INVALID_JWT) {
++      console.error('🔐 [AUTH ERROR] Invalid JWT token format or signature');
++    } else if (error?.type === SupabaseErrorType.INTERNAL_SERVER_ERROR) {
++      console.error('💥 [AUTH 500 ERROR] Server error during user authentication');
++      if (error?.supabaseDetails) {
++        console.error('🔍 [AUTH 500 DETAILS]', error.supabaseDetails);
++      }
++    }
++    
+     return null;
+   }
+ }
+@@ -850,23 +863,45 @@ export async function getUserDealershipId(userId: string): Promise<number | nul
+   
+   try {
+     console.log('[getUserDealershipId] Getting dealership ID for user:', userId);
+-    const { data, error } = await client
+-      .from('profiles')
+-      .select('dealership_id')
+-      .eq('id', userId)
+-      .single();
+ 
+-    if (error) {
+-      console.error('[getUserDealershipId] Error getting dealership ID:', error);
+-      throw error;
+-    }
++    // Enhanced: Use global error handler for dealership ID fetch
++    const result = await withSupabaseErrorHandling(
++      async () => {
++        const { data, error } = await client
++          .from('profiles')
++          .select('dealership_id')
++          .eq('id', userId)
++          .single();
++
++        if (error) {
++          // Enhanced: Let global error handler analyze profiles table errors
++          throw error;
++        }
++
++        return data?.dealership_id || null;
++      },
++      {
++        operation: 'get_user_dealership_id',
++        table: 'profiles',
++        userId: userId
++      },
++      {
++        preventRedirect: true,
++        fallbackValue: null, // Return null dealership ID on error
++        maxRetries: 3,
++        retryDelay: 1000
++      }
++    );
+ 
+-    console.log('[getUserDealershipId] Dealership ID:', data?.dealership_id || 'none');
+-    return data?.dealership_id || null;
++    console.log('[getUserDealershipId] Global error handler result:', result);
++    return result;
++    
+   } catch (error: any) {
+-    console.error('[getUserDealershipId] Failed to get dealership ID:', error);
++    // Enhanced: Detailed error logging for dealership ID failures
++    console.error('[getUserDealershipId] Global error handler reported failure:', error);
++    
++    if (error?.statusCode === 500 && error?.supabaseDetails) {
++      console.error('💥 [DEALERSHIP 500 ERROR] Details:', error.supabaseDetails);
++    }
++    
+     return null;
+   }
+ }
+@@ -880,6 +915,36 @@ export async function testSupabaseConnection(): Promise<boolean> {
+   console.log('[testSupabaseConnection] Testing Supabase connection');
+   
+   try {
++    // Enhanced: Use global error handler for connection testing
++    const isConnected = await withSupabaseErrorHandling(
++      async () => {
++        // Test basic connectivity with a simple query
++        const { error } = await client.from('profiles').select('id').limit(1);
++        
++        if (error) {
++          console.error('[testSupabaseConnection] Connection test failed:', error);
++          throw error;
++        }
++        
++        return true;
++      },
++      {
++        operation: 'test_supabase_connection',
++        table: 'profiles'
++      },
++      {
++        preventRedirect: true,
++        fallbackValue: false, // Return false if connection test fails
++        maxRetries: 1,        // Only try once for connection testing
++        retryDelay: 1000
++      }
++    );
++
++    console.log('[testSupabaseConnection] Global error handler result:', isConnected);
++    return isConnected;
++    
++  } catch (error: any) {
++    // Enhanced: Log connection test failures with global error handler details
++    console.error('[testSupabaseConnection] Global error handler reported connection failure:', error);
+     
+     // Test basic connectivity with a simple query
+     const { error } = await client.from('profiles').select('id').limit(1);
+@@ -890,7 +955,15 @@ export async function testSupabaseConnection(): Promise<boolean> {
+       return false;
+     }
+     
+-    console.log('[testSupabaseConnection] Connection test successful');
++    // Enhanced: Log specific connection error types
++    if (error?.type === SupabaseErrorType.INTERNAL_SERVER_ERROR) {
++      console.error('💥 [CONNECTION 500 ERROR] Server error during connection test');
++    } else if (error?.type === SupabaseErrorType.NETWORK_TIMEOUT) {
++      console.error('⏱️ [CONNECTION TIMEOUT] Network timeout during connection test');
++    } else if (error?.type === SupabaseErrorType.CONNECTION_REFUSED) {
++      console.error('🚫 [CONNECTION REFUSED] Server refused connection');
++    }
++    
+     return true;
+   } catch (error: any) {
+     console.error('[testSupabaseConnection] Connection test failed:', error);
+@@ -900,6 +973,47 @@ export async function testSupabaseConnection(): Promise<boolean> {
+ 
+ // =================== ENHANCED CLIENT CREATION ===================
+ 
++/**
++ * Enhanced: Global error handler wrapper for Supabase client
++ * This creates a proxy that wraps all client methods with error handling
++ */
++function createErrorHandledSupabaseClient(client: SupabaseClient<Database>): SupabaseClient<Database> {
++  // Create a proxy that wraps all methods with global error handling
++  return new Proxy(client, {
++    get(target, prop, receiver) {
++      const originalValue = Reflect.get(target, prop, receiver);
++      
++      // Wrap database query methods with error handling
++      if (prop === 'from') {
++        return (tableName: string) => {
++          const table = originalValue.call(target, tableName);
++          
++          // Wrap table methods with error handling
++          return new Proxy(table, {
++            get(tableTarget, tableProp) {
++              const tableMethod = Reflect.get(tableTarget, tableProp);
++              
++              // Wrap async query methods
++              if (typeof tableMethod === 'function' && 
++                  ['select', 'insert', 'update', 'delete', 'upsert'].includes(tableProp as string)) {
++                return function(...args: any[]) {
++                  const query = tableMethod.apply(tableTarget, args);
++                  
++                  // Override the query execution to include error handling
++                  const originalThen = query.then;
++                  query.then = function(onfulfilled?: any, onrejected?: any) {
++                    return originalThen.call(this, 
++                      (result: any) => {
++                        // Enhanced: Log successful queries in development
++                        if (import.meta.env.DEV) {
++                          console.log(`✅ [SUPABASE] ${tableName}.${tableProp as string} succeeded`);
++                        }
++                        return onfulfilled ? onfulfilled(result) : result;
++                      },
++                      (error: any) => {
++                        // Enhanced: Let global error handler manage query failures
++                        const enhancedError = globalSupabaseErrorHandler.analyzeSupabaseError(error, {
++                          operation: `${tableName}.${tableProp as string}`,
++                          table: tableName
++                        });
++                        
++                        console.error(`❌ [SUPABASE] ${tableName}.${tableProp as string} failed:`, enhancedError);
++                        
++                        return onrejected ? onrejected(enhancedError) : Promise.reject(enhancedError);
++                      }
++                    );
++                  };
++                  
++                  return query;
++                };
++              }
++              
++              return tableMethod;
++            }
++          });
++        };
++      }
++      
++      return originalValue;
++    }
++  });
++}
++
+ /**
+  * Enhanced secure Supabase client creation with comprehensive security features
+  */
+@@ -950,7 +1064,12 @@ async function createSecureSupabaseClient(): Promise<SupabaseClient<Database>>
+     },
+   });
+ 
+-  console.log('[createSecureSupabaseClient] Secure client created successfully');
++  // Enhanced: Wrap client with global error handling
++  const errorHandledClient = createErrorHandledSupabaseClient(client);
++  
++  console.log('[createSecureSupabaseClient] Secure client with global error handling created successfully');
++  
++  // Enhanced: Initialize global error handler statistics
++  const errorStats = globalSupabaseErrorHandler.getErrorStats();
++  if (import.meta.env.DEV && errorStats.totalErrors > 0) {
++    console.warn('[createSecureSupabaseClient] Previous errors detected:', errorStats);
++  }
+   
+-  return client;
++  return errorHandledClient;
+ }
+ 
+ // =================== SINGLETON CLIENT MANAGEMENT ===================
